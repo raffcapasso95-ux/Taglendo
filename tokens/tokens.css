@@ -53,3 +53,62 @@
   --nav-rail-width: 76px;
   --tap-min: 44px;
 }
+
+/* Fase 0 — valori dei componenti presi dai design (fonte tra parentesi).
+   Servono perché i componenti non usino mai valori sparsi. */
+:root {
+  /* Colori */
+  --status-error-bg: #F9ECEF;               /* .alert, design-system */
+  --status-error-border: #E0B8C0;           /* .alert, design-system */
+  --toggle-off: #E6D9DC;                    /* switch cookie, Sito Barberia Saragozza */
+  --toggle-on: #21624E;                     /* switch cookie, Sito Barberia Saragozza */
+  --backdrop-sheet: rgba(33, 19, 27, .45);  /* fondo sotto il foglio, Taglendo App */
+  --shadow-sheet: 0 -10px 40px rgba(62, 37, 50, .14);   /* foglio, Taglendo App */
+  --shadow-modal: 0 30px 80px rgba(33, 19, 27, .35);    /* finestre B6-D, B7-D */
+  --shadow-toast: 0 12px 32px rgba(62, 37, 50, .3);     /* toast, Taglendo App */
+  --shadow-knob: 0 1px 3px rgba(0, 0, 0, .2);           /* pallino dello switch */
+
+  /* Angoli */
+  --radius-small-button: 9px;     /* .btn-small */
+  --radius-icon-button: 10px;     /* .icon-btn */
+  --radius-segmented: 11px;       /* .segmented */
+  --radius-checkbox: 6px;         /* casella privacy */
+  --radius-toast: 14px;           /* toast, Taglendo App */
+  --radius-sheet: 28px;           /* foglio, Taglendo App */
+  --radius-pill: 999px;
+
+  /* Misure */
+  --control-height-small: 44px;   /* .btn-small, .icon-btn */
+  --control-height-large: 52px;   /* pulsanti principali di telefono e finestre (B6, B7, App) */
+  --segmented-item-height: 40px;  /* .segmented button */
+  --button-padding: 11px 20px;    /* .btn */
+  --button-padding-small: 10px 14px; /* .btn-small */
+  --field-padding: 11px 14px;     /* .field input */
+  --segmented-item-padding: 9px 13px;
+  --toggle-width: 52px;
+  --toggle-height: 32px;
+  --toggle-knob: 26px;
+  --toggle-padding: 3px;
+  --checkbox-size: 22px;
+  --checkbox-border: 1.5px;
+  --sheet-height: 92%;
+  --sheet-handle-width: 40px;
+  --sheet-handle-height: 5px;
+  --modal-width: 520px;           /* B6-D */
+  --modal-padding: 28px;
+  --card-padding: 28px;           /* .surface */
+  --toast-padding: 12px 16px;
+  --toast-max-width: 360px;
+  --field-gap: 7px;               /* .field */
+  --checkbox-gap: 10px;           /* casella privacy */
+  --row-padding: 12px 14px;       /* righe con switch, Sito Barberia Saragozza */
+  --focus-ring: 3px;
+
+  /* Tempi */
+  --duration-fast: 160ms;         /* .btn */
+  --duration-toast-in: 200ms;
+  --duration-toast-move: 260ms;
+  --duration-backdrop: 280ms;
+  --duration-sheet-open: 380ms;
+  --duration-sheet-close: 240ms;
+}

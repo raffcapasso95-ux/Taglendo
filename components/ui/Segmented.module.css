@@ -1,0 +1,38 @@
+/* Da design/uploads/design-system.html (.segmented): 40 + 2×4 = 48 px. */
+.group {
+  display: inline-flex;
+  align-self: flex-start;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--surface-muted);
+  border-radius: var(--radius-segmented);
+}
+
+.item {
+  min-height: var(--segmented-item-height);
+  padding: var(--segmented-item-padding);
+  border: 0;
+  border-radius: var(--radius-input);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.item[aria-pressed="true"] {
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.full {
+  display: flex;
+  align-self: stretch;
+}
+
+.full .item {
+  flex: 1;
+}

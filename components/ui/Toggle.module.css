@@ -1,0 +1,62 @@
+/* Da design/Sito Barberia Saragozza.dc.html (preferenze cookie, role="switch"). */
+.row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  padding: var(--row-padding);
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.row:disabled {
+  opacity: .42;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.description {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.track {
+  flex: none;
+  display: flex;
+  width: var(--toggle-width);
+  height: var(--toggle-height);
+  padding: var(--toggle-padding);
+  border-radius: var(--radius-pill);
+  background: var(--toggle-off);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.knob {
+  width: var(--toggle-knob);
+  height: var(--toggle-knob);
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-knob);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.row[aria-checked="true"] .track {
+  background: var(--toggle-on);
+}
+
+.row[aria-checked="true"] .knob {
+  transform: translateX(calc(var(--toggle-width) - var(--toggle-knob) - 2 * var(--toggle-padding)));
+}

@@ -1,0 +1,58 @@
+/* Da design/Taglendo App.dc.html: in alto su telefono, in basso a destra su desktop. */
+.region {
+  position: fixed;
+  z-index: 100;
+  top: var(--space-2);
+  left: 14px;
+  right: 14px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  flex-direction: column;
+  max-width: var(--toast-max-width);
+  padding: var(--toast-padding);
+  border-radius: var(--radius-toast);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  box-shadow: var(--shadow-toast);
+  opacity: 0;
+  transform: translateY(calc(-1 * var(--space-3)));
+  transition:
+    opacity var(--duration-toast-in) ease-out,
+    transform var(--duration-toast-move) var(--ease-out);
+}
+
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.message {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.detail {
+  font-size: 13px;
+  color: var(--brand-peach);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 1024px) {
+  .region {
+    inset: auto var(--space-6) var(--space-6) auto;
+    justify-content: flex-end;
+  }
+
+  .toast {
+    transform: translateY(var(--space-3));
+  }
+
+  .visible {
+    transform: translateY(0);
+  }
+}

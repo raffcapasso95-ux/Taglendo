@@ -1,0 +1,68 @@
+/* Da design/Schermate mancanti.dc.html (B6-D "Disdire il piano Salone?", B7-D). */
+.modal {
+  width: calc(100% - 2 * var(--space-4));
+  max-width: var(--modal-width);
+  padding: var(--modal-padding);
+  border: 0;
+  border-radius: var(--radius-panel);
+  background: var(--brand-cream);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-modal);
+  opacity: 0;
+  transform: translateY(var(--space-2)) scale(.98);
+  transition:
+    opacity var(--duration-toast-in) var(--ease-out),
+    transform var(--duration-toast-move) var(--ease-out);
+}
+
+.modal[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal.open {
+  opacity: 1;
+  transform: none;
+}
+
+.modal::backdrop {
+  background: var(--overlay);
+  opacity: 0;
+  transition: opacity var(--duration-toast-in) ease;
+}
+
+.modal.open::backdrop {
+  opacity: 1;
+}
+
+.title {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.15;
+  letter-spacing: -.04em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.body {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.body > :first-child {
+  margin-top: 0;
+}
+
+.body > :last-child {
+  margin-bottom: 0;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

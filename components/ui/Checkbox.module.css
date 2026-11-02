@@ -1,0 +1,57 @@
+/* Da design/Sito Barberia Saragozza.dc.html e Taglendo App.dc.html (casella privacy). */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--checkbox-gap);
+  min-height: var(--tap-min);
+  padding: var(--space-1) 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.row:disabled {
+  opacity: .42;
+}
+
+.box {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border: var(--checkbox-border) solid var(--border-strong);
+  border-radius: var(--radius-checkbox);
+  background: var(--surface);
+  color: var(--brand-cream);
+  font-size: 13px;
+  font-weight: 700;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.row[aria-checked="true"] .box {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+}
+
+.row[aria-invalid="true"] .box {
+  border-color: var(--status-error);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--status-error);
+}
