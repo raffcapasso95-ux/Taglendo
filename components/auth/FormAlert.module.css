@@ -1,0 +1,10 @@
+/* Da design/uploads/design-system.html (.alert). */
+.alert {
+  padding: var(--space-4);
+  border: 1px solid var(--status-error-border);
+  border-radius: var(--radius-button);
+  background: var(--status-error-bg);
+  color: var(--status-error);
+  font-size: 13px;
+  line-height: 1.45;
+}

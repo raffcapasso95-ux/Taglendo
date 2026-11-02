@@ -1,0 +1,240 @@
+/* Da design/Schermate mancanti.dc.html: A1–A5, C7 (telefono) e A1-D…C7-D (desktop). */
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--brand-apricot);
+}
+
+.panel {
+  position: relative;
+  overflow: hidden;
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+}
+
+/* — Telefono — */
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--space-6) var(--auth-hero-padding-bottom);
+  overflow: hidden;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--brand-plum);
+  text-decoration: none;
+}
+
+.icon {
+  width: var(--auth-icon-size);
+  height: var(--auth-icon-size);
+  border-radius: var(--radius-button);
+  box-shadow: var(--shadow-icon);
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 270px;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.08;
+  letter-spacing: -.045em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.heroLead {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--chip-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips li {
+  padding: var(--chip-padding);
+  border-radius: var(--radius-pill);
+  background: var(--brand-cream);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.side {
+  display: none;
+}
+
+.formArea {
+  flex: 1;
+  margin-top: calc(-1 * var(--auth-sheet-overlap));
+  position: relative;
+  display: flex;
+  background: var(--brand-cream);
+  border-radius: var(--radius-panel) var(--radius-panel) 0 0;
+}
+
+.form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-6) calc(var(--auth-sheet-padding-bottom) + env(safe-area-inset-bottom));
+}
+
+.formHead {
+  display: none;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.footer {
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+.footer a {
+  color: var(--text-primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* — Desktop — */
+@media (min-width: 1024px) {
+  .shell {
+    flex-direction: row;
+    background: var(--brand-cream);
+  }
+
+  .panel {
+    flex: none;
+    width: var(--auth-panel-width);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero {
+    display: none;
+  }
+
+  .side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: var(--auth-panel-padding);
+  }
+
+  .logo {
+    width: var(--auth-logo-width);
+    height: auto;
+  }
+
+  .headline {
+    margin: 0;
+    max-width: 400px;
+    font-size: var(--auth-headline-size);
+    line-height: 1.1;
+    letter-spacing: -.045em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .shot {
+    position: absolute;
+    left: 56px;
+    bottom: -60px;
+    width: 760px;
+    max-width: none;
+    height: auto;
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-shot);
+    transform: rotate(-3deg);
+    transform-origin: left bottom;
+  }
+
+  .formArea {
+    margin-top: 0;
+    border-radius: 0;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-12) var(--space-8);
+  }
+
+  .form {
+    flex: none;
+    width: 100%;
+    max-width: var(--auth-form-max-width);
+    padding: 0;
+  }
+
+  .formHead {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: flex-start;
+  }
+
+  .formTitle {
+    margin: 0;
+    font-size: var(--auth-headline-size);
+    line-height: 1.15;
+    letter-spacing: -.04em;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  .formLead {
+    margin: 0 0 var(--space-1);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    text-wrap: pretty;
+  }
+
+  .spacer {
+    display: none;
+  }
+
+  .footer {
+    margin-top: var(--space-2);
+  }
+
+  .desktopOnly {
+    display: block;
+  }
+}

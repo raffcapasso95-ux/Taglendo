@@ -1,0 +1,49 @@
+/* Da design/Schermate mancanti.dc.html, A3: una casella per cifra. */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.boxes {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--code-box-gap);
+}
+
+.box {
+  width: 100%;
+  min-width: 0;
+  height: var(--code-box-height);
+  padding: 0;
+  border: var(--field-border-width) solid var(--border-subtle);
+  border-radius: var(--radius-field-large);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  outline: none;
+  caret-color: var(--brand-plum);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.box:focus {
+  border: var(--field-border-width-focus) solid var(--brand-plum);
+}
+
+.box[aria-invalid="true"] {
+  border-color: var(--status-error);
+}
+
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--status-error);
+}

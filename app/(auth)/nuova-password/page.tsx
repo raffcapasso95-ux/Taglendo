@@ -1,5 +1,21 @@
-import { Placeholder } from "@/components/Placeholder";
+import type { Metadata } from "next";
+import { AuthShell } from "@/components/auth/AuthShell";
+import { NewPasswordForm } from "@/components/auth/NewPasswordForm";
+import { authCopy } from "@/lib/copy/auth";
+
+export const metadata: Metadata = { title: "Nuova password · Taglendo" };
+
+const copy = authCopy.newPassword;
 
 export default function Page() {
-  return <Placeholder title="Nuova password" phase="Fase 1" design="A5, A5-D" />;
+  return (
+    <AuthShell
+      title={copy.title}
+      desktopTitle={copy.desktopTitle}
+      lead={copy.lead}
+      headline={copy.desktopHeadline}
+    >
+      <NewPasswordForm />
+    </AuthShell>
+  );
 }

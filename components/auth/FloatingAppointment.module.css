@@ -1,0 +1,44 @@
+/* Da design/Schermate mancanti.dc.html, A1. Solo telefono. */
+.card {
+  position: absolute;
+  top: var(--space-1);
+  right: -14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 14px;
+  background: var(--brand-cream);
+  box-shadow: var(--shadow-float-card);
+  transform: rotate(4deg);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
