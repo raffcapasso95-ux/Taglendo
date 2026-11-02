@@ -1,0 +1,16 @@
+/* Da design/uploads/design-system.html (.surface). */
+.card {
+  padding: var(--card-padding);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.flush > * + * {
+  border-top: 1px solid var(--border-subtle);
+}

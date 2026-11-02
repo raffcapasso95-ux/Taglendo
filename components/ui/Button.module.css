@@ -1,0 +1,87 @@
+/* Da design/uploads/design-system.html (.btn*) e, per "pericolo", B6/B6-D. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.button:disabled {
+  opacity: .42;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(.98);
+}
+
+/* Misure */
+.medium {
+  min-height: var(--control-height);
+  padding: var(--button-padding);
+  font-size: 14px;
+}
+
+.small {
+  min-height: var(--control-height-small);
+  padding: var(--button-padding-small);
+  border-radius: var(--radius-small-button);
+  font-size: 12px;
+}
+
+.large {
+  min-height: var(--control-height-large);
+  padding: 0 var(--space-6);
+  font-size: 16px;
+}
+
+.full {
+  width: 100%;
+}
+
+/* Varianti */
+.primary {
+  background: var(--action-primary);
+  color: var(--text-inverse);
+}
+
+.secondary {
+  background: transparent;
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.accent {
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+}
+
+.danger {
+  background: var(--status-error);
+  color: var(--surface);
+}
+
+@media (hover: hover) {
+  .primary:hover:not(:disabled) {
+    background: var(--action-primary-hover);
+  }
+
+  .secondary:hover:not(:disabled) {
+    background: var(--brand-peach);
+  }
+
+  .accent:hover:not(:disabled) {
+    background: var(--brand-apricot-hover);
+  }
+}

@@ -1,0 +1,50 @@
+/* Da design/uploads/design-system.html (.field). */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--field-gap);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.input {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--field-padding);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-input);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 16px;
+  outline-offset: var(--focus-ring);
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+  opacity: .9;
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--status-error);
+  box-shadow: 0 0 0 1px var(--status-error);
+}
+
+.input:disabled {
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+}
+
+.hint {
+  margin: 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--status-error);
+}
