@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useActionState, useState } from "react";
 import { requestPasswordReset, type AuthState } from "@/lib/auth/actions";
 import { authCopy } from "@/lib/copy/auth";
 import { isEmail } from "@/lib/rules/forms";
-import { Button, Field } from "@/components/ui";
+import { Button, ButtonLink, Field } from "@/components/ui";
 import { FormAlert } from "./FormAlert";
 import styles from "./Form.module.css";
 
@@ -52,16 +51,12 @@ export function ForgotForm() {
               <p>{copy.sentText}</p>
             </div>
           </div>
-          <a href="mailto:" className={styles.phoneOnly}>
-            <Button type="button" size="large" fullWidth tabIndex={-1}>
-              {copy.openMail}
-            </Button>
+          <a href="mailto:" className={`${styles.phoneOnly} ${styles.mailLink}`}>
+            {copy.openMail}
           </a>
-          <Link href="/accedi" className={styles.block}>
-            <Button type="button" variant="secondary" size="large" fullWidth tabIndex={-1}>
-              {copy.backToSignIn}
-            </Button>
-          </Link>
+          <ButtonLink href="/accedi" variant="secondary" size="large" fullWidth>
+            {copy.backToSignIn}
+          </ButtonLink>
         </>
       ) : (
         <Button type="submit" size="large" fullWidth disabled={pending}>

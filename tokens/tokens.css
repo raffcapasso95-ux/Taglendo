@@ -139,3 +139,10 @@
   --chip-gap: 6px;
   --status-warning-bar: #8A4B16;
 }
+
+/* Primo avvio su desktop (A6-D–A9-D) */
+:root {
+  --onboarding-nav-width: 260px;
+  --onboarding-aside-width: 340px;
+  --onboarding-form-width: 460px;
+}

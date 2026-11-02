@@ -82,13 +82,21 @@
   font-weight: 700;
 }
 
-.block {
-  display: block;
-  text-decoration: none;
+.phoneOnly {
+  display: flex;
 }
 
-.phoneOnly {
-  display: block;
+/* Un <a> con l'aspetto del pulsante primario grande. */
+.mailLink {
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-height-large);
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-button);
+  background: var(--action-primary);
+  color: var(--text-inverse);
+  font-size: 16px;
+  font-weight: 700;
   text-decoration: none;
 }
 

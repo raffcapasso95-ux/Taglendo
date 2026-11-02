@@ -1,0 +1,240 @@
+/* Da design/Schermate mancanti.dc.html: A6–A9 (telefono) e A6-D–A9-D (desktop). */
+.frame {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--brand-cream);
+}
+
+.nav,
+.aside {
+  display: none;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.progress {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+  padding: calc(var(--space-4) + env(safe-area-inset-top)) var(--space-6) 0;
+}
+
+.seg,
+.segOn {
+  height: var(--meter-bar-height);
+  border-radius: 2px;
+  background: var(--border-subtle);
+}
+
+.segOn {
+  background: var(--brand-plum);
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-6) var(--space-4);
+}
+
+.stepLabel {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.12;
+  letter-spacing: -.04em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.lead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6) calc(var(--space-6) + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--brand-cream) 70%, transparent);
+}
+
+.actions > * {
+  flex: 1;
+}
+
+@media (min-width: 1024px) {
+  .frame {
+    display: grid;
+    grid-template-columns: var(--onboarding-nav-width) minmax(0, 1fr) var(--onboarding-aside-width);
+    border-top: 0;
+  }
+
+  .nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-6);
+    border-right: 1px solid var(--border-subtle);
+    background: var(--brand-cream);
+  }
+
+  .navTitle {
+    margin: var(--space-4) 0 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .step,
+  .stepActive {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--tap-min);
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-button);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .stepActive {
+    background: var(--brand-peach);
+    font-weight: 700;
+  }
+
+  .badge,
+  .badgeActive,
+  .badgeDone {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--border-subtle);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .badgeActive {
+    background: var(--brand-plum);
+    color: var(--brand-cream);
+  }
+
+  .badgeDone {
+    background: var(--status-success);
+    color: var(--brand-cream);
+  }
+
+  .navNote {
+    margin: auto 0 0;
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+
+  .main {
+    min-height: 100dvh;
+    padding: var(--space-8) var(--space-8) 0 var(--space-8);
+  }
+
+  .progress {
+    display: none;
+  }
+
+  .content {
+    flex: 1;
+    max-width: var(--onboarding-form-width);
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--space-6) 0;
+  }
+
+  .stepLabel {
+    font-size: 13px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+
+  .actions {
+    position: static;
+    max-width: var(--onboarding-form-width);
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--space-4) 0 var(--space-6);
+    background: none;
+    justify-content: space-between;
+  }
+
+  .actions > * {
+    flex: none;
+  }
+
+  .aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-8) var(--space-6);
+    border-left: 1px solid var(--border-subtle);
+    background: var(--surface-muted);
+  }
+
+  .asideTitle {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+}
+
+.back {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .back {
+    display: inline-flex;
+  }
+}

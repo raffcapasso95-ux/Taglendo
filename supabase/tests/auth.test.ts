@@ -147,7 +147,7 @@ describe("abbonamento e inviti", () => {
     await inTx(async (tx) => {
       await tx.as(ANDREA);
       const rows = await tx.q<{ name: string; token: string }>(`select * from pending_invites($1)`, [SALON]);
-      expect(rows).toEqual([expect.objectContaining({ name: "Simone", token: "invito-demo-simone" })]);
+      expect(rows).toEqual([expect.objectContaining({ name: "Simone", token: "invito-demo-simone-0123456789abcdef" })]);
     });
   });
 });
