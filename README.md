@@ -93,3 +93,19 @@ Il file completo è `tokens/tokens.css`.
 1. Leggi `docs/05-fasi-e-prompt.md`.
 2. Crea il repository e copia dentro `CLAUDE.md`, `docs/`, `tokens/` e `design/`.
 3. Apri Claude Code nella cartella e incolla il prompt della **Fase 0**.
+
+## Sviluppo in locale
+
+Requisiti: Node 20+ e Docker in esecuzione.
+
+```bash
+npm install
+npm run db:start          # Supabase locale: applica la migrazione e il seed
+cp .env.example .env.local # poi incolla API_URL e ANON_KEY da `npx supabase status`
+npm run dev               # http://localhost:3000/dev/ui per i componenti
+```
+
+- `npm run db:reset` ricrea il database con i dati demo di Barberia Saragozza. Le date sono relative al giorno del seed.
+- Accessi demo (password `taglendo-demo`): `andrea@barberia-saragozza.example` (titolare), `marco@barberia-saragozza.example` (barbiere).
+- `npm test`: test unitari. `npm run test:db`: test di RLS e vincoli sul database locale.
+- `npm run lint` controlla anche che nei CSS non ci siano colori fuori dai token.
