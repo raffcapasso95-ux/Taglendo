@@ -1,0 +1,55 @@
+/* Taglendo — design token (da design/uploads/design-system.html) */
+@font-face { font-family: "Manrope"; src: url("../design/fonts/Manrope.ttf") format("truetype"); font-weight: 200 800; font-display: swap; }
+
+:root {
+  --brand-apricot: #F28C6F;
+  --brand-plum: #3E2532;
+  --brand-cream: #FFF7F0;
+  --brand-peach: #F8D6C6;
+  --canvas: #FFF7F0;
+  --surface: #FFFFFF;
+  --surface-muted: #FBF0E9;
+  --text-primary: #3E2532;
+  --text-secondary: #725C66;
+  --text-inverse: #FFF7F0;
+  --border-subtle: #E6D9DC;
+  --border-strong: #A88C99;
+  --action-primary: #3E2532;
+  --action-primary-hover: #523342;
+  --status-success: #21624E;
+  --status-warning: #8A4B16;
+  --status-error: #B43E4B;
+  --font-family: "Manrope", Arial, sans-serif;
+  --font-body: 16px;
+  --line-body: 1.5;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-input: 8px;
+  --radius-button: 12px;
+  --radius-card: 16px;
+  --radius-panel: 24px;
+  --control-height: 48px;
+}
+
+/* Valori aggiuntivi usati nei design */
+:root {
+  --brand-apricot-hover: #EF7C5D;
+  --surface-skeleton: #EFE3DC;
+  --status-success-bg: #EEF6F1;
+  --status-success-border: #7FB29B;
+  --status-success-text: #1B4F3F;
+  --plum-hover-dark: #523342;      /* hover su fondo prugna */
+  --overlay: rgba(62, 37, 50, .45); /* sotto fogli e finestre */
+  --shadow-card: 0 24px 60px rgba(62, 37, 50, .12);
+  --shadow-float: 0 16px 40px rgba(33, 19, 27, .3);
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --nav-rail-width: 76px;
+  --tap-min: 44px;
+}

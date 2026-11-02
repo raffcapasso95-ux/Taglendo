@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#3E2532">
+<title>Barberia Saragozza — Bologna</title>
+<style>
+@font-face{font-family:Manrope;src:url(fonts/Manrope.ttf) format('truetype');font-weight:200 800;font-display:swap}
+*{box-sizing:border-box}
+html,body,.sc-host,.sc-host>*{height:auto!important}
+html{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;background:#3E2532;color:#FFF7F0;font-family:Manrope,Arial,sans-serif;font-size:16px;line-height:1.5}
+a{color:#FFF7F0}a:hover{color:#F8D6C6}
+a:focus-visible,button:focus-visible{outline:3px solid #F28C6F;outline-offset:4px}
+::selection{background:#F8D6C6;color:#3E2532}
+img{display:block;max-width:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</helmet>
+
+<header style="position:sticky;top:0;z-index:20;background:rgba(62,37,50,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgba(255,247,240,.12)">
+<div style="max-width:1200px;margin:0 auto;padding:0 20px;height:72px;display:flex;align-items:center;gap:16px">
+<a href="#top" style="display:flex;flex-direction:column;flex:none;text-decoration:none;line-height:1.15"><span style="font-size:16px;font-weight:700;letter-spacing:.2em;text-transform:uppercase">Barberia Saragozza</span><span style="font-size:12px;font-weight:700;letter-spacing:.08em;color:#F8D6C6">Porta Saragozza · Bologna</span></a>
+<sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><nav aria-label="Sezioni" style="display:flex;align-items:center;gap:2px;margin:0 auto"><a href="#prenota" style="padding:10px 12px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;white-space:nowrap" style-hover="background:rgba(255,247,240,.1)">Prezzi</a><a href="#barbieri" style="padding:10px 12px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;white-space:nowrap" style-hover="background:rgba(255,247,240,.1)">Barbieri</a><a href="#lavori" style="padding:10px 12px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;white-space:nowrap" style-hover="background:rgba(255,247,240,.1)">Lavori</a><a href="#dove" style="padding:10px 12px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;white-space:nowrap" style-hover="background:rgba(255,247,240,.1)">Dove siamo</a></nav></sc-if>
+<div style="display:flex;align-items:center;gap:6px;margin-left:{{ ctaML }}"><sc-if value="{{ showPhoneLink }}" hint-placeholder-val="{{ true }}"><a href="tel:+390516442190" style="padding:10px 12px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;font-variant-numeric:tabular-nums;white-space:nowrap" style-hover="background:rgba(255,247,240,.1)">051 644 2190</a></sc-if><a href="{{ ctaHref }}" style="display:flex;align-items:center;min-height:44px;padding:0 18px;border-radius:12px;background:#F28C6F;color:#3E2532;font-size:15px;font-weight:700;text-decoration:none;white-space:nowrap;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-hover="background:#EF7C5D;color:#3E2532" style-active="transform:scale(0.97)">{{ ctaLbl }}</a></div>
+</div>
+</header>
+
+<section id="top" style="position:relative;min-height:{{ heroMin }};display:flex;flex-direction:column;overflow:hidden">
+<img src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?w=1900&q=70&auto=format&fit=crop" alt="Rasatura con panno caldo in una barberia illuminata" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(33,19,27,.92) 0%,rgba(33,19,27,.55) 45%,rgba(33,19,27,.25) 100%)"></div>
+<div style="position:relative;flex:1;max-width:1200px;width:100%;margin:0 auto;padding:32px 20px clamp(32px,5vw,64px);display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px 40px">
+<div style="flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:18px">
+<span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#F8D6C6">Bologna · Porta Saragozza</span>
+<h1 style="margin:0;font-size:clamp(52px,8.4vw,120px);line-height:.95;letter-spacing:-0.05em;font-weight:700">Barberia Saragozza</h1>
+<p style="margin:0;font-size:clamp(18px,1.8vw,22px);line-height:1.45;max-width:560px;text-wrap:pretty">Taglio, barba e rasatura con tre barbieri in Via Saragozza. {{ heroBook }}</p>
+<div style="display:flex;flex-wrap:wrap;gap:10px"><a href="{{ ctaHref }}" style="display:flex;align-items:center;min-height:48px;padding:0 24px;border-radius:12px;background:#F28C6F;color:#3E2532;font-size:17px;font-weight:700;text-decoration:none;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-hover="background:#EF7C5D;color:#3E2532" style-active="transform:scale(0.97)">{{ heroCta }}</a><a href="#prenota" style="display:flex;align-items:center;min-height:48px;padding:0 20px;border-radius:12px;border:1.5px solid rgba(255,247,240,.5);font-size:17px;font-weight:700;text-decoration:none" style-hover="background:rgba(255,247,240,.1)">Vedi servizi e prezzi</a></div>
+<div style="display:flex;flex-wrap:wrap;gap:8px 22px;font-size:15px;font-weight:700;color:#F8D6C6"><span>Via Saragozza 48</span><span>Mar–Sab · 9–19</span><sc-if value="{{ pricesOn }}" hint-placeholder-val="{{ true }}"><span>Da 12 €</span></sc-if></div>
+</div>
+<a href="{{ ctaHref }}" aria-label="{{ signAria }}" style="flex:none;align-self:{{ signAlign }};display:flex;flex-direction:column;align-items:center;text-decoration:none;transform:rotate(-4deg);transform-origin:50% 0;transition:transform 400ms cubic-bezier(0.23,1,0.32,1)" style-hover="transform:rotate(0deg)">
+<span style="width:12px;height:12px;border-radius:50%;background:#A88C99;box-shadow:0 2px 0 rgba(0,0,0,.4)"></span>
+<span style="position:relative;width:120px;height:40px;margin-top:-6px"><span style="position:absolute;left:50%;top:0;width:2px;height:68px;background:#A88C99;transform-origin:top center;transform:rotate(62deg)"></span><span style="position:absolute;left:50%;top:0;width:2px;height:68px;background:#A88C99;transform-origin:top center;transform:rotate(-62deg)"></span></span>
+<span style="display:flex;flex-direction:column;align-items:center;gap:2px;width:{{ signW }};padding:18px 16px;border-radius:12px;background:#FFF7F0;color:#3E2532;box-shadow:0 20px 40px rgba(0,0,0,.35);border:3px solid #3E2532;outline:2px solid #FFF7F0">
+<span style="font-size:{{ signBig }};line-height:1;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Aperto</span>
+<span style="font-size:14px;font-weight:700;color:#21624E">oggi fino alle 19:00</span>
+<span style="margin-top:8px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#725C66">{{ signLine }}</span>
+</span>
+</a>
+</div>
+</section>
+
+<section id="prenota" style="max-width:1200px;margin:0 auto;padding:clamp(64px,8vw,112px) 20px;display:flex;flex-direction:column;gap:28px;scroll-margin-top:80px">
+<sc-if value="{{ bookOn }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 48px">
+<div style="flex:1 1 440px;min-width:0;display:flex;flex-direction:column;gap:10px"><span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#F28C6F">Prenota online</span><h2 style="margin:0;font-size:clamp(30px,3.6vw,48px);line-height:1.15;letter-spacing:-0.04em;font-weight:700;text-wrap:balance">Tre passi, un minuto.</h2></div>
+<p style="margin:0;flex:0 1 360px;font-size:16px;color:#F8D6C6;text-wrap:pretty">Scegli il servizio, poi quando venire, poi lasci nome ed email. Nessuna registrazione. Paghi in negozio.</p>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+<div style="flex:1.6 1 480px;min-width:0">
+<div ref="{{ cardRef }}" style="border-radius:24px;background:#FFF7F0;color:#3E2532;padding:clamp(20px,3vw,32px);display:flex;flex-direction:column;gap:22px;min-width:0;gap:18px;scroll-margin-top:88px">
+<sc-if value="{{ notDone }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px"><h3 style="margin:0;font-size:clamp(22px,2.6vw,28px);line-height:1.12;letter-spacing:-0.03em;font-weight:700;text-wrap:balance">Prenota</h3><span style="flex:none;white-space:nowrap;font-size:14px;font-weight:700;color:#725C66">{{ doneCount }} di 3 fatto</span></div>
+<div style="border-top:1px solid #E6D9DC;padding-top:18px;display:flex;flex-direction:column;gap:0">
+<div style="display:flex;align-items:center;gap:12px;min-height:44px"><span style="width:28px;height:28px;border-radius:50%;background:{{ n1Bg }};color:{{ n1Fg }};font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">{{ n1Mark }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:18px;font-weight:700;letter-spacing:-0.01em;color:{{ n1Title }}">Servizio</span><sc-if value="{{ sum1 }}"><span style="font-size:15px;color:#725C66;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ sum1Text }}">{{ sum1Text }}</span></sc-if></span><sc-if value="{{ sum1 }}"><button onClick="{{ edit1 }}" style="flex:none;min-height:40px;padding:0 12px;border-radius:10px;border:1px solid #E6D9DC;background:#FFFFFF;color:#3E2532;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Cambia</button></sc-if></div>
+<div style="display:grid;grid-template-rows:{{ o1Rows }};transition:grid-template-rows 300ms cubic-bezier(0.77,0,0.175,1)"><div style="min-height:0;overflow:hidden"><div style="display:flex;flex-direction:column;gap:18px;padding:16px 2px 4px;opacity:{{ o1Op }};transition:opacity 200ms ease-out"><div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ services }}" as="s" hint-placeholder-count="5"><button onClick="{{ s.pick }}" aria-pressed="{{ s.on }}" style="display:flex;align-items:center;gap:14px;width:100%;min-height:72px;padding:12px 14px 12px 16px;border-radius:12px;border:1.5px solid {{ s.bd }};background:{{ s.bg }};color:#3E2532;font:inherit;text-align:left;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)" style-hover="border-color:#3E2532"><span style="flex:1;display:flex;flex-direction:column;min-width:0"><span style="font-size:17px;font-weight:700;line-height:1.25;text-wrap:pretty">{{ s.name }}</span><span style="font-size:14px;color:#725C66">{{ s.dur }}</span></span><span style="flex:none;font-size:19px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap">{{ s.price }}</span><span aria-hidden="true" style="flex:none;font-size:22px;color:#A88C99">›</span></button></sc-for></div></div></div></div>
+</div>
+<div style="border-top:1px solid #E6D9DC;padding-top:18px;display:flex;flex-direction:column;gap:0">
+<div style="display:flex;align-items:center;gap:12px;min-height:44px"><span style="width:28px;height:28px;border-radius:50%;background:{{ n2Bg }};color:{{ n2Fg }};font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">{{ n2Mark }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:18px;font-weight:700;letter-spacing:-0.01em;color:{{ n2Title }}">Giorno e ora</span><sc-if value="{{ sum2 }}"><span style="font-size:15px;color:#725C66;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ sum2Text }}">{{ sum2Text }}</span></sc-if></span><sc-if value="{{ sum2 }}"><button onClick="{{ edit2 }}" style="flex:none;min-height:40px;padding:0 12px;border-radius:10px;border:1px solid #E6D9DC;background:#FFFFFF;color:#3E2532;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Cambia</button></sc-if></div>
+<div style="display:grid;grid-template-rows:{{ o2Rows }};transition:grid-template-rows 300ms cubic-bezier(0.77,0,0.175,1)"><div style="min-height:0;overflow:hidden"><div style="display:flex;flex-direction:column;gap:18px;padding:16px 2px 4px;opacity:{{ o2Op }};transition:opacity 200ms ease-out"><div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:700">Con chi</span><div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ ops }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.pick }}" aria-pressed="{{ o.on }}" style="display:flex;align-items:center;gap:8px;min-height:44px;max-width:100%;padding:0 14px 0 6px;border-radius:999px;border:1.5px solid {{ o.bd }};background:{{ o.bg }};color:{{ o.fg }};font:inherit;font-size:14px;font-weight:700;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)"><span style="width:30px;height:30px;border-radius:50%;background:{{ o.avBg }};color:{{ o.avFg }};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">{{ o.i }}</span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ o.name }}</span></button></sc-for></div></div><sc-if value="{{ hasQuick }}"><div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:14px;font-weight:700">Primi orari liberi</span><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px"><sc-for list="{{ quick }}" as="q" hint-placeholder-count="3"><button onClick="{{ q.pick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;min-height:68px;padding:10px 14px;border-radius:12px;border:1.5px solid #7FB29B;background:#EEF6F1;color:#1B4F3F;font:inherit;text-align:left;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)" style-hover="background:#E1EFE7"><span style="font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.04em">{{ q.day }}</span><span style="font-size:22px;line-height:1.1;font-weight:700;font-variant-numeric:tabular-nums">{{ q.time }}</span><span style="font-size:13px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">con {{ q.who }}</span></button></sc-for></div></div></sc-if><sc-if value="{{ someFree }}" hint-placeholder-val="{{ true }}"><div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><button onClick="{{ prevWeek }}" disabled="{{ noPrev }}" aria-label="Settimana precedente" style="width:44px;height:44px;border-radius:10px;border:1px solid #E6D9DC;background:#FFFFFF;color:#3E2532;opacity:{{ prevOp }};font:inherit;font-size:20px;cursor:pointer;touch-action:manipulation">‹</button><span style="font-size:15px;font-weight:700">{{ weekLbl }}</span><button onClick="{{ nextWeek }}" disabled="{{ noNext }}" aria-label="Settimana successiva" style="width:44px;height:44px;border-radius:10px;border:1px solid #E6D9DC;background:#FFFFFF;color:#3E2532;opacity:{{ nextOp }};font:inherit;font-size:20px;cursor:pointer;touch-action:manipulation">›</button></div>
+<div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px"><sc-for list="{{ week }}" as="d" hint-placeholder-count="7"><button onClick="{{ d.pick }}" aria-pressed="{{ d.on }}" aria-disabled="{{ d.off }}" aria-label="{{ d.aria }}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;min-height:68px;padding:0;border-radius:12px;border:1.5px solid {{ d.bd }};background:{{ d.bg }};color:{{ d.fg }};font:inherit;cursor:{{ d.cur }};touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:background-color 150ms ease"><span style="font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">{{ d.dow }}</span><span style="font-size:20px;line-height:1;font-weight:700;font-variant-numeric:tabular-nums;text-decoration:{{ d.deco }}">{{ d.num }}</span><span style="width:6px;height:6px;border-radius:50%;background:{{ d.dot }}"></span></button></sc-for></div>
+<div style="display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:#725C66"><span style="display:flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:#21624E"></span>orari liberi</span><span>Domenica e lunedì chiuso</span></div>
+</div>
+<sc-if value="{{ hasDay }}"><div style="display:flex;flex-direction:column;gap:10px"><span style="font-size:16px;font-weight:700">{{ dayLong }}</span><div style="display:grid;grid-template-columns:repeat({{ slotCols }},minmax(0,1fr));gap:6px"><sc-for list="{{ slots }}" as="t" hint-placeholder-count="8"><button onClick="{{ t.pick }}" style="min-height:48px;border-radius:12px;border:1.5px solid #7FB29B;background:#EEF6F1;color:#1B4F3F;font:inherit;font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)" style-hover="background:#21624E;color:#FFFFFF">{{ t.label }}</button></sc-for></div></div></sc-if>
+<sc-if value="{{ weekEmpty }}"><div style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:12px;background:#FBF0E9"><span style="font-size:15px;font-weight:700">Questa settimana è tutto pieno.</span><button onClick="{{ goOtherWeek }}" style="align-self:flex-start;min-height:44px;padding:0 14px;border-radius:10px;border:1.5px solid #3E2532;background:#FFFFFF;color:#3E2532;font:inherit;font-size:14px;font-weight:700;cursor:pointer">{{ otherWeekLbl }}</button></div></sc-if>
+</sc-if><sc-if value="{{ noneAtAll }}"><div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:12px;background:#FBF0E9"><span style="font-size:16px;font-weight:700">Nessun posto online nelle prossime due settimane{{ withWho }}.</span><span style="font-size:15px;color:#725C66">Chiamaci: a volte si libera qualcosa all’ultimo.</span><div style="display:flex;flex-wrap:wrap;gap:8px"><a href="tel:+390516442190" style="display:flex;align-items:center;min-height:48px;padding:0 16px;border-radius:12px;background:#3E2532;color:#FFF7F0;font-size:15px;font-weight:700;text-decoration:none;font-variant-numeric:tabular-nums">Chiama 051 644 2190</a><sc-if value="{{ canAnyone }}"><button onClick="{{ setAnyone }}" style="min-height:48px;padding:0 16px;border-radius:12px;border:1.5px solid #3E2532;background:#FFFFFF;color:#3E2532;font:inherit;font-size:15px;font-weight:700;cursor:pointer">Prova con chiunque</button></sc-if></div></div></sc-if></div></div></div>
+</div>
+<div style="border-top:1px solid #E6D9DC;padding-top:18px;display:flex;flex-direction:column;gap:0">
+<div style="display:flex;align-items:center;gap:12px;min-height:44px"><span style="width:28px;height:28px;border-radius:50%;background:{{ n3Bg }};color:{{ n3Fg }};font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none">{{ n3Mark }}</span><span style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font-size:18px;font-weight:700;letter-spacing:-0.01em;color:{{ n3Title }}">I tuoi dati</span><sc-if value="{{ sum3 }}"><span style="font-size:15px;color:#725C66;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{{ sum3Text }}">{{ sum3Text }}</span></sc-if></span><sc-if value="{{ sum3 }}"><button onClick="{{ edit3 }}" style="flex:none;min-height:40px;padding:0 12px;border-radius:10px;border:1px solid #E6D9DC;background:#FFFFFF;color:#3E2532;font:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Cambia</button></sc-if></div>
+<div style="display:grid;grid-template-rows:{{ o3Rows }};transition:grid-template-rows 300ms cubic-bezier(0.77,0,0.175,1)"><div style="min-height:0;overflow:hidden"><div style="display:flex;flex-direction:column;gap:18px;padding:16px 2px 4px;opacity:{{ o3Op }};transition:opacity 200ms ease-out"><sc-if value="{{ s3 }}"><div style="display:flex;flex-direction:column;gap:6px"><label for="bk-name" style="font-size:14px;font-weight:700">Nome e cognome</label><input id="bk-name" autocomplete="name" enterkeyhint="next" maxLength="80" value="{{ name }}" onInput="{{ onName }}" style="min-height:48px;padding:0 14px;border-radius:8px;border:1.5px solid #A88C99;background:#FFFFFF;color:#3E2532;font:inherit;font-size:16px;width:100%;min-width:0"></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="bk-mail" style="font-size:14px;font-weight:700">Email</label><input id="bk-mail" type="email" inputmode="email" autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next" maxLength="120" value="{{ email }}" onInput="{{ onEmail }}" onBlur="{{ blurEmail }}" placeholder="nome@esempio.it" aria-invalid="{{ emailBad }}" style="min-height:48px;padding:0 14px;border-radius:8px;border:1.5px solid {{ emailBd }};background:#FFFFFF;color:#3E2532;font:inherit;font-size:16px;width:100%;min-width:0"><sc-if value="{{ emailBad }}"><span style="font-size:13px;font-weight:700;color:#B43E4B">Controlla l’email: manca qualcosa (es. nome@esempio.it).</span></sc-if></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label for="bk-tel" style="font-size:14px;font-weight:700">Telefono <span style="font-weight:500;color:#725C66">· facoltativo</span></label><input id="bk-tel" type="tel" inputmode="tel" autocomplete="tel" enterkeyhint="done" maxLength="20" value="{{ phone }}" onInput="{{ onPhone }}" style="min-height:48px;padding:0 14px;border-radius:8px;border:1.5px solid #A88C99;background:#FFFFFF;color:#3E2532;font:inherit;font-size:16px;width:100%;min-width:0"></div>
+<button onClick="{{ togglePrivacy }}" role="checkbox" aria-checked="{{ privacyOn }}" style="display:flex;gap:10px;align-items:flex-start;padding:2px 0;border:0;background:transparent;font:inherit;font-size:14px;line-height:1.45;text-align:left;color:#3E2532;cursor:pointer"><span style="flex:none;width:22px;height:22px;border-radius:6px;border:1.5px solid {{ privacyBd }};background:{{ privacyBg }};color:#FFF7F0;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ privacyMark }}</span><span>Ho letto l’<a href="#" style="color:#3E2532;text-decoration:underline">informativa privacy</a> del salone.</span></button><sc-if value="{{ privacyErr }}"><span style="font-size:13px;font-weight:700;color:#B43E4B;margin-top:-6px">Conferma di aver letto l’informativa per prenotare.</span></sc-if>
+<button onClick="{{ sendCode }}" disabled="{{ sendDis }}" style="min-height:48px;border-radius:12px;border:0;background:{{ sendBg }};color:{{ sendFg }};font:inherit;font-size:17px;font-weight:700;cursor:pointer;touch-action:manipulation;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">Prenota</button>
+<span style="font-size:13px;color:#725C66;text-align:center;margin-top:-6px">Ti mandiamo un codice via email per confermare. Paghi in negozio.</span></sc-if><sc-if value="{{ s4 }}"><h3 style="margin:0;font-size:clamp(22px,2.6vw,28px);line-height:1.12;letter-spacing:-0.03em;font-weight:700;text-wrap:balance">Controlla la tua email</h3>
+<span style="font-size:16px;color:#725C66">Codice di 6 cifre inviato a <strong style="color:#3E2532;overflow-wrap:anywhere">{{ email }}</strong>. Inseriscilo: la prenotazione si conferma da sola.</span>
+<input id="bk-code" aria-label="Codice di conferma" inputmode="numeric" autocomplete="one-time-code" enterkeyhint="done" value="{{ code }}" onInput="{{ onCode }}" placeholder="••••••" style="min-height:68px;padding:0 16px;border-radius:12px;border:2px solid #3E2532;background:#FFFFFF;color:#3E2532;font:inherit;font-size:30px;font-weight:700;letter-spacing:.45em;font-variant-numeric:tabular-nums;text-align:center;width:100%;min-width:0">
+<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;font-size:14px"><button onClick="{{ backToData }}" style="min-height:40px;border:0;background:none;padding:0;font:inherit;font-weight:700;color:#3E2532;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Email sbagliata?</button><span style="color:#725C66">Demo: 6 cifre qualsiasi</span></div></sc-if></div></div></div>
+</div>
+</sc-if>
+<sc-if value="{{ s5 }}"><div style="display:flex;flex-direction:column;align-items:flex-start;gap:14px">
+<span style="width:56px;height:56px;border-radius:50%;background:#21624E;color:#FFFFFF;font-size:28px;display:flex;align-items:center;justify-content:center;transform:scale({{ doneSc }});opacity:{{ doneOp }};transition:transform 320ms cubic-bezier(0.34,1.4,0.64,1), opacity 200ms ease-out">✓</span>
+<h3 style="margin:0;font-size:clamp(22px,2.6vw,28px);line-height:1.12;letter-spacing:-0.03em;font-weight:700;text-wrap:balance">Ci vediamo {{ seeYou }}!</h3>
+<div style="display:flex;flex-direction:column;width:100%;border-top:1px solid #E6D9DC"><sc-for list="{{ doneRows }}" as="r" hint-placeholder-count="4"><div style="display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #E6D9DC;font-size:16px"><span style="color:#725C66;flex:none">{{ r.k }}</span><strong style="text-align:right;min-width:0;overflow-wrap:anywhere">{{ r.v }}</strong></div></sc-for></div>
+<span style="font-size:14px;color:#725C66;overflow-wrap:anywhere">Riepilogo inviato a {{ email }}. {{ cancelDone }}</span>
+<div style="display:flex;flex-wrap:wrap;gap:8px;width:100%"><a href="#" style="flex:1 1 180px;display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:12px;background:#3E2532;color:#FFF7F0;font-size:15px;font-weight:700;text-decoration:none">Aggiungi al calendario</a><button onClick="{{ restart }}" style="flex:1 1 180px;min-height:48px;border-radius:12px;border:1.5px solid #3E2532;background:transparent;color:#3E2532;font:inherit;font-size:15px;font-weight:700;cursor:pointer">Nuova prenotazione</button></div>
+</div></sc-if>
+</div>
+</div>
+<sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}"><figure style="flex:1 1 300px;min-width:0;margin:0;position:sticky;top:92px;display:flex;flex-direction:column;gap:12px"><img src="https://images.unsplash.com/photo-1622287162716-f311baa1a2b8?w=900&q=70&auto=format&fit=crop" alt="Andrea al lavoro su un cliente in negozio" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:24px"><figcaption style="display:flex;flex-direction:column;gap:2px;font-size:14px;color:#F8D6C6"><strong style="color:#FFF7F0;font-size:15px">{{ cancelTitle }}</strong>{{ cancelBody }}</figcaption></figure></sc-if>
+</div>
+</sc-if>
+<sc-if value="{{ bookOff }}">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 48px">
+<div style="flex:1 1 440px;min-width:0;display:flex;flex-direction:column;gap:10px"><span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#F28C6F">Servizi e prezzi</span><h2 style="margin:0;font-size:clamp(30px,3.6vw,48px);line-height:1.15;letter-spacing:-0.04em;font-weight:700;text-wrap:balance">Si prenota al telefono.</h2></div>
+<p style="margin:0;flex:0 1 360px;font-size:16px;color:#F8D6C6;text-wrap:pretty">Chiamaci negli orari di apertura: ti troviamo il primo posto libero, con il barbiere che preferisci. Paghi in negozio.</p>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start">
+<div style="flex:1.6 1 480px;min-width:0;border-radius:24px;background:#FFF7F0;color:#3E2532">
+<div style="padding:clamp(20px,3vw,32px);display:flex;flex-direction:column">
+<span style="font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#725C66;padding-bottom:12px">Listino</span><sc-if value="{{ pricesOff }}" hint-placeholder-val="{{ false }}"><span style="font-size:15px;color:#725C66;padding-bottom:12px">Prezzi in salone: chiedi pure al telefono.</span></sc-if>
+<sc-for list="{{ services }}" as="s" hint-placeholder-count="6"><div style="display:flex;align-items:baseline;gap:12px;padding:14px 0;border-top:1px solid #E6D9DC"><span style="display:flex;flex-direction:column;min-width:0"><span style="font-size:clamp(17px,1.8vw,20px);font-weight:700;text-wrap:pretty">{{ s.name }}</span><span style="font-size:14px;color:#725C66">{{ s.dur }}</span></span><span style="flex:1;min-width:16px;border-bottom:2px dotted #E6D9DC;transform:translateY(-5px)"></span><span style="font-size:clamp(19px,2vw,24px);font-weight:700;color:#3E2532;font-variant-numeric:tabular-nums;white-space:nowrap">{{ s.price }}</span></div></sc-for>
+</div>
+</div>
+<div style="flex:1 1 300px;min-width:0;position:sticky;top:92px;border-radius:24px;background:#F8D6C6;color:#3E2532;padding:clamp(22px,3vw,32px);display:flex;flex-direction:column;gap:16px">
+<span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase">Per prenotare</span>
+<a href="tel:+390516442190" style="font-size:clamp(32px,3.6vw,44px);line-height:1;font-weight:700;letter-spacing:-0.04em;font-variant-numeric:tabular-nums;color:#3E2532;text-decoration:none;white-space:nowrap">051 644 2190</a>
+<a href="tel:+390516442190" style="display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:12px;background:#3E2532;color:#FFF7F0;font-size:17px;font-weight:700;text-decoration:none;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-hover="background:#523342;color:#FFF7F0" style-active="transform:scale(0.97)">Chiama ora</a>
+<div style="display:flex;flex-direction:column;gap:4px;padding-top:14px;border-top:1px solid rgba(62,37,50,.18);font-size:15px"><strong>Mar–Sab · 9–13 e 14:30–19</strong><span>Rispondiamo tra un cliente e l’altro: se non rispondiamo, richiama tra poco.</span></div>
+<span style="font-size:14px;font-weight:700;padding-top:14px;border-top:1px solid rgba(62,37,50,.18)">Per spostare o annullare un appuntamento chiama lo stesso numero.</span>
+</div>
+</div>
+</sc-if>
+</section>
+
+<section id="barbieri" style="max-width:1200px;margin:0 auto;padding:0 20px clamp(64px,8vw,112px);display:flex;flex-direction:column;gap:28px;scroll-margin-top:80px">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;border-top:1px solid rgba(255,247,240,.18);padding-top:28px"><h2 style="margin:0;font-size:clamp(30px,3.6vw,48px);line-height:1.15;letter-spacing:-0.04em;font-weight:700">Chi ti taglia.</h2><span style="font-size:15px;color:#F8D6C6">Tre poltrone, tre mani diverse.</span></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px">
+<sc-for list="{{ barbers }}" as="b" hint-placeholder-count="3"><figure style="margin:0;display:flex;flex-direction:column;gap:14px"><div style="position:relative"><img src="{{ b.img }}" loading="lazy" alt="{{ b.alt }}" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:16px;filter:grayscale(1) contrast(1.05)"><sc-if value="{{ b.showFree }}"><span style="position:absolute;left:12px;bottom:12px;display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#EEF6F1;color:#1B4F3F;font-size:14px;font-weight:700"><span style="width:8px;height:8px;border-radius:50%;background:#21624E"></span>{{ b.free }}</span></sc-if></div><figcaption style="display:flex;flex-direction:column;gap:2px"><span style="display:flex;align-items:center;gap:10px;font-size:24px;font-weight:700;letter-spacing:-0.02em"><span style="width:12px;height:12px;border-radius:50%;background:{{ b.col }};border:1px solid rgba(255,247,240,.4)"></span>{{ b.name }}</span><span style="color:#F8D6C6">{{ b.what }}</span></figcaption></figure></sc-for>
+</div>
+</section>
+
+<section id="lavori" style="scroll-margin-top:80px;max-width:1200px;margin:0 auto;padding:0 20px clamp(64px,8vw,112px);display:grid;grid-template-columns:{{ galCols }};grid-auto-rows:{{ galRow }};gap:12px">
+<img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?w=1200&q=70&auto=format&fit=crop" alt="Sfumatura alta con riga disegnata" style="grid-row:span 2;width:100%;height:100%;object-fit:cover;border-radius:16px">
+<img src="https://images.unsplash.com/photo-1532710093739-9470acff878f?w=800&q=70&auto=format&fit=crop" alt="Barba insaponata prima della rasatura" style="width:100%;height:100%;object-fit:cover;border-radius:16px">
+<img src="https://images.unsplash.com/photo-1521490683712-35a1cb235d1c?w=800&q=70&auto=format&fit=crop" alt="Taglio per bambino in poltrona" style="width:100%;height:100%;object-fit:cover;border-radius:16px">
+<a href="#" style="grid-column:{{ galWide }};display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 22px;border-radius:16px;background:#F28C6F;color:#3E2532;font-size:18px;font-weight:700;text-decoration:none" style-hover="background:#EF7C5D;color:#3E2532"><span>Altri lavori su Instagram</span><span>@barberiasaragozza →</span></a>
+</section>
+
+<section id="dove" style="background:#FFF7F0;color:#3E2532;scroll-margin-top:72px">
+<div style="max-width:1200px;margin:0 auto;padding:clamp(56px,7vw,96px) 20px {{ bottomPad }};display:flex;flex-wrap:wrap;gap:40px 64px">
+<div style="flex:1 1 360px;min-width:0;display:flex;flex-direction:column;gap:18px">
+<span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#725C66">Dove siamo</span>
+<h2 style="margin:0;font-size:clamp(30px,3.6vw,48px);line-height:1.15;letter-spacing:-0.04em;font-weight:700">Via Saragozza 48, sotto il portico.</h2>
+<p style="margin:0;color:#725C66;max-width:420px">A due minuti da Porta Saragozza. Parcheggio in Viale Vicini.</p>
+<div style="display:flex;flex-wrap:wrap;gap:8px"><a href="#" style="display:flex;align-items:center;min-height:48px;padding:0 16px;border-radius:12px;background:#3E2532;color:#FFF7F0;font-size:15px;font-weight:700;text-decoration:none" style-hover="background:#523342;color:#FFF7F0">Apri in Mappe</a><a href="tel:+390516442190" style="display:flex;align-items:center;min-height:48px;padding:0 16px;border-radius:12px;border:1px solid #A88C99;color:#3E2532;font-size:15px;font-weight:700;text-decoration:none;font-variant-numeric:tabular-nums" style-hover="background:#FBF0E9;color:#3E2532">051 644 2190</a></div>
+</div>
+<div style="flex:1 1 360px;min-width:0;display:flex;flex-direction:column">
+<sc-for list="{{ hours }}" as="h" hint-placeholder-count="7"><div style="display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #E6D9DC;font-size:16px;font-weight:{{ h.w }};color:{{ h.fg }}"><span>{{ h.day }}</span><span style="font-variant-numeric:tabular-nums;text-align:right">{{ h.time }}</span></div></sc-for>
+</div>
+</div>
+</section>
+
+<footer style="background:#FFF7F0;color:#725C66;border-top:1px solid #E6D9DC">
+<div style="max-width:1200px;margin:0 auto;padding:20px 20px {{ footPad }};display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;font-size:14px">
+<span style="display:flex;flex-wrap:wrap;gap:6px 16px"><span>© Barberia Saragozza · Bologna</span><a href="#" style="color:#725C66">Informativa privacy</a><a href="#" onClick="{{ cookieReopen }}" style="color:#725C66">Preferenze cookie</a></span>
+<a href="#" aria-label="Prenotazioni con Taglendo" style="display:flex;align-items:center;gap:8px;color:#725C66;text-decoration:none"><span>Prenotazioni con</span><img src="assets/taglendo-logo.svg" alt="Taglendo" style="width:96px;height:auto"></a>
+</div>
+</footer>
+<sc-if value="{{ cookieShow }}" hint-placeholder-val="{{ false }}">
+<div role="dialog" aria-label="Cookie" style="position:fixed;left:16px;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:40;max-width:440px;background:#FFF7F0;color:#3E2532;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 50px rgba(0,0,0,.35)">
+<span style="font-size:18px;font-weight:700">Cookie</span>
+<sc-if value="{{ cookieLess }}" hint-placeholder-val="{{ true }}"><span style="font-size:14px;line-height:1.5;color:#725C66">Usiamo cookie tecnici per farti prenotare. Quelli per le statistiche li usiamo solo se accetti.</span></sc-if>
+<sc-if value="{{ cookieMore }}"><div style="background:#FFFFFF;border:1px solid #E6D9DC;border-radius:16px;overflow:hidden"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px"><span style="display:flex;flex-direction:column"><strong style="font-size:15px">Necessari</strong><span style="font-size:13px;color:#725C66">Servono per prenotare.</span></span><span style="font-size:14px;font-weight:700;color:#725C66">Sempre attivi</span></div><button onClick="{{ toggleStats }}" role="switch" aria-checked="{{ statsOn }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 14px;border:0;border-top:1px solid #E6D9DC;background:transparent;font:inherit;color:#3E2532;text-align:left;cursor:pointer"><span style="display:flex;flex-direction:column"><strong style="font-size:15px">Statistiche</strong><span style="font-size:13px;color:#725C66">Pagine più viste, in forma anonima.</span></span><span style="flex:none;width:52px;height:32px;border-radius:999px;background:{{ statsBg }};padding:3px;display:flex;justify-content:{{ statsJ }}"><span style="width:26px;height:26px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span></span></button></div></sc-if>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<sc-if value="{{ cookieLess }}" hint-placeholder-val="{{ true }}"><button onClick="{{ cookieNo }}" style="min-height:48px;border-radius:12px;border:1px solid #A88C99;background:transparent;color:#3E2532;font:inherit;font-size:15px;font-weight:700;cursor:pointer">Rifiuta</button><button onClick="{{ cookieYes }}" style="min-height:48px;border-radius:12px;border:1px solid #A88C99;background:transparent;color:#3E2532;font:inherit;font-size:15px;font-weight:700;cursor:pointer">Accetta</button></sc-if>
+<sc-if value="{{ cookieMore }}"><button onClick="{{ cookieSave }}" style="min-height:48px;border-radius:12px;border:0;background:#3E2532;color:#FFF7F0;font:inherit;font-size:15px;font-weight:700;cursor:pointer">Salva le scelte</button><button onClick="{{ cookieYes }}" style="min-height:48px;border-radius:12px;border:1px solid #A88C99;background:transparent;color:#3E2532;font:inherit;font-size:15px;font-weight:700;cursor:pointer">Accetta tutti</button></sc-if>
+</div>
+<sc-if value="{{ cookieLess }}" hint-placeholder-val="{{ true }}"><button onClick="{{ cookieOpenMore }}" style="align-self:center;min-height:36px;border:0;background:transparent;font:inherit;font-size:14px;font-weight:700;color:#3E2532;text-decoration:underline;text-underline-offset:3px;cursor:pointer">Scegli quali</button></sc-if>
+</div>
+</sc-if>
+
+
+<sc-if value="{{ narrow }}">
+<div style="position:fixed;left:0;right:0;bottom:0;z-index:30;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:rgba(62,37,50,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid rgba(255,247,240,.14);display:flex;align-items:center;gap:12px">
+<span style="display:flex;flex-direction:column;min-width:0;flex:1"><span style="font-size:12px;color:#F8D6C6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ barSub }}</span><span style="font-size:16px;font-weight:700;color:#FFF7F0">{{ barMain }}</span></span>
+<a href="{{ ctaHref }}" style="display:flex;align-items:center;min-height:48px;padding:0 20px;border-radius:12px;background:#F28C6F;color:#3E2532;font-size:16px;font-weight:700;text-decoration:none;transition:transform 140ms cubic-bezier(0.23,1,0.32,1)" style-active="transform:scale(0.97)">{{ barCta }}</a>
+</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;prenotazioneOnline&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Come nell’app&quot;,&quot;Attiva&quot;,&quot;Solo telefono&quot;],&quot;default&quot;:&quot;Come nell’app&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Regole del salone&quot;},&quot;annullamentoOnline&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Come nell’app&quot;,&quot;Attivo&quot;,&quot;Solo telefono&quot;],&quot;default&quot;:&quot;Come nell’app&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Regole del salone&quot;},&quot;prezzi&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Come nell’app&quot;,&quot;Visibili&quot;,&quot;Nascosti&quot;],&quot;default&quot;:&quot;Come nell’app&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Regole del salone&quot;}}">
+class Component extends DCLogic {
+  state = Object.assign({ w: typeof window !== 'undefined' ? window.innerWidth : 1280, v: 2, data: 'demo', step: 1, svc: null, op: 'any', wk: 0, day: null, time: null, pickedOp: null, name: '', email: '', phone: '', code: '', privacy: false, cookie: (() => { try { return localStorage.getItem('tgCookieSaragozza'); } catch (e) { return 'x'; } })(), cookieMore: false, cookieStats: false, emailTouched: false, fxX: '0px', fxOp: 1, fxTr: 'none', sheet: false, sheetIn: false, expanded: {}, doneIn: false });
+  cardRef = React.createRef();
+  readRules() { try { return Object.assign({ book: true, cancel: true, prices: true }, JSON.parse(localStorage.getItem('tgClientRules') || '{}')); } catch (e) { return { book: true, cancel: true }; } }
+  componentDidMount() {
+    this._r = () => this.setState({ w: window.innerWidth }); window.addEventListener('resize', this._r);
+    this._st = e => { if (!e || e.key === 'tgClientRules') this.setState({ rules: this.readRules() }); }; window.addEventListener('storage', this._st); window.addEventListener('focus', this._st); this.setState({ rules: this.readRules() });
+    this._rm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._r); window.removeEventListener('storage', this._st); window.removeEventListener('focus', this._st); clearTimeout(this._t); }
+  save(p) { try { const o = JSON.parse(localStorage.getItem('sfBookProto') || '{}'); localStorage.setItem('sfBookProto', JSON.stringify(Object.assign(o, p))); } catch (e) {} }
+  reset(extra) { const worst = (extra && extra.data || this.state.data) === 'worst'; return Object.assign({ step: 1, svc: null, op: 'any', wk: 0, day: null, time: null, pickedOp: null, code: '', emailTouched: false, sheet: false, sheetIn: false, expanded: {}, doneIn: false, fxX: '0px', fxOp: 1, fxTr: 'none', name: worst ? 'Aleksandra Wiśniewska-Kowalczyk' : '', email: worst ? 'bartholomew.fitzgerald@northwind-industries-holdings.example.com' : '', phone: '' }, extra || {}); }
+  setV(v) { this.save({ v }); this.setState(this.reset({ v })); }
+  setD(data) { this.save({ data }); this.setState(this.reset({ data })); }
+  scrollCard() { const el = this.cardRef.current; if (!el) return; const t = el.getBoundingClientRect().top; if (t < 72 || t > window.innerHeight * 0.6) window.scrollTo({ top: t + window.scrollY - 88, behavior: this._rm ? 'auto' : 'smooth' }); }
+  go(patch) {
+    const cur = this.state.step, nx = patch.step != null ? patch.step : cur, dir = nx >= cur ? 1 : -1;
+    if (this.state.v === 1 && nx !== cur && !this._rm) {
+      this.setState(Object.assign({}, patch, { fxX: (dir * 28) + 'px', fxOp: 0, fxTr: 'none' }), () => { requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ fxX: '0px', fxOp: 1, fxTr: 'transform 260ms cubic-bezier(0.23,1,0.32,1), opacity 200ms ease-out' }))); this.scrollCard(); });
+    } else this.setState(patch, () => { if (this.state.v !== 3) this.scrollCard(); });
+    if (nx === 5) { this.setState({ doneIn: false }); requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ doneIn: true }))); }
+  }
+  openSheet(patch) { this.setState(Object.assign({}, patch, { sheet: true, sheetIn: false, step: 3 }), () => requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ sheetIn: true })))); }
+  closeSheet() { this.setState({ sheetIn: false }); clearTimeout(this._t); this._t = setTimeout(() => this.setState(s => (s.step === 5 ? this.reset() : { sheet: false, step: 1, code: '' })), 220); }
+  renderVals() {
+    const S = this.state, n = S.w < 820, worst = S.data === 'worst', full = S.data === 'full';
+    const SV = worst ? [['Taglio sfumato con disegno a mano libera e rifinitura a rasoio', 75, 45], ['Barba', 20, 12], ['Rasatura classica con panno caldo e trattamento pre-barba', 40, 28], ['Taglio bambino (fino a 12 anni)', 25, 15], ['Taglio uomo', 30, 20]] : [['Taglio uomo', 30, 20], ['Barba', 20, 12], ['Taglio e barba', 50, 30], ['Rasatura classica', 30, 18], ['Taglio bambino', 25, 15]];
+    const OPN = worst ? { a: 'Gianfrancesco', m: 'Massimiliano', s: 'Jo' } : { a: 'Andrea', m: 'Marco', s: 'Simone' };
+    const OPC = { any: ['★', '#F8D6C6', '#3E2532'], a: ['A', '#3E2532', '#FFF7F0'], m: ['M', '#F28C6F', '#3E2532'], s: ['S', '#F8D6C6', '#3E2532'] };
+    const svcIdx = S.svc != null ? S.svc : (S.v === 3 ? 0 : null), sv = svcIdx != null ? SV[svcIdx] : null, dur = sv ? sv[1] : 30;
+    const fmt = m => Math.floor(m / 60) + ':' + String(m % 60).padStart(2, '0');
+    const hash = s => { let x = 2166136261; for (let k = 0; k < s.length; k++) { x ^= s.charCodeAt(k); x = Math.imul(x, 16777619); } return (x >>> 0) / 4294967295; };
+    const DOW = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'], DOWL = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'], MON = ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'];
+    const DAYS = Array.from({ length: 14 }, (_, i) => { const d = new Date(2026, 9, 30 + i), w = d.getDay(); return { i, w, num: d.getDate(), mon: d.getMonth(), closed: w === 0 || w === 1 }; });
+    const CAND = []; for (let m = 540; m < 780; m += 30) CAND.push(m); for (let m = 870; m < 1140; m += 30) CAND.push(m);
+    const freeFor = (op, di) => { const D = DAYS[di]; if (D.closed || full) return []; if (worst && di < 7) return di === 0 && op === 's' ? [1110].filter(t => t + dur <= 1140) : []; const thr = worst ? 0.82 : D.w === 6 ? 0.78 : 0.55; let L = CAND.filter(t => t + dur <= (t < 780 ? 780 : 1140) && hash(op + ':' + di + ':' + t) > thr); if (di === 0) { L = L.filter(t => t >= 690); if (op === 's' && dur <= 30) L.push(665); } return L.sort((a, b) => a - b); };
+    const slotMap = di => { const M = new Map(); (S.op === 'any' ? ['s', 'm', 'a'] : [S.op]).forEach(o => freeFor(o, di).forEach(t => { if (!M.has(t)) M.set(t, o); })); return [...M.entries()].sort((a, b) => a[0] - b[0]); };
+    const counts = DAYS.map(D => slotMap(D.i).length), someFree = counts.some(c => c > 0);
+    const plural = (c, one, many) => c + ' ' + (c === 1 ? one : many);
+    const dayName = i => i === 0 ? 'Oggi' : i === 1 ? 'Domani' : DOW[DAYS[i].w] + ' ' + DAYS[i].num;
+    const longDay = i => DOWL[DAYS[i].w] + ' ' + DAYS[i].num + ' ' + MON[DAYS[i].mon];
+    const pickTime = (di, t, o) => S.v === 3 ? this.openSheet({ day: di, time: t, pickedOp: o }) : this.go({ day: di, time: t, pickedOp: o, step: 3 });
+    const R0 = this.state.rules || { book: true, cancel: true }, P0 = this.props || {};
+    const pricesOn = P0.prezzi === 'Nascosti' ? false : P0.prezzi === 'Visibili' ? true : R0.prices !== false; const eurX = v => pricesOn ? v + ' €' : '';
+    const services = SV.map(([name, d, p], i) => { const on = svcIdx === i; return { name, dur: d + ' min', price: eurX(p), on, bd: on ? '#3E2532' : '#E6D9DC', bg: on ? '#FBF0E9' : '#FFFFFF', bd3: on ? '#3E2532' : '#E6D9DC', bg3: on ? '#3E2532' : '#FFFFFF', fg3: on ? '#FFF7F0' : '#3E2532', pick: () => this.go({ svc: i, step: 2, time: null, day: null, wk: 0 }), pick3: () => this.setState({ svc: i, day: null, expanded: {} }) }; });
+    const ops = ['any', 'a', 'm', 's'].map(id => { const on = S.op === id; return { name: id === 'any' ? 'Chiunque' : OPN[id], i: OPC[id][0], avBg: OPC[id][1], avFg: OPC[id][2], on, bd: on ? '#3E2532' : '#E6D9DC', bg: on ? '#3E2532' : '#FFFFFF', fg: on ? '#FFF7F0' : '#3E2532', pick: () => this.setState({ op: id, day: null, wk: 0, expanded: {} }) }; });
+    const quick = []; for (let di = 0; di < DAYS.length && quick.length < 3; di++) slotMap(di).slice(0, 3 - quick.length).forEach(([t, o]) => quick.push({ day: dayName(di), time: fmt(t), who: OPN[o], pick: () => pickTime(di, t, o) }));
+    const firstIn = wk => counts.findIndex((c, i) => i >= wk * 7 && i < wk * 7 + 7 && c > 0);
+    const inWk = S.day != null && S.day >= S.wk * 7 && S.day < S.wk * 7 + 7;
+    const selDay = inWk ? S.day : firstIn(S.wk);
+    const week = DAYS.slice(S.wk * 7, S.wk * 7 + 7).map(D => { const c = counts[D.i], on = selDay === D.i, off = D.closed || !c; return { dow: D.i === 0 ? 'Oggi' : DOW[D.w], num: String(D.num), on, off, deco: D.closed ? 'line-through' : 'none', aria: longDay(D.i) + (D.closed ? ', chiuso' : c ? ', ' + plural(c, 'orario libero', 'orari liberi') : ', tutto pieno'), bd: on ? '#3E2532' : '#E6D9DC', bg: on ? '#3E2532' : off ? 'transparent' : '#FFFFFF', fg: on ? '#FFF7F0' : off ? '#A88C99' : '#3E2532', dot: c ? (on ? '#9FD3BC' : '#21624E') : 'transparent', cur: off ? 'default' : 'pointer', pick: () => { if (!off) this.setState({ day: D.i }); } }; });
+    const wkA = DAYS[S.wk * 7], wkB = DAYS[S.wk * 7 + 6], otherWk = S.wk ? 0 : 1, otherHas = firstIn(otherWk) >= 0;
+    const sm = selDay >= 0 ? slotMap(selDay) : [];
+    const slots = sm.map(([t, o]) => ({ label: fmt(t), pick: () => pickTime(selDay, t, o) }));
+    const tOp = S.op === 'any' ? (S.pickedOp || 's') : S.op, hasTime = S.time != null && S.day != null;
+    const whenLong = hasTime ? longDay(S.day) + (S.day === 0 ? ' (oggi)' : '') + ', ore ' + fmt(S.time) : '';
+    const whatLong = sv ? sv[0] + ' con ' + OPN[tOp] + ' · ' + sv[1] + ' min' + (pricesOn ? ' · ' + sv[2] + ' €' : '') : '';
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(S.email.trim()), nameOk = S.name.trim().length >= 2, dataOk = nameOk && emailOk && !!S.privacy;
+    const emailBad = S.emailTouched && S.email.trim().length > 0 && !emailOk;
+    const progN = Math.min(S.step, 3), stepLbl = { 1: 'Servizio', 2: 'Giorno e ora', 3: 'I tuoi dati', 4: 'Conferma' };
+    const chips = [sv && S.step >= 2 && { v: sv[0], full: sv[0], edit: () => this.go({ step: 1 }) }, hasTime && S.step >= 3 && { v: dayName(S.day) + ' ' + fmt(S.time), full: whenLong, edit: () => this.go({ step: 2 }) }].filter(Boolean);
+    const mark = (k, done) => ({ [k + 'Bg']: done ? '#21624E' : S.step >= +k.slice(1) ? '#3E2532' : '#E6D9DC', [k + 'Fg']: done || S.step >= +k.slice(1) ? '#FFFFFF' : '#725C66', [k + 'Mark']: done ? '✓' : k.slice(1), [k + 'Title']: S.step >= +k.slice(1) || done ? '#3E2532' : '#725C66' });
+    const acc = (k, open) => ({ [k + 'Rows']: open ? '1fr' : '0fr', [k + 'Op']: open ? 1 : 0 });
+    const agenda = DAYS.filter(D => !D.closed).map(D => { const L = slotMap(D.i), ex = !!S.expanded[D.i], lim = 6, shown = ex ? L : L.slice(0, lim); return { title: dayName(D.i) + (D.i > 1 ? '' : ' · ' + DOW[D.w].toLowerCase() + ' ' + D.num), sub: L.length ? plural(L.length, 'orario', 'orari') : 'Pieno', subFg: L.length ? '#21624E' : '#725C66', has: L.length > 0, items: shown.map(([t, o]) => ({ label: fmt(t), pick: () => pickTime(D.i, t, o) })), more: !ex && L.length > lim, moreN: L.length - lim, expand: () => this.setState(s => ({ expanded: Object.assign({}, s.expanded, { [D.i]: true }) })) }; });
+    const titles = { 1: ['Passo per passo', 'Una domanda per schermata, si avanza da soli toccando. Con transizione direzionale tra i passi.'], 2: ['Tutto in una pagina', 'Tre sezioni a fisarmonica: quella fatta si chiude in una riga riassuntiva, la successiva si apre.'], 3: ['Prima l’orario', 'Si parte dagli orari liberi dei prossimi giorni. Tocchi un orario, il resto in un pannello dal basso.'] };
+    const segs = (arr, cur, fn) => arr.map(([id, label]) => { const on = cur === id; return { label, on, bg: on ? '#FFFFFF' : 'transparent', sh: on ? '0 1px 3px rgba(0,0,0,.15)' : 'none', pick: () => fn(id) }; });
+    const first0 = o => { const L = freeFor(o, 0); return L.length ? fmt(L[0]) : null; };
+    const firstAny = (() => { const L = ['s', 'm', 'a'].map(o => freeFor(o, 0)[0]).filter(x => x != null); return L.length ? fmt(Math.min(...L)) : null; })();
+    const H = [['Lunedì', 'Chiuso'], ['Martedì', '9:00–13:00 · 14:30–19:00'], ['Mercoledì', '9:00–13:00 · 14:30–19:00'], ['Giovedì', '9:00–13:00 · 14:30–19:00'], ['Venerdì', '9:00–13:00 · 14:30–19:00'], ['Sabato', '9:00–13:00 · 14:30–19:00'], ['Domenica', 'Chiuso']];
+    const U = id => 'https://images.unsplash.com/photo-' + id + '?w=800&q=70&auto=format&fit=crop';
+    const R = S.rules || { book: true, cancel: true }, P = this.props || {};
+    const bookOn = P.prenotazioneOnline === 'Attiva' ? true : P.prenotazioneOnline === 'Solo telefono' ? false : R.book !== false;
+    const cancelOn = bookOn && (P.annullamentoOnline === 'Attivo' ? true : P.annullamentoOnline === 'Solo telefono' ? false : R.cancel !== false);
+    return Object.assign({
+      bookOn, bookOff: !bookOn, pricesOn, pricesOff: !pricesOn, showPhoneLink: S.w >= 1100 && bookOn,
+      ctaHref: bookOn ? '#prenota' : 'tel:+390516442190', ctaLbl: bookOn ? 'Prenota online' : 'Chiama per prenotare', heroCta: bookOn ? 'Prenota online' : 'Chiama 051 644 2190', barCta: bookOn ? 'Prenota' : 'Chiama',
+      heroBook: bookOn ? 'Prenoti online in un minuto, senza registrarti.' : 'Per prenotare chiamaci allo 051 644 2190.',
+      signAria: bookOn ? 'Aperto oggi fino alle 19:00. Vai alla prenotazione' : 'Aperto oggi fino alle 19:00. Chiama per prenotare', signLine: bookOn ? 'Primo posto · ' + (firstAny || '—') : 'Prenota al telefono',
+      cancelTitle: cancelOn ? 'Annulli gratis fino a 2 ore prima' : 'Per spostare o annullare, chiamaci', cancelBody: cancelOn ? 'Dal link nell’email di conferma. Paghi in negozio.' : '051 644 2190, negli orari di apertura. Paghi in negozio.',
+      cancelDone: cancelOn ? 'Annulli dal link nell’email, fino a 2 ore prima.' : 'Per spostare o annullare chiamaci allo 051 644 2190.',
+      narrow: n, wide: !n, full: S.w >= 1100, firstAny: firstAny || '—',
+      barbers: [
+        { name: 'Andrea', what: 'Titolare · tagli classici e rasatura', free: first0('a') ? 'Libero oggi alle ' + first0('a') : 'Oggi al completo', showFree: bookOn, col: '#3E2532', img: U('1622287162716-f311baa1a2b8'), alt: 'Andrea al lavoro su un cliente' },
+        { name: 'Marco', what: 'Sfumature e disegni', free: first0('m') ? 'Libero oggi alle ' + first0('m') : 'Oggi al completo', showFree: bookOn, col: '#F28C6F', img: U('1567894340315-735d7c361db0'), alt: 'Marco con la macchinetta in mano' },
+        { name: 'Simone', what: 'Barba e styling', free: first0('s') ? 'Libero oggi alle ' + first0('s') : 'Oggi al completo', showFree: bookOn, col: '#F8D6C6', img: U('1605497788044-5a32c7078486'), alt: 'Simone che asciuga i capelli di un cliente' }
+      ],
+      hours: H.map(([day, time]) => ({ day: day === 'Venerdì' ? day + ' · oggi' : day, time, w: day === 'Venerdì' ? 700 : 500, fg: time === 'Chiuso' ? '#725C66' : '#3E2532' })),
+      heroMin: n ? '640px' : 'min(760px, calc(100svh - 72px))', ctaML: n ? 'auto' : '0', signAlign: n ? 'flex-end' : 'flex-start', signW: n ? '190px' : '230px', signBig: n ? '30px' : '38px',
+      galCols: n ? '1fr 1fr' : '2fr 1fr 1fr', galRow: n ? '160px' : '240px', galWide: n ? 'span 2' : '2 / span 2',
+      bottomPad: n ? '40px' : 'clamp(56px,7vw,96px)', footPad: n ? '110px' : '32px',
+      barSub: !bookOn ? 'Prenotazioni al telefono' : sv ? sv[0] + (pricesOn ? ' · ' + sv[2] + ' €' : '') : 'Prenota in un minuto', barMain: !bookOn ? '051 644 2190' : hasTime && S.step >= 3 ? dayName(S.day) + ' · ' + fmt(S.time) + ' con ' + OPN[tOp] : (firstAny ? 'Primo libero oggi alle ' + firstAny : 'Oggi al completo'),
+      vTitle: titles[S.v][0], vAxis: titles[S.v][1], vMax: S.v === 2 ? '680px' : S.v === 3 ? '760px' : '640px',
+      v1: S.v === 1, v2: S.v === 2, v3: S.v === 3, cardRef: this.cardRef,
+      s1: S.step === 1, s2: S.step === 2, s3: S.step === 3, s4: S.step === 4, s5: S.step === 5, notDone: S.step < 5,
+      showProg: S.step < 5, canBack: S.step > 1 && S.step < 5, back: () => this.go({ step: S.step - 1 }), progN, progLbl: stepLbl[S.step] || '',
+      prog: [1, 2, 3].map(k => ({ bg: k <= progN ? '#3E2532' : '#E6D9DC' })), hasChips: chips.length > 0 && S.step < 5, chips,
+      fxX: S.fxX, fxOp: S.fxOp, fxTr: S.fxTr,
+      services, ops, quick, hasQuick: quick.length > 0, someFree, noneAtAll: !someFree, withWho: S.op === 'any' ? '' : ' con ' + OPN[S.op], canAnyone: S.op !== 'any', setAnyone: () => this.setState({ op: 'any', day: null, wk: 0 }),
+      week, weekLbl: wkA.num + ' ' + MON[wkA.mon].slice(0, 3) + ' – ' + wkB.num + ' ' + MON[wkB.mon].slice(0, 3),
+      prevWeek: () => this.setState({ wk: 0, day: null }), nextWeek: () => this.setState({ wk: 1, day: null }), noPrev: S.wk === 0, noNext: S.wk === 1, prevOp: S.wk === 0 ? 0.35 : 1, nextOp: S.wk === 1 ? 0.35 : 1,
+      hasDay: selDay >= 0 && sm.length > 0, weekEmpty: someFree && selDay < 0, goOtherWeek: () => this.setState({ wk: otherWk, day: null }), otherWeekLbl: otherHas ? (otherWk ? 'Vedi la settimana dopo' : 'Torna a questa settimana') : 'Cambia settimana',
+      dayLong: selDay >= 0 ? longDay(selDay) + (selDay === 0 ? ' · oggi' : '') + ' · ' + plural(sm.length, 'orario', 'orari') : '', slots, slotCols: n ? 4 : 5,
+      whenLong, whatLong, name: S.name, email: S.email, phone: S.phone, code: S.code,
+      onName: e => this.setState({ name: e.target.value }), onEmail: e => this.setState({ email: e.target.value }), blurEmail: () => this.setState({ emailTouched: true }), onPhone: e => this.setState({ phone: e.target.value.replace(/[^\d+ ]/g, '') }),
+      emailBad, emailBd: emailBad ? '#B43E4B' : '#A88C99',
+      onCode: e => { const c = e.target.value.replace(/\D/g, '').slice(0, 6); this.setState({ code: c }); if (c.length === 6) { clearTimeout(this._ct); this._ct = setTimeout(() => this.go({ step: 5 }), 250); } },
+      privacyMark: S.privacy ? '✓' : '', privacyBg: S.privacy ? '#3E2532' : '#FFFFFF', privacyBd: S.emailTouched && !S.privacy ? '#B43E4B' : S.privacy ? '#3E2532' : '#A88C99', privacyOn: !!S.privacy, privacyErr: S.emailTouched && !S.privacy && nameOk && emailOk, togglePrivacy: () => this.setState({ privacy: !this.state.privacy }),
+      cookieShow: !S.cookie, cookieMore: !!S.cookieMore, cookieLess: !S.cookieMore, statsOn: !!S.cookieStats, statsBg: S.cookieStats ? '#21624E' : '#E6D9DC', statsJ: S.cookieStats ? 'flex-end' : 'flex-start',
+      cookieSet: v => { try { localStorage.setItem('tgCookieSaragozza', v); } catch (e) {} this.setState({ cookie: v, cookieMore: false }); },
+      cookieNo: () => { try { localStorage.setItem('tgCookieSaragozza', 'necessari'); } catch (e) {} this.setState({ cookie: 'necessari', cookieMore: false }); },
+      cookieYes: () => { try { localStorage.setItem('tgCookieSaragozza', 'tutti'); } catch (e) {} this.setState({ cookie: 'tutti', cookieMore: false }); },
+      cookieSave: () => { const v = this.state.cookieStats ? 'tutti' : 'necessari'; try { localStorage.setItem('tgCookieSaragozza', v); } catch (e) {} this.setState({ cookie: v, cookieMore: false }); },
+      cookieOpenMore: () => this.setState({ cookieMore: true }), toggleStats: () => this.setState({ cookieStats: !this.state.cookieStats }),
+      cookieReopen: e => { if (e) e.preventDefault(); this.setState({ cookie: null, cookieMore: false, cookieStats: this.state.cookie === 'tutti' }); },
+      sendCode: () => { if (dataOk) this.go({ step: 4, code: '' }); else this.setState({ emailTouched: true }); }, sendDis: !dataOk, sendBg: dataOk ? '#3E2532' : '#E6D9DC', sendFg: dataOk ? '#FFF7F0' : '#725C66',
+      backToData: () => this.go({ step: 3 }),
+      seeYou: hasTime ? (S.day === 0 ? 'oggi' : S.day === 1 ? 'domani' : DOWL[DAYS[S.day].w].toLowerCase()) + ' alle ' + fmt(S.time) : '',
+      doneRows: hasTime && sv ? [{ k: 'Quando', v: longDay(S.day) + ', ' + fmt(S.time) }, { k: 'Servizio', v: sv[0] + ' · ' + sv[1] + ' min' }, { k: 'Barbiere', v: OPN[tOp] }, { k: 'Prezzo', v: pricesOn ? sv[2] + ' €, in negozio' : 'Te lo diciamo in salone' }, { k: 'Dove', v: 'Via Saragozza 48, Bologna' }] : [],
+      doneSc: S.doneIn || this._rm ? 1 : 0.6, doneOp: S.doneIn || this._rm ? 1 : 0,
+      restart: () => { if (S.v === 3) { this.closeSheet(); } else this.go(this.reset()); },
+      doneCount: [svcIdx != null && S.step > 1, hasTime && S.step > 2, S.step > 4].filter(Boolean).length,
+      sum1: S.step > 1 && !!sv, sum1Text: sv ? sv[0] + ' · ' + sv[1] + ' min' + (pricesOn ? ' · ' + sv[2] + ' €' : '') : '', edit1: () => this.go({ step: 1 }),
+      sum2: S.step > 2 && hasTime, sum2Text: hasTime ? dayName(S.day) + ', ' + fmt(S.time) + ' con ' + OPN[tOp] : '', edit2: () => this.go({ step: 2 }),
+      sum3: false, sum3Text: '', edit3: () => {},
+      agenda, sheetMounted: S.sheet, sheetY: S.sheetIn ? '0' : '100%', sheetBgOp: S.sheetIn ? 1 : 0, sheetDur: S.sheetIn ? '320ms' : '200ms',
+      sheetLbl: S.step === 5 ? 'Prenotato' : S.step === 4 ? 'Conferma' : 'Ultimo passo', closeSheet: () => this.closeSheet(), sheetKey: e => { if (e.key === 'Escape') this.closeSheet(); }
+    }, mark('n1', S.step > 1 && !!sv), mark('n2', S.step > 2 && hasTime), mark('n3', S.step > 4), acc('o1', S.step === 1), acc('o2', S.step === 2), acc('o3', S.step === 3 || S.step === 4));
+  }
+}
+</script>
+</body>
+</html>
