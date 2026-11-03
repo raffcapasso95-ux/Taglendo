@@ -9,6 +9,7 @@ export const LIMITS = {
   clientName: 60,
   phone: 20,
   email: 254,
+  clientNote: 500,
 } as const;
 
 export const isEmail = (value: string) => value.length <= LIMITS.email && EMAIL.test(value.trim());

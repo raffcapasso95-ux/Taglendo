@@ -39,6 +39,12 @@ export type Database = {
       foreignKeyName: "appointments_client_id_salon_id_fkey"
       columns: ["client_id","salon_id"]
 isOneToOne: false
+      referencedRelation: "client_stats"
+      referencedColumns: ["client_id","salon_id"]
+    },{
+      foreignKeyName: "appointments_client_id_salon_id_fkey"
+      columns: ["client_id","salon_id"]
+isOneToOne: false
       referencedRelation: "clients"
       referencedColumns: ["id","salon_id"]
     },{
@@ -270,7 +276,21 @@ isOneToOne: false
                 }
           }
           Views: {
-            "clients_visible": {
+            "client_stats": {
+                  Row: {
+                    "client_id": string,"last_visit_at": string | null,"next_at": string | null,"salon_id": string,"spent_cents": number | null,"usual_member_id": string | null,"usual_service_id": string | null,"visits": number | null
+                  }
+                  ComputedFields: never
+                  Relationships: [
+                    {
+      foreignKeyName: "clients_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"clients_visible": {
                   Row: {
                     "created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"privacy_accepted_at": string | null,"salon_id": string
                   }

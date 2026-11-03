@@ -15,7 +15,7 @@ import styles from "./Dialogs.module.css";
 
 const copy = agendaCopy.form;
 
-export type Prefill = { date?: string; memberId?: string | null; startMin?: number };
+export type Prefill = { date?: string; memberId?: string | null; startMin?: number; clientId?: string | null; serviceId?: string | null; newName?: string | null };
 
 type Props = {
   mode: "new" | "walkin";
@@ -39,11 +39,11 @@ export function dayLabel(date: string, today: string, tomorrow: string): string 
 export function NewAppointment({ mode, prefill, operators, services, clients, today, selectedDate, onClose, onCreated }: Props) {
   const walkInMode = mode === "walkin";
   const [query, setQuery] = useState("");
-  const [clientId, setClientId] = useState<string | null>(null);
-  const [newMode, setNewMode] = useState(false);
-  const [newName, setNewName] = useState("");
+  const [clientId, setClientId] = useState<string | null>(() => (prefill?.clientId && clients.some((c) => c.id === prefill.clientId) ? prefill.clientId : null));
+  const [newMode, setNewMode] = useState(() => !prefill?.clientId && prefill?.newName !== undefined && prefill?.newName !== null);
+  const [newName, setNewName] = useState(prefill?.newName ?? "");
   const [newPhone, setNewPhone] = useState("");
-  const [serviceId, setServiceId] = useState(services[0]?.id ?? "");
+  const [serviceId, setServiceId] = useState(() => (prefill?.serviceId && services.some((s) => s.id === prefill.serviceId) ? prefill.serviceId : (services[0]?.id ?? "")));
   const [memberId, setMemberId] = useState<string | "any">(prefill?.memberId ?? "any");
   const [date, setDate] = useState(prefill?.date ?? selectedDate);
   const [startMin, setStartMin] = useState<number | null>(prefill?.startMin ?? null);

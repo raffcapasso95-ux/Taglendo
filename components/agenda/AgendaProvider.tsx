@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { ToastProvider, useToast } from "@/components/ui";
 import { agendaCopy } from "@/lib/copy/agenda";
 import type { Created } from "@/lib/agenda/actions";
@@ -34,6 +34,8 @@ type Props = {
   operators: Operator[];
   services: ServiceOption[];
   clients: ClientOption[];
+  /** Foglio “nuovo appuntamento” da aprire subito (arriva dalla scheda cliente). */
+  initialNew?: Prefill | null;
   children: ReactNode;
 };
 
@@ -48,10 +50,15 @@ export function AgendaProvider(props: Props) {
   );
 }
 
-function Inner({ canEdit, salonName, today, selectedDate, operators, services, clients, children }: Props) {
+function Inner({ canEdit, salonName, today, selectedDate, operators, services, clients, initialNew, children }: Props) {
   const router = useRouter();
   const toast = useToast();
-  const [dialog, setDialog] = useState<Dialog | null>(null);
+  const [dialog, setDialog] = useState<Dialog | null>(() => (canEdit && initialNew ? { kind: "new", prefill: initialNew } : null));
+
+  // L'indirizzo con ?nuovo=… serve una volta sola: lo ripuliamo.
+  useEffect(() => {
+    if (initialNew) router.replace("/agenda");
+  }, [initialNew, router]);
 
   const api = useMemo<Api>(
     () => ({

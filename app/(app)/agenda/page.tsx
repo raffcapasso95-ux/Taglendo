@@ -15,8 +15,8 @@ import { clock } from "@/lib/rules/agenda";
 
 export const metadata: Metadata = { title: "Agenda · Taglendo" };
 
-async function Content({ searchParams }: { searchParams: Promise<{ g?: string; op?: string }> }) {
-  const { g, op } = await searchParams;
+async function Content({ searchParams }: { searchParams: Promise<{ g?: string; op?: string; nuovo?: string; servizio?: string; barbiere?: string; nome?: string }> }) {
+  const { g, op, nuovo, servizio, barbiere, nome } = await searchParams;
   const data = await loadAgenda({ date: g, op });
   if (!data) return null;
   const { day } = data;
@@ -30,6 +30,16 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
       operators={data.operators}
       services={data.services}
       clients={data.clients}
+      initialNew={
+        nuovo
+          ? {
+              clientId: nuovo === "nuovo" ? null : nuovo,
+              newName: nuovo === "nuovo" ? (nome?.slice(0, 60) ?? "") : null,
+              serviceId: servizio ?? null,
+              memberId: barbiere ?? null,
+            }
+          : null
+      }
     >
     <div className={styles.page}>
       <div className={styles.main}>
