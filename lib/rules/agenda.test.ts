@@ -3,6 +3,7 @@ import {
   buildDay,
   busyPercent,
   freeIntervals,
+  gridRange,
   gridStart,
   initials,
   operatorStatus,
@@ -172,5 +173,52 @@ describe("buildDay", () => {
       appts: [appt("1", "a", 540, 600)],
     });
     expect(full.summary).toBe("1 cliente · Nessuno spazio libero");
+  });
+});
+
+describe("barbiere in ferie", () => {
+  it("la colonna c'è ma senza spazi liberi, e lo dice", () => {
+    const day = buildDay({
+      date: "2026-11-05",
+      isToday: false,
+      nowMin: 0,
+      hours: HOURS,
+      operators: [
+        { id: "a", name: "Andrea", chairNo: 1 },
+        { id: "m", name: "Marco", chairNo: 2, off: true },
+      ],
+      appts: [],
+    });
+    expect(day.columns[1]!.gaps).toEqual([]);
+    expect(day.columns[1]!.status.text).toBe("Non lavora oggi");
+    expect(day.columns[0]!.gaps.length).toBe(2);
+    expect(day.freeNext.every((f) => f.memberId === "a")).toBe(true);
+  });
+});
+
+describe("gridRange", () => {
+  const operators = [{ id: "a", name: "Andrea", chairNo: 1 }];
+  const day = (hours: DayHours, appts: AgendaAppt[], isToday = false, nowMin = 0) =>
+    buildDay({ date: "2026-11-05", isToday, nowMin, hours, operators, appts });
+
+  it("di solito dall'apertura alla chiusura", () => {
+    expect(gridRange(day(HOURS, [appt("1", "a", 600, 630)]), false)).toEqual({ open: 540, start: 540, end: 1140 });
+  });
+
+  it("si allarga per un appuntamento fuori orario", () => {
+    const r = gridRange(day(HOURS, [appt("1", "a", 510, 540), appt("2", "a", 1140, 1175)]), false);
+    expect(r).toEqual({ open: 510, start: 510, end: 1200 }); // 19:35 si arrotonda alle 20:00
+  });
+
+  it("un giorno chiuso con appuntamenti li mostra; senza, una giornata normale", () => {
+    const closed = { ...HOURS, closed: true };
+    expect(gridRange(day(closed, [appt("1", "a", 600, 650)]), false)).toEqual({ open: 600, start: 600, end: 660 });
+    expect(gridRange(day(closed, []), false)).toEqual({ open: 540, start: 540, end: 1140 });
+  });
+
+  it("oggi non si allarga per gli appuntamenti già passati", () => {
+    const past = day(HOURS, [appt("1", "a", 500, 530)], true, 700);
+    expect(gridRange(past, false).open).toBe(540);
+    expect(gridRange(past, true).open).toBe(480); // con "Mostra" sì
   });
 });

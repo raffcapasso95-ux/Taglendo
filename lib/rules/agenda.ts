@@ -29,7 +29,13 @@ export type DayHours = {
   breakEndMin: number | null;
 };
 
-export type Operator = { id: string; name: string; chairNo: number };
+export type Operator = {
+  id: string;
+  name: string;
+  chairNo: number;
+  /** In chiusura (ferie) in questo giorno: la colonna c'è ma non ha spazi liberi. */
+  off?: boolean;
+};
 
 /** Occupa il tempo del barbiere: confermato o completato (come nel prototipo e in free_slots). */
 export const isActive = (s: ApptStatus) => s === "confermato" || s === "completato";
@@ -136,6 +142,29 @@ export function gridStart(hours: DayHours, isToday: boolean, nowMin: number, sho
     : hours.openMin;
 }
 
+/**
+ * Da dove a dove si disegna la griglia. Di solito dall'apertura alla chiusura, ma se un appuntamento
+ * resta fuori orario (orari cambiati dopo, o giorno diventato chiuso) la griglia si allarga per mostrarlo.
+ * `open` è l'inizio della giornata; `start` è dove parte davvero (oggi si nascondono le ore passate).
+ */
+export function gridRange(day: DayModel, showPast: boolean): { open: number; start: number; end: number } {
+  const { hours, isToday, nowMin } = day;
+  const relevant = day.columns
+    .flatMap((c) => c.appts)
+    .filter((a) => a.status !== "annullato" && !(isToday && !showPast && a.endMin <= nowMin));
+  const down = (m: number) => Math.floor(m / 30) * 30;
+  const up = (m: number) => Math.ceil(m / 30) * 30;
+
+  let open = hours.closed ? (relevant.length ? down(Math.min(...relevant.map((a) => a.startMin))) : 540) : hours.openMin;
+  let end = hours.closed ? (relevant.length ? up(Math.max(...relevant.map((a) => a.endMin))) : 1140) : hours.closeMin;
+  for (const a of relevant) {
+    open = Math.min(open, down(a.startMin));
+    end = Math.max(end, up(a.endMin));
+  }
+  const start = gridStart({ ...hours, closed: false, openMin: open, closeMin: end }, isToday, nowMin, showPast);
+  return { open, start, end };
+}
+
 export type Column = {
   operator: Operator;
   /** Indice per il colore (0 prugna, 1 albicocca, 2 pesca, 3 grigio). */
@@ -189,9 +218,9 @@ export function buildDay(input: DayInput): DayModel {
       colorIndex: i % 4,
       appts: mine,
       count: live.length,
-      status: operatorStatus(mine, isToday, nowMin),
+      status: operator.off ? { kind: "free" as const, text: "Non lavora oggi" } : operatorStatus(mine, isToday, nowMin),
       fill: busyPercent(hours, mine),
-      gaps: freeIntervals(hours, live, from),
+      gaps: operator.off ? [] : freeIntervals(hours, live, from),
     };
   });
 

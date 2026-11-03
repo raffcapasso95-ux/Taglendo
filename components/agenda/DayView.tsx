@@ -6,7 +6,7 @@ import {
   clock,
   firstName,
   GRID_PX_PER_MIN as PX,
-  gridStart,
+  gridRange,
   plural,
   span,
   type AgendaAppt,
@@ -36,12 +36,16 @@ function Empty({ day, weekdayName }: { day: DayModel; weekdayName: string }) {
 export function DayView({ day, weekdayName, multiple }: Props) {
   const [showPast, setShowPast] = useState(false);
   const [showCancelled, setShowCancelled] = useState(false);
-  const empty = day.closed || day.columns.every((c) => c.appts.length === 0);
-
-  if (day.closed) return <Empty day={day} weekdayName={weekdayName} />;
+  const empty = day.columns.every((c) => c.appts.length === 0);
+  const toMove = day.columns.reduce((n, c) => n + c.appts.filter((a) => a.status === "confermato").length, 0);
 
   return (
     <>
+      {day.closed && !empty ? (
+        <p className={styles.closedBanner} role="status">
+          {weekdayName}: salone chiuso · {plural(toMove, "appuntamento da spostare", "appuntamenti da spostare")}
+        </p>
+      ) : null}
       <div className={styles.desktopOnly}>
         {empty ? (
           <Empty day={day} weekdayName={weekdayName} />
@@ -76,19 +80,18 @@ const blockClass = (a: AgendaAppt, current: boolean) =>
 function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled }: ViewProps) {
   const { canEdit, openNew, openAppointment } = useAgenda();
   const { hours, isToday, nowMin } = day;
-  const g0 = gridStart(hours, isToday, nowMin, showPast);
-  const end = hours.closeMin;
+  const { open: dayOpen, start: g0, end } = gridRange(day, showPast);
   const height = (end - g0) * PX;
   const hourMarks: number[] = [];
   for (let h = Math.ceil(g0 / 60); h * 60 < end; h++) hourMarks.push(h * 60);
   const lineOffset = ((60 - (g0 % 60)) % 60) * PX;
   const nowTop = isToday && nowMin > g0 && nowMin < end ? (nowMin - g0) * PX : null;
-  const hasBreak = hours.breakStartMin != null && hours.breakEndMin != null && hours.breakEndMin > g0;
+  const hasBreak = !hours.closed && hours.breakStartMin != null && hours.breakEndMin != null && hours.breakEndMin > g0;
   const breakTop = hasBreak ? (Math.max(hours.breakStartMin!, g0) - g0) * PX : 0;
   const breakH = hasBreak ? (hours.breakEndMin! - Math.max(hours.breakStartMin!, g0)) * PX : 0;
 
   const hiddenCount = day.columns.reduce((n, c) => n + c.appts.filter((a) => a.status !== "annullato" && a.startMin < g0).length, 0);
-  const canCollapse = isToday && (g0 > hours.openMin || showPast);
+  const canCollapse = isToday && (g0 > dayOpen || showPast);
   const cancelled = day.cancelledCount;
 
   return (
@@ -106,7 +109,7 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
               <span>
                 {showPast
                   ? "Ore passate visibili"
-                  : `Nascoste ${clock(hours.openMin)}–${clock(g0)}${hiddenCount ? ` · ${plural(hiddenCount, "appuntamento", "appuntamenti")}` : ""}`}
+                  : `Nascoste ${clock(dayOpen)}–${clock(g0)}${hiddenCount ? ` · ${plural(hiddenCount, "appuntamento", "appuntamenti")}` : ""}`}
               </span>
               <span className={styles.pastToggle}>{showPast ? "Nascondi" : "Mostra"}</span>
             </button>

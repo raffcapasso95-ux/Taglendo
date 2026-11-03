@@ -1,0 +1,320 @@
+/* Da design/Taglendo App.dc.html: scheda "Listino e orari" (Altro). */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 640px;
+  margin: 0 auto;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--space-4) calc(var(--space-16) + var(--space-12));
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: -.04em;
+  font-weight: 700;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.count {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.service,
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--row-padding);
+}
+
+.row {
+  min-height: var(--control-height);
+}
+
+.serviceText {
+  min-width: 0;
+}
+
+.serviceName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.serviceMeta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.link {
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-1);
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.add {
+  min-height: var(--control-height);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-card);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.day {
+  min-height: var(--control-height);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.day[aria-pressed="true"] {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.day:disabled {
+  cursor: default;
+}
+
+.rowLabel {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stepButton {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-icon-button);
+  background: var(--canvas);
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stepValue {
+  min-width: 56px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--row-padding);
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.navSub {
+  display: block;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.dirty {
+  position: fixed;
+  z-index: 15;
+  inset: auto 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4) calc(var(--space-4) + var(--tabbar-height) + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border-subtle);
+  background: var(--canvas);
+  box-shadow: var(--shadow-sheet);
+}
+
+.dirtyText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.dirtyButtons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.dirtyButtons > * {
+  flex: 1;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--space-8) var(--space-8) calc(var(--space-16) + var(--space-12));
+  }
+
+  .dirty {
+    inset: auto 0 0 var(--nav-rail-width);
+    padding: var(--space-3) var(--space-8) var(--space-4);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dirtyButtons > * {
+    flex: none;
+  }
+}
+
+/* Ferie e chiusure (C2, C3) */
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.navRowButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--row-padding);
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+}
+
+.impact {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+}
+
+.impactTitle {
+  margin: 0 0 var(--space-1);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--status-warning);
+}
+
+.impactText {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+/* Indice delle impostazioni */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.logout {
+  width: 100%;
+  min-height: var(--control-height-large);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--status-error);
+  font-size: 15px;
+  font-weight: 700;
+}

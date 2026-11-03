@@ -1,57 +1,8 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
-import { adminSelect, adminUpdate, completeOnboarding, createVerifiedUser, seedDay, signIn, uniqueEmail, visibleText } from "./helpers";
+import { bookNewClient, dialog, freshOwner, newButton, nextOpenDay, openAppointment, pickDayAndTime, romeNow, weekday } from "./agenda-helpers";
+import { adminSelect, adminUpdate, seedDay, signIn, visibleText } from "./helpers";
 
-const SHORT = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
 const SALON = "5a100000-0000-4000-8000-000000000001";
-
-/** Ora e giorno di Roma adesso. */
-function romeNow() {
-  const parts = new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome", dateStyle: "short", timeStyle: "short" }).format(new Date()); // 2026-11-03 09:23
-  const [date, time] = parts.split(" ") as [string, string];
-  const [h, m] = time.split(":").map(Number) as [number, number];
-  return { date, minutes: h * 60 + m };
-}
-const weekday = (date: string) => new Date(`${date}T12:00:00Z`).getUTCDay();
-const addDay = (date: string, n: number) => new Date(new Date(`${date}T12:00:00Z`).getTime() + n * 86400000).toISOString().slice(0, 10);
-
-/** Il primo giorno di apertura (mar–sab) dopo oggi: gli orari non dipendono dall'ora in cui si lancia il test. */
-function nextOpenDay() {
-  let d = addDay(romeNow().date, 1);
-  while (weekday(d) < 2) d = addDay(d, 1);
-  return d;
-}
-
-const newButton = (page: Page) => page.getByRole("button", { name: /^\+ (Nuovo appuntamento|Appuntamento)$/ }).filter({ visible: true });
-const dialog = (page: Page) => page.getByRole("dialog");
-
-/** Titolare con un salone nuovo e finito il primo avvio. */
-async function freshOwner(page: Page, salon: string) {
-  const email = uniqueEmail("agenda");
-  await createVerifiedUser(email, "Andrea Conti");
-  await signIn(page, email);
-  await completeOnboarding(page, salon);
-  return email;
-}
-
-async function pickDayAndTime(page: Page, date: string, time: string) {
-  const label = `${SHORT[weekday(date)]} ${Number(date.slice(8))}`;
-  await dialog(page).getByRole("button", { name: label, exact: true }).click();
-  await dialog(page).getByRole("button", { name: time, exact: true }).click();
-}
-
-async function bookNewClient(page: Page, name: string, date: string, time: string) {
-  await newButton(page).click();
-  await dialog(page).getByRole("button", { name: "+ Nuovo cliente" }).click();
-  await dialog(page).getByLabel("Nome").fill(name);
-  await pickDayAndTime(page, date, time);
-  await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();
-}
-
-async function openAppointment(page: Page, name: string) {
-  // testo esatto: l'avviso dopo il salvataggio contiene lo stesso nome dentro una frase più lunga
-  await page.getByText(name, { exact: true }).filter({ visible: true }).first().click();
-  await expect(dialog(page)).toBeVisible();
-}
 
 test.describe("Appuntamenti", () => {
   test("fissare, cambiare stato, spostare e annullare", async ({ page }) => {
