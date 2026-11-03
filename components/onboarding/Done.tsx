@@ -13,7 +13,8 @@ type Props = {
   url: string;
   /** Senza "https://", come nei design. */
   display: string;
-  trialEnds: string;
+  /** Data di fine prova, solo quando i pagamenti sono accesi; altrimenti beta gratuita. */
+  trialEnds?: string;
 };
 
 export function Done({ salonName, url, display, trialEnds }: Props) {
@@ -76,7 +77,7 @@ export function Done({ salonName, url, display, trialEnds }: Props) {
             {copy.share}
           </Button>
         </div>
-        <p className={styles.trial}>{copy.trial(trialEnds)}</p>
+        <p className={styles.trial}>{trialEnds ? copy.trial(trialEnds) : copy.beta}</p>
         <ButtonLink href="/agenda" variant="secondary" size="large" fullWidth className={styles.agenda}>
           {copy.agenda}
         </ButtonLink>

@@ -57,7 +57,7 @@ export const onboardingCopy = {
     you: "Tu",
     chair: (n: number) => `Poltrona ${n}`,
     placeholder: "Nome del barbiere",
-    plan: "Con 2 o 3 poltrone sei nel piano Salone (19,90 € al mese + IVA). Gli inviti ai barbieri li mandi dopo.",
+    plan: "Gli inviti ai barbieri li mandi dopo.",
   },
   done: {
     eyebrow: "Tutto pronto",
@@ -65,6 +65,8 @@ export const onboardingCopy = {
     copy: "Copia link",
     copied: "✓ Link copiato",
     share: "Condividi su WhatsApp o Instagram",
+    /** Beta gratuita: nessun pagamento (BILLING_ENABLED spento). */
+    beta: "Beta gratuita: non ti chiediamo nessun pagamento.",
     trial: (date: string) => `Prova gratuita attiva fino al ${date}.`,
     agenda: "Vai all’agenda",
   },

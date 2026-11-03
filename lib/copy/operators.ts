@@ -41,7 +41,7 @@ export const operatorsCopy = {
     copy: "Copia link",
     copied: "✓ Link copiato",
   },
-  full: "Hai già tre poltrone: è il massimo del piano Salone.",
+  full: "Hai già tre poltrone: è il massimo.",
   errors: {
     name: "Scrivi il nome del barbiere.",
     email: "Controlla l’indirizzo email.",

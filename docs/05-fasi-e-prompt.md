@@ -7,6 +7,46 @@ Si lavora una fase alla volta. A fine fase ci vogliono:
 
 I prompt sono da incollare così come sono; Claude Code legge `CLAUDE.md` da solo.
 
+## Rilascio gratuito (beta) e ordine delle fasi
+
+La prima uscita è **gratuita, solo web, con registrazione**: senza pagamenti e senza app negli store. Si usa per circa un mese per vedere come risponde il prodotto. Intanto si sviluppa la parte a pagamento. Dopo, l'app.
+
+**Ordine**
+1. **Release gratuita:** Fasi 0–5, 7 e 8, poi la 9 (prove e beta).
+2. **In parallelo alla beta:** Fase 6 (abbonamento), su un branch separato e spenta da `BILLING_ENABLED=false` fino al lancio dei pagamenti.
+3. **Dopo:** app nativa per gli store (fuori dalla v1). Nella beta il gestionale si può aggiungere alla schermata Home grazie alla PWA (Fase 5).
+
+**Cosa cambia nella beta**
+- Con `BILLING_ENABLED` spento ogni salone ha l'accesso completo e nessuna scadenza (`hasActiveAccess` in `lib/billing.ts`). La prenotazione online non passa mai a "solo telefono" per abbonamento.
+- Fino a 3 poltrone per tutti. Niente schermate B (abbonamento), niente Stripe, niente fattura elettronica.
+- Testi cambiati rispetto ai design (approvati):
+  - registrazione: «Gratis in beta · Senza carta · Disdici quando vuoi»;
+  - "Tutto pronto": «Beta gratuita: non ti chiediamo nessun pagamento.»;
+  - poltrone: resta solo «Gli inviti ai barbieri li mandi dopo.»;
+  - operatori: «Hai già tre poltrone: è il massimo.»;
+  - sito commerciale (Fase 7): la sezione prezzi dice «Gratis durante la beta».
+
+**Cosa serve comunque, anche gratis** (si trattano dati personali dei clienti dei saloni)
+- Privacy, termini e cookie (Fase 7), con revisione di un consulente.
+- Eliminazione dell'account ed esportazione dei dati (Fase 8).
+- Accordo sul trattamento dei dati (DPA) con i saloni, accettato alla registrazione.
+- SPF, DKIM e DMARC sul dominio delle email.
+- Backup di Supabase e controllo di sicurezza della RLS.
+- Piani dei servizi adatti a saloni veri: i piani gratuiti di Supabase, Vercel e Resend hanno limiti (pausa del progetto, uso non commerciale, quote di invio). Verificare i prezzi attuali.
+
+**Quando si accendono i pagamenti**
+- Si imposta `BILLING_ENABLED=true`.
+- Ai saloni della beta si dà una nuova prova di 15 giorni: `trial_ends_at = now() + interval '15 days'` e `sub_status = 'trialing'`.
+- Si avvisano in anticipo: la cosa va scritta nei termini fin dalla registrazione.
+
+**Come si misura il mese** (interrogazioni sui dati esistenti, nessun tracciamento nuovo)
+- Saloni registrati e quanti finiscono il primo avvio (`onboarding_step = 5`).
+- Quanti hanno appuntamenti dopo una settimana, e quanti ne creano ancora alla quarta.
+- Quante prenotazioni arrivano dal link (`source = 'online'`).
+- Da 3 a 5 saloni pilota con un canale diretto per le segnalazioni.
+
+---
+
 ## Prima di iniziare (tu)
 - Account necessari: GitHub, Vercel, Supabase, Stripe (modalità test), Resend, Sentry.
 - Installazioni: Node 20+, Docker (per Supabase in locale), Supabase CLI, Stripe CLI.
@@ -32,10 +72,14 @@ I prompt sono da incollare così come sono; Claude Code legge `CLAUDE.md` da sol
 ### Fase 5 · Email e notifiche (1,5–2 settimane)
 > Email F1–F6 con React Email, identiche a design/Schermate mancanti.dc.html sezione F, inviate con Resend. Promemoria alle 18:00 del giorno prima con cron. Impostazioni C6 e C11. Notifiche web push al barbiere (D5) con service worker; rendi il gestionale installabile come PWA (manifest, icone da assets/taglendo-icon.svg).
 
-### Fase 6 · Abbonamento (2–3 settimane)
+### Fase 6 · Abbonamento (2–3 settimane) · dopo la release gratuita, in parallelo alla beta
+> Va sviluppata dietro l'interruttore `BILLING_ENABLED` (spento nella beta).
+
 > Stripe Billing: prodotti Solo e Salone, prova di 15 giorni senza carta, pagamento (B2), stato attivo con fatture (B5), disdetta (B6), passaggio di piano al superamento delle poltrone (B7), prova finita (B3), pagamento non riuscito con 7 giorni di tolleranza (B4). Webhook per aggiornare sub_status e piano. Quando l’abbonamento non è attivo la pagina pubblica passa a solo telefono. Prepara il punto in cui si collegherà il provider di fattura elettronica.
 
 ### Fase 7 · Sito commerciale e pagine legali (1–1,5 settimane)
+> Nella beta la sezione prezzi dice «Gratis durante la beta»; i prezzi veri tornano con la Fase 6.
+
 > Ricostruisci design/Sito Taglendo.dc.html con header, hero, sezioni, prezzi, FAQ e footer legale; “Accedi” porta ad /accedi e “Prova gratis” a /registrati. Pagine /privacy, /termini, /cookie (G1, G4, G5) con i testi segnaposto marcati come bozza. Metadati SEO, immagine di anteprima per i social, favicon dall’icona, sitemap.
 
 ### Fase 8 · Robustezza (1,5 settimane)

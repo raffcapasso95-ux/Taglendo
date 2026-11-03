@@ -23,7 +23,7 @@ export const authCopy = {
     title: "Registra il tuo salone",
     lead: "Crea il tuo salone in dieci minuti.",
     desktopHeadline: "Il primo venerdì senza quaderno.",
-    chips: ["15 giorni gratis", "Senza carta", "Disdici quando vuoi"],
+    chips: ["Gratis in beta", "Senza carta", "Disdici quando vuoi"],
     back: "Indietro",
     submit: "Crea account",
     haveAccount: "Hai già un account?",

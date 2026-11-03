@@ -2,6 +2,8 @@
 
 Agenda e prenotazioni online per barberie da 1 a 3 poltrone. Questo pacchetto contiene tutto il design e le istruzioni per costruire la **v1 solo web** con Claude Code: niente app negli store.
 
+> **Rilascio:** la prima uscita è gratuita (beta di circa un mese, con registrazione, senza pagamenti). La parte a pagamento si sviluppa in parallelo e poi arriva l'app nativa. Ordine delle fasi e dettagli in `docs/05-fasi-e-prompt.md`.
+
 ## Cosa costruire (perimetro v1)
 
 1. **Sito Taglendo**: la pagina commerciale per i barbieri, più registrazione, accesso e pagine legali.

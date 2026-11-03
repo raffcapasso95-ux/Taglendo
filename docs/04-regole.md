@@ -46,6 +46,7 @@ Il cliente non crea nessun account e nessuna password.
   - “solo i miei appuntamenti” per il titolare.
 
 ## Piani e prova
+- **Beta gratuita:** finché `BILLING_ENABLED` è spento, ogni salone ha l'accesso completo e nessuna scadenza; le regole qui sotto valgono dal lancio dei pagamenti (vedi `docs/05-fasi-e-prompt.md`).
 - **Prova:** 15 giorni dalla registrazione, con tutte le funzioni e senza carta.
 - **Piani:**
   - Solo: 9,90 € al mese + IVA, 1 poltrona;
