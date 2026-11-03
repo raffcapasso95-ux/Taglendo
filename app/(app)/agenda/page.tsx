@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { AgendaProvider } from "@/components/agenda/AgendaProvider";
 import { AutoRefresh } from "@/components/agenda/AutoRefresh";
 import { DayHeader } from "@/components/agenda/DayHeader";
 import { DayStrip } from "@/components/agenda/DayStrip";
 import { DayView } from "@/components/agenda/DayView";
+import { PhoneActions } from "@/components/agenda/HeaderActions";
 import { OperatorFilter } from "@/components/agenda/OperatorFilter";
 import { SidePanel } from "@/components/agenda/SidePanel";
 import styles from "@/components/agenda/Agenda.module.css";
@@ -20,6 +22,15 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
   const { day } = data;
 
   return (
+    <AgendaProvider
+      canEdit={data.canEdit}
+      salonName={data.salonName}
+      today={data.today}
+      selectedDate={day.date}
+      operators={data.operators}
+      services={data.services}
+      clients={data.clients}
+    >
     <div className={styles.page}>
       <div className={styles.main}>
         <DayHeader
@@ -37,8 +48,10 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
         <DayView day={day} weekdayName={weekdayName(day.date)} multiple={day.columns.length > 1} />
       </div>
       <SidePanel day={day} title={day.isToday ? `Adesso in salone · ${clock(day.nowMin)}` : "Primo cliente"} />
+      <PhoneActions />
       <AutoRefresh />
     </div>
+    </AgendaProvider>
   );
 }
 

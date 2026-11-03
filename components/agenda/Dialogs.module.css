@@ -1,0 +1,356 @@
+/* Nuovo appuntamento e dettaglio: sezioni, pulsanti a scelta e orari. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.sectionNote {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.chip,
+.chipOn,
+.chipOff {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: var(--control-height);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.chipOn {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.chipOff {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+  background: var(--surface-muted);
+  cursor: not-allowed;
+}
+
+.chipSub {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: .85;
+}
+
+.times {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: var(--space-2);
+}
+
+.time {
+  align-items: center;
+  padding: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.days {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+  scrollbar-width: none;
+}
+
+.dayButton,
+.dayButtonOn {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--day-chip-width);
+  min-height: var(--day-chip-height);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-day);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.dayButtonOn {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.dayDow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dayNum {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.dateInput {
+  align-self: flex-start;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-input);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 16px;
+}
+
+.hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.list li + li {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.listButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.listButton[aria-pressed="true"] {
+  background: var(--brand-peach);
+}
+
+.listSub {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.linkButton {
+  align-self: flex-start;
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.recap {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.alert {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--status-error-border);
+  border-radius: var(--radius-button);
+  background: var(--status-error-bg);
+  color: var(--status-error);
+  font-size: 14px;
+}
+
+.alert p {
+  margin: 0;
+}
+
+.alertTitle {
+  font-weight: 700;
+}
+
+/* Dettaglio */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.badge,
+.badgeNow {
+  align-self: flex-start;
+  padding: 5px var(--space-2);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge[data-status="confermato"] {
+  background: var(--badge-confirmed-bg);
+  color: var(--status-success);
+}
+
+.badge[data-status="completato"] {
+  background: var(--badge-completed-bg);
+  color: var(--badge-completed-fg);
+}
+
+.badge[data-status="non_presentato"] {
+  background: var(--badge-noshow-bg);
+  color: var(--status-warning);
+}
+
+.badge[data-status="annullato"] {
+  background: var(--badge-canceled-bg);
+  color: var(--status-error);
+}
+
+.badgeNow {
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+}
+
+.when {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.whenTime {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -.03em;
+}
+
+.whenSub {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.who {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  overflow-wrap: anywhere;
+}
+
+.sub {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.note {
+  padding: var(--space-3);
+  border-radius: var(--radius-button);
+  background: var(--surface-muted);
+  font-size: 14px;
+}
+
+.noteTitle {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.contact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+/* Pulsanti dell'agenda */
+.headerActions {
+  display: none;
+}
+
+.phoneActions {
+  position: fixed;
+  z-index: 15;
+  inset: auto var(--space-4) calc(var(--tabbar-height) + env(safe-area-inset-bottom) + var(--space-3));
+  display: flex;
+  gap: var(--space-2);
+}
+
+.phoneActions > * {
+  flex: 1;
+  box-shadow: var(--shadow-float);
+}
+
+/* Sopra la lista: serve un fondo pieno. */
+.phoneActions > button:first-child {
+  background: var(--surface);
+}
+
+@media (min-width: 1024px) {
+  .headerActions {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .phoneActions {
+    display: none;
+  }
+}

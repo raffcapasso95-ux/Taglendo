@@ -48,7 +48,8 @@ a {
   color: var(--text-primary);
 }
 
-a:hover {
+/* Solo i link semplici: quelli con una classe hanno già i loro colori. */
+a:not([class]):hover {
   color: var(--action-primary-hover);
 }
 

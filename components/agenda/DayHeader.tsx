@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { HeaderActions } from "./HeaderActions";
 import styles from "./Agenda.module.css";
 
 type Props = {
@@ -31,10 +32,13 @@ export function DayHeader({ salonName, userInitials, greeting, longDate, summary
           </Link>
         </div>
       </div>
-      <div className={styles.titles}>
-        <p className={styles.greeting}>{greeting}</p>
-        <h1 className={styles.date}>{longDate}</h1>
-        {summary ? <p className={styles.summary}>{summary}</p> : null}
+      <div className={styles.titleRow}>
+        <div className={styles.titles}>
+          <p className={styles.greeting}>{greeting}</p>
+          <h1 className={styles.date}>{longDate}</h1>
+          {summary ? <p className={styles.summary}>{summary}</p> : null}
+        </div>
+        <HeaderActions />
       </div>
     </header>
   );

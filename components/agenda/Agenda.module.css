@@ -81,6 +81,12 @@
   text-decoration: none;
 }
 
+.titleRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
 .titles {
   display: flex;
   flex-direction: column;
@@ -297,6 +303,12 @@
 
   .phoneBar {
     display: none;
+  }
+
+  .titleRow {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
   }
 
   .strip,

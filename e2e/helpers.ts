@@ -111,15 +111,26 @@ export async function adminUpdate(table: string, query: string, body: Record<str
   if (!res.ok) throw new Error(`${table}: ${await res.text()}`);
 }
 
+const SEED_SALON = "5a100000-0000-4000-8000-000000000001";
+const romeDay = (d: Date) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(d);
+
 /**
- * Il giorno (di Roma) con gli appuntamenti del seed: il primo giorno da oggi in poi con appuntamenti confermati.
- * Il seed li mette sul primo giorno di apertura da quando si lancia `npm run db:reset`.
+ * Il primo giorno di Roma dopo oggi con appuntamenti confermati nel seed, con i clienti di ogni barbiere.
+ * Un giorno futuro non dipende dall'ora in cui si lancia il test (oggi gli appuntamenti passati si nascondono).
+ * Il seed li mette sui primi giorni di apertura da quando si lancia `npm run db:reset`.
  */
-export async function seedDay(): Promise<string> {
-  const rows = await adminSelect<{ starts_at: string }>(
+export async function seedDay(): Promise<{ date: string; byOperator: Record<string, string[]> }> {
+  const today = romeDay(new Date());
+  const rows = await adminSelect<{ starts_at: string; member: { name: string }; client: { name: string } }>(
     "appointments",
-    `select=starts_at&salon_id=eq.5a100000-0000-4000-8000-000000000001&status=eq.confermato&starts_at=gte.${new Date(Date.now() - 24 * 3600 * 1000).toISOString()}&order=starts_at.asc&limit=1`,
+    `select=starts_at,member:members(name),client:clients(name)&salon_id=eq.${SEED_SALON}&status=eq.confermato&starts_at=gte.${new Date().toISOString()}&order=starts_at.asc`,
   );
-  if (!rows[0]) throw new Error("Nessun appuntamento nel seed: lancia `npm run db:reset`");
-  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date(rows[0].starts_at));
+  const future = rows.filter((r) => romeDay(new Date(r.starts_at)) > today);
+  if (!future[0]) throw new Error("Nessun appuntamento futuro nel seed: lancia `npm run db:reset`");
+  const date = romeDay(new Date(future[0].starts_at));
+  const byOperator: Record<string, string[]> = {};
+  for (const r of future.filter((x) => romeDay(new Date(x.starts_at)) === date)) {
+    (byOperator[r.member.name] ??= []).push(r.client.name);
+  }
+  return { date, byOperator };
 }

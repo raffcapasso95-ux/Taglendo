@@ -98,14 +98,27 @@
 
 .apptRow,
 .gapRow {
+  border-top: 1px solid var(--border-subtle);
+  background: var(--surface);
+}
+
+.rowButton {
   display: grid;
   grid-template-columns: 44px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
+  width: 100%;
   min-height: 64px;
   padding: var(--space-2) var(--space-3) var(--space-2) 14px;
-  border-top: 1px solid var(--border-subtle);
-  background: var(--surface);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.rowButton:disabled {
+  cursor: default;
 }
 
 .rows > :first-child {
@@ -179,9 +192,12 @@
 }
 
 .gapRow {
-  min-height: 56px;
   background: var(--status-success-bg);
   color: var(--status-success-text);
+}
+
+.gapRow .rowButton {
+  min-height: 56px;
 }
 
 .gapRow .rowTime {
@@ -443,6 +459,9 @@
   }
 
   .gap {
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
     position: absolute;
     inset-inline: 6px;
     display: flex;
@@ -456,6 +475,15 @@
     background: var(--status-success-bg);
     color: var(--status-success-text);
     line-height: 1.2;
+  }
+
+  .gap:disabled {
+    cursor: default;
+  }
+
+  .gap:hover:not(:disabled) {
+    border-color: var(--status-success);
+    background: var(--gap-hover-bg);
   }
 
   .gapLine {
@@ -496,6 +524,8 @@
     overflow: hidden;
     border: 1px solid transparent;
     border-radius: var(--radius-block);
+    cursor: pointer;
+    font: inherit;
     text-align: left;
   }
 

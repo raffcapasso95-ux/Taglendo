@@ -8,23 +8,25 @@ const SALON = "5a100000-0000-4000-8000-000000000001";
 
 test.describe("Agenda (sola lettura)", () => {
   test("il titolare vede la giornata con i tre barbieri e il riepilogo", async ({ page }) => {
-    const day = await seedDay();
+    const { date, byOperator } = await seedDay();
     await signIn(page, ANDREA, DEMO_PASSWORD);
-    await page.goto(`/agenda?g=${day}`);
+    await page.goto(`/agenda?g=${date}`);
 
     await expect(page.getByRole("heading", { level: 1 }).filter({ visible: true })).toContainText(/\d{1,2} \w+/);
-    await expect(visibleText(page, /^\d+ clienti · .+ libere$/)).toBeVisible();
-    // il nome di ogni cliente del seed compare nel giorno
-    for (const name of ["Marco Bianchi", "Giorgio Conti", "Alessio Ricci"]) {
-      await expect(visibleText(page, name)).toBeVisible();
-    }
-    // il filtro per barbiere
+    await expect(visibleText(page, /^\d+ client[ei] · .+ libere$/)).toBeVisible();
+    // ogni cliente del giorno compare
+    for (const names of Object.values(byOperator)) await expect(visibleText(page, names[0]!)).toBeVisible();
+
+    // il filtro per barbiere: sceglie un barbiere e gli altri spariscono
+    const operators = Object.keys(byOperator);
+    expect(operators.length).toBeGreaterThanOrEqual(2);
+    const [chosen, other] = operators as [string, string];
     const filter = page.getByRole("navigation", { name: "Barbieri" });
     await expect(filter.getByRole("link", { name: "Tutti" })).toHaveAttribute("aria-current", "true");
-    await filter.getByRole("link", { name: "Marco" }).click();
+    await filter.getByRole("link", { name: chosen }).click();
     await expect(page).toHaveURL(/op=/);
-    await expect(visibleText(page, "Giorgio Conti")).toBeVisible();
-    await expect(page.getByText("Marco Bianchi").filter({ visible: true })).toHaveCount(0); // è di Andrea
+    await expect(visibleText(page, byOperator[chosen]![0]!)).toBeVisible();
+    await expect(page.getByText(byOperator[other]![0]!).filter({ visible: true })).toHaveCount(0);
   });
 
   test("un giorno chiuso lo dice", async ({ page }) => {
@@ -50,14 +52,15 @@ test.describe("Agenda (sola lettura)", () => {
   });
 
   test("un barbiere senza «vedere l'agenda di tutti» vede solo la propria colonna", async ({ page }) => {
-    const day = await seedDay();
+    const { date, byOperator } = await seedDay();
     try {
       await adminUpdate("salons", `id=eq.${SALON}`, { barbers_see_all: false });
       await signIn(page, MARCO, DEMO_PASSWORD);
-      await page.goto(`/agenda?g=${day}`);
-      await expect(visibleText(page, "Giorgio Conti")).toBeVisible(); // di Marco
-      await expect(page.getByText("Marco Bianchi").filter({ visible: true })).toHaveCount(0); // di Andrea
-      await expect(page.getByText("Alessio Ricci").filter({ visible: true })).toHaveCount(0); // di Simone
+      await page.goto(`/agenda?g=${date}`);
+      await expect(visibleText(page, byOperator["Marco"]![0]!)).toBeVisible();
+      for (const [name, clients] of Object.entries(byOperator)) {
+        if (name !== "Marco") await expect(page.getByText(clients[0]!).filter({ visible: true })).toHaveCount(0);
+      }
       await expect(page.getByRole("navigation", { name: "Barbieri" })).toHaveCount(0); // un solo barbiere: niente filtro
     } finally {
       await adminUpdate("salons", `id=eq.${SALON}`, { barbers_see_all: true });

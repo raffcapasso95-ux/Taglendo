@@ -14,6 +14,7 @@ import {
   type DayModel,
 } from "@/lib/rules/agenda";
 import { formatPrice } from "@/lib/dates/format";
+import { useAgenda } from "./AgendaProvider";
 import { OperatorAvatar } from "./OperatorAvatar";
 import styles from "./Day.module.css";
 
@@ -73,6 +74,7 @@ const blockClass = (a: AgendaAppt, current: boolean) =>
 /* ───────────── Desktop: griglia con una colonna per barbiere ───────────── */
 
 function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled }: ViewProps) {
+  const { canEdit, openNew, openAppointment } = useAgenda();
   const { hours, isToday, nowMin } = day;
   const g0 = gridStart(hours, isToday, nowMin, showPast);
   const end = hours.closeMin;
@@ -137,7 +139,15 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                 .map(([a, b]) => {
                   const from = Math.max(a, g0);
                   return (
-                    <div key={`${a}-${b}`} className={styles.gap} style={{ top: (from - g0) * PX, height: (b - from) * PX }}>
+                    <button
+                      key={`${a}-${b}`}
+                      type="button"
+                      className={styles.gap}
+                      style={{ top: (from - g0) * PX, height: (b - from) * PX }}
+                      disabled={!canEdit}
+                      aria-label={`Fissa con ${c.operator.name} ${clock(from)}–${clock(b)}`}
+                      onClick={() => openNew({ date: day.date, memberId: c.operator.id, startMin: Math.max(from, isToday ? Math.ceil(nowMin / 5) * 5 : 0) })}
+                    >
                       <span className={styles.gapLine}>
                         <span className={styles.gapAction}>+ Fissa</span>
                         <span className={styles.gapLabel}>{span(b - from)} libere</span>
@@ -147,7 +157,7 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                           {clock(from)}–{clock(b)}
                         </span>
                       ) : null}
-                    </div>
+                    </button>
                   );
                 })}
               {c.appts
@@ -157,18 +167,20 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                   const top = (Math.max(a.startMin, g0) - g0) * PX;
                   const h = (a.endMin - Math.max(a.startMin, g0)) * PX;
                   return (
-                    <div
+                    <button
                       key={a.id}
+                      type="button"
                       className={cx(blockClass(a, current), a.status === "annullato" && styles.struck)}
                       style={{ top, height: h }}
                       title={`${clock(a.startMin)}–${clock(a.endMin)} · ${a.clientName} · ${a.serviceName}`}
+                      onClick={() => openAppointment(a.id)}
                     >
                       <span className={styles.blockLine}>
                         <span className={styles.blockTime}>{clock(a.startMin)}</span>
                         <span className={styles.blockName}>{a.clientName}</span>
                       </span>
                       {h >= 44 ? <span className={styles.blockSvc}>{a.serviceName}</span> : null}
-                    </div>
+                    </button>
                   );
                 })}
               {nowTop !== null ? <div className={styles.nowLine} style={{ top: nowTop }} /> : null}
@@ -213,6 +225,7 @@ type Item =
   | { kind: "now"; start: number };
 
 function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setShowCancelled }: ViewProps & { multiple: boolean }) {
+  const { canEdit, openNew, openAppointment } = useAgenda();
   const { hours, isToday, nowMin } = day;
   const items: Item[] = [];
   for (const column of day.columns) {
@@ -262,14 +275,22 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
           if (item.kind === "gap") {
             return (
               <li key={`g-${item.column.operator.id}-${item.start}`} className={styles.gapRow}>
-                <span className={styles.rowTime}>{clock(item.start)}</span>
-                <span className={styles.gapRowText}>
-                  Libero {span(item.end - item.start)}
-                  {multiple ? ` · ${item.column.operator.name}` : ""}
-                  <span className={styles.gapRowRange}>
-                    {clock(item.start)}–{clock(item.end)}
+                <button
+                  type="button"
+                  className={styles.rowButton}
+                  disabled={!canEdit}
+                  aria-label={`Fissa con ${item.column.operator.name} ${clock(item.start)}–${clock(item.end)}`}
+                  onClick={() => openNew({ date: day.date, memberId: item.column.operator.id, startMin: Math.max(item.start, isToday ? Math.ceil(nowMin / 5) * 5 : 0) })}
+                >
+                  <span className={styles.rowTime}>{clock(item.start)}</span>
+                  <span className={styles.gapRowText}>
+                    Libero {span(item.end - item.start)}
+                    {multiple ? ` · ${item.column.operator.name}` : ""}
+                    <span className={styles.gapRowRange}>
+                      {clock(item.start)}–{clock(item.end)}
+                    </span>
                   </span>
-                </span>
+                </button>
               </li>
             );
           }
@@ -277,6 +298,7 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
           const current = isToday && a.status === "confermato" && a.startMin <= nowMin && nowMin < a.endMin;
           return (
             <li key={`${a.id}-${i}`} className={cx(styles.apptRow, current && styles.apptRowNow, a.status === "annullato" && styles.apptRowCanceled)}>
+              <button type="button" className={styles.rowButton} onClick={() => openAppointment(a.id)}>
               <span className={styles.rowTime}>
                 {clock(a.startMin)}
                 <span className={styles.rowEnd}>{clock(a.endMin)}</span>
@@ -296,6 +318,7 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
                   {firstName(column.operator.name)}
                 </span>
               ) : null}
+              </button>
             </li>
           );
         })}
