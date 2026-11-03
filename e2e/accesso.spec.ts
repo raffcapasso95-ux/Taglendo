@@ -11,7 +11,8 @@ test.describe("Accesso e password", () => {
   test("il titolare del salone demo entra in agenda", async ({ page }) => {
     await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
     await expect(page).toHaveURL(/\/agenda$/);
-    await expect(page.getByRole("heading", { name: "Agenda" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1 }).filter({ visible: true })).toBeVisible();
+    await expect(page.getByText(/^Buongiorno, Andrea$|^Agenda di /).filter({ visible: true })).toBeVisible();
   });
 
   test("senza accesso le aree riservate portano a /accedi e poi alla pagina richiesta", async ({ page }) => {

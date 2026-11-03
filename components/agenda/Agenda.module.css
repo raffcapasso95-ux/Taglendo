@@ -1,0 +1,462 @@
+/* Da design/Taglendo App.dc.html: intestazione, striscia dei giorni, filtro e colonna laterale. */
+.page {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: calc(var(--space-4) + env(safe-area-inset-top)) var(--space-4) var(--space-6);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.phoneBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brandIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-icon-button);
+}
+
+.brandName {
+  font-size: 15px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.phoneActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.todayButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-icon-button);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border-radius: 50%;
+  background: var(--brand-peach);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.greeting {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.date {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -.045em;
+  font-weight: 700;
+}
+
+.summary {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* Giorni */
+.strip {
+  display: flex;
+  gap: 6px;
+  margin: 0 calc(-1 * var(--space-4));
+  padding: 2px var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+.dayChip {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--day-chip-width);
+  min-height: var(--day-chip-height);
+  padding: var(--space-1) 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-day);
+  background: var(--surface);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.dayChipOn {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.dayChipClosed {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.dayDow {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.dayNum {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.daySub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 12px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brand-apricot);
+}
+
+.dotOn {
+  background: var(--brand-apricot);
+}
+
+/* Filtro per barbiere */
+.filter {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 calc(-1 * var(--space-4));
+  padding: 2px var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filterItem {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  padding: 0 var(--space-4) 0 var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.filterItem:first-child {
+  padding-left: var(--space-4);
+}
+
+.filterOn {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.filterAvatar {
+  display: flex;
+}
+
+/* Cerchio con l'iniziale */
+.avatar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.avatarSm {
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+}
+
+.op0 {
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.op1 {
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+}
+
+.op2 {
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+}
+
+.op3 {
+  background: var(--text-secondary);
+  color: var(--brand-cream);
+}
+
+/* Colonna laterale */
+.side {
+  display: none;
+}
+
+.dotBusy,
+.dotFree {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dotBusy {
+  background: var(--brand-apricot);
+}
+
+.dotFree {
+  background: var(--status-success);
+}
+
+@media (min-width: 1024px) {
+  .main {
+    padding: var(--space-8) var(--space-8) var(--space-6) var(--space-8);
+    height: 100dvh;
+  }
+
+  .phoneBar {
+    display: none;
+  }
+
+  .strip,
+  .filter {
+    margin: 0;
+    padding: 2px 0;
+  }
+
+  .controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .strip {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .filter {
+    flex: none;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    border-radius: var(--radius-segmented);
+    background: var(--surface-muted);
+  }
+
+  .filterItem {
+    min-height: var(--segmented-item-height);
+    padding: 0 var(--space-3);
+    border: 0;
+    border-radius: var(--radius-input);
+    background: transparent;
+    font-size: 14px;
+  }
+
+  .filterItem:first-child {
+    padding-left: var(--space-3);
+  }
+
+  .filterOn {
+    background: var(--brand-plum);
+  }
+
+  .filterAvatar {
+    display: none;
+  }
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    width: var(--side-panel-width);
+    flex: none;
+    height: 100dvh;
+    overflow-y: auto;
+    padding: var(--space-6) var(--space-4);
+    border-left: 1px solid var(--border-subtle);
+  }
+
+  .sideSection,
+  .freeSection {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .sideTitle,
+  .freeTitle {
+    margin: 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .sideList {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-card);
+    background: var(--surface);
+  }
+
+  .sideRow,
+  .sideRowBusy,
+  .freeRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+  }
+
+  .sideRowBusy {
+    background: var(--surface-muted);
+  }
+
+  .freeRow {
+    padding: var(--space-2) 0;
+  }
+
+  .sideRow + .sideRow,
+  .sideRow + .sideRowBusy,
+  .sideRowBusy + .sideRow,
+  .freeRow + .freeRow {
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .sideText {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .sideLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .sideName {
+    font-size: 15px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .freeSection {
+    padding: var(--space-3);
+    border: 1px solid var(--status-success-border);
+    border-radius: var(--radius-card);
+    background: var(--status-success-bg);
+  }
+
+  .freeTitle {
+    color: var(--status-success);
+  }
+
+  .freeSection .sideList {
+    border: 0;
+    background: transparent;
+  }
+
+  .freeWhen {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--status-success-text);
+  }
+
+  .freeSub {
+    font-size: 12px;
+    color: var(--gap-text-soft);
+  }
+}

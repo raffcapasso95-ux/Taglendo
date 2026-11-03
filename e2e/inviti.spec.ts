@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { adminSelect, completeOnboarding, createVerifiedUser, PASSWORD, signIn, uniqueEmail, visibleText } from "./helpers";
+import { adminSelect, adminUpdate, completeOnboarding, createVerifiedUser, PASSWORD, signIn, uniqueEmail, visibleText } from "./helpers";
 
 test.describe("Operatori e inviti", () => {
   test("il titolare invita un barbiere, che sceglie la password ed entra nel salone", async ({ page, browser, baseURL }) => {
@@ -96,16 +96,19 @@ test.describe("Operatori e inviti", () => {
   });
 
   test("i permessi dei barbieri si salvano", async ({ page }) => {
+    await adminUpdate("salons", "id=eq.5a100000-0000-4000-8000-000000000001", { barbers_contacts: false }); // parte da uno stato noto
     await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
     await page.goto("/impostazioni/operatori");
     const contacts = page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ });
+    // ogni clic parte dall'interruttore e aspetta che il salvataggio sul server sia finito
+    const toggle = async (expected: "true" | "false") => {
+      await Promise.all([page.waitForResponse((r) => r.request().method() === "POST"), page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ }).click()]);
+      await expect(page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ })).toHaveAttribute("aria-checked", expected);
+    };
     await expect(contacts).toHaveAttribute("aria-checked", "false");
-    await contacts.click();
-    await expect(contacts).toHaveAttribute("aria-checked", "true");
+    await toggle("true");
     await page.reload();
     await expect(page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ })).toHaveAttribute("aria-checked", "true");
-    // ripristina il seed
-    await page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ }).click();
-    await expect(page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ })).toHaveAttribute("aria-checked", "false");
+    await toggle("false"); // ripristina il seed
   });
 });

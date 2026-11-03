@@ -146,3 +146,32 @@
   --onboarding-aside-width: 340px;
   --onboarding-form-width: 460px;
 }
+
+/* Fase 2 — struttura dell'app e agenda (Taglendo App.dc.html) */
+:root {
+  --nav-item-size: 48px;
+  --nav-padding: 14px;
+  --tabbar-height: 52px;
+  --logo-tile-size: 36px;
+  --grid-line: #EFE2E5;             /* linea dell'ora */
+  --grid-line-soft: #F7EEEF;        /* linea della mezz'ora */
+  --grid-px-per-hour: 96px;
+  --grid-half-hour: 48px;
+  --grid-time-col: 56px;
+  --grid-col-min: 200px;
+  --past-veil: rgba(251, 240, 233, .75);
+  --progress-track: #F3E8EA;
+  --gap-hover-bg: #E1EFE7;
+  --gap-text-soft: #2E6B55;
+  --badge-completed-bg: #ECE8EF;
+  --badge-completed-fg: #5D456B;
+  --badge-confirmed-bg: #E9F2EC;
+  --badge-noshow-bg: #FBEDDF;
+  --badge-canceled-bg: #F7E8EB;
+  --day-chip-width: 52px;
+  --day-chip-height: 62px;
+  --side-panel-width: 340px;
+  --radius-grid: 18px;
+  --radius-block: 10px;
+  --radius-day: 12px;
+}

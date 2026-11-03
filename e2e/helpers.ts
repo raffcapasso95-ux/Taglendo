@@ -98,3 +98,28 @@ export async function adminSelect<T = Record<string, unknown>>(table: string, qu
   if (!res.ok) throw new Error(`${table}: ${await res.text()}`);
   return (await res.json()) as T[];
 }
+
+/** Modifica righe di una tabella con la chiave di servizio (solo per preparare i test). */
+export async function adminUpdate(table: string, query: string, body: Record<string, unknown>) {
+  const url = env("NEXT_PUBLIC_SUPABASE_URL");
+  const key = env("SUPABASE_SERVICE_ROLE_KEY");
+  const res = await fetch(`${url}/rest/v1/${table}?${query}`, {
+    method: "PATCH",
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`${table}: ${await res.text()}`);
+}
+
+/**
+ * Il giorno (di Roma) con gli appuntamenti del seed: il primo giorno da oggi in poi con appuntamenti confermati.
+ * Il seed li mette sul primo giorno di apertura da quando si lancia `npm run db:reset`.
+ */
+export async function seedDay(): Promise<string> {
+  const rows = await adminSelect<{ starts_at: string }>(
+    "appointments",
+    `select=starts_at&salon_id=eq.5a100000-0000-4000-8000-000000000001&status=eq.confermato&starts_at=gte.${new Date(Date.now() - 24 * 3600 * 1000).toISOString()}&order=starts_at.asc&limit=1`,
+  );
+  if (!rows[0]) throw new Error("Nessun appuntamento nel seed: lancia `npm run db:reset`");
+  return new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date(rows[0].starts_at));
+}
