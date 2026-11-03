@@ -88,3 +88,47 @@ export async function createOtherSalon(tx: Tx) {
   );
   return { userId, salonId, memberId: member!.id, clientId: client!.id };
 }
+
+export type TestHours = { closed: boolean; open?: number; close?: number; brk?: [number, number] | null };
+
+/** Un salone di prova con n poltrone, un servizio e orari scelti (come postgres). Da usare dentro inTx. */
+export async function createTestSalon(
+  tx: Tx,
+  opts: { chairs?: number; duration?: number; hours?: (weekday: number) => TestHours } = {},
+) {
+  const chairs = opts.chairs ?? 1;
+  const userId = "b1000000-0000-4000-8000-000000000001";
+  const salonId = "5a300000-0000-4000-8000-000000000001";
+  const hours =
+    opts.hours ??
+    ((w: number): TestHours => (w >= 2 ? { closed: false, open: 540, close: 1140, brk: [780, 870] } : { closed: true }));
+
+  await tx.asAdmin();
+  await tx.q(
+    `insert into auth.users (instance_id, id, aud, role, email, encrypted_password, created_at, updated_at)
+     values ('00000000-0000-0000-0000-000000000000', $1, 'authenticated', 'authenticated', 'prova@example.com', '', now(), now())`,
+    [userId],
+  );
+  await tx.q(`insert into salons (id, slug, name, phone) values ($1, 'salone-di-prova', 'Salone di prova', '051 000 0000')`, [salonId]);
+  const memberIds: string[] = [];
+  for (let n = 1; n <= chairs; n++) {
+    const [m] = await tx.q<{ id: string }>(
+      `insert into members (salon_id, user_id, name, role, chair_no) values ($1, $2, $3, $4, $5) returning id`,
+      [salonId, n === 1 ? userId : null, `Barbiere ${n}`, n === 1 ? "owner" : "barber", n],
+    );
+    memberIds.push(m!.id);
+  }
+  for (let w = 0; w <= 6; w++) {
+    const h = hours(w);
+    await tx.q(
+      `insert into opening_hours (salon_id, weekday, closed, open_min, close_min, break_start_min, break_end_min)
+       values ($1, $2, $3, $4, $5, $6, $7)`,
+      [salonId, w, h.closed, h.closed ? null : h.open, h.closed ? null : h.close, h.brk?.[0] ?? null, h.brk?.[1] ?? null],
+    );
+  }
+  const [service] = await tx.q<{ id: string }>(
+    `insert into services (salon_id, name, duration_min, price_cents) values ($1, 'Taglio', $2, 2000) returning id`,
+    [salonId, opts.duration ?? 30],
+  );
+  return { userId, salonId, memberIds, serviceId: service!.id };
+}
