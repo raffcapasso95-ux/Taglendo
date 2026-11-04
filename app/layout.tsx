@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   description: "Agenda e prenotazioni online per barberie.",
   applicationName: "Taglendo",
   // favicon.ico e icon.svg arrivano dai file in app/; qui restano la 192 px e l'icona per iOS
-  icons: { icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }], apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }] },
+  icons: { icon: [{ url: "/icon.svg", type: "image/svg+xml" }, { url: "/favicon.ico", sizes: "48x48" }, { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }], apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }] },
   appleWebApp: { capable: true, title: "Taglendo", statusBarStyle: "default" },
 };
 
