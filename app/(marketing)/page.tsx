@@ -61,7 +61,7 @@ export default function Page() {
               <Image src="/images/foto/hero.jpg" alt={copy.hero.photoAlt} fill priority sizes="(min-width: 820px) 28vw, 64vw" className={styles.heroPhoto} />
             </div>
             <span className={styles.sticker}>{copy.hero.sticker}</span>
-            <Image src="/images/shot-agenda-mobile.png" alt={copy.hero.phoneAlt} width={780} height={1688} priority className={styles.heroPhone} />
+            <Image src="/images/shot-agenda-mobile.png" alt={copy.hero.phoneAlt} width={780} height={1688} priority sizes="(min-width: 820px) 230px, 150px" className={styles.heroPhone} />
           </div>
         </div>
       </section>
