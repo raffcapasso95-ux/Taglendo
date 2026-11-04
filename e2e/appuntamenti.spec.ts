@@ -104,10 +104,11 @@ test.describe("Appuntamenti", () => {
     await dialog(page).getByLabel("Nome").fill("Ragazzo con lo zaino rosso");
     await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();
 
-    // mar–sab, 9–19, pausa 13–14:30; il servizio proposto dura 30 minuti
+    // mar–sab, 9–19, pausa 13–14:30; il servizio proposto dura 30 minuti.
+    // C'è posto finché un servizio entra prima della chiusura: prima dell'apertura o in pausa parte al primo orario libero.
     const { date, minutes } = romeNow();
     const open = weekday(date) >= 2;
-    const room = open && minutes >= 540 && minutes + 30 <= 1140 && !(minutes < 870 && minutes + 30 > 780);
+    const room = open && minutes + 30 <= 1140;
     if (room) {
       await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
       const rows = await adminSelect<{ source: string }>("appointments", "select=source&order=created_at.desc&limit=1");
