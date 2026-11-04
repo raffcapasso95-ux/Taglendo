@@ -14,6 +14,8 @@ import {
   useToast,
   type ButtonVariant,
 } from "@/components/ui";
+import { ErrorState } from "@/components/states/ErrorState";
+import { CardsSkeleton } from "@/components/states/Skeletons";
 import styles from "./Showcase.module.css";
 
 const VARIANTS: Array<{ variant: ButtonVariant; label: string; text: string }> = [
@@ -247,6 +249,10 @@ function Catalog() {
         />
       </Sheet>
 
+      <Section id="stati" title="Stati" source="Schermate mancanti · D2, D3">
+        <CardsSkeleton />
+        <StateDemo />
+      </Section>
       <Modal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -269,5 +275,15 @@ function Catalog() {
         </ul>
       </Modal>
     </main>
+  );
+}
+
+function StateDemo() {
+  const [tries, setTries] = useState(0);
+  return (
+    <div>
+      <ErrorState error={new Error("prova")} reset={() => setTries((n) => n + 1)} />
+      <output aria-live="polite" data-testid="retries">{tries}</output>
+    </div>
   );
 }

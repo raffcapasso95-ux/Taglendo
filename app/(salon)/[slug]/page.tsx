@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { PublicSkeleton } from "@/components/states/Skeletons";
 import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -34,7 +35,7 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
 
 export default function Page(props: PageProps<"/[slug]">) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<PublicSkeleton />}>
       <Content params={props.params} />
     </Suspense>
   );

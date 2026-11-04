@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { signOut } from "@/lib/auth/actions";
 import { cx } from "@/components/ui/cx";
+import { SessionGuard } from "./SessionGuard";
 import { CalendarIcon, CheckIcon, CopyIcon, LinkIcon, LogoutIcon, ScissorsIcon, SettingsIcon, UsersIcon } from "./Icons";
 import styles from "./AppShell.module.css";
 
@@ -95,6 +96,7 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, childr
       </nav>
 
       <div className={styles.content}>{children}</div>
+      <SessionGuard />
 
       <nav className={styles.tabbar} aria-label="Menu principale">
         {ITEMS.map((item) => {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { AgendaSkeleton } from "@/components/states/Skeletons";
 import { Suspense } from "react";
 import { AgendaProvider } from "@/components/agenda/AgendaProvider";
 import { AutoRefresh } from "@/components/agenda/AutoRefresh";
@@ -67,7 +68,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
 
 export default function Page(props: PageProps<"/agenda">) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<AgendaSkeleton />}>
       <Content searchParams={props.searchParams} />
     </Suspense>
   );

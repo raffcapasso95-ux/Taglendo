@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CardsSkeleton } from "@/components/states/Skeletons";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
@@ -50,7 +51,7 @@ async function Content() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CardsSkeleton />}>
       <Content />
     </Suspense>
   );

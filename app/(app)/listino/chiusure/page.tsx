@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CardsSkeleton } from "@/components/states/Skeletons";
 import { Suspense } from "react";
 import { ClosuresView } from "@/components/listino/ClosuresView";
 import { loadClosures } from "@/lib/listino/closures";
@@ -12,7 +13,7 @@ async function Content() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CardsSkeleton />}>
       <Content />
     </Suspense>
   );
