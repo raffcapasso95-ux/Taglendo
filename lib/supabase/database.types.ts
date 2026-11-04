@@ -367,8 +367,14 @@ isOneToOne: false
 "public_salon_slugs":
 { Args: Record<PropertyKey, never>; Returns: string[]
                            },
+"purge_deleted_salons":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
 "register_salon":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"request_account_deletion":
+{ Args: Record<PropertyKey, never>; Returns: number
                            },
 "request_booking_code":
 { Args: { "p_code_hash": string,"p_email": string,"p_payload": Json,"p_salon": string }; Returns: Json
