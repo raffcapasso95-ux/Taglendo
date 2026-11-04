@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CardsSkeleton } from "@/components/states/Skeletons";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ClientDetail } from "@/components/clients/ClientDetail";
@@ -15,7 +16,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
 
 export default function Page(props: PageProps<"/clienti/[id]">) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CardsSkeleton />}>
       <Content params={props.params} />
     </Suspense>
   );

@@ -7,12 +7,23 @@ import { agendaCopy } from "@/lib/copy/agenda";
 import type { Created } from "@/lib/agenda/actions";
 import type { ClientOption, ServiceOption } from "@/lib/agenda/load";
 import { addDays } from "@/lib/dates/rome";
-import { clock, type Operator } from "@/lib/rules/agenda";
+import { offlineCopy } from "@/lib/copy/offline";
+import { browserStore } from "@/lib/offline/hooks";
+import { addItem, addStatus, SAVED_KEY, type QueuedCreate } from "@/lib/offline/queue";
+import { toOfflineDay, type OfflineDay } from "@/lib/offline/slots";
+import { clock, type DayModel, type Operator } from "@/lib/rules/agenda";
 import { AppointmentDetail } from "./AppointmentDetail";
 import { dayLabel, NewAppointment, type Prefill } from "./NewAppointment";
 
 type Api = {
   canEdit: boolean;
+  /** La fotografia del giorno per lavorare senza rete. */
+  offlineDay: OfflineDay;
+  day: DayModel;
+  /** Mette in coda un nuovo appuntamento fatto offline. */
+  queueCreate: (input: QueuedCreate["input"], label: QueuedCreate["label"]) => void;
+  /** Mette in coda un cambio di stato fatto offline. */
+  queueStatus: (appointmentId: string, status: "confermato" | "completato" | "non_presentato", label: QueuedCreate["label"]) => void;
   openNew: (prefill?: Prefill) => void;
   openWalkIn: () => void;
   openAppointment: (id: string) => void;
@@ -34,6 +45,8 @@ type Props = {
   operators: Operator[];
   services: ServiceOption[];
   clients: ClientOption[];
+  day: DayModel;
+  savedAt: string;
   /** Foglio “nuovo appuntamento” da aprire subito (arriva dalla scheda cliente). */
   initialNew?: Prefill | null;
   children: ReactNode;
@@ -50,7 +63,7 @@ export function AgendaProvider(props: Props) {
   );
 }
 
-function Inner({ canEdit, salonName, today, selectedDate, operators, services, clients, initialNew, children }: Props) {
+function Inner({ canEdit, salonName, today, selectedDate, operators, services, clients, day, savedAt, initialNew, children }: Props) {
   const router = useRouter();
   const toast = useToast();
   const [dialog, setDialog] = useState<Dialog | null>(() => (canEdit && initialNew ? { kind: "new", prefill: initialNew } : null));
@@ -60,14 +73,29 @@ function Inner({ canEdit, salonName, today, selectedDate, operators, services, c
     if (initialNew) router.replace("/agenda");
   }, [initialNew, router]);
 
+  const offlineDay = useMemo(() => toOfflineDay(day.date, day.hours, day.columns), [day]);
+
+  // Ricorda quando questa agenda è stata disegnata: la barra offline dice "salvata alle…".
+  useEffect(() => {
+    browserStore.setItem(SAVED_KEY, JSON.stringify({ at: savedAt }));
+  }, [savedAt]);
+
   const api = useMemo<Api>(
     () => ({
       canEdit,
+      offlineDay,
+      day,
+      queueCreate: (input, label) => {
+        addItem(browserStore, { kind: "create", input, label });
+      },
+      queueStatus: (appointmentId, status, label) => {
+        addStatus(browserStore, { kind: "status", appointmentId, status, label });
+      },
       openNew: (prefill) => setDialog({ kind: "new", prefill }),
       openWalkIn: () => setDialog({ kind: "walkin" }),
       openAppointment: (id) => setDialog({ kind: "appointment", id }),
     }),
-    [canEdit],
+    [canEdit, offlineDay, day],
   );
 
   const close = useCallback(() => setDialog(null), []);
@@ -77,6 +105,7 @@ function Inner({ canEdit, salonName, today, selectedDate, operators, services, c
     (message: string, sub?: string, date?: string) => {
       setDialog(null);
       toast(message, sub);
+      if (!navigator.onLine) return; // senza rete non si ricarica la pagina: resta com'è
       if (date && date !== selectedDate) router.push(date === today ? "/agenda" : `/agenda?g=${date}`);
       else router.refresh();
     },
@@ -101,6 +130,10 @@ function Inner({ canEdit, salonName, today, selectedDate, operators, services, c
           selectedDate={selectedDate}
           onClose={close}
           onCreated={created}
+          onQueued={() => {
+            setDialog(null);
+            toast(offlineCopy.queued, offlineCopy.queuedSub);
+          }}
         />
       ) : null}
       {dialog?.kind === "appointment" ? (

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ListSkeleton } from "@/components/states/Skeletons";
 import { Suspense } from "react";
 import { ClientsView } from "@/components/clients/ClientsView";
 import { loadClients } from "@/lib/clients/load";
@@ -12,7 +13,7 @@ async function Content() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<ListSkeleton />}>
       <Content />
     </Suspense>
   );

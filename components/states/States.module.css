@@ -1,0 +1,125 @@
+/* Stati D2 (caricamento a segnaposto) e D3 (errore), da Schermate mancanti.dc.html. Solo token. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 720px;
+  margin: 0 auto;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) var(--space-4) var(--space-12);
+}
+
+.block {
+  display: block;
+  border-radius: var(--radius-button);
+  background: var(--surface-skeleton);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.pill {
+  border-radius: var(--radius-pill);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.col {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.dark {
+  min-height: 100vh;
+  background: var(--salon-bg);
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .55;
+  }
+}
+
+/* Errore */
+.error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--space-16) var(--space-6);
+  text-align: center;
+}
+
+.errorIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--status-error-bg);
+  border: 1px solid var(--status-error-border);
+  color: var(--status-error);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.errorTitle {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -.03em;
+  font-weight: 700;
+  text-wrap: balance;
+}
+
+.errorText {
+  margin: 0;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.errorText a {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.errorActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .block {
+    animation: none;
+  }
+}

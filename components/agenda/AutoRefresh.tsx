@@ -8,11 +8,14 @@ export function AutoRefresh({ everyMs = 60_000 }: { everyMs?: number }) {
   const router = useRouter();
   useEffect(() => {
     const refresh = () => {
-      if (document.visibilityState === "visible") router.refresh();
+      // senza rete si lascia l'agenda com'è: ricaricarla la romperebbe
+      if (document.visibilityState === "visible" && navigator.onLine) router.refresh();
     };
     const timer = window.setInterval(refresh, everyMs);
     document.addEventListener("visibilitychange", refresh);
+    window.addEventListener("online", refresh);
     return () => {
+      window.removeEventListener("online", refresh);
       window.clearInterval(timer);
       document.removeEventListener("visibilitychange", refresh);
     };

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CardsSkeleton } from "@/components/states/Skeletons";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { EmailPrefsView } from "@/components/settings/EmailPrefsView";
@@ -17,7 +18,7 @@ async function Content() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CardsSkeleton />}>
       <Content />
     </Suspense>
   );

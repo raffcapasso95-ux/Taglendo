@@ -1,4 +1,5 @@
 import { Suspense, type ReactNode } from "react";
+import { CardsSkeleton } from "@/components/states/Skeletons";
 import { AppShell } from "@/components/app/AppShell";
 import { requireSalon } from "@/lib/auth/session";
 import { initials } from "@/lib/rules/agenda";
@@ -24,7 +25,7 @@ async function Guard({ children }: { children: ReactNode }) {
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CardsSkeleton />}>
       <Guard>{children}</Guard>
     </Suspense>
   );

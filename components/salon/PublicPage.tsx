@@ -68,7 +68,7 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn }: Props) 
               {showPrices && from !== null ? <span>Da {formatPrice(from)}</span> : null}
             </div>
           </div>
-          <a href={cta.href} className={styles.sign} aria-label={`${sign.title} ${sign.line}. ${cta.hint}`}>
+          <a href={cta.href} className={styles.sign}>
             <span className={styles.nail} />
             <span className={styles.cords}>
               <span className={`${styles.cord} ${styles.cordL}`} />

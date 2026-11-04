@@ -34,11 +34,11 @@ export function DayStrip({ days, selected, today, operator }: Props) {
             href={hrefFor(d.date, today, operator)}
             className={cx(styles.dayChip, current && styles.dayChipOn, d.closed && !current && styles.dayChipClosed)}
             aria-current={current ? "date" : undefined}
-            aria-label={d.label}
+            // il nome accessibile riparte dal testo che si vede (es. "Gio 5 dic"), poi dice il giorno per esteso
+            aria-label={`${d.weekday} ${d.number}${d.month ? ` ${d.month}` : ""}, ${d.label}`}
             scroll={false}
           >
-            <span className={styles.dayDow}>{d.weekday}</span>
-            <span className={styles.dayNum}>{d.number}</span>
+            <span className={styles.dayDow}>{d.weekday}</span> <span className={styles.dayNum}>{d.number}</span>{" "}
             <span className={styles.daySub}>
               {d.month ? d.month : d.hasAppointments ? <span className={cx(styles.dot, current && styles.dotOn)} aria-hidden="true" /> : null}
             </span>

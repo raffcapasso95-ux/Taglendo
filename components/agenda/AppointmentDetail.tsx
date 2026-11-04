@@ -16,8 +16,11 @@ import {
 } from "@/lib/agenda/actions";
 import { formatPrice } from "@/lib/dates/format";
 import { longDay } from "@/lib/dates/rome";
-import { clock, firstName } from "@/lib/rules/agenda";
+import { clock, firstName, type DayModel } from "@/lib/rules/agenda";
 import { reminderText, whatsappLink } from "@/lib/rules/whatsapp";
+import { offlineCopy } from "@/lib/copy/offline";
+import { useOnline } from "@/lib/offline/hooks";
+import { useAgenda } from "./AgendaProvider";
 import { dayLabel } from "./NewAppointment";
 import { DayPicker } from "./DayPicker";
 import { TimeChips } from "./TimeChips";
@@ -48,7 +51,24 @@ const STATUS_TOAST: Record<StatusKey, string> = {
   non_presentato: agendaCopy.toasts.noShow,
 };
 
+/** Il dettaglio dalla fotografia del giorno, quando non c'è la rete. Telefono e nota ci sono solo se erano già nella pagina. */
+function detailFromSnapshot(day: DayModel, id: string): Detail | null {
+  for (const col of day.columns) {
+    const a = col.appts.find((x) => x.id === id);
+    if (a) {
+      return {
+        id: a.id, clientId: null, clientName: a.clientName, phone: a.phone, note: "", serviceId: null, serviceName: a.serviceName,
+        priceCents: a.priceCents, date: day.date, startMin: a.startMin, endMin: a.endMin, memberId: a.memberId, memberName: col.operator.name,
+        status: a.status, source: a.source,
+      };
+    }
+  }
+  return null;
+}
+
 export function AppointmentDetail({ id, today, canEdit, salonName, multipleOperators, onClose, onChanged }: Props) {
+  const online = useOnline();
+  const { day, queueStatus } = useAgenda();
   const [detail, setDetail] = useState<Detail | null>(null);
   const [missing, setMissing] = useState(false);
   const [mode, setMode] = useState<"view" | "move" | "cancel">("view");
@@ -62,14 +82,19 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
 
   useEffect(() => {
     startLoad(async () => {
-      const d = await getAppointment(id);
+      let d: Detail | null;
+      try {
+        d = navigator.onLine ? await getAppointment(id) : detailFromSnapshot(day, id);
+      } catch {
+        d = detailFromSnapshot(day, id); // la rete è caduta proprio adesso
+      }
       if (!d) setMissing(true);
       else {
         setDetail(d);
         setDate(d.date >= today ? d.date : today);
       }
     });
-  }, [id, today]);
+  }, [id, today, day]);
 
   // Orari liberi per lo spostamento (l'appuntamento stesso non conta come occupato).
   useEffect(() => {
@@ -89,6 +114,12 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
   const changeStatus = (status: StatusKey) => {
     if (!detail || status === detail.status) return;
     startWork(async () => {
+      if (!navigator.onLine) {
+        // Niente rete: si mette in coda e parte appena torna.
+        queueStatus(detail.id, status, { client: detail.clientName, service: detail.serviceName });
+        setDetail({ ...detail, status });
+        return onChanged({ message: offlineCopy.queued, sub: offlineCopy.queuedSub });
+      }
       const result = await setAppointmentStatus(detail.id, status);
       if (result.ok) {
         setDetail({ ...detail, status });
@@ -219,10 +250,10 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
       footer={
         editable ? (
           <>
-            <Button variant="secondary" size="large" onClick={() => setMode("move")} disabled={!detail.serviceId}>
+            <Button variant="secondary" size="large" onClick={() => setMode("move")} disabled={!detail.serviceId || !online}>
               {copy.move}
             </Button>
-            <Button variant="danger" size="large" onClick={() => { setError(null); setMode("cancel"); }}>
+            <Button variant="danger" size="large" disabled={!online} onClick={() => { setError(null); setMode("cancel"); }}>
               {copy.cancel}
             </Button>
           </>

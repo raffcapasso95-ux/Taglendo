@@ -1,0 +1,133 @@
+/* Barra offline (D1): scura in cima, sempre leggibile. Solo token. */
+.bar,
+.barOnline {
+  position: sticky;
+  top: 0;
+  z-index: 25;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+}
+
+.barOnline {
+  background: var(--status-success);
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.text {
+  font-size: 14px;
+  color: var(--brand-peach);
+}
+
+.barOnline .text {
+  color: var(--text-inverse);
+}
+
+.badge {
+  margin-left: auto;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.failed {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--salon-line);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.link {
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-inverse);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* Elenco "in attesa di invio" nell'agenda */
+.pending {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pendingTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.pendingRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: var(--space-3) 14px;
+  border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.pendingTime {
+  flex: none;
+  width: 46px;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pendingText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pendingName {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.pendingMeta {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.pendingTag {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--badge-noshow-bg);
+  color: var(--status-warning);
+  font-size: 12px;
+  font-weight: 700;
+}

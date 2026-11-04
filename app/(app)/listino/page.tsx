@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CardsSkeleton } from "@/components/states/Skeletons";
 import { Suspense } from "react";
 import { ListinoView } from "@/components/listino/ListinoView";
 import { requireSalon } from "@/lib/auth/session";
@@ -41,7 +42,7 @@ async function Content() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CardsSkeleton />}>
       <Content />
     </Suspense>
   );

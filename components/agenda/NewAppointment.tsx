@@ -9,6 +9,10 @@ import { formatPrice } from "@/lib/dates/format";
 import { dayNumber, monthShort, weekdayShort } from "@/lib/dates/rome";
 import { clock, type Operator } from "@/lib/rules/agenda";
 import { LIMITS } from "@/lib/rules/forms";
+import { offlineCopy } from "@/lib/copy/offline";
+import { useOnline } from "@/lib/offline/hooks";
+import { offlineSlots } from "@/lib/offline/slots";
+import { useAgenda } from "./AgendaProvider";
 import { DayPicker } from "./DayPicker";
 import { TimeChips } from "./TimeChips";
 import styles from "./Dialogs.module.css";
@@ -27,6 +31,8 @@ type Props = {
   selectedDate: string;
   onClose: () => void;
   onCreated: (created: Created) => void;
+  /** Fatto senza rete: messo in coda, parte quando torna. */
+  onQueued: () => void;
 };
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
@@ -36,7 +42,9 @@ export function dayLabel(date: string, today: string, tomorrow: string): string 
   return date === today ? copy.today : date === tomorrow ? copy.tomorrow : `${weekdayShort(date)} ${dayNumber(date)} ${monthShort(date)}`;
 }
 
-export function NewAppointment({ mode, prefill, operators, services, clients, today, selectedDate, onClose, onCreated }: Props) {
+export function NewAppointment({ mode, prefill, operators, services, clients, today, selectedDate, onClose, onCreated, onQueued }: Props) {
+  const online = useOnline();
+  const { offlineDay, queueCreate } = useAgenda();
   const walkInMode = mode === "walkin";
   const [query, setQuery] = useState("");
   const [clientId, setClientId] = useState<string | null>(() => (prefill?.clientId && clients.some((c) => c.id === prefill.clientId) ? prefill.clientId : null));
@@ -56,9 +64,12 @@ export function NewAppointment({ mode, prefill, operators, services, clients, to
   const client = clients.find((c) => c.id === clientId);
   const operatorName = memberId === "any" ? null : operators.find((o) => o.id === memberId)?.name;
 
+  // Senza rete gli orari si ricavano dalla fotografia del giorno: solo quel giorno, senza chiedere al server.
+  const offlineResult: SlotsResult | null = !online && service ? (date === offlineDay.date ? { closed: offlineDay.hours.closed, durationMin: service.durationMin, slots: offlineSlots(offlineDay, service.durationMin, memberId === "any" ? null : memberId, 0) } : { closed: false, durationMin: service.durationMin, slots: [] }) : null;
+
   // Gli orari liberi si ricaricano quando cambia servizio, barbiere o giorno.
   useEffect(() => {
-    if (walkInMode || !serviceId) return;
+    if (!online || walkInMode || !serviceId) return;
     let cancelled = false;
     startSlots(async () => {
       const result = await listSlots({ serviceId, memberId: memberId === "any" ? null : memberId, date });
@@ -69,7 +80,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients, to
     return () => {
       cancelled = true;
     };
-  }, [walkInMode, serviceId, memberId, date]);
+  }, [online, walkInMode, serviceId, memberId, date]);
 
   const matches = useMemo(() => {
     const q = norm(query.trim());
@@ -79,12 +90,17 @@ export function NewAppointment({ mode, prefill, operators, services, clients, to
   }, [clients, query]);
 
   const hasClient = clientId !== null || (newMode && newName.trim().length > 0);
-  const canSave = hasClient && Boolean(service) && (walkInMode || startMin !== null) && !saving;
+  const canSave = hasClient && Boolean(service) && (walkInMode ? online : startMin !== null) && !saving;
 
   const save = () =>
     startSave(async () => {
       setError(null);
       const who = clientId ? { clientId } : { newClient: { name: newName.trim(), phone: newPhone.trim() || null } };
+      if (!online && !walkInMode) {
+        // Niente rete: si mette in coda e parte appena torna.
+        queueCreate({ ...who, serviceId, memberId: memberId === "any" ? null : memberId, date, startMin: startMin ?? 0 }, { client: client?.name ?? newName.trim(), service: service?.name ?? "" });
+        return onQueued();
+      }
       const result = walkInMode
         ? await walkIn({ ...who, serviceId, memberId: memberId === "any" ? null : memberId })
         : await createAppointment({ ...who, serviceId, memberId: memberId === "any" ? null : memberId, date, startMin: startMin ?? 0 });
@@ -233,10 +249,11 @@ export function NewAppointment({ mode, prefill, operators, services, clients, to
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>{copy.when}</h3>
             <DayPicker value={date} today={today} onChange={setDate} />
-            <TimeChips result={slots} loading={loadingSlots} selected={startMin} onSelect={setStartMin} label={copy.slotsWith(operatorName ?? copy.anyone)} />
+            <TimeChips result={online ? slots : offlineResult} loading={online && loadingSlots} selected={startMin} onSelect={setStartMin} label={copy.slotsWith(operatorName ?? copy.anyone)} />
           </section>
         )}
 
+        {!online ? <p className={styles.hint}>{walkInMode ? offlineCopy.walkInNeedsNet : date !== offlineDay.date ? offlineCopy.onlyDay(dayLabel(offlineDay.date, today, "")) : offlineCopy.text(null)}</p> : null}
         <p className={styles.recap}>{recap}</p>
       </div>
     </ResponsiveDialog>
