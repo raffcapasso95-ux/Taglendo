@@ -145,3 +145,111 @@ test.describe("Prenotazione online", () => {
     await visitor.close();
   });
 });
+
+test.describe("Gestione della prenotazione dal link", () => {
+  /** Prenota come cliente e restituisce il link di gestione dalla email di conferma. */
+  async function bookAndGetLink(page: Page, browser: import("@playwright/test").Browser, salon: string) {
+    const slug = await newSalon(page, salon);
+    const visitor = await browser.newPage();
+    const email = uniqueEmail("cliente");
+    await visitor.goto(`/${slug}`);
+    await chooseFirstSlot(visitor);
+    await fillData(visitor, email, "Luca Bianchi");
+    await visitor.getByLabel("Codice di conferma").fill(await bookingCode(email));
+    await expect(visitor.getByRole("heading", { name: /Ci vediamo/ })).toBeVisible();
+    const { html } = await waitForConfirmation(email);
+    const link = /href="([^"]*\/prenotazione\/[0-9a-f]{64})"/.exec(html)?.[1];
+    if (!link) throw new Error("Link di gestione non trovato nell'email");
+    return { slug, email, visitor, path: new globalThis.URL(link).pathname };
+  }
+
+  async function waitForConfirmation(to: string) {
+    for (let i = 0; i < 40; i++) {
+      const list = (await (await fetch("http://127.0.0.1:54324/api/v1/messages?limit=100")).json()) as { messages: Array<{ ID: string; Subject: string; To: Array<{ Address: string }> }> };
+      const found = list.messages.find((m) => m.Subject.startsWith("Confermato") && m.To.some((t) => t.Address === to));
+      if (found) {
+        const full = (await (await fetch(`http://127.0.0.1:54324/api/v1/message/${found.ID}`)).json()) as { HTML: string };
+        return { html: full.HTML };
+      }
+      await new Promise((r) => setTimeout(r, 250));
+    }
+    throw new Error(`Nessuna conferma per ${to}`);
+  }
+
+  test("dal link si vede la prenotazione e si scarica il calendario", async ({ page, browser }) => {
+    const { visitor, path } = await bookAndGetLink(page, browser, "Barberia Gestisci Uno");
+    await visitor.goto(path);
+    await expect(visitor.getByRole("heading", { name: "La tua prenotazione" })).toBeVisible();
+    await expect(visitor.getByText(/^Prenotazione TG-\d{4,6}$/)).toBeVisible();
+    await expect(visitor.getByText("Taglio uomo")).toBeVisible();
+    await expect(visitor.getByText("Paghi in negozio")).toBeVisible();
+    const res = await visitor.request.get(`${path}/calendario.ics`);
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toContain("text/calendar");
+    const ics = await res.text();
+    expect(ics).toContain("BEGIN:VEVENT");
+    expect(ics).toContain("SUMMARY:Taglio uomo da Barberia Gestisci Uno");
+    await visitor.close();
+  });
+
+  test("annulla con la doppia conferma: l'orario torna libero e arriva l'email", async ({ page, browser }) => {
+    const { visitor, path, email } = await bookAndGetLink(page, browser, "Barberia Gestisci Due");
+    await visitor.goto(path);
+    await visitor.getByRole("button", { name: "Annulla la prenotazione" }).click();
+    await expect(visitor.getByRole("heading", { name: "Annullare l’appuntamento?" })).toBeVisible();
+    await visitor.getByRole("button", { name: "No, lo tengo" }).click();
+    await expect(visitor.getByRole("heading", { name: "La tua prenotazione" })).toBeVisible();
+    await visitor.getByRole("button", { name: "Annulla la prenotazione" }).click();
+    await visitor.getByRole("button", { name: "Sì, annulla" }).click();
+    await expect(visitor.getByRole("heading", { name: "Appuntamento annullato" })).toBeVisible();
+    await expect(visitor.getByText(/Ti abbiamo mandato una conferma via email/)).toBeVisible();
+
+    const rows = await adminSelect<{ status: string; cancelled_by: string }>("appointments", "select=status,cancelled_by&source=eq.online&order=created_at.desc&limit=1");
+    expect(rows[0]).toEqual({ status: "annullato", cancelled_by: "cliente" });
+
+    // F4 nella casella
+    for (let i = 0; i < 40; i++) {
+      const list = (await (await fetch("http://127.0.0.1:54324/api/v1/messages?limit=100")).json()) as { messages: Array<{ Subject: string; To: Array<{ Address: string }> }> };
+      if (list.messages.some((m) => m.Subject === "Appuntamento annullato" && m.To.some((t) => t.Address === email))) break;
+      if (i === 39) throw new Error("Email di annullamento non arrivata");
+      await new Promise((r) => setTimeout(r, 250));
+    }
+
+    // da qui il link non vale più (E5)
+    await visitor.goto(path);
+    await expect(visitor.getByRole("heading", { name: "Questo link non funziona più" })).toBeVisible();
+    await expect(visitor.getByRole("link", { name: "Vai alla pagina del salone" })).toBeVisible();
+    await visitor.close();
+  });
+
+  test("troppo tardi: oltre il limite si chiama il salone, senza pulsante di annullamento", async ({ page, browser }) => {
+    const { visitor, path } = await bookAndGetLink(page, browser, "Barberia Gestisci Tre");
+    // l'appuntamento è tra poco più di 2 ore: si porta a 30 minuti da adesso
+    const soon = new Date(Date.now() + 30 * 60000).toISOString();
+    const end = new Date(Date.now() + 60 * 60000).toISOString();
+    await adminUpdate("appointments", `manage_token=eq.${path.split("/").pop()}`, { starts_at: soon, ends_at: end });
+    await visitor.goto(path);
+    await expect(visitor.getByRole("heading", { name: "Non puoi più annullare online" })).toBeVisible();
+    await expect(visitor.getByRole("button", { name: "Annulla la prenotazione" })).toHaveCount(0);
+    await expect(visitor.getByRole("link", { name: /^Chiama / }).first()).toBeVisible();
+    await visitor.close();
+  });
+
+  test("con l'annullamento online spento si chiama il salone", async ({ page, browser }) => {
+    const { slug, visitor, path } = await bookAndGetLink(page, browser, "Barberia Gestisci Quattro");
+    await adminUpdate("salons", `slug=eq.${slug}`, { cancel_online: false });
+    await visitor.goto(path);
+    await expect(visitor.getByText("Per annullare o spostare l’orario chiama il salone.")).toBeVisible();
+    await expect(visitor.getByRole("button", { name: "Annulla la prenotazione" })).toHaveCount(0);
+    await visitor.close();
+  });
+
+  test("un link inventato o di un altro salone mostra la pagina neutra", async ({ browser }) => {
+    const visitor = await browser.newPage();
+    await visitor.goto(`/barberia-saragozza/prenotazione/${"a".repeat(64)}`);
+    await expect(visitor.getByRole("heading", { name: "Questo link non funziona più" })).toBeVisible();
+    await visitor.goto("/barberia-saragozza/prenotazione/abc");
+    await expect(visitor.getByRole("heading", { name: "Questo link non funziona più" })).toBeVisible();
+    await visitor.close();
+  });
+});

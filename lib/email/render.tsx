@@ -1,7 +1,8 @@
 import "server-only";
 import { render } from "@react-email/render";
-import { emailCopy } from "@/lib/copy/emails";
+import { cancelEmailCopy, emailCopy } from "@/lib/copy/emails";
 import { env } from "@/lib/supabase/env";
+import { CancellationEmail, type CancellationEmailProps } from "./templates/CancellationEmail";
 import { CodeEmail, type CodeEmailProps } from "./templates/CodeEmail";
 import { ConfirmationEmail, type ConfirmationEmailProps } from "./templates/ConfirmationEmail";
 
@@ -19,4 +20,10 @@ export async function buildConfirmationEmail(p: Omit<ConfirmationEmailProps, "si
   const { subjectWhen, ...props } = p;
   const el = <ConfirmationEmail {...props} siteUrl={env.siteUrl()} />;
   return { subject: emailCopy.confirmed.subject(subjectWhen), html: await render(el), text: await render(el, { plainText: true }) };
+}
+
+/** F4: appuntamento annullato. */
+export async function buildCancellationEmail(p: Omit<CancellationEmailProps, "siteUrl">): Promise<Built> {
+  const el = <CancellationEmail {...p} siteUrl={env.siteUrl()} />;
+  return { subject: cancelEmailCopy.subject, html: await render(el), text: await render(el, { plainText: true }) };
 }

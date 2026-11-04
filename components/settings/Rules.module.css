@@ -1,0 +1,49 @@
+/* Regole di prenotazione: righe con testo e interruttore, da Taglendo App.dc.html. */
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.rule {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: var(--space-3) 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.rule:first-child {
+  border-top: 0;
+}
+
+.ruleText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ruleLabel {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ruleHint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}

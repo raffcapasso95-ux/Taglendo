@@ -313,7 +313,13 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "check_booking_code":
+            "booking_by_token":
+{ Args: { "p_token": string }; Returns: Json
+                           },
+"cancel_booking_by_token":
+{ Args: { "p_token": string }; Returns: Json
+                           },
+"check_booking_code":
 { Args: { "p_code_hash": string,"p_email": string,"p_salon": string }; Returns: Json
                            },
 "confirm_online_booking":

@@ -21,3 +21,12 @@ export const emailCopy = {
     calendar: "Aggiungi al calendario",
   },
 } as const;
+
+/** F4 · Appuntamento annullato (qui: annullato dal cliente; l'annullamento dal salone arriva con la Fase 5). */
+export const cancelEmailCopy = {
+  subject: "Appuntamento annullato",
+  title: "Appuntamento annullato",
+  body: (when: string) => `Hai annullato l’appuntamento di ${when}. Non sei più in agenda.`,
+  again: "Prenota un altro orario",
+  notYou: (phone: string) => `Non sei stato tu? Chiama il salone allo ${phone}.`,
+} as const;
