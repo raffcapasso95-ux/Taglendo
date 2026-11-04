@@ -48,3 +48,56 @@
   font-size: 12px;
   color: var(--status-error);
 }
+
+/* Variante grande: Schermate mancanti.dc.html, A1–A5 e C7. */
+.fieldLarge {
+  gap: var(--space-1);
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--field-height-large);
+  padding: 0 14px;
+  border: var(--field-border-width) solid var(--border-subtle);
+  border-radius: var(--radius-field-large);
+  background: var(--surface);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.box:focus-within {
+  border-color: var(--brand-plum);
+  box-shadow: 0 0 0 .5px var(--brand-plum);
+}
+
+.boxInvalid,
+.boxInvalid:focus-within {
+  border-color: var(--status-error);
+  box-shadow: 0 0 0 .5px var(--status-error);
+}
+
+.inputLarge {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--field-height-large);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 16px;
+  outline: none;
+}
+
+.inputLarge::placeholder {
+  color: var(--text-secondary);
+  opacity: .9;
+}
+
+.inputLarge:disabled {
+  color: var(--text-secondary);
+}
+
+.box:has(.inputLarge:disabled) {
+  background: var(--surface-muted);
+}

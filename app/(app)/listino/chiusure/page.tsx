@@ -1,5 +1,19 @@
-import { Placeholder } from "@/components/Placeholder";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { ClosuresView } from "@/components/listino/ClosuresView";
+import { loadClosures } from "@/lib/listino/closures";
+
+export const metadata: Metadata = { title: "Ferie e chiusure · Taglendo" };
+
+async function Content() {
+  const data = await loadClosures();
+  return <ClosuresView {...data} />;
+}
 
 export default function Page() {
-  return <Placeholder title="Chiusure e ferie" phase="Fase 2" design="C2, C3" />;
+  return (
+    <Suspense fallback={null}>
+      <Content />
+    </Suspense>
+  );
 }

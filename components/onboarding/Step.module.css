@@ -1,0 +1,211 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* A6: scheda del link */
+.linkCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+}
+
+.linkCard > * {
+  max-width: 100%;
+}
+
+.linkTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.linkValue {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+}
+
+.linkValue strong {
+  color: var(--text-primary);
+}
+
+.linkError {
+  margin: 0;
+  font-size: 12px;
+  color: var(--status-error);
+}
+
+.linkEdit {
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.linkCard > div {
+  width: 100%;
+}
+
+/* A7: giorni */
+.label {
+  margin: 0 0 var(--space-2);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-2);
+}
+
+.day {
+  min-height: var(--control-height);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.day[aria-pressed="true"] {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.breakCard {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.fieldError {
+  margin: var(--space-1) 0 0;
+  font-size: 12px;
+  color: var(--status-error);
+}
+
+/* A8: servizi */
+.serviceRow {
+  display: flex;
+  align-items: center;
+}
+
+.serviceRow > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.serviceEdit {
+  flex: none;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4) 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.serviceOff {
+  opacity: .6;
+}
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--surface-muted);
+}
+
+.addButton {
+  min-height: var(--control-height);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-card);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* A9: poltrone */
+.owner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--row-padding);
+}
+
+.ownerName {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ownerRole {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.ownerYou {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.chair {
+  padding: var(--row-padding);
+}
+
+.plan {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+/* A8: il testo introduttivo cambia tra telefono e desktop */
+.desktopLead {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .phoneLead {
+    display: none;
+  }
+
+  .desktopLead {
+    display: inline;
+  }
+}

@@ -1,0 +1,130 @@
+/* Da design/Schermate mancanti.dc.html, A6-D–A9-D: colonna "Come lo vedono i clienti". */
+.card {
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.head {
+  padding: var(--space-4);
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+}
+
+.area {
+  margin: 0 0 var(--space-1);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+.name {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.line {
+  margin: var(--space-1) 0 0;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.note {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font-size: 12px;
+}
+
+.rowLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.rowSub {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.rowValue {
+  font-weight: 700;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-1) 10px var(--space-1) var(--space-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--brand-peach);
+  font-size: 11px;
+  font-weight: 700;
+}

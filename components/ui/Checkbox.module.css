@@ -6,21 +6,26 @@
 }
 
 .row {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: var(--checkbox-gap);
   min-height: var(--tap-min);
   padding: var(--space-1) 0;
-  border: 0;
-  background: transparent;
   color: var(--text-primary);
   font-size: 14px;
   line-height: 1.45;
-  text-align: left;
+  cursor: pointer;
 }
 
-.row:disabled {
-  opacity: .42;
+/* La casella vera è nascosta ma resta raggiungibile da tastiera e dai lettori di schermo. */
+.native {
+  position: absolute;
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
 }
 
 .box {
@@ -41,13 +46,29 @@
     border-color var(--duration-fast) var(--ease-out);
 }
 
-.row[aria-checked="true"] .box {
+.native:checked + .box {
   border-color: var(--brand-plum);
   background: var(--brand-plum);
 }
 
-.row[aria-invalid="true"] .box {
+.native[aria-invalid="true"] + .box {
   border-color: var(--status-error);
+}
+
+.native:focus-visible + .box {
+  outline: var(--focus-ring) solid var(--brand-plum);
+  outline-offset: var(--space-1);
+}
+
+.native:disabled + .box,
+.native:disabled ~ .text {
+  opacity: .42;
+}
+
+.text a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .error {

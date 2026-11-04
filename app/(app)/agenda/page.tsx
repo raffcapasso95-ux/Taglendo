@@ -1,5 +1,74 @@
-import { Placeholder } from "@/components/Placeholder";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { AgendaProvider } from "@/components/agenda/AgendaProvider";
+import { AutoRefresh } from "@/components/agenda/AutoRefresh";
+import { DayHeader } from "@/components/agenda/DayHeader";
+import { DayStrip } from "@/components/agenda/DayStrip";
+import { DayView } from "@/components/agenda/DayView";
+import { PhoneActions } from "@/components/agenda/HeaderActions";
+import { OperatorFilter } from "@/components/agenda/OperatorFilter";
+import { SidePanel } from "@/components/agenda/SidePanel";
+import styles from "@/components/agenda/Agenda.module.css";
+import { loadAgenda } from "@/lib/agenda/load";
+import { weekdayName } from "@/lib/dates/rome";
+import { clock } from "@/lib/rules/agenda";
 
-export default function Page() {
-  return <Placeholder title="Agenda" phase="Fase 2" design="Taglendo App.dc.html · Agenda" />;
+export const metadata: Metadata = { title: "Agenda · Taglendo" };
+
+async function Content({ searchParams }: { searchParams: Promise<{ g?: string; op?: string; nuovo?: string; servizio?: string; barbiere?: string; nome?: string }> }) {
+  const { g, op, nuovo, servizio, barbiere, nome } = await searchParams;
+  const data = await loadAgenda({ date: g, op });
+  if (!data) return null;
+  const { day } = data;
+
+  return (
+    <AgendaProvider
+      canEdit={data.canEdit}
+      salonName={data.salonName}
+      today={data.today}
+      selectedDate={day.date}
+      operators={data.operators}
+      services={data.services}
+      clients={data.clients}
+      initialNew={
+        nuovo
+          ? {
+              clientId: nuovo === "nuovo" ? null : nuovo,
+              newName: nuovo === "nuovo" ? (nome?.slice(0, 60) ?? "") : null,
+              serviceId: servizio ?? null,
+              memberId: barbiere ?? null,
+            }
+          : null
+      }
+    >
+    <div className={styles.page}>
+      <div className={styles.main}>
+        <DayHeader
+          salonName={data.salonName}
+          userInitials={data.userInitials}
+          greeting={data.greeting}
+          longDate={data.longDate}
+          summary={day.summary}
+          showToday={!day.isToday}
+        />
+        <div className={styles.controls}>
+          <DayStrip days={data.strip} selected={day.date} today={data.today} operator={data.selectedOperator} />
+          <OperatorFilter operators={data.operators} selected={data.selectedOperator} date={day.date} today={data.today} />
+        </div>
+        <DayView day={day} weekdayName={weekdayName(day.date)} multiple={day.columns.length > 1} />
+      </div>
+      <SidePanel day={day} title={day.isToday ? `Adesso in salone · ${clock(day.nowMin)}` : "Primo cliente"} />
+      <PhoneActions />
+      <AutoRefresh />
+    </div>
+    </AgendaProvider>
+  );
+}
+
+export default function Page(props: PageProps<"/agenda">) {
+  return (
+    <Suspense fallback={null}>
+      <Content searchParams={props.searchParams} />
+    </Suspense>
+  );
 }

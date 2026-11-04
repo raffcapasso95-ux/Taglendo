@@ -1,0 +1,178 @@
+/* Da design/Taglendo App.dc.html: barra laterale chiusa (76 px) e barra in basso del telefono. */
+.shell {
+  min-height: 100dvh;
+  background: var(--canvas);
+}
+
+.content {
+  min-height: 100dvh;
+  padding-bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+}
+
+.rail {
+  display: none;
+}
+
+.tabbar {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding-bottom: env(safe-area-inset-bottom);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--canvas);
+}
+
+.tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: var(--tabbar-height);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.tabActive {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tabBar {
+  width: 28px;
+  height: 4px;
+  border-radius: 2px;
+  background: transparent;
+}
+
+.tabActive .tabBar {
+  background: var(--brand-apricot);
+}
+
+@media (min-width: 1024px) {
+  .content {
+    margin-left: var(--nav-rail-width);
+    padding-bottom: 0;
+  }
+
+  .tabbar {
+    display: none;
+  }
+
+  .rail {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 30;
+    width: var(--nav-rail-width);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: var(--nav-padding);
+    border-right: 1px solid var(--border-subtle);
+    background: var(--canvas);
+  }
+
+  .logo {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--nav-item-size);
+    height: var(--nav-item-size);
+    margin-bottom: var(--space-3);
+  }
+
+  .logoImage {
+    width: var(--logo-tile-size);
+    height: var(--logo-tile-size);
+    border-radius: var(--radius-icon-button);
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .groupBottom {
+    margin-top: auto;
+  }
+
+  .railItem {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--nav-item-size);
+    height: var(--nav-item-size);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-button);
+    background: transparent;
+    color: var(--text-primary);
+    text-decoration: none;
+    transition:
+      background-color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+
+  .railItem:hover {
+    background: var(--surface-muted);
+  }
+
+  .railItem:active {
+    transform: scale(.97);
+  }
+
+  .railItemActive,
+  .railItemActive:hover {
+    background: var(--brand-peach);
+  }
+
+  .avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--brand-peach);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  /* Etichette: compaiono a destra al passaggio del mouse o con la tastiera. */
+  .railItem::after,
+  .logo::after {
+    content: attr(data-label);
+    position: absolute;
+    left: calc(100% + var(--space-3));
+    top: 50%;
+    padding: 9px 11px;
+    border-radius: var(--radius-icon-button);
+    background: var(--brand-plum);
+    color: var(--brand-cream);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-4px, -50%) scale(.97);
+    transition:
+      opacity 125ms ease-out,
+      transform 125ms ease-out;
+  }
+
+  .railItem:hover::after,
+  .railItem:focus-visible::after,
+  .logo:hover::after {
+    opacity: 1;
+    transform: translate(0, -50%) scale(1);
+  }
+}

@@ -64,12 +64,12 @@ from auth.users u
 where u.id in ('a0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000002');
 
 -- ── Salone ───────────────────────────────────────────────────
-insert into public.salons (id, slug, name, address, area, phone, description, trial_ends_at, created_at)
+insert into public.salons (id, slug, name, address, area, phone, description, trial_ends_at, created_at, onboarding_step)
 values (
   '5a100000-0000-4000-8000-000000000001', 'barberia-saragozza', 'Barberia Saragozza',
   'Via Saragozza 48, Bologna', 'Porta Saragozza · Bologna', '051 644 2190',
   'Taglio, barba e rasatura con tre barbieri in Via Saragozza.',
-  now() + interval '15 days', now()
+  now() + interval '15 days', now(), 5
 );
 
 insert into public.email_prefs (salon_id) values ('5a100000-0000-4000-8000-000000000001');
@@ -93,7 +93,7 @@ values
    'a0000000-0000-4000-8000-000000000002', 'Marco', 'barber', 2, null, null, null),
   ('3e300000-0000-4000-8000-000000000003', '5a100000-0000-4000-8000-000000000001',
    null, 'Simone', 'barber', 3, 'simone@barberia-saragozza.example',
-   'invito-demo-simone', now() + interval '7 days');
+   'invito-demo-simone-0123456789abcdef', now() + interval '7 days');
 
 insert into public.notification_prefs (member_id, daily_summary)
 values ('3e300000-0000-4000-8000-000000000001', true),

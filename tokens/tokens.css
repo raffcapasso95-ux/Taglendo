@@ -112,3 +112,66 @@
   --duration-sheet-open: 380ms;
   --duration-sheet-close: 240ms;
 }
+
+/* Fase 1 — accesso e primo avvio (Schermate mancanti.dc.html, A1–A10, C7) */
+:root {
+  --field-height-large: 50px;       /* campi delle schermate di accesso */
+  --radius-field-large: 10px;
+  --field-border-width: 1.5px;
+  --field-border-width-focus: 2px;
+  --button-height-auth: 52px;
+  --code-box-height: 58px;          /* A3: una casella per cifra */
+  --code-box-gap: 8px;
+  --meter-bar-height: 4px;          /* A2, A5: robustezza della password */
+  --auth-icon-size: 44px;           /* simbolo nell'intestazione del telefono */
+  --auth-hero-padding-bottom: 44px;
+  --auth-sheet-overlap: 24px;       /* il foglio chiaro sale sull'intestazione */
+  --auth-sheet-padding-bottom: 36px;
+  --auth-panel-width: 46%;          /* pannello albicocca su desktop */
+  --auth-panel-padding: 48px 56px;
+  --auth-form-max-width: 380px;
+  --auth-headline-size: 36px;
+  --auth-logo-width: 150px;
+  --shadow-float-card: 0 10px 24px rgba(62, 37, 50, .16);
+  --shadow-icon: 0 6px 16px rgba(62, 37, 50, .18);
+  --shadow-shot: 0 24px 60px rgba(62, 37, 50, .3);
+  --chip-padding: 5px 9px;          /* A2: chip dei vantaggi */
+  --chip-gap: 6px;
+  --status-warning-bar: #8A4B16;
+}
+
+/* Primo avvio su desktop (A6-D–A9-D) */
+:root {
+  --onboarding-nav-width: 260px;
+  --onboarding-aside-width: 340px;
+  --onboarding-form-width: 460px;
+}
+
+/* Fase 2 — struttura dell'app e agenda (Taglendo App.dc.html) */
+:root {
+  --nav-item-size: 48px;
+  --nav-padding: 14px;
+  --tabbar-height: 52px;
+  --logo-tile-size: 36px;
+  --grid-line: #EFE2E5;             /* linea dell'ora */
+  --grid-line-soft: #F7EEEF;        /* linea della mezz'ora */
+  --grid-px-per-hour: 96px;
+  --grid-half-hour: 48px;
+  --grid-time-col: 56px;
+  --grid-col-min: 200px;
+  --past-veil: rgba(251, 240, 233, .75);
+  --progress-track: #F3E8EA;
+  --gap-hover-bg: #E1EFE7;
+  --gap-text-soft: #2E6B55;
+  --badge-completed-bg: #ECE8EF;
+  --badge-completed-fg: #5D456B;
+  --badge-confirmed-bg: #E9F2EC;
+  --badge-noshow-bg: #FBEDDF;
+  --badge-canceled-bg: #F7E8EB;
+  --day-chip-width: 52px;
+  --day-chip-height: 62px;
+  --side-panel-width: 340px;
+  --radius-grid: 18px;
+  --radius-block: 10px;
+  --radius-day: 12px;
+}

@@ -39,3 +39,10 @@ export function formatPrice(cents: number): string {
     maximumFractionDigits: 2,
   }).format(euros);
 }
+
+const dayMonth = new Intl.DateTimeFormat("it-IT", { timeZone: TIME_ZONE, day: "numeric", month: "long" });
+
+/** `13 novembre` */
+export function formatDayMonth(date: Date): string {
+  return dayMonth.format(date);
+}

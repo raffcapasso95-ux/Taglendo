@@ -1,5 +1,19 @@
-import { Placeholder } from "@/components/Placeholder";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { ClientsView } from "@/components/clients/ClientsView";
+import { loadClients } from "@/lib/clients/load";
+
+export const metadata: Metadata = { title: "Clienti · Taglendo" };
+
+async function Content() {
+  const data = await loadClients();
+  return <ClientsView {...data} />;
+}
 
 export default function Page() {
-  return <Placeholder title="Clienti" phase="Fase 3" design="Taglendo App.dc.html · Clienti" />;
+  return (
+    <Suspense fallback={null}>
+      <Content />
+    </Suspense>
+  );
 }

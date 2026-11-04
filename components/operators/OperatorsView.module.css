@@ -1,0 +1,204 @@
+/* Da design/Schermate mancanti.dc.html: C4 e C4-D (Operatori e permessi). */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: calc(var(--space-4) + env(safe-area-inset-top)) var(--space-4) var(--space-12);
+}
+
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.salon {
+  margin: 0;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -.04em;
+  font-weight: 700;
+}
+
+.inviteTop {
+  display: none;
+}
+
+.columns {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--row-padding);
+}
+
+.who {
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.sub,
+.warn {
+  margin: 0;
+  font-size: 13px;
+}
+
+.sub {
+  color: var(--text-secondary);
+}
+
+.warn {
+  color: var(--status-warning);
+}
+
+.badge {
+  flex: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.actions {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.link,
+.linkMuted {
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.linkMuted {
+  min-height: 28px;
+  margin-top: -10px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inviteBottom {
+  background: transparent;
+}
+
+.full {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.fixed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  padding: var(--row-padding);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.fixedValue {
+  flex: none;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.form,
+.ready {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.ready p {
+  margin: 0;
+}
+
+.linkField {
+  width: 100%;
+  min-height: var(--field-height-large);
+  padding: 0 14px;
+  border: var(--field-border-width) solid var(--border-subtle);
+  border-radius: var(--radius-field-large);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: var(--space-8) var(--space-8) var(--space-16);
+  }
+
+  .inviteTop {
+    display: inline-flex;
+  }
+
+  .inviteBottom {
+    display: none;
+  }
+
+  .columns {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}

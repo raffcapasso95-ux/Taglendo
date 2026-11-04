@@ -2,6 +2,8 @@
 
 Agenda e prenotazioni online per barberie da 1 a 3 poltrone. Questo pacchetto contiene tutto il design e le istruzioni per costruire la **v1 solo web** con Claude Code: niente app negli store.
 
+> **Rilascio:** la prima uscita è gratuita (beta di circa un mese, con registrazione, senza pagamenti). La parte a pagamento si sviluppa in parallelo e poi arriva l'app nativa. Ordine delle fasi e dettagli in `docs/05-fasi-e-prompt.md`.
+
 ## Cosa costruire (perimetro v1)
 
 1. **Sito Taglendo**: la pagina commerciale per i barbieri, più registrazione, accesso e pagine legali.
@@ -100,12 +102,25 @@ Requisiti: Node 20+ e Docker in esecuzione.
 
 ```bash
 npm install
-npm run db:start          # Supabase locale: applica la migrazione e il seed
-cp .env.example .env.local # poi incolla API_URL e ANON_KEY da `npx supabase status`
-npm run dev               # http://localhost:3000/dev/ui per i componenti
+npm run db:start            # Supabase locale: applica le migrazioni e il seed
+npx supabase status -o env  # copia API_URL, ANON_KEY e SERVICE_ROLE_KEY in .env.local (vedi .env.example)
+npm run dev                 # http://localhost:3000
 ```
 
+- `/dev/ui` mostra i componenti base.
+- **Email in locale:** i codici di verifica e i link di recupero password arrivano in Mailpit, su http://127.0.0.1:54324.
 - `npm run db:reset` ricrea il database con i dati demo di Barberia Saragozza. Le date sono relative al giorno del seed.
-- Accessi demo (password `taglendo-demo`): `andrea@barberia-saragozza.example` (titolare), `marco@barberia-saragozza.example` (barbiere).
-- `npm test`: test unitari. `npm run test:db`: test di RLS e vincoli sul database locale.
-- `npm run lint` controlla anche che nei CSS non ci siano colori fuori dai token.
+- Accessi demo (password `taglendo-demo`): `andrea@barberia-saragozza.example` (titolare), `marco@barberia-saragozza.example` (barbiere). Simone ha un invito in sospeso: `/invito/invito-demo-simone-0123456789abcdef`.
+- Dopo una modifica allo schema: `npm run db:types` aggiorna `lib/supabase/database.types.ts`.
+
+### Test
+
+| Comando | Cosa prova |
+|---|---|
+| `npm test` | Regole pure e formati (Vitest) |
+| `npm run test:db` | RLS, permessi e vincoli sul database locale |
+| `npm run test:e2e` | Registrazione, accesso, recupero password, primo avvio, inviti (Playwright, telefono e desktop). Serve `npm run db:start`; la prima volta `npx playwright install chromium` |
+| `npm run lint` | ESLint e Stylelint (niente colori fuori dai token) |
+
+### Accesso con Apple e Google
+I pulsanti compaiono solo se il provider è acceso: imposta `NEXT_PUBLIC_AUTH_APPLE=true` o `NEXT_PUBLIC_AUTH_GOOGLE=true` dopo aver creato le app sui rispettivi portali e configurato i provider in Supabase.

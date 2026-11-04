@@ -1,0 +1,81 @@
+/**
+ * Testi dell'agenda: nuovo appuntamento, dettaglio, spostamento, annullamento.
+ * Quelli senza marca vengono da design/Taglendo App.dc.html; quelli marcati NUOVO sono una proposta.
+ */
+
+export const agendaCopy = {
+  actions: { walkIn: "Cliente in negozio", add: "+ Nuovo appuntamento", walkInPhone: "In negozio ora", addPhone: "+ Appuntamento" },
+  form: {
+    titleNew: "Nuovo appuntamento",
+    titleWalkIn: "Cliente in negozio",
+    client: "Cliente",
+    search: "Cerca tra i clienti salvati",
+    newClient: "+ Nuovo cliente",
+    name: "Nome",
+    phone: "Telefono",
+    phoneHint: "facoltativo, per WhatsApp",
+    service: "Servizio",
+    barber: "Barbiere",
+    anyone: "Chiunque",
+    when: "Giorno e ora",
+    closed: "Il salone è chiuso in questo giorno.",
+    noSlots: "Nessun orario libero per questo servizio. Prova un altro giorno o operatore.",
+    slotsWith: (op: string) => `Orari con ${op}`,
+    busyHint: "Barrato = occupato",
+    save: "Fissa l’appuntamento",
+    saving: "Salvataggio…",
+    chooseClient: "Scegli il cliente",
+    now: "adesso",
+    cancel: "Annulla",
+    // NUOVO
+    otherDay: "Altro giorno",
+    noClients: "Nessun cliente trovato.",
+    change: "Cambia",
+    anyoneHint: "il primo libero",
+    today: "Oggi",
+    tomorrow: "Domani",
+  },
+  detail: {
+    note: "Nota privata",
+    whatsapp: "WhatsApp",
+    call: "Chiama",
+    noPhone: "Nessun telefono salvato per questo cliente.",
+    statuses: { confermato: "Confermato", completato: "Completato", non_presentato: "Non presentato", annullato: "Annullato" },
+    move: "Sposta",
+    cancel: "Annulla",
+    moveTitle: (op: string) => `Nuovo orario con ${op}`,
+    moveSummary: (when: string) => `Nuovo orario: ${when}`,
+    moveChoose: "Scegli il nuovo orario.",
+    back: "Indietro",
+    confirm: "Conferma",
+    cancelAsk: (first: string) => `Annullare l’appuntamento di ${first}? L’orario torna libero anche sul link.`,
+    keep: "No, tienilo",
+    cancelYes: "Sì, annulla",
+    online: "dal link",
+    // NUOVO
+    close: "Chiudi",
+    readOnly: "Puoi vedere questo appuntamento, ma non modificarlo.",
+  },
+  toasts: {
+    created: "Appuntamento fissato",
+    moved: "Appuntamento spostato",
+    cancelled: "Appuntamento annullato",
+    cancelledSub: "L’orario è di nuovo libero sul link",
+    done: "Segnato come completato",
+    noShow: "Segnato come non presentato",
+    confirmed: "Appuntamento confermato",
+  },
+  conflict: {
+    title: "Orario appena prenotato",
+    text: (time: string, alt: string | null) => `Le ${time} non sono più libere. ${alt ? `Ti proponiamo le ${alt}.` : "Scegli un altro giorno."}`,
+  },
+  errors: {
+    // NUOVO
+    notAllowed: "Non hai il permesso di fissare o spostare appuntamenti.",
+    clientName: "Scrivi il nome del cliente.",
+    phone: "Il telefono può avere solo cifre, + e spazi.",
+    noRoom: "Oggi non c’è spazio per questo servizio.",
+    gone: "Questo appuntamento non esiste più.",
+    generic: "Qualcosa non ha funzionato. Riprova.",
+  },
+} as const;

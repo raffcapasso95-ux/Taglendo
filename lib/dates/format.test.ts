@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDay, formatPrice, formatTime } from "./format";
+import { formatDay, formatDayMonth, formatPrice, formatTime } from "./format";
 
 describe("formati italiani", () => {
   it("giorno breve in Europe/Rome", () => {
@@ -16,5 +16,10 @@ describe("formati italiani", () => {
   it("prezzi in centesimi", () => {
     expect(formatPrice(2000)).toBe("20 €");
     expect(formatPrice(990)).toBe("9,90 €");
+  });
+
+  it("giorno e mese, nel fuso di Roma", () => {
+    expect(formatDayMonth(new Date("2026-11-13T10:00:00Z"))).toBe("13 novembre");
+    expect(formatDayMonth(new Date("2026-11-12T23:30:00Z"))).toBe("13 novembre"); // mezzanotte passata a Roma
   });
 });
