@@ -77,7 +77,7 @@ test.describe("Clienti", () => {
     await owner(page);
     await page.goto("/clienti/00000000-0000-4000-8000-00000000dead");
     await expect(page.getByRole("heading", { level: 1, name: "Luca Rossi" })).toHaveCount(0);
-    await expect(visibleText(page, /non trovata|404/i)).toBeVisible();
+    await expect(visibleText(page, /non trovata|404|Questa pagina non c’è/i)).toBeVisible();
   });
 });
 
