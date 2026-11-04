@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { env } from "@/lib/supabase/env";
 import "./globals.css";
 
 const manrope = localFont({
@@ -10,6 +11,7 @@ const manrope = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(env.siteUrl()),
   title: "Taglendo",
   description: "Agenda e prenotazioni online per barberie.",
   applicationName: "Taglendo",

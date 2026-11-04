@@ -63,3 +63,22 @@ describe("public_salon", () => {
     });
   });
 });
+
+describe("public_salon_slugs", () => {
+  it("elenca solo i saloni con una pagina da mostrare", async () => {
+    await inTx(async (tx) => {
+      const s = await createTestSalon(tx);
+      await tx.as(null);
+      const slugs = (await tx.q<{ public_salon_slugs: string }>(`select * from public.public_salon_slugs()`)).map((r) => r.public_salon_slugs);
+      expect(slugs).toContain("barberia-saragozza");
+      expect(slugs).toContain("salone-di-prova");
+      await tx.asAdmin();
+      await tx.q(`update services set active = false where salon_id = $1`, [s.salonId]);
+      await tx.q(`update salons set deleted_at = now() where id = $1`, [SALON]);
+      await tx.as(null);
+      const after = (await tx.q<{ public_salon_slugs: string }>(`select * from public.public_salon_slugs()`)).map((r) => r.public_salon_slugs);
+      expect(after).not.toContain("salone-di-prova"); // senza servizi attivi
+      expect(after).not.toContain("barberia-saragozza"); // eliminato
+    });
+  });
+});

@@ -364,6 +364,9 @@ isOneToOne: false
 "public_salon":
 { Args: { "p_slug": string }; Returns: Json
                            },
+"public_salon_slugs":
+{ Args: Record<PropertyKey, never>; Returns: string[]
+                           },
 "register_salon":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
