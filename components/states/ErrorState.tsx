@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui";
@@ -23,6 +24,7 @@ export function ErrorState({ error, reset }: { error: Error & { digest?: string 
   useEffect(() => {
     // lo si vede in Sentry (se attivo) e nei registri; all'utente non si mostra
     console.error(error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (
