@@ -196,3 +196,18 @@
   --salon-tilt: -4deg;
   --salon-ease-sign: 400ms var(--ease-out);
 }
+
+/* Fase 4b — prenotazione online (Sito Barberia Saragozza.dc.html) */
+:root {
+  --booking-step-size: 28px;          /* cerchio col numero del passo */
+  --booking-row-min: 44px;
+  --booking-service-min: 72px;        /* riga di un servizio */
+  --booking-day-min: 68px;            /* casella di un giorno */
+  --booking-slot-min: 48px;
+  --booking-code-min: 68px;
+  --booking-code-size: 30px;
+  --booking-code-spacing: .45em;
+  --duration-accordion: 300ms;        /* apertura dei passi */
+  --ease-accordion: cubic-bezier(0.77, 0, 0.175, 1);
+  --check-size: 56px;                 /* ✓ finale */
+}

@@ -6,6 +6,15 @@ export const publicCopy = {
   nav: { prices: "Prezzi", team: "Barbieri", where: "Dove siamo" },
   callToBook: "Chiama per prenotare", // docs/04-regole.md
   callNow: "Chiama ora",
+  bookOnline: "Prenota online",
+  bookShort: "Prenota", // NUOVO: bottone corto nella barra
+  aside: {
+    // NUOVO: riquadro accanto alla prenotazione
+    cancelTitle: "Annulli gratis",
+    cancelBody: (limit: string) => `fino a ${limit} prima, dal link nell’email di conferma. Per spostare l’orario chiama il salone.`,
+    phoneTitle: "Annullamento al telefono",
+    phoneBody: "Per annullare o spostare l’appuntamento chiama il salone.",
+  },
   seeServices: "Vedi servizi e prezzi",
   seeServicesNoPrices: "Vedi i servizi", // NUOVO: prezzi nascosti
   menu: {

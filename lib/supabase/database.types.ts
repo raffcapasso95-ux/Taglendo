@@ -313,7 +313,22 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "delete_client":
+            "booking_by_token":
+{ Args: { "p_token": string }; Returns: Json
+                           },
+"cancel_booking_by_token":
+{ Args: { "p_token": string }; Returns: Json
+                           },
+"check_booking_code":
+{ Args: { "p_code_hash": string,"p_email": string,"p_salon": string }; Returns: Json
+                           },
+"confirm_online_booking":
+{ Args: { "p_email": string,"p_marketing": boolean,"p_member": string,"p_name": string,"p_phone": string,"p_salon": string,"p_service": string,"p_starts": string }; Returns: Json
+                           },
+"consume_booking_code":
+{ Args: { "p_email": string,"p_salon": string }; Returns: undefined
+                           },
+"delete_client":
 { Args: { "p_client": string }; Returns: number
                            },
 "free_slots":
@@ -331,6 +346,9 @@ isOneToOne: false
                            },
 "register_salon":
 { Args: Record<PropertyKey, never>; Returns: string
+                           },
+"request_booking_code":
+{ Args: { "p_code_hash": string,"p_email": string,"p_payload": Json,"p_salon": string }; Returns: Json
                            },
 "slug_available":
 { Args: { "p_slug": string }; Returns: boolean

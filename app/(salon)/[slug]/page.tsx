@@ -3,6 +3,8 @@ import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { PublicPage } from "@/components/salon/PublicPage";
+import { hasActiveAccess } from "@/lib/billing";
+import { ONLINE_BOOKING_READY } from "@/lib/features";
 import { loadPublicSalon } from "@/lib/public/load";
 import { romeMinutes, weekdayOf, romeDate } from "@/lib/dates/rome";
 
@@ -25,7 +27,9 @@ async function Content({ params }: { params: Promise<{ slug: string }> }) {
   if (!salon) notFound();
   await connection(); // il cartello Aperto/Chiuso dipende dall'ora
   const now = new Date();
-  return <PublicPage salon={salon} weekday={weekdayOf(romeDate(now))} nowMin={romeMinutes(now)} />;
+  const today = romeDate(now);
+  const bookingOn = ONLINE_BOOKING_READY && salon.bookingOnline && hasActiveAccess(salon.access) && salon.services.length > 0;
+  return <PublicPage salon={salon} weekday={weekdayOf(today)} nowMin={romeMinutes(now)} today={today} bookingOn={bookingOn} />;
 }
 
 export default function Page(props: PageProps<"/[slug]">) {

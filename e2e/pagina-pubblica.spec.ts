@@ -11,14 +11,12 @@ test.describe("Pagina pubblica del salone", () => {
     await page.goto(PAGE);
     await expect(page).toHaveTitle(/Barberia Saragozza/);
     await expect(page.getByRole("heading", { level: 1, name: "Barberia Saragozza" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Si prenota al telefono." })).toBeVisible();
-    await expect(visibleText(page, "Taglio uomo")).toBeVisible();
-    await expect(visibleText(page, "20 €")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Tre passi, un minuto." })).toBeVisible();
+    await expect(page.locator("#prenota-card").getByRole("button", { name: /^Taglio uomo.*20 €/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Chi ti taglia." })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Via Saragozza 48, Bologna" })).toBeVisible();
     await expect(page.getByText("Lunedì").first()).toBeVisible();
-    const call = page.getByRole("link", { name: "Chiama per prenotare" }).first();
-    await expect(call).toHaveAttribute("href", "tel:+390516442190");
+    await expect(page.getByRole("link", { name: "051 644 2190" }).first()).toHaveAttribute("href", "tel:+390516442190");
   });
 
   test("non mostra dati privati", async ({ page }) => {
@@ -31,8 +29,7 @@ test.describe("Pagina pubblica del salone", () => {
     await adminUpdate("salons", `id=eq.${SALON}`, { show_prices: false });
     try {
       await page.goto(PAGE);
-      await expect(visibleText(page, "Taglio uomo")).toBeVisible();
-      await expect(visibleText(page, "Prezzi in salone: chiedi pure al telefono.")).toBeVisible();
+      await expect(page.locator("#prenota-card").getByRole("button", { name: /^Taglio uomo/ })).toBeVisible();
       await expect(page.getByText(/\d+ €/)).toHaveCount(0);
       await expect(page.getByRole("link", { name: "Vedi i servizi" })).toBeVisible();
     } finally {

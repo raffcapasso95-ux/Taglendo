@@ -759,6 +759,11 @@
   border-top: 1px solid var(--salon-line-soft);
 }
 
+.barHidden {
+  transform: translateY(100%);
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
 .barText {
   display: flex;
   flex-direction: column;
