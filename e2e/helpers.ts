@@ -134,3 +134,11 @@ export async function seedDay(): Promise<{ date: string; byOperator: Record<stri
   }
   return { date, byOperator };
 }
+
+/** Il codice della prenotazione online (F1): sta nell'oggetto, "Il tuo codice: 482 913". */
+export async function bookingCode(email: string): Promise<string> {
+  const { subject } = await waitForEmail(email);
+  const match = /(\d{3}) (\d{3})/.exec(subject);
+  if (!match) throw new Error(`Codice non trovato nell'oggetto: ${subject}`);
+  return `${match[1]}${match[2]}`;
+}
