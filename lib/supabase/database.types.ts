@@ -326,6 +326,9 @@ isOneToOne: false
               "email": string,"expires_at": string,"member_id": string,"name": string,"token": string
             }[]
                            },
+"public_salon":
+{ Args: { "p_slug": string }; Returns: Json
+                           },
 "register_salon":
 { Args: Record<PropertyKey, never>; Returns: string
                            },

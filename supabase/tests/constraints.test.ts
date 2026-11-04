@@ -69,14 +69,14 @@ describe("seed Barberia Saragozza", () => {
       );
       expect(visits?.n).toBe("40");
 
-      // il giorno 0 è un giorno di apertura con appuntamenti
+      // il giorno più pieno del seed è un giorno di apertura con 15 appuntamenti (le prove e2e ne aggiungono altri al più sparsi)
       const [day0] = await tx.q<{ dow: number; n: string }>(`
         select extract(dow from d)::int as dow, count(*) as n
         from (select (starts_at at time zone 'Europe/Rome')::date as d from appointments
-              where starts_at >= date_trunc('day', now() at time zone 'Europe/Rome') at time zone 'Europe/Rome') x
-        group by d order by d limit 1`);
+              where salon_id = '5a100000-0000-4000-8000-000000000001') x
+        group by d order by count(*) desc, d limit 1`);
       expect(day0?.dow).toBeGreaterThanOrEqual(2);
-      expect(Number(day0?.n)).toBe(15);
+      expect(Number(day0?.n)).toBeGreaterThanOrEqual(15);
     });
   });
 });
