@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
-import { dialog } from "./agenda-helpers";
-import { adminUpdate, signIn, visibleText } from "./helpers";
+import { bookNewClient, dialog, freshOwner, nextOpenDay } from "./agenda-helpers";
+import { adminSelect, adminUpdate, signIn, visibleText } from "./helpers";
 
 const DEMO = "taglendo-demo";
 const SALON = "5a100000-0000-4000-8000-000000000001";
@@ -78,5 +78,63 @@ test.describe("Clienti", () => {
     await page.goto("/clienti/00000000-0000-4000-8000-00000000dead");
     await expect(page.getByRole("heading", { level: 1, name: "Luca Rossi" })).toHaveCount(0);
     await expect(visibleText(page, /non trovata|404/i)).toBeVisible();
+  });
+});
+
+test.describe("Clienti · dati e privacy", () => {
+  test("il titolare esporta un cliente e tutta la rubrica", async ({ page }) => {
+    await owner(page);
+    await page.goto("/clienti");
+    const all = await page.request.get("/clienti/esporta");
+    expect(all.status()).toBe(200);
+    expect(all.headers()["content-type"]).toContain("text/csv");
+    expect(all.headers()["content-disposition"]).toContain("attachment");
+    const body = await all.text();
+    expect(body.charCodeAt(0)).toBe(0xfeff);
+    expect(body).toContain("Nome;Telefono;Email;Note");
+    expect(body).toContain("Luca Rossi");
+
+    await page.getByRole("link", { name: /^Luca Rossi/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Luca Rossi" })).toBeVisible();
+    const href = await page.getByRole("link", { name: /Esporta i dati di Luca/ }).getAttribute("href");
+    const one = await page.request.get(href!);
+    expect(one.status()).toBe(200);
+    expect(await one.text()).toContain("Data;Servizio;Barbiere;Prezzo (€);Stato");
+  });
+
+  test("un barbiere non vede le voci e non può scaricare", async ({ page }) => {
+    await barber(page);
+    await page.goto("/clienti");
+    await page.getByRole("link", { name: /^Luca Rossi/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Luca Rossi" })).toBeVisible();
+    await expect(page.getByText("Dati e privacy")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Esporta tutta la rubrica" })).toHaveCount(0);
+    expect((await page.request.get("/clienti/esporta")).status()).toBe(403);
+    expect((await page.request.get(page.url() + "/esporta")).status()).toBe(403);
+  });
+
+  test("eliminare un cliente: sparisce dalla rubrica e l'appuntamento futuro è annullato", async ({ page }) => {
+    await freshOwner(page, "Barberia Privacy");
+    const date = nextOpenDay();
+    await page.goto(`/agenda?g=${date}`);
+    await bookNewClient(page, "Giorgio Da Cancellare", date, "10:00");
+    await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
+
+    await page.goto("/clienti");
+    await page.getByRole("link", { name: /^Giorgio Da Cancellare/ }).click();
+    await page.getByRole("button", { name: /Elimina cliente/ }).click();
+    await expect(dialog(page).getByText("Eliminare Giorgio Da Cancellare?")).toBeVisible();
+    await expect(dialog(page).getByText(/Gli incassi restano nei totali, senza nome/)).toBeVisible();
+    await dialog(page).getByRole("button", { name: "Annulla" }).click();
+    await expect(dialog(page)).toHaveCount(0);
+
+    await page.getByRole("button", { name: /Elimina cliente/ }).click();
+    await dialog(page).getByRole("button", { name: "Elimina cliente" }).click();
+    await expect(page).toHaveURL(/\/clienti$/);
+    await expect(page.getByText("Cliente eliminato").filter({ visible: true })).toBeVisible();
+    await expect(page.getByText("La rubrica è ancora vuota").filter({ visible: true })).toBeVisible();
+
+    const rows = await adminSelect<{ status: string; client_id: string | null }>("appointments", "select=status,client_id&service_name=neq.zz&order=created_at.desc&limit=1");
+    expect(rows[0]).toMatchObject({ status: "annullato", client_id: null });
   });
 });

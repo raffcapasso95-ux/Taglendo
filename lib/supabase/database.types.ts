@@ -313,7 +313,10 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "free_slots":
+            "delete_client":
+{ Args: { "p_client": string }; Returns: number
+                           },
+"free_slots":
 { Args: { "p_days": number,"p_exclude"?: string,"p_from": string,"p_member": string,"p_public"?: boolean,"p_salon": string,"p_service": string,"p_step"?: number }; Returns: {
               "ends_at": string,"member_id": string,"starts_at": string
             }[]

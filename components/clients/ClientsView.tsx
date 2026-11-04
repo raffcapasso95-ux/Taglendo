@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { ButtonLink, Field, ToastProvider, useToast } from "@/components/ui";
 import { initials, firstName } from "@/lib/rules/agenda";
 import {
@@ -24,6 +25,7 @@ type Props = {
   today: string;
   multipleOperators: boolean;
   canEdit: boolean;
+  isOwner: boolean;
   bookingUrl: string;
   salonName: string;
 };
@@ -36,8 +38,15 @@ export function ClientsView(props: Props) {
   );
 }
 
-function Inner({ rows, today, multipleOperators, canEdit, bookingUrl, salonName }: Props) {
+function Inner({ rows, today, multipleOperators, canEdit, isOwner, bookingUrl, salonName }: Props) {
   const toast = useToast();
+  const router = useRouter();
+  const deleted = useSearchParams().get("eliminato");
+  useEffect(() => {
+    if (!deleted) return;
+    toast("Cliente eliminato");
+    router.replace("/clienti");
+  }, [deleted, toast, router]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<ClientFilter>("all");
 
@@ -179,6 +188,12 @@ function Inner({ rows, today, multipleOperators, canEdit, bookingUrl, salonName 
           </div>
         </div>
       )}
+
+      {isOwner && !emptyRubric ? (
+        <a className={styles.exportAll} href="/clienti/esporta" download>
+          Esporta tutta la rubrica
+        </a>
+      ) : null}
     </main>
   );
 }

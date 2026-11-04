@@ -42,6 +42,7 @@ export async function loadClients() {
     multipleOperators: (members.data ?? []).length > 1,
     bookingUrl: `${env.siteUrl()}/${salon.slug}`,
     salonName: salon.name,
+    isOwner: role === "owner",
     ...perms,
   };
 }
@@ -100,6 +101,7 @@ export async function loadClient(id: string) {
     next: next.data ? { startsAt: next.data.starts_at, service: next.data.service_name, member: next.data.member?.name ?? "" } : null,
     multipleOperators: (members.data ?? []).length > 1,
     salonName: salon.name,
+    isOwner: role === "owner",
     ...perms,
   };
 }

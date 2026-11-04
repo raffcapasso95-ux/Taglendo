@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Button, ButtonLink, ToastProvider, useToast } from "@/components/ui";
-import { saveClientNote } from "@/lib/clients/actions";
+import { Button, ButtonLink, ResponsiveDialog, ToastProvider, useToast } from "@/components/ui";
+import { deleteClient, saveClientNote } from "@/lib/clients/actions";
 import type { ClientDetail as Data } from "@/lib/clients/load";
 import { LIMITS } from "@/lib/rules/forms";
 import { formatPrice } from "@/lib/dates/format";
@@ -23,8 +24,10 @@ export function ClientDetail(props: Props) {
   );
 }
 
-function Inner({ row, note, today, createdDate, usual, usualMemberId, visits, next, multipleOperators, canEdit, canSeeContacts }: Props) {
+function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, visits, next, multipleOperators, canEdit, canSeeContacts }: Props) {
   const toast = useToast();
+  const router = useRouter();
+  const [confirming, setConfirming] = useState(false);
   const [text, setText] = useState(note);
   const [saved, setSaved] = useState(note);
   const [error, setError] = useState<string | null>(null);
@@ -37,6 +40,17 @@ function Inner({ row, note, today, createdDate, usual, usualMemberId, visits, ne
       if (!result.ok) return setError(result.error);
       setSaved(text.trim());
       toast("Nota salvata");
+    });
+
+  const remove = () =>
+    startSave(async () => {
+      setError(null);
+      const result = await deleteClient(row.id);
+      if (!result.ok) {
+        setConfirming(false);
+        return setError(result.error);
+      }
+      router.push("/clienti?eliminato=1");
     });
 
   const wa = whatsappLink(row.phone, isRecall(row, today) ? recallMessage(firstName(row.name)) : greetingMessage(firstName(row.name)));
@@ -167,6 +181,52 @@ function Inner({ row, note, today, createdDate, usual, usualMemberId, visits, ne
           <p className={styles.sub}>Ancora nessuna visita.</p>
         )}
       </section>
+
+      {isOwner ? (
+        <section aria-labelledby="privacy-title" className={styles.group}>
+          <h2 id="privacy-title" className={styles.letter}>
+            Dati e privacy
+          </h2>
+          <div className={styles.list}>
+            <a className={styles.privacyRow} href={`/clienti/${row.id}/esporta`} download>
+              <span className={styles.rowText}>
+                <span className={styles.name}>Esporta i dati di {firstName(row.name)}</span>
+                <span className={styles.sub}>File con contatti, note e storico visite</span>
+              </span>
+              <span aria-hidden="true">›</span>
+            </a>
+            <button type="button" className={styles.privacyRow} onClick={() => setConfirming(true)}>
+              <span className={styles.rowText}>
+                <span className={styles.name}>Elimina cliente</span>
+                <span className={styles.sub}>Su richiesta del cliente</span>
+              </span>
+              <span aria-hidden="true">›</span>
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {confirming ? (
+        <ResponsiveDialog
+          open
+          onClose={() => setConfirming(false)}
+          title={`Eliminare ${row.name}?`}
+          footer={
+            <>
+              <Button variant="secondary" size="large" onClick={() => setConfirming(false)}>
+                Annulla
+              </Button>
+              <Button variant="danger" size="large" disabled={saving} onClick={remove}>
+                Elimina cliente
+              </Button>
+            </>
+          }
+        >
+          <p className={styles.confirmText}>
+            Cancelliamo contatti, note e storico delle visite. Gli incassi restano nei totali, senza nome. Gli appuntamenti futuri vengono annullati.
+          </p>
+        </ResponsiveDialog>
+      ) : null}
     </main>
   );
 }

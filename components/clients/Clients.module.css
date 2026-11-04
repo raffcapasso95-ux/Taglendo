@@ -534,3 +534,40 @@
   display: flex;
   flex-direction: column;
 }
+
+.privacyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+}
+
+.privacyRow:first-child {
+  border-top: 0;
+}
+
+.confirmText {
+  margin: 0;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.exportAll {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
