@@ -175,3 +175,24 @@
   --radius-block: 10px;
   --radius-day: 12px;
 }
+
+/* Fase 4 — pagina pubblica del salone (Sito Barberia Saragozza.dc.html) */
+:root {
+  --salon-bg: #3E2532;                          /* fondo della pagina: prugna */
+  --salon-bg-deep: #21131B;                     /* parte bassa della sfumatura sull'immagine */
+  --salon-header-bg: rgba(62, 37, 50, .96);     /* barra in alto e barra in basso */
+  --salon-line: rgba(255, 247, 240, .18);       /* filetti su fondo prugna */
+  --salon-line-soft: rgba(255, 247, 240, .12);
+  --salon-outline: rgba(255, 247, 240, .5);     /* bordo del pulsante secondario */
+  --salon-hover: rgba(255, 247, 240, .1);       /* hover sui link della barra */
+  --salon-scrim: linear-gradient(to top, rgba(33, 19, 27, .92) 0%, rgba(33, 19, 27, .55) 45%, rgba(33, 19, 27, .25) 100%);
+  --salon-sign-shadow: 0 20px 40px rgba(0, 0, 0, .35);
+  --salon-nail-shadow: 0 2px 0 rgba(0, 0, 0, .4);  /* ombra del chiodo del cartello */
+  --plum-line: rgba(62, 37, 50, .18);            /* filetti su fondo pesca */
+  --salon-cord: #A88C99;                        /* cavi del cartello */
+  --salon-content: 1200px;
+  --salon-gutter: 20px;
+  --salon-header-height: 72px;
+  --salon-tilt: -4deg;
+  --salon-ease-sign: 400ms var(--ease-out);
+}
