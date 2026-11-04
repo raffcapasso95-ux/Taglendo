@@ -13,10 +13,10 @@ import styles from "./Form.module.css";
 const initial: AuthState = {};
 const copy = authCopy.signUp;
 
-export function SignUpForm() {
+export function SignUpForm({ defaultEmail = "" }: { defaultEmail?: string }) {
   const [state, action, pending] = useActionState(signUp, initial);
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState("");
   const [terms, setTerms] = useState(false);
   const [touched, setTouched] = useState({ name: false, email: false });

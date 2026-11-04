@@ -211,3 +211,24 @@
   --ease-accordion: cubic-bezier(0.77, 0, 0.175, 1);
   --check-size: 56px;                 /* ✓ finale */
 }
+
+/* Fase 7 — sito commerciale (Sito Taglendo.dc.html) */
+:root {
+  --paper: #FBF3E4;                  /* quaderno, "Prima e dopo" */
+  --paper-line: #D9CBB8;
+  --paper-margin: #E7A897;
+  --paper-ink: #3B3550;
+  --site-header-shadow: 0 1px 0 rgba(62, 37, 50, .14), 0 8px 24px rgba(62, 37, 50, .12);
+  --site-bar-bg: rgba(255, 247, 240, .94);  /* barra in basso su telefono */
+  --shadow-sticker: 0 10px 24px rgba(33, 19, 27, .22);
+  --shadow-handle: 0 8px 24px rgba(33, 19, 27, .35);
+  --drop-phone: drop-shadow(0 24px 40px rgba(33, 19, 27, .35));
+  --on-plum-dim: rgba(255, 247, 240, .72);  /* testo "prima" già superato, su prugna */
+  --site-max: 1200px;
+  --site-hero-max: 1240px;
+  --site-header-max: 1280px;
+  --site-header-height: 72px;
+  --site-radius: 24px;
+  --duration-reveal: 700ms;
+  --ease-reveal: cubic-bezier(0.77, 0, 0.175, 1);
+}

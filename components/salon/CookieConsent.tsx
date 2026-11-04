@@ -32,7 +32,7 @@ function saveChoice(choice: Choice) {
 const copy = publicCopy.cookie;
 
 /** Banner cookie (E8) e preferenze (E9). Il link nel piè di pagina li riapre. */
-export function CookieConsent() {
+export function CookieConsent({ text, buttonClassName }: { text?: string; buttonClassName?: string } = {}) {
   const choice = useSyncExternalStore(subscribe, snapshot, serverSnapshot);
   const [view, setView] = useState<"auto" | "simple" | "choose" | "closed">("auto");
   const [stats, setStats] = useState(false);
@@ -53,7 +53,7 @@ export function CookieConsent() {
     <>
       <button
         type="button"
-        className={styles.footerButton}
+        className={buttonClassName ?? styles.footerButton}
         onClick={() => open("simple")}
       >
         {publicCopy.footer.cookies}
@@ -62,7 +62,7 @@ export function CookieConsent() {
         <div className={styles.cookie} role="dialog" aria-label="Cookie">
           <span className={styles.cookieTitle}>{mode === "simple" ? copy.title : copy.chooseTitle}</span>
           {mode === "simple" ? (
-            <p className={styles.cookieText}>{copy.text}</p>
+            <p className={styles.cookieText}>{text ?? copy.text}</p>
           ) : (
             <div className={styles.cookieGroup}>
               <div className={styles.cookieRow}>
