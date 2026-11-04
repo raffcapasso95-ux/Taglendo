@@ -36,6 +36,8 @@ export type AgendaData = {
   services: ServiceOption[];
   /** Rubrica per cercare il cliente; il telefono c'è solo se chi guarda può vederlo. */
   clients: ClientOption[];
+  /** Quando è stata disegnata questa agenda: la "salvata alle…" della barra offline. */
+  savedAt: string;
 };
 
 const STRIP_DAYS = 28;
@@ -125,5 +127,6 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
     salonId: salon.id,
     services: (servicesRes.data ?? []).map((x) => ({ id: x.id, name: x.name, durationMin: x.duration_min, priceCents: x.price_cents })),
     clients: (clientsRes.data ?? []).flatMap((c) => (c.id && c.name ? [{ id: c.id, name: c.name, phone: c.phone }] : [])),
+    savedAt: now.toISOString(),
   };
 }

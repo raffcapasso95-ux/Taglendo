@@ -111,6 +111,18 @@ export async function adminUpdate(table: string, query: string, body: Record<str
   if (!res.ok) throw new Error(`${table}: ${await res.text()}`);
 }
 
+/** Inserisce una riga con la chiave di servizio (solo per preparare i test). */
+export async function adminInsert(table: string, body: Record<string, unknown>) {
+  const url = env("NEXT_PUBLIC_SUPABASE_URL");
+  const key = env("SUPABASE_SERVICE_ROLE_KEY");
+  const res = await fetch(`${url}/rest/v1/${table}`, {
+    method: "POST",
+    headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json", Prefer: "return=minimal" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error(`${table}: ${await res.text()}`);
+}
+
 const SEED_SALON = "5a100000-0000-4000-8000-000000000001";
 const romeDay = (d: Date) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(d);
 

@@ -6,6 +6,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { signOut } from "@/lib/auth/actions";
 import { cx } from "@/components/ui/cx";
+import { OfflineSync } from "@/components/offline/OfflineSync";
+import { SwRegister } from "@/components/offline/SwRegister";
+import { clearOfflineData } from "@/lib/offline/clear";
 import { SessionGuard } from "./SessionGuard";
 import { CalendarIcon, CheckIcon, CopyIcon, LinkIcon, LogoutIcon, ScissorsIcon, SettingsIcon, UsersIcon } from "./Icons";
 import styles from "./AppShell.module.css";
@@ -87,7 +90,7 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, childr
           <Link href="/profilo" className={styles.railItem} aria-label={`Profilo di ${userName}`} data-label={userName}>
             <span className={styles.avatar}>{userInitials}</span>
           </Link>
-          <form action={signOut}>
+          <form action={signOut} onSubmit={clearOfflineData}>
             <button type="submit" className={styles.railItem} aria-label="Esci" data-label="Esci">
               <LogoutIcon />
             </button>
@@ -95,8 +98,12 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, childr
         </div>
       </nav>
 
-      <div className={styles.content}>{children}</div>
+      <div className={styles.content}>
+        <OfflineSync />
+        {children}
+      </div>
       <SessionGuard />
+      <SwRegister />
 
       <nav className={styles.tabbar} aria-label="Menu principale">
         {ITEMS.map((item) => {

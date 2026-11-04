@@ -10,6 +10,7 @@ import { PhoneActions } from "@/components/agenda/HeaderActions";
 import { OperatorFilter } from "@/components/agenda/OperatorFilter";
 import { SidePanel } from "@/components/agenda/SidePanel";
 import styles from "@/components/agenda/Agenda.module.css";
+import { PendingAppointments } from "@/components/offline/PendingAppointments";
 import { loadAgenda } from "@/lib/agenda/load";
 import { weekdayName } from "@/lib/dates/rome";
 import { clock } from "@/lib/rules/agenda";
@@ -31,6 +32,8 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
       operators={data.operators}
       services={data.services}
       clients={data.clients}
+      day={data.day}
+      savedAt={data.savedAt}
       initialNew={
         nuovo
           ? {
@@ -56,6 +59,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
           <DayStrip days={data.strip} selected={day.date} today={data.today} operator={data.selectedOperator} />
           <OperatorFilter operators={data.operators} selected={data.selectedOperator} date={day.date} today={data.today} />
         </div>
+        <PendingAppointments date={day.date} />
         <DayView day={day} weekdayName={weekdayName(day.date)} multiple={day.columns.length > 1} />
       </div>
       <SidePanel day={day} title={day.isToday ? `Adesso in salone · ${clock(day.nowMin)}` : "Primo cliente"} />
