@@ -142,3 +142,25 @@ export async function bookingCode(email: string): Promise<string> {
   if (!match) throw new Error(`Codice non trovato nell'oggetto: ${subject}`);
   return `${match[1]}${match[2]}`;
 }
+
+type MailRow = { ID: string; Subject: string; To: Array<{ Address: string }> };
+const mailList = async () => ((await (await fetch(`${MAILPIT}/api/v1/messages?limit=200`)).json()) as { messages: MailRow[] }).messages;
+
+/** Aspetta un'email a questo indirizzo con un oggetto che corrisponde, e ne restituisce l'HTML. */
+export async function waitForMail(to: string, subject: RegExp, timeoutMs = 15000): Promise<{ subject: string; html: string }> {
+  const end = Date.now() + timeoutMs;
+  while (Date.now() < end) {
+    const found = (await mailList()).find((m) => subject.test(m.Subject) && m.To.some((t) => t.Address === to));
+    if (found) {
+      const full = (await (await fetch(`${MAILPIT}/api/v1/message/${found.ID}`)).json()) as { HTML?: string; Text?: string };
+      return { subject: found.Subject, html: full.HTML ?? full.Text ?? "" };
+    }
+    await new Promise((r) => setTimeout(r, 300));
+  }
+  throw new Error(`Nessuna email per ${to} con oggetto ${subject}`);
+}
+
+/** Quante email con questo oggetto sono arrivate a questo indirizzo. */
+export async function countMail(to: string, subject: RegExp): Promise<number> {
+  return (await mailList()).filter((m) => subject.test(m.Subject) && m.To.some((t) => t.Address === to)).length;
+}

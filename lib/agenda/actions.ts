@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
+import { emailCancelledBySalon, emailMoved } from "@/lib/notify/clientMail";
 import { requireSalon } from "@/lib/auth/session";
 import { agendaCopy } from "@/lib/copy/agenda";
 import { isValidDate, romeDate, romeMinutes, romeWallToUtc } from "@/lib/dates/rome";
@@ -281,6 +283,7 @@ export async function cancelAppointment(id: string): Promise<{ ok: true } | Fail
   if (!canEdit) return fail(errors.notAllowed);
   const { data, error } = await supabase.from("appointments").update({ status: "annullato", cancelled_by: "salone" }).eq("id", id).neq("status", "annullato").select("id");
   if (error || !data?.length) return fail(errors.generic);
+  after(() => emailCancelledBySalon(id).catch((e) => console.error("email di annullamento:", e)));
   revalidatePath("/agenda");
   return { ok: true };
 }
@@ -290,7 +293,7 @@ export async function moveAppointment(input: { id: string; date: string; startMi
   const { supabase, salon, canEdit } = await editor();
   if (!canEdit) return fail(errors.notAllowed);
   if (!isValidDate(input.date)) return fail(errors.generic);
-  const { data: appt } = await supabase.from("appointments").select("id, member_id, service_id, status").eq("id", input.id).maybeSingle();
+  const { data: appt } = await supabase.from("appointments").select("id, member_id, service_id, status, starts_at").eq("id", input.id).maybeSingle();
   if (!appt || appt.status === "annullato") return fail(errors.gone);
   if (!appt.service_id) return fail(errors.generic);
 
@@ -299,9 +302,12 @@ export async function moveAppointment(input: { id: string; date: string; startMi
   const slot = rows.find((r) => r.startMin === input.startMin);
   if (!slot) return fail(conflictCopy.title, await conflictFor(supabase, salon.id, appt.service_id, appt.member_id, wanted, appt.id));
 
-  const { data, error } = await supabase.from("appointments").update({ starts_at: slot.startsAt, ends_at: slot.endsAt }).eq("id", appt.id).select("id");
+  // spostato: il promemoria, se era già partito, riparte per il nuovo orario
+  const { data, error } = await supabase.from("appointments").update({ starts_at: slot.startsAt, ends_at: slot.endsAt, reminder_sent_at: null }).eq("id", appt.id).select("id");
   if (isOverlap(error)) return fail(conflictCopy.title, await conflictFor(supabase, salon.id, appt.service_id, appt.member_id, wanted, appt.id));
   if (error || !data?.length) return fail(errors.generic);
+  const before = new Date(appt.starts_at);
+  after(() => emailMoved(appt.id, before).catch((e) => console.error("email di spostamento:", e)));
   revalidatePath("/agenda");
   return { ok: true, date: input.date, startMin: input.startMin };
 }

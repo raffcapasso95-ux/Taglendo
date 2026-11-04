@@ -4,6 +4,8 @@ import { cancelEmailCopy } from "@/lib/copy/emails";
 import { manageCopy } from "@/lib/copy/manage";
 import { buildCancellationEmail } from "@/lib/email/render";
 import { sendEmail } from "@/lib/email/send";
+import { notifyStaff } from "@/lib/notify/staff";
+import { after } from "next/server";
 import { romeDate, romeMinutes } from "@/lib/dates/rome";
 import { whenLong } from "@/lib/rules/emailText";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -15,6 +17,7 @@ export type CancelResult = { ok: true; emailSent: boolean } | { ok: false; reaso
 export async function cancelBooking(input: { slug: string; token: string }): Promise<CancelResult> {
   if (!/^[0-9a-f]{64}$/.test(input.token)) return { ok: false, reason: "gone", error: manageCopy.invalidTitle };
   const admin = createAdminClient();
+  const { data: known } = await admin.from("appointments").select("id").eq("manage_token", input.token).maybeSingle();
   const { data, error } = await admin.rpc("cancel_booking_by_token", { p_token: input.token });
   if (error || !data) return { ok: false, reason: "error", error: manageCopy.errors.generic };
   const r = data as { status: "ok" | "too_late" | "not_allowed" | "gone"; starts_at?: string; client_email?: string | null; salon_name?: string; salon_slug?: string; salon_phone?: string; salon_address?: string | null; send_email?: boolean };
@@ -22,6 +25,7 @@ export async function cancelBooking(input: { slug: string; token: string }): Pro
   if (r.status === "not_allowed") return { ok: false, reason: "not_allowed", error: manageCopy.phoneNote };
   if (r.status !== "ok" || !r.starts_at || r.salon_slug?.toLowerCase() !== input.slug.toLowerCase()) return { ok: false, reason: "gone", error: manageCopy.invalidTitle };
 
+  if (known?.id) after(() => notifyStaff("cancel", known.id));
   let emailSent = false;
   if (r.send_email && r.client_email) {
     const starts = new Date(r.starts_at);

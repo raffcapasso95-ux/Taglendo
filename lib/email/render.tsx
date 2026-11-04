@@ -1,9 +1,13 @@
 import "server-only";
 import { render } from "@react-email/render";
-import { cancelEmailCopy, emailCopy } from "@/lib/copy/emails";
+import { cancelEmailCopy, emailCopy, inviteEmailCopy, movedEmailCopy, reminderEmailCopy } from "@/lib/copy/emails";
 import { env } from "@/lib/supabase/env";
 import { CancellationEmail, type CancellationEmailProps } from "./templates/CancellationEmail";
 import { CodeEmail, type CodeEmailProps } from "./templates/CodeEmail";
+import { InviteEmail, type InviteEmailProps } from "./templates/InviteEmail";
+import { MovedEmail, type MovedEmailProps } from "./templates/MovedEmail";
+import { ReminderEmail, type ReminderEmailProps } from "./templates/ReminderEmail";
+import { StaffEmail, type StaffEmailProps } from "./templates/StaffEmail";
 import { ConfirmationEmail, type ConfirmationEmailProps } from "./templates/ConfirmationEmail";
 
 type Built = { subject: string; html: string; text: string };
@@ -26,4 +30,32 @@ export async function buildConfirmationEmail(p: Omit<ConfirmationEmailProps, "si
 export async function buildCancellationEmail(p: Omit<CancellationEmailProps, "siteUrl">): Promise<Built> {
   const el = <CancellationEmail {...p} siteUrl={env.siteUrl()} />;
   return { subject: cancelEmailCopy.subject, html: await render(el), text: await render(el, { plainText: true }) };
+}
+
+/** F3: promemoria. `at` è l'ora, "10:30", per l'oggetto. */
+export async function buildReminderEmail(p: Omit<ReminderEmailProps, "siteUrl"> & { at: string }): Promise<Built> {
+  const { at, ...props } = p;
+  const el = <ReminderEmail {...props} siteUrl={env.siteUrl()} />;
+  return { subject: reminderEmailCopy.subject(p.salonName, at), html: await render(el), text: await render(el, { plainText: true }) };
+}
+
+/** F6: appuntamento spostato. `afterLong` è "venerdì 30 ottobre alle 11:30". */
+export async function buildMovedEmail(p: Omit<MovedEmailProps, "siteUrl"> & { afterLong: string }): Promise<Built> {
+  const { afterLong, ...props } = p;
+  const el = <MovedEmail {...props} siteUrl={env.siteUrl()} />;
+  return { subject: movedEmailCopy.subject(afterLong), html: await render(el), text: await render(el, { plainText: true }) };
+}
+
+/** F5: invito a un operatore. */
+export async function buildInviteEmail(p: Omit<InviteEmailProps, "siteUrl"> & { ownerFirst: string }): Promise<Built> {
+  const { ownerFirst, ...props } = p;
+  const el = <InviteEmail {...props} siteUrl={env.siteUrl()} />;
+  return { subject: inviteEmailCopy.subject(ownerFirst), html: await render(el), text: await render(el, { plainText: true }) };
+}
+
+/** Avvisi al barbiere. */
+export async function buildStaffEmail(p: Omit<StaffEmailProps, "siteUrl"> & { subject: string }): Promise<Built> {
+  const { subject, ...props } = p;
+  const el = <StaffEmail {...props} siteUrl={env.siteUrl()} />;
+  return { subject, html: await render(el), text: await render(el, { plainText: true }) };
 }

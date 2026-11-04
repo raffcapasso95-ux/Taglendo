@@ -25,14 +25,14 @@ export type Database = {
           Tables: {
             "appointments": {
                   Row: {
-                    "cancelled_by": string | null,"client_id": string | null,"created_at": string,"ends_at": string,"id": string,"manage_token": string,"member_id": string,"price_cents": number,"public_code": string,"salon_id": string,"service_id": string | null,"service_name": string,"source": Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status": Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by": string | null,"client_id": string | null,"created_at": string,"ends_at": string,"id": string,"manage_token": string,"member_id": string,"price_cents": number,"public_code": string,"reminder_sent_at": string | null,"salon_id": string,"service_id": string | null,"service_name": string,"source": Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status": Database["public"]['Enums']["appt_status_t"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at": string,"id"?: string,"manage_token"?: string,"member_id": string,"price_cents": number,"public_code"?: string,"salon_id": string,"service_id"?: string | null,"service_name": string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status"?: Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at": string,"id"?: string,"manage_token"?: string,"member_id": string,"price_cents": number,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id": string,"service_id"?: string | null,"service_name": string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status"?: Database["public"]['Enums']["appt_status_t"]
                   }
                   Update: {
-                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at"?: string,"id"?: string,"manage_token"?: string,"member_id"?: string,"price_cents"?: number,"public_code"?: string,"salon_id"?: string,"service_id"?: string | null,"service_name"?: string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at"?: string,"status"?: Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at"?: string,"id"?: string,"manage_token"?: string,"member_id"?: string,"price_cents"?: number,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id"?: string,"service_id"?: string | null,"service_name"?: string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at"?: string,"status"?: Database["public"]['Enums']["appt_status_t"]
                   }
                   Relationships: [
                     {
@@ -270,6 +270,26 @@ isOneToOne: false
       columns: ["salon_id"]
 isOneToOne: false
       referencedRelation: "salons"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"summary_runs": {
+                  Row: {
+                    "member_id": string,"run_date": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "member_id": string,"run_date": string
+                  }
+                  Update: {
+                    "member_id"?: string,"run_date"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "summary_runs_member_id_fkey"
+      columns: ["member_id"]
+isOneToOne: false
+      referencedRelation: "members"
       referencedColumns: ["id"]
     }
                   ]

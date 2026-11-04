@@ -47,3 +47,17 @@
   color: var(--text-secondary);
   text-wrap: pretty;
 }
+
+.link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: var(--control-height-large);
+  padding: var(--row-padding);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+}

@@ -12,6 +12,9 @@ const manrope = localFont({
 export const metadata: Metadata = {
   title: "Taglendo",
   description: "Agenda e prenotazioni online per barberie.",
+  applicationName: "Taglendo",
+  icons: { icon: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }], apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }] },
+  appleWebApp: { capable: true, title: "Taglendo", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

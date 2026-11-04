@@ -3,6 +3,8 @@
 import { createHmac, randomInt } from "node:crypto";
 import { buildCodeEmail, buildConfirmationEmail } from "@/lib/email/render";
 import { sendEmail } from "@/lib/email/send";
+import { notifyStaff } from "@/lib/notify/staff";
+import { after } from "next/server";
 import { bookingCopy } from "@/lib/copy/booking";
 import { formatPrice } from "@/lib/dates/format";
 import { isValidDate, romeDate, romeWallToUtc, weekdayName } from "@/lib/dates/rome";
@@ -170,8 +172,10 @@ export async function confirmCode(input: { slug: string; email: string; code: st
     return fail(errors.generic);
   }
   await admin.rpc("consume_booking_code", { p_salon: salon.id, p_email: email });
+  const apptId = (data as { id: string }).id;
+  after(() => notifyStaff("new", apptId));
 
-  const appt = data as { public_code: string; manage_token: string; member_id: string; starts_at: string; service_name: string; price_cents: number };
+  const appt = data as { id: string; public_code: string; manage_token: string; member_id: string; starts_at: string; service_name: string; price_cents: number };
   const { data: service } = await admin.from("services").select("duration_min").eq("id", p.serviceId).maybeSingle();
   const barber = salon.members.length > 1 ? (salon.members.find((m) => m.id === appt.member_id)?.name ?? null) : null;
   const date = romeDate(new Date(appt.starts_at));
