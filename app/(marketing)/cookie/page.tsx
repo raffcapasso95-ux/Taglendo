@@ -27,7 +27,7 @@ export default function Page() {
           id: "quali",
           title: "Quali usiamo",
           body: (
-            <div className={styles.tableWrap}>
+            <div className={styles.tableWrap} role="region" aria-label="Elenco dei cookie" tabIndex={0}>
               <table className={styles.table}>
                 <thead>
                   <tr>

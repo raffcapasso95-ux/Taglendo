@@ -87,7 +87,7 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, childr
           >
             <SettingsIcon />
           </Link>
-          <Link href="/profilo" className={styles.railItem} aria-label={`Profilo di ${userName}`} data-label={userName}>
+          <Link href="/profilo" className={styles.railItem} aria-label={`${userInitials}, profilo di ${userName}`} data-label={userName}>
             <span className={styles.avatar}>{userInitials}</span>
           </Link>
           <form action={signOut} onSubmit={clearOfflineData}>

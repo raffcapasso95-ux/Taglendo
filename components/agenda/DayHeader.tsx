@@ -27,7 +27,7 @@ export function DayHeader({ salonName, userInitials, greeting, longDate, summary
               Oggi
             </Link>
           ) : null}
-          <Link href="/impostazioni" className={styles.profileButton} aria-label="Impostazioni e profilo">
+          <Link href="/impostazioni" className={styles.profileButton} aria-label={`${userInitials}, impostazioni e profilo`}>
             {userInitials}
           </Link>
         </div>

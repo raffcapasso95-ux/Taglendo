@@ -21,7 +21,7 @@ export function DayPicker({ value, today, onChange, days = 14 }: Props) {
             aria-label={`${weekdayShort(d)} ${dayNumber(d)}`}
             onClick={() => onChange(d)}
           >
-            <span className={styles.dayDow}>{weekdayShort(d)}</span>
+            <span className={styles.dayDow}>{weekdayShort(d)}</span>{" "}
             <span className={styles.dayNum}>{dayNumber(d)}</span>
           </button>
         ))}

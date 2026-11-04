@@ -20,6 +20,18 @@ export function useDialog(open: boolean, onClose: () => void, closeMs: number) {
     onCloseRef.current = onClose;
   }, [onClose]);
 
+  // Chi ha aperto la finestra riavrà il focus anche se la finestra viene tolta dalla pagina
+  // prima della sua chiusura nativa (il browser allora non lo restituisce).
+  // Si legge al primo disegno: dopo, il campo con autofocus avrebbe già preso il focus.
+  const [opener] = useState<HTMLElement | null>(() =>
+    typeof document !== "undefined" && document.activeElement instanceof HTMLElement && document.activeElement !== document.body ? document.activeElement : null,
+  );
+  useEffect(() => {
+    return () => {
+      if (opener?.isConnected && (document.activeElement === document.body || !document.activeElement?.isConnected)) opener.focus();
+    };
+  }, [opener]);
+
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;

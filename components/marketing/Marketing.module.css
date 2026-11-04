@@ -553,6 +553,11 @@
   text-wrap: pretty;
 }
 
+/* il testo secondario non regge il contrasto sul pesca: lì si usa il testo principale */
+.stepPeach .muted {
+  color: var(--text-primary);
+}
+
 .stepShot {
   display: flex;
   justify-content: center;

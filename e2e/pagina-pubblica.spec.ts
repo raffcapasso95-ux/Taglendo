@@ -40,7 +40,7 @@ test.describe("Pagina pubblica del salone", () => {
   test("un link che non esiste dice che la pagina non c'è", async ({ page }) => {
     await page.goto("/questo-salone-non-esiste");
     await expect(page.getByRole("heading", { name: "Barberia Saragozza" })).toHaveCount(0);
-    await expect(page.getByText(/non trovata|404|could not be found/i).first()).toBeVisible();
+    await expect(page.getByText(/non trovata|404|could not be found|Questa pagina non c’è/i).first()).toBeVisible();
   });
 
   test("cookie: rifiuta, la scelta resta e si riapre dal piè di pagina", async ({ page, context }) => {
