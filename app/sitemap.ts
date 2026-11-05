@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
 import { connection } from "next/server";
+import { gateEnabled } from "@/lib/gate";
 import { createAnonClient } from "@/lib/supabase/anon";
 import { env } from "@/lib/supabase/env";
 
 /** Il sito, le pagine legali e la pagina di ogni salone. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await connection();
+  if (gateEnabled()) return []; // anteprima privata: niente da indicizzare
   const base = env.siteUrl().replace(/\/$/, "");
   const now = new Date();
   const fixed: MetadataRoute.Sitemap = [

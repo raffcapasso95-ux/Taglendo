@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { gateEnabled, GATE_COOKIE, isOpenPath, verifyGateToken } from "@/lib/gate";
 import { REMEMBER_COOKIE, withRemember } from "@/lib/supabase/cookies";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -14,7 +15,25 @@ const GUEST_ONLY = ["/accedi", "/registrati", "/verifica", "/password"];
 const matches = (path: string, prefixes: string[]) =>
   prefixes.some((p) => path === p || path.startsWith(`${p}/`));
 
+/** Anteprima privata: senza il permesso si vede solo la pagina «a breve online». */
+async function gateResponse(request: NextRequest): Promise<NextResponse | null> {
+  if (!gateEnabled()) return null;
+  const path = request.nextUrl.pathname;
+  if (isOpenPath(path)) return null;
+  if (await verifyGateToken(request.cookies.get(GATE_COOKIE)?.value, process.env.PREVIEW_SECRET)) return null;
+  const url = request.nextUrl.clone();
+  url.pathname = "/a-breve";
+  url.search = "";
+  const res = NextResponse.rewrite(url);
+  res.headers.set("X-Robots-Tag", "noindex, nofollow");
+  res.headers.set("Cache-Control", "no-store");
+  return res;
+}
+
 export async function proxy(request: NextRequest) {
+  const closed = await gateResponse(request);
+  if (closed) return closed;
+
   let response = NextResponse.next({ request });
   const remember = request.cookies.get(REMEMBER_COOKIE)?.value !== "0";
 

@@ -1,0 +1,58 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+  background: var(--canvas);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+}
+
+.card {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+}
+
+.eyebrow {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  background: var(--brand-peach);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.headline {
+  margin: 0;
+  font-size: clamp(30px, 6vw, 44px);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  text-wrap: balance;
+}
+
+.text {
+  margin: 0;
+  font-size: 18px;
+  line-height: var(--line-body);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
+
+.bar {
+  width: 64px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--brand-apricot);
+}
