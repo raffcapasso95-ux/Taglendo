@@ -26,6 +26,7 @@
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
+  --space-5: 20px;                /* passo della scala a 4 px che mancava: schede e riquadri */
   --space-6: 24px;
   --space-8: 32px;
   --space-12: 48px;
