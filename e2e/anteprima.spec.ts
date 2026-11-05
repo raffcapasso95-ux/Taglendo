@@ -62,6 +62,15 @@ test.describe("Anteprima privata", () => {
     await expect(page.getByRole("heading", { name: "Barberia Saragozza" }).first()).toBeVisible();
   });
 
+  test("senza destinazione l'accesso porta alla home del sito", async ({ page }) => {
+    await page.goto("/accesso-riservato");
+    await page.getByLabel("Utente").fill(USER);
+    await page.getByLabel("Password", { exact: true }).fill(PASSWORD);
+    await page.getByRole("button", { name: "Entra" }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByRole("heading", { name: "Stiamo ultimando gli ultimi dettagli." })).toHaveCount(0);
+  });
+
   test("un cookie inventato o modificato non fa entrare", async ({ page, context }) => {
     const base = new URL(process.env.E2E_BASE_URL ?? "http://localhost:3100");
     await context.addCookies([{ name: "tg_preview", value: `${Math.floor(Date.now() / 1000) + 99999999}.firmainventata`, domain: base.hostname, path: "/" }]);
