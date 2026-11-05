@@ -1,7 +1,7 @@
 # Checklist di lancio
 
 Legenda: ✅ fatto e verificato · 🟡 fatto in parte · ⬜ da fare · 👤 lo fa il titolare del progetto.
-Ultimo controllo: fine Fase 9 (novembre 2026).
+Ultimo controllo: fine Fase 10 (novembre 2026).
 
 ## Legale e amministrazione
 - ⬜ 👤 Società e P.IVA. Dati societari nel footer (oggi tra parentesi quadre in `lib/site.ts`).
@@ -19,9 +19,9 @@ Ultimo controllo: fine Fase 9 (novembre 2026).
 - ✅ Sentry attivo (DSN su Vercel). ⬜ 👤 Avvisi via email da impostare dentro Sentry (Alerts → regola «nuovo errore»).
 - 🟡 Sicurezza, controllo interno: tutte le tabelle hanno RLS (verificato anche sul database online), i test di isolamento tra saloni sono verdi, le funzioni chiamabili senza accesso sono solo le due della pagina pubblica, le chiavi segrete stanno solo nelle variabili d'ambiente. ⬜ Revisione esterna (RLS, chiavi, webhook): 5–10 giornate di uno sviluppatore senior.
 - ⬜ 👤 Cambiare le chiavi incollate in chat durante lo sviluppo (password del database, chiave segreta Supabase, token di accesso Supabase, chiave Resend, token Sentry) e aggiornarle su Vercel.
-- 🟡 Test end-to-end verdi su Chrome (telefono e desktop emulati). ⬜ 👤 Prova a mano su Safari iOS e su un Android vero: installazione come app, notifiche, offline.
+- 🟡 Test end-to-end verdi su Chrome (telefono e desktop emulati): 257 passati, 0 falliti, più 280 test unitari e del database. ⬜ 👤 Prova a mano su Safari iOS e su un Android vero: installazione come app, notifiche, offline.
 - ✅ Accessibilità: controllo automatico (axe) verde su tutte le pagine principali. ⬜ 👤 Una prova con uno screen reader vero.
-- ✅ Velocità: Lighthouse da telefono sulla pagina del salone 98.
+- ✅ Velocità: Lighthouse da telefono (fine Fase 10) — pagina del salone 95, registrazione 96, accesso 98, home 82. Accessibilità 100 e best practices 100 ovunque.
 
 ## Contenuti
 - ⬜ 👤 Foto con licenza al posto di quelle dimostrative.
