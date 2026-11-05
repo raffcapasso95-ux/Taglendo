@@ -30,10 +30,14 @@ export const agendaCopy = {
     // NUOVO
     otherDay: "Altro giorno",
     noClients: "Nessun cliente trovato.",
-    change: "Cambia",
+    change: "Cambia cliente",
+    changeTime: "Cambia orario",
     anyoneHint: "il primo libero",
     today: "Oggi",
     tomorrow: "Domani",
+    firstFree: (day: string) => `Primi orari liberi · ${day}`,
+    moreTimes: "Altro orario o giorno",
+    fewer: "Mostra solo i primi orari",
   },
   detail: {
     note: "Nota privata",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTransition, type ReactNode } from "react";
+import { useState, useTransition, type ReactNode } from "react";
 import { useToast } from "@/components/ui";
 import { setAppointmentStatus } from "@/lib/agenda/actions";
 import { agendaCopy } from "@/lib/copy/agenda";
@@ -12,6 +12,9 @@ import { useAgenda } from "./AgendaProvider";
 import { OperatorAvatar } from "./OperatorAvatar";
 import agenda from "./Agenda.module.css";
 import styles from "./SidePanel.module.css";
+
+/** Quanti appuntamenti «da chiudere» si mostrano subito; gli altri dietro «Altri N». */
+const TO_CLOSE_SHOWN = 3;
 
 type Status = "completato" | "non_presentato";
 
@@ -24,7 +27,9 @@ export function SidePanel({ day, title }: { day: DayModel; title: string }) {
   const router = useRouter();
   const toast = useToast();
   const [pending, start] = useTransition();
+  const [allClose, setAllClose] = useState(false);
   const s = sideSummary(day);
+  const closeShown = allClose ? s.toClose : s.toClose.slice(0, TO_CLOSE_SHOWN);
 
   const close = (a: SideAppt, status: Status) =>
     start(async () => {
@@ -52,11 +57,18 @@ export function SidePanel({ day, title }: { day: DayModel; title: string }) {
               {canEdit ? <Actions appt={a} pending={pending} onClose={close} /> : null}
             </Card>
           ))}
-          {s.toClose.map((a) => (
+          {closeShown.map((a) => (
             <Card key={a.id} onOpen={openAppointment} appt={a} tag={`Finito alle ${clock(a.endMin)} · da chiudere`} live>
               {canEdit ? <Actions appt={a} pending={pending} onClose={close} /> : null}
             </Card>
           ))}
+          {s.toClose.length > TO_CLOSE_SHOWN ? (
+            <li className={styles.more}>
+              <button type="button" onClick={() => setAllClose(!allClose)} aria-expanded={allClose}>
+                {allClose ? "Mostra meno" : `Altri ${s.toClose.length - TO_CLOSE_SHOWN} da chiudere`}
+              </button>
+            </li>
+          ) : null}
           {s.live.length === 0 && s.toClose.length === 0 && day.isToday ? <li className={styles.empty}>Nessuno in poltrona.</li> : null}
           {s.upcoming.map((a) => (
             <Card key={a.id} onOpen={openAppointment} appt={a} tag={`${clock(a.startMin)} · ${a.serviceName}`} />

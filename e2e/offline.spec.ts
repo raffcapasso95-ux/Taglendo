@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { bookNewClient, dialog, freshOwner, nextOpenDay, openAppointment } from "./agenda-helpers";
+import { bookNewClient, dialog, freshOwner, nextOpenDay, openAppointment, pickTime } from "./agenda-helpers";
 import { adminInsert, adminSelect, visibleText } from "./helpers";
 
 const run = Math.random().toString(36).slice(2, 6);
@@ -31,7 +31,7 @@ test.describe("Senza rete", () => {
     await dialog(page).getByRole("button", { name: "+ Nuovo cliente" }).click();
     await dialog(page).getByLabel("Nome").fill(`Osvaldo ${run}`);
     // gli orari vengono dalla fotografia del giorno
-    await dialog(page).getByRole("button", { name: "11:00", exact: true }).click();
+    await pickTime(page, "11:00");
     await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();
     await expect(page.getByText("Salvato sul telefono").filter({ visible: true })).toBeVisible();
     await expect(page.getByText("Parte appena torni online").filter({ visible: true })).toBeVisible();
@@ -82,7 +82,7 @@ test.describe("Senza rete", () => {
     await page.getByRole("button", { name: /^\+ (Nuovo appuntamento|Appuntamento)$/ }).filter({ visible: true }).click();
     await dialog(page).getByRole("button", { name: "+ Nuovo cliente" }).click();
     await dialog(page).getByLabel("Nome").fill(`Annalisa ${run}`);
-    await dialog(page).getByRole("button", { name: "12:00", exact: true }).click();
+    await pickTime(page, "12:00");
     await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();
     await expect(page.getByRole("region", { name: "In attesa di invio" })).toContainText(`Annalisa ${run}`);
 
