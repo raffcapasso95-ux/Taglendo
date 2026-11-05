@@ -63,9 +63,23 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
 
   return (
     <main className={styles.page}>
-      <Link href="/clienti" className={styles.back}>
-        ‹ Clienti
-      </Link>
+      <div className={styles.topbar}>
+        <Link href="/clienti" className={styles.back}>
+          ‹ Clienti
+        </Link>
+        {canSeeContacts && row.phone ? (
+          <div className={styles.topActions}>
+            {wa ? (
+              <ButtonLink href={wa} variant="secondary" size="small" target="_blank" rel="noopener noreferrer">
+                WhatsApp
+              </ButtonLink>
+            ) : null}
+            <ButtonLink href={`tel:${row.phone.replace(/\s/g, "")}`} variant="secondary" size="small">
+              Chiama
+            </ButtonLink>
+          </div>
+        ) : null}
+      </div>
 
       <header className={styles.person}>
         <span className={styles.avatarLarge} aria-hidden="true">
@@ -76,6 +90,21 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
           <p className={styles.sub}>{clientSinceLine(createdDate, row.visits)}</p>
         </div>
       </header>
+
+      <dl className={styles.stats}>
+        <div className={styles.stat}>
+          <dt>Visite</dt>
+          <dd>{row.visits}</dd>
+        </div>
+        <div className={styles.stat}>
+          <dt>Ultima</dt>
+          <dd>{row.lastVisitDate ? dateText(row.lastVisitDate) : "—"}</dd>
+        </div>
+        <div className={styles.stat}>
+          <dt>Prossima</dt>
+          <dd>{nextDate ? dateText(nextDate) : "—"}</dd>
+        </div>
+      </dl>
 
       <section className={styles.usual} aria-label="Il solito">
         <span className={styles.usualLabel}>Il solito</span>
@@ -95,19 +124,9 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
       <section className={styles.card} aria-label="Contatti">
         {canSeeContacts ? (
           row.phone ? (
-            <>
-              <p className={styles.contact}>{row.phone}</p>
-              <div className={styles.contactActions}>
-                {wa ? (
-                  <ButtonLink href={wa} variant="secondary" target="_blank" rel="noopener noreferrer">
-                    WhatsApp
-                  </ButtonLink>
-                ) : null}
-                <ButtonLink href={`tel:${row.phone.replace(/\s/g, "")}`} variant="secondary">
-                  Chiama
-                </ButtonLink>
-              </div>
-            </>
+            <a className={styles.contact} href={`tel:${row.phone.replace(/\s/g, "")}`}>
+              {row.phone}
+            </a>
           ) : (
             <p className={styles.sub}>Nessun telefono salvato per questo cliente.</p>
           )
@@ -159,7 +178,7 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
       </section>
 
       <section aria-labelledby="visits-title" className={styles.group}>
-        <h2 id="visits-title" className={styles.letter}>
+        <h2 id="visits-title" className={styles.sectionTitle}>
           Ultime visite
         </h2>
         {visits.length > 0 ? (
@@ -184,7 +203,7 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
 
       {isOwner ? (
         <section aria-labelledby="privacy-title" className={styles.group}>
-          <h2 id="privacy-title" className={styles.letter}>
+          <h2 id="privacy-title" className={styles.sectionTitle}>
             Dati e privacy
           </h2>
           <div className={styles.list}>

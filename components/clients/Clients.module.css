@@ -571,3 +571,78 @@
   font-weight: 700;
   color: var(--text-primary);
 }
+
+
+/* ── Scheda cliente: barra in alto, numeri e titoli di sezione ───────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: calc(-1 * (var(--space-6) + env(safe-area-inset-top))) calc(-1 * var(--space-4)) 0;
+  padding: calc(var(--space-2) + env(safe-area-inset-top)) var(--space-4) var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--canvas);
+}
+
+.topbar .back {
+  align-self: auto;
+}
+
+.topActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.topActions > a {
+  min-height: var(--tap-min);
+  font-size: 13px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.stat dt {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.stat dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sectionTitle {
+  margin: var(--space-2) 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.usual .usualName {
+  margin-bottom: var(--space-1);
+}
+
+.usual > a {
+  margin-top: var(--space-3);
+}
