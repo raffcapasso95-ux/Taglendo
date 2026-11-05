@@ -12,7 +12,9 @@ export type GateState = { error?: string };
 export async function gateLogin(_prev: GateState, data: FormData): Promise<GateState> {
   const user = String(data.get("user") ?? "");
   const password = String(data.get("password") ?? "");
-  const next = safeNext(String(data.get("next") ?? ""));
+  // senza destinazione si va alla home (safeNext, da solo, porterebbe in agenda)
+  const rawNext = String(data.get("next") ?? "");
+  const next = rawNext ? safeNext(rawNext) : "/";
 
   if (!(await checkGateLogin(user, password))) {
     // una breve attesa rende lento indovinare la password a tentativi
