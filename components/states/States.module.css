@@ -110,6 +110,14 @@
   font-weight: 700;
 }
 
+a.errorText {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
 .errorActions {
   display: flex;
   flex-wrap: wrap;

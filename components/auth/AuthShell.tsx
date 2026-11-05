@@ -72,7 +72,7 @@ export function AuthShell({
 
         {/* Desktop */}
         <div className={styles.side}>
-          <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={150} height={48} className={styles.logo} style={{ height: "auto" }} priority />
+          <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={150} height={36} className={styles.logo} style={{ width: "var(--auth-logo-width, 150px)", height: "auto" }} priority />
           <p className={styles.headline}>{headline}</p>
           {chips ? (
             <ul className={styles.chips}>
@@ -85,7 +85,7 @@ export function AuthShell({
             src="/images/shot-agenda-desktop.png"
             alt=""
             width={760}
-            height={520}
+            height={487}
             className={styles.shot}
             style={{ height: "auto" }}
             sizes="760px"

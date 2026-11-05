@@ -50,6 +50,8 @@
 .brand {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  min-height: var(--tap-min);
   flex: none;
   min-width: 0;
   line-height: 1.15;
@@ -983,5 +985,56 @@ button.cookieRow {
     left: var(--space-6);
     right: auto;
     bottom: var(--space-6);
+  }
+}
+
+/* ── Telefono: zone di tocco da 44 px e barbieri compatti ───────────────── */
+.cookieLink,
+.footerButton,
+.powered,
+.page .footer a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+}
+
+@media (max-width: 899px) {
+  /* il pulsante «Prenota» c'è già nella barra in basso: in alto resterebbe un doppione */
+  .headerActions .cta {
+    display: none;
+  }
+
+  /* i due pulsanti dell'hero, uno sotto l'altro, larghi uguale */
+  .heroButtons {
+    flex-direction: column;
+  }
+
+  .heroCta,
+  .heroGhost {
+    justify-content: center;
+  }
+
+  /* i barbieri sono una lista, non tre schermate: ritratto piccolo e nome accanto */
+  .team {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+  }
+
+  .member {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .portrait {
+    flex: none;
+    width: 72px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    font-size: 28px;
+  }
+
+  .memberName {
+    font-size: 20px;
   }
 }

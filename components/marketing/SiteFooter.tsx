@@ -17,7 +17,7 @@ export function SiteFooter() {
       <div className={styles.footerInner}>
         <div className={styles.footerGrid}>
           <div className={styles.footerCol}>
-            <Image src="/brand/taglendo-logo-light.svg" alt="Taglendo" width={160} height={50} style={{ width: 160, height: "auto" }} />
+            <Image src="/brand/taglendo-logo-light.svg" alt="Taglendo" width={160} height={38} style={{ width: 160, height: "auto" }} />
             <span className={styles.footerText}>{f.tagline}</span>
           </div>
           <div className={styles.footerCol}>
