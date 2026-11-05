@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { cx } from "@/components/ui/cx";
 import {
   clock,
   firstName,
-  GRID_PX_PER_MIN as PX,
+  fitGridScale,
   gridRange,
   plural,
   span,
@@ -81,14 +81,47 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
   const { canEdit, openNew, openAppointment } = useAgenda();
   const { hours, isToday, nowMin } = day;
   const { open: dayOpen, start: g0, end } = gridRange(day, showPast);
-  const height = (end - g0) * PX;
-  const hourMarks: number[] = [];
-  for (let h = Math.ceil(g0 / 60); h * 60 < end; h++) hourMarks.push(h * 60);
-  const lineOffset = ((60 - (g0 % 60)) % 60) * PX;
-  const nowTop = isToday && nowMin > g0 && nowMin < end ? (nowMin - g0) * PX : null;
+  // scala uguale per tutte le colonne: i tratti in cui nessuno ha appuntamenti si comprimono
+  const busy = day.columns.flatMap((c) => c.appts.filter((a) => a.status !== "annullato" || showCancelled).map((a): [number, number] => [a.startMin, a.endMin]));
+  const pauseBand: Array<[number, number]> = !hours.closed && hours.breakStartMin != null && hours.breakEndMin != null ? [[hours.breakStartMin, hours.breakEndMin]] : [];
+  // la scala più comoda che fa stare la giornata nello spazio dell'agenda (misurato dopo il primo disegno)
+  const gridRef = useRef<HTMLDivElement>(null);
+  const headRef = useRef<HTMLDivElement>(null);
+  const [available, setAvailable] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const measure = () => setAvailable(Math.max(0, el.clientHeight - (headRef.current?.offsetHeight ?? 0)));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const scale = fitGridScale(busy, g0, end, available, pauseBand);
+  const y = scale.y;
+  const height = scale.height;
+  // etichette delle ore: una ogni almeno 22 px, per non sovrapporle nei tratti compressi
+  const hourMarks: Array<{ min: number; top: number; label: boolean }> = [];
+  let lastLabel = -Infinity;
+  for (let h = Math.ceil(g0 / 60); h * 60 < end; h++) {
+    const top = y(h * 60);
+    const label = top - lastLabel >= 22;
+    if (label) lastLabel = top;
+    hourMarks.push({ min: h * 60, top, label });
+  }
+  const nowTop = isToday && nowMin > g0 && nowMin < end ? y(nowMin) : null;
   const hasBreak = !hours.closed && hours.breakStartMin != null && hours.breakEndMin != null && hours.breakEndMin > g0;
-  const breakTop = hasBreak ? (Math.max(hours.breakStartMin!, g0) - g0) * PX : 0;
-  const breakH = hasBreak ? (hours.breakEndMin! - Math.max(hours.breakStartMin!, g0)) * PX : 0;
+  const breakTop = hasBreak ? y(Math.max(hours.breakStartMin!, g0)) : 0;
+  const breakH = hasBreak ? y(hours.breakEndMin!) - breakTop : 0;
+
+  // oggi, se la griglia è più alta dello spazio, si parte dall'ora attuale
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el || nowTop === null || el.scrollHeight <= el.clientHeight) return;
+    el.scrollTop = Math.max(0, nowTop - el.clientHeight / 3);
+    // solo al primo disegno del giorno
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [day.date]);
 
   const hiddenCount = day.columns.reduce((n, c) => n + c.appts.filter((a) => a.status !== "annullato" && a.startMin < g0).length, 0);
   const canCollapse = isToday && (g0 > dayOpen || showPast);
@@ -96,8 +129,8 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
 
   return (
     <div className={styles.gridWrap}>
-      <div className={styles.grid} style={{ minWidth: `calc(var(--grid-time-col) + ${day.columns.length} * var(--grid-col-min))` }}>
-        <div className={styles.gridHead}>
+      <div ref={gridRef} data-testid="agenda-grid" className={styles.grid} style={{ minWidth: `calc(var(--grid-time-col) + ${day.columns.length} * var(--grid-col-min))` }}>
+        <div ref={headRef} className={styles.gridHead}>
           <div className={styles.cols} style={{ gridTemplateColumns: `var(--grid-time-col) repeat(${day.columns.length}, minmax(0, 1fr))` }}>
             <span className={styles.corner} />
             {day.columns.map((c) => (
@@ -118,9 +151,9 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
 
         <div className={styles.cols} style={{ gridTemplateColumns: `var(--grid-time-col) repeat(${day.columns.length}, minmax(0, 1fr))` }}>
           <div className={styles.timeCol} style={{ height }}>
-            {hourMarks.map((m) => (
-              <span key={m} className={styles.hourLabel} style={{ top: (m - g0) * PX }}>
-                {clock(m)}
+            {hourMarks.filter((m) => m.label).map((m) => (
+              <span key={m.min} className={styles.hourLabel} style={{ top: m.top }}>
+                {clock(m.min)}
               </span>
             ))}
             {nowTop !== null ? (
@@ -130,7 +163,10 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
             ) : null}
           </div>
           {day.columns.map((c) => (
-            <div key={c.operator.id} className={styles.col} style={{ height, backgroundPosition: `0 ${lineOffset}px, 0 ${lineOffset}px` }}>
+            <div key={c.operator.id} className={styles.col} style={{ height }}>
+              {hourMarks.map((m) => (
+                <div key={m.min} className={styles.hourLine} style={{ top: m.top }} />
+              ))}
               {nowTop !== null ? <div className={styles.veil} style={{ height: nowTop }} /> : null}
               {hasBreak ? (
                 <div className={styles.pause} style={{ top: breakTop, height: breakH }}>
@@ -141,12 +177,14 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                 .filter(([, b]) => b > g0)
                 .map(([a, b]) => {
                   const from = Math.max(a, g0);
+                  const gapTop = y(from);
+                  const gapH = y(b) - gapTop;
                   return (
                     <button
                       key={`${a}-${b}`}
                       type="button"
                       className={styles.gap}
-                      style={{ top: (from - g0) * PX, height: (b - from) * PX }}
+                      style={{ top: gapTop, height: gapH }}
                       disabled={!canEdit}
                       aria-label={`Fissa con ${c.operator.name} ${clock(from)}–${clock(b)}`}
                       onClick={() => openNew({ date: day.date, memberId: c.operator.id, startMin: Math.max(from, isToday ? Math.ceil(nowMin / 5) * 5 : 0) })}
@@ -154,8 +192,13 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                       <span className={styles.gapLine}>
                         <span className={styles.gapAction}>+ Fissa</span>
                         <span className={styles.gapLabel}>{span(b - from)} libere</span>
+                        {gapH < 52 ? (
+                          <span className={styles.gapRangeInline}>
+                            {clock(from)}–{clock(b)}
+                          </span>
+                        ) : null}
                       </span>
-                      {(b - from) * PX >= 52 ? (
+                      {gapH >= 52 ? (
                         <span className={styles.gapRange}>
                           {clock(from)}–{clock(b)}
                         </span>
@@ -167,8 +210,8 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                 .filter((a) => a.endMin > g0 && (a.status !== "annullato" || showCancelled))
                 .map((a) => {
                   const current = isToday && a.status === "confermato" && a.startMin <= nowMin && nowMin < a.endMin;
-                  const top = (Math.max(a.startMin, g0) - g0) * PX;
-                  const h = (a.endMin - Math.max(a.startMin, g0)) * PX;
+                  const top = y(Math.max(a.startMin, g0));
+                  const h = y(a.endMin) - top;
                   return (
                     <button
                       key={a.id}

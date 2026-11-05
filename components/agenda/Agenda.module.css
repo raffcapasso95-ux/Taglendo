@@ -297,8 +297,22 @@
 
 @media (min-width: 1024px) {
   .main {
-    padding: var(--space-8) var(--space-8) var(--space-6) var(--space-8);
+    /* testata più bassa: lo spazio serve alla griglia, per vedere la giornata senza scorrere */
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-8) var(--space-4) var(--space-8);
     height: 100dvh;
+  }
+
+  .header {
+    gap: var(--space-3);
+  }
+
+  .greeting {
+    display: none;
+  }
+
+  .date {
+    font-size: 30px;
   }
 
   .phoneBar {

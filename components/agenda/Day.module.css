@@ -441,12 +441,14 @@
     position: relative;
     min-width: 0;
     border-left: 1px solid var(--border-subtle);
-    background-image:
-      linear-gradient(var(--grid-line) 1px, transparent 1px),
-      linear-gradient(var(--grid-line-soft) 1px, transparent 1px);
-    background-size:
-      100% var(--grid-px-per-hour),
-      100% var(--grid-half-hour);
+  }
+
+  .hourLine {
+    position: absolute;
+    inset-inline: 0;
+    height: 1px;
+    background: var(--grid-line);
+    pointer-events: none;
   }
 
   .veil {
@@ -518,6 +520,15 @@
     font-size: 12px;
     color: var(--gap-text-soft);
     font-variant-numeric: tabular-nums;
+  }
+
+  .gapRangeInline {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 12px;
+    color: var(--gap-text-soft);
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
   }
 
   .block,

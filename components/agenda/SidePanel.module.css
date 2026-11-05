@@ -1,0 +1,218 @@
+/* Barra destra dell'agenda (solo desktop): cosa fare adesso, cosa viene dopo, posti liberi, numeri. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.count {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.item + .item {
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Riga che apre l'appuntamento */
+.rowButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-3);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rowButton:hover {
+  background: var(--surface-muted);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.name {
+  font-size: 15px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.time {
+  flex: none;
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* In poltrona / da chiudere */
+.live {
+  background: var(--surface-muted);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  padding: 0 var(--space-3) var(--space-3);
+}
+
+.actions > button {
+  flex: 1;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actions > button:first-child {
+  border-color: var(--action-primary);
+  background: var(--action-primary);
+  color: var(--text-inverse);
+}
+
+.actions > button:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-3);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Posti liberi */
+.free {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 1px solid var(--status-success-border);
+  border-radius: var(--radius-card);
+  background: var(--status-success-bg);
+}
+
+.free .title {
+  color: var(--status-success);
+}
+
+.freeButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.freeButton:disabled {
+  cursor: default;
+}
+
+.freeWhen {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--status-success);
+}
+
+.freeButton:hover:not(:disabled) .freeWhen {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.freeSub {
+  font-size: 12px;
+  color: var(--gap-text-soft);
+}
+
+.plus {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--status-success);
+}
+
+/* Numeri della giornata */
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.number {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.number dt {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.number dd {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
