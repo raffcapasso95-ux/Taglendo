@@ -26,3 +26,34 @@ describe("variabili CSS", () => {
     expect([...new Set(missing)]).toEqual([]);
   });
 });
+
+describe("hover su schermi a tocco", () => {
+  it("ogni regola :hover sta dentro @media (hover: hover): sul telefono non resta «incollata» dopo il tocco", () => {
+    const offenders: string[] = [];
+    for (const f of cssFiles(process.cwd())) {
+      const text = readFileSync(f, "utf8");
+      // si scorrono le righe tenendo conto delle parentesi graffe: quando si apre un blocco @media con hover, ci si segna la profondità
+      let depth = 0;
+      const hoverDepths: number[] = [];
+      let pending = "";
+      for (const raw of text.split("\n")) {
+        const line = raw.replace(/\/\*.*?\*\//g, "");
+        const opens = (line.match(/\{/g) ?? []).length;
+        const closes = (line.match(/\}/g) ?? []).length;
+        pending += line;
+        if (opens > 0) {
+          const prelude = pending.slice(0, pending.lastIndexOf("{"));
+          const inside = hoverDepths.length > 0;
+          if (/@media[^{]*hover:\s*hover/.test(prelude)) hoverDepths.push(depth + 1);
+          else if (/:hover/.test(prelude.split(/[};]/).pop() ?? "") && !inside) offenders.push(`${f.replace(process.cwd() + "/", "")}: ${prelude.trim().split("\n").pop()?.trim()}`);
+          pending = "";
+        } else if (/[;}]\s*$/.test(line)) {
+          pending = "";
+        }
+        depth += opens - closes;
+        while (hoverDepths.length && depth < hoverDepths[hoverDepths.length - 1]!) hoverDepths.pop();
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+});

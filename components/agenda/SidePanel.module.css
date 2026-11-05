@@ -55,8 +55,10 @@
   cursor: pointer;
 }
 
-.rowButton:hover {
-  background: var(--surface-muted);
+@media (hover: hover) and (pointer: fine) {
+  .rowButton:hover {
+    background: var(--surface-muted);
+  }
 }
 
 .text {
@@ -189,9 +191,11 @@
   color: var(--status-success);
 }
 
-.freeButton:hover:not(:disabled) .freeWhen {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+@media (hover: hover) and (pointer: fine) {
+  .freeButton:hover:not(:disabled) .freeWhen {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
 .freeSub {

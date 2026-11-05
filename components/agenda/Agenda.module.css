@@ -486,3 +486,15 @@
     color: var(--gap-text-soft);
   }
 }
+
+/* Lo scorrimento orizzontale cambia giorno; quello verticale resta al browser. */
+.swipe {
+  display: contents;
+}
+
+@media (max-width: 1023px) {
+  .swipe {
+    display: block;
+    touch-action: pan-y;
+  }
+}

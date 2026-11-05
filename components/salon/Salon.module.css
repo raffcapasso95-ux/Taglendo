@@ -1,6 +1,6 @@
 /* Da design/Sito Barberia Saragozza.dc.html. Colori e misure solo dai token. */
 .page {
-  min-height: 100vh;
+  min-height: 100svh;
   background: var(--salon-bg);
   color: var(--text-inverse);
   font-family: var(--font-family);
@@ -11,8 +11,10 @@
   color: var(--text-inverse);
 }
 
-.page a:hover {
-  color: var(--brand-peach);
+@media (hover: hover) and (pointer: fine) {
+  .page a:hover {
+    color: var(--brand-peach);
+  }
 }
 
 .page a:focus-visible,
@@ -87,8 +89,10 @@
   white-space: nowrap;
 }
 
-.navLink:hover {
-  background: var(--salon-hover);
+@media (hover: hover) and (pointer: fine) {
+  .navLink:hover {
+    background: var(--salon-hover);
+  }
 }
 
 .headerActions {
@@ -109,8 +113,10 @@
   white-space: nowrap;
 }
 
-.phoneLink:hover {
-  background: var(--salon-hover);
+@media (hover: hover) and (pointer: fine) {
+  .phoneLink:hover {
+    background: var(--salon-hover);
+  }
 }
 
 .cta {
@@ -129,8 +135,10 @@
   transition: transform 140ms var(--ease-out), background-color 140ms var(--ease-out);
 }
 
-.cta:hover {
-  background: var(--brand-apricot-hover);
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover {
+    background: var(--brand-apricot-hover);
+  }
 }
 
 .cta:active {
@@ -218,8 +226,10 @@
   transition: transform 140ms var(--ease-out), background-color 140ms var(--ease-out);
 }
 
-.heroCta:hover {
-  background: var(--brand-apricot-hover);
+@media (hover: hover) and (pointer: fine) {
+  .heroCta:hover {
+    background: var(--brand-apricot-hover);
+  }
 }
 
 .heroCta:active {
@@ -238,8 +248,10 @@
   text-decoration: none;
 }
 
-.heroGhost:hover {
-  background: var(--salon-hover);
+@media (hover: hover) and (pointer: fine) {
+  .heroGhost:hover {
+    background: var(--salon-hover);
+  }
 }
 
 .facts {
@@ -264,8 +276,10 @@
   transition: transform var(--salon-ease-sign);
 }
 
-.sign:hover {
-  transform: rotate(0deg);
+@media (hover: hover) and (pointer: fine) {
+  .sign:hover {
+    transform: rotate(0deg);
+  }
 }
 
 .nail {
@@ -502,8 +516,10 @@
   transition: transform 140ms var(--ease-out), background-color 140ms var(--ease-out);
 }
 
-.callButton:hover {
-  background: var(--plum-hover-dark);
+@media (hover: hover) and (pointer: fine) {
+  .callButton:hover {
+    background: var(--plum-hover-dark);
+  }
 }
 
 .callButton:active {
@@ -578,8 +594,10 @@
   text-decoration: none;
 }
 
-.instagram:hover {
-  background: var(--brand-apricot-hover);
+@media (hover: hover) and (pointer: fine) {
+  .instagram:hover {
+    background: var(--brand-apricot-hover);
+  }
 }
 
 /* Dove siamo */
@@ -641,8 +659,10 @@
   text-decoration: none;
 }
 
-.whereButton:hover {
-  background: var(--plum-hover-dark);
+@media (hover: hover) and (pointer: fine) {
+  .whereButton:hover {
+    background: var(--plum-hover-dark);
+  }
 }
 
 .whereGhost {
@@ -659,8 +679,10 @@
   text-decoration: none;
 }
 
-.whereGhost:hover {
-  background: var(--surface-muted);
+@media (hover: hover) and (pointer: fine) {
+  .whereGhost:hover {
+    background: var(--surface-muted);
+  }
 }
 
 .hours {
@@ -723,8 +745,10 @@
   color: var(--text-secondary);
 }
 
-.page .footer a:hover {
-  color: var(--text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .page .footer a:hover {
+    color: var(--text-primary);
+  }
 }
 
 .footerButton {

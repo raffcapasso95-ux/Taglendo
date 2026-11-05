@@ -106,6 +106,7 @@
   --focus-ring: 3px;
 
   /* Tempi */
+  --duration-press: 100ms;        /* risposta al tocco: il pulsante si preme subito */
   --duration-fast: 160ms;         /* .btn */
   --duration-toast-in: 200ms;
   --duration-toast-move: 260ms;

@@ -23,6 +23,10 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: "#FFF7F0",
   viewportFit: "cover",
+  // l'app ha solo il tema chiaro: niente campi scuri se il telefono è in modalità scura
+  colorScheme: "light",
+  // la tastiera riduce l'area utile anche su Android, come su iPhone: i pulsanti in basso restano visibili
+  interactiveWidget: "resizes-content",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
