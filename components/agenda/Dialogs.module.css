@@ -354,3 +354,79 @@
     display: none;
   }
 }
+
+
+/* ── Nuovo appuntamento: orari proposti, scelta fatta e riepilogo vicino al pulsante ── */
+.footerStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.footerButtons {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.footerButtons > * {
+  flex: 1;
+}
+
+.footerStack .recap {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-wrap: balance;
+}
+
+.suggest {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: var(--space-2);
+}
+
+.slotBig {
+  min-height: 56px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.slotBig[aria-pressed="true"] {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.picked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--brand-plum);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+}
+
+.pickedText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pickedWhen {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pickedSub {
+  font-size: 13px;
+  color: var(--text-secondary);
+}

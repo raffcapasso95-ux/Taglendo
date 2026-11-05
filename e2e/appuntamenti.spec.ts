@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
-import { bookNewClient, dialog, freshOwner, newButton, nextOpenDay, openAppointment, pickDayAndTime, romeNow, weekday } from "./agenda-helpers";
+import { bookNewClient, dialog, freshOwner, newButton, nextOpenDay, openAppointment, pickDayAndTime, pickTime, romeNow, weekday } from "./agenda-helpers";
 import { adminSelect, adminUpdate, seedDay, signIn, visibleText } from "./helpers";
 
 const SALON = "5a100000-0000-4000-8000-000000000001";
@@ -37,7 +37,7 @@ test.describe("Appuntamenti", () => {
     // sposta alle 11:00
     await openAppointment(page, "Mario Verdi");
     await dialog(page).getByRole("button", { name: "Sposta" }).click();
-    await dialog(page).getByRole("button", { name: "11:00", exact: true }).click();
+    await pickTime(page, "11:00");
     await expect(dialog(page).getByText(/Nuovo orario: .*11:00/)).toBeVisible();
     await dialog(page).getByRole("button", { name: "Conferma" }).click();
     await expect(page.getByText("Appuntamento spostato").filter({ visible: true })).toBeVisible();

@@ -32,7 +32,25 @@ export async function freshOwner(page: Page, salon: string) {
   return email;
 }
 
+/** Apre la griglia completa («Altro orario o giorno» o «Cambia») se non è già aperta. */
+export async function showAllTimes(page: Page) {
+  const d = dialog(page);
+  for (const name of ["Altro orario o giorno", "Cambia orario"]) {
+    const b = d.getByRole("button", { name, exact: true });
+    if (await b.isVisible().catch(() => false)) return void (await b.click());
+  }
+}
+
+/** Sceglie un orario del giorno già mostrato (anche tra i primi proposti). */
+export async function pickTime(page: Page, time: string) {
+  const d = dialog(page);
+  const direct = d.getByRole("button", { name: time, exact: true });
+  if (!(await direct.isVisible().catch(() => false))) await showAllTimes(page);
+  await d.getByRole("button", { name: time, exact: true }).click();
+}
+
 export async function pickDayAndTime(page: Page, date: string, time: string) {
+  await showAllTimes(page);
   const label = `${SHORT[weekday(date)]} ${Number(date.slice(8))}`;
   await dialog(page).getByRole("button", { name: label, exact: true }).click();
   await dialog(page).getByRole("button", { name: time, exact: true }).click();

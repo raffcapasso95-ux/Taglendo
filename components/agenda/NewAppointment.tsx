@@ -35,6 +35,11 @@ type Props = {
   onQueued: () => void;
 };
 
+/** Quanti clienti si propongono senza che si scriva niente. */
+const SUGGESTED_CLIENTS = 3;
+/** Quanti orari liberi si propongono prima di «Altro orario o giorno». */
+const SUGGESTED_SLOTS = 4;
+
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 /** Etichetta breve di un giorno: "Oggi", "Domani", "Ven 30 ott". */
@@ -55,6 +60,8 @@ export function NewAppointment({ mode, prefill, operators, services, clients, to
   const [memberId, setMemberId] = useState<string | "any">(prefill?.memberId ?? "any");
   const [date, setDate] = useState(prefill?.date ?? selectedDate);
   const [startMin, setStartMin] = useState<number | null>(prefill?.startMin ?? null);
+  // con l'ora già scelta (clic su un buco dell'agenda) si parte dal riepilogo; altrimenti dai primi orari liberi
+  const [showAll, setShowAll] = useState(false);
   const [slots, setSlots] = useState<SlotsResult | null>(null);
   const [loadingSlots, startSlots] = useTransition();
   const [saving, startSave] = useTransition();
@@ -84,10 +91,14 @@ export function NewAppointment({ mode, prefill, operators, services, clients, to
 
   const matches = useMemo(() => {
     const q = norm(query.trim());
-    if (!q) return clients.slice(0, 6);
+    if (!q) return clients.slice(0, SUGGESTED_CLIENTS);
     const digits = q.replace(/\D/g, "");
-    return clients.filter((c) => norm(c.name).includes(q) || (digits.length >= 3 && (c.phone ?? "").replace(/\D/g, "").endsWith(digits))).slice(0, 6);
+    return clients.filter((c) => norm(c.name).includes(q) || (digits.length >= 3 && (c.phone ?? "").replace(/\D/g, "").endsWith(digits))).slice(0, SUGGESTED_CLIENTS);
   }, [clients, query]);
+
+  const shown = online ? slots : offlineResult;
+  const freeSlots = shown?.slots.filter((x) => x.free) ?? [];
+  const suggested = freeSlots.slice(0, SUGGESTED_SLOTS);
 
   const hasClient = clientId !== null || (newMode && newName.trim().length > 0);
   const canSave = hasClient && Boolean(service) && (walkInMode ? online : startMin !== null) && !saving;
@@ -130,14 +141,19 @@ export function NewAppointment({ mode, prefill, operators, services, clients, to
       onClose={onClose}
       title={walkInMode ? copy.titleWalkIn : copy.titleNew}
       footer={
-        <>
-          <Button variant="secondary" size="large" onClick={onClose}>
-            {copy.cancel}
-          </Button>
-          <Button size="large" disabled={!canSave} onClick={save}>
-            {saving ? copy.saving : copy.save}
-          </Button>
-        </>
+        <div className={styles.footerStack}>
+          <p className={styles.recap} aria-live="polite">
+            {recap}
+          </p>
+          <div className={styles.footerButtons}>
+            <Button variant="secondary" size="large" onClick={onClose}>
+              {copy.cancel}
+            </Button>
+            <Button size="large" disabled={!canSave} onClick={save}>
+              {saving ? copy.saving : copy.save}
+            </Button>
+          </div>
+        </div>
       }
     >
       <div className={styles.form}>
@@ -248,13 +264,49 @@ export function NewAppointment({ mode, prefill, operators, services, clients, to
         {walkInMode ? null : (
           <section className={styles.section}>
             <h3 className={styles.sectionTitle}>{copy.when}</h3>
-            <DayPicker value={date} today={today} onChange={setDate} />
-            <TimeChips result={online ? slots : offlineResult} loading={online && loadingSlots} selected={startMin} onSelect={setStartMin} label={copy.slotsWith(operatorName ?? copy.anyone)} />
+            {showAll ? (
+              <>
+                <DayPicker value={date} today={today} onChange={setDate} />
+                <TimeChips result={shown} loading={online && loadingSlots} selected={startMin} onSelect={setStartMin} label={copy.slotsWith(operatorName ?? copy.anyone)} />
+                <button type="button" className={styles.linkButton} onClick={() => setShowAll(false)}>
+                  {copy.fewer}
+                </button>
+              </>
+            ) : startMin !== null ? (
+              <div className={styles.picked}>
+                <span className={styles.pickedText}>
+                  <span className={styles.pickedWhen}>
+                    {dayLabel(date, today, "")} · {clock(startMin)}
+                  </span>
+                  {operatorName && operators.length > 1 ? <span className={styles.pickedSub}>con {operatorName}</span> : null}
+                </span>
+                <button type="button" className={styles.linkButton} onClick={() => setShowAll(true)}>
+                  {copy.changeTime}
+                </button>
+              </div>
+            ) : (
+              <>
+                <p className={styles.hint} aria-live="polite">
+                  {online && loadingSlots && !shown ? "…" : shown?.closed ? copy.closed : suggested.length === 0 ? copy.noSlots : copy.firstFree(dayLabel(date, today, ""))}
+                </p>
+                {suggested.length > 0 ? (
+                  <div className={styles.suggest} role="group" aria-label={copy.firstFree(dayLabel(date, today, ""))} aria-busy={online && loadingSlots}>
+                    {suggested.map((x) => (
+                      <button key={x.startMin} type="button" className={styles.slotBig} aria-pressed={startMin === x.startMin} onClick={() => setStartMin(x.startMin)}>
+                        {clock(x.startMin)}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+                <button type="button" className={styles.linkButton} onClick={() => setShowAll(true)}>
+                  {copy.moreTimes}
+                </button>
+              </>
+            )}
           </section>
         )}
 
         {!online ? <p className={styles.hint}>{walkInMode ? offlineCopy.walkInNeedsNet : date !== offlineDay.date ? offlineCopy.onlyDay(dayLabel(offlineDay.date, today, "")) : offlineCopy.text(null)}</p> : null}
-        <p className={styles.recap}>{recap}</p>
       </div>
     </ResponsiveDialog>
   );

@@ -19,6 +19,9 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+
+  /* il titolo e i pulsanti restano fermi: scorre solo il corpo, su schermi bassi */
+  max-height: calc(100dvh - 2 * var(--space-6));
 }
 
 .modal.open {
@@ -46,6 +49,10 @@
 }
 
 .body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   font-size: 15px;
   line-height: 1.5;
   color: var(--text-secondary);
@@ -61,6 +68,7 @@
 }
 
 .footer {
+  flex: none;
   display: flex;
   justify-content: flex-end;
   gap: var(--space-2);
