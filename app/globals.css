@@ -11,6 +11,12 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* Nel gestionale non si tira giù per ricaricare né rimbalza la pagina: scorrono solo le sue aree.
+   Le pagine pubbliche restano come sono (il «tira per ricaricare» lì è utile). */
+html:has([data-app-shell]) {
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   background: var(--canvas);
@@ -36,6 +42,20 @@ textarea {
   touch-action: manipulation;
 }
 
+a {
+  color: var(--text-primary);
+}
+
+/* Ciò che si tocca non si seleziona con la pressione lunga e non apre il menu del browser; il testo dei contenuti sì. */
+button,
+[role="button"],
+nav a,
+summary {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 button {
   cursor: pointer;
 }
@@ -44,13 +64,29 @@ button:disabled {
   cursor: not-allowed;
 }
 
-a {
-  color: var(--text-primary);
+/* Il dito risponde subito: il pulsante «si preme» appena lo si tocca, non quando lo si lascia. */
+:where(button:not(:disabled), [role="button"]) {
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+:where(button:not(:disabled), [role="button"]):active {
+  transform: scale(.98);
+}
+
+/* Su telefono i campi sono almeno 16 px, altrimenti iOS ingrandisce la pagina quando ci si scrive. */
+@media (pointer: coarse) {
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
 }
 
 /* Solo i link semplici: quelli con una classe hanno già i loro colori. */
-a:not([class]):hover {
-  color: var(--action-primary-hover);
+@media (hover: hover) and (pointer: fine) {
+  a:not([class]):hover {
+    color: var(--action-primary-hover);
+  }
 }
 
 :focus-visible {

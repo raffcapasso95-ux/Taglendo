@@ -1,6 +1,6 @@
 /* "La tua prenotazione" (E1–E5, Schermate mancanti.dc.html). Solo token. */
 .page {
-  min-height: 100vh;
+  min-height: 100svh;
   background: var(--salon-bg);
   color: var(--text-inverse);
   font-family: var(--font-family);

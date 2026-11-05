@@ -399,9 +399,11 @@
     text-align: left;
   }
 
+  @media (hover: hover) and (pointer: fine) {
   .pastBar:hover {
-    color: var(--text-primary);
-  }
+      color: var(--text-primary);
+    }
+}
 
   .pastToggle {
     text-decoration: underline;
@@ -493,10 +495,12 @@
     cursor: default;
   }
 
+  @media (hover: hover) and (pointer: fine) {
   .gap:hover:not(:disabled) {
-    border-color: var(--status-success);
-    background: var(--gap-hover-bg);
-  }
+      border-color: var(--status-success);
+      background: var(--gap-hover-bg);
+    }
+}
 
   .gapLine {
     display: flex;

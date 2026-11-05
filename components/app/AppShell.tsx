@@ -55,7 +55,7 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, childr
   const settingsActive = isCurrent(pathname, "/impostazioni");
 
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} data-app-shell>
       <nav className={styles.rail} aria-label="Menu principale">
         <div className={styles.logo} data-label={salonName}>
           <Image src="/brand/taglendo-icon.svg" alt="Taglendo" width={36} height={36} className={styles.logoImage} />

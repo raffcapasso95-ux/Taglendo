@@ -1,6 +1,6 @@
 /* Sito commerciale, da design/Sito Taglendo.dc.html. Colori e misure solo dai token. */
 .page {
-  min-height: 100vh;
+  min-height: 100svh;
   background: var(--canvas);
   color: var(--text-primary);
   font-family: var(--font-family);
@@ -69,10 +69,12 @@
   display: none;
 }
 
-.navLink:hover,
-.ghost:hover {
-  background: var(--surface-muted);
-  color: var(--text-primary);
+@media (hover: hover) and (pointer: fine) {
+  .navLink:hover,
+  .ghost:hover {
+    background: var(--surface-muted);
+    color: var(--text-primary);
+  }
 }
 
 .headerActions {
@@ -111,10 +113,12 @@
   font-size: 17px;
 }
 
-.button:hover,
-.buttonLarge:hover {
-  background: var(--plum-hover-dark);
-  color: var(--text-inverse);
+@media (hover: hover) and (pointer: fine) {
+  .button:hover,
+  .buttonLarge:hover {
+    background: var(--plum-hover-dark);
+    color: var(--text-inverse);
+  }
 }
 
 .button:active,
@@ -1017,8 +1021,10 @@
   color: var(--brand-plum) !important;
 }
 
-.betaCta:hover {
-  background: var(--brand-apricot-hover);
+@media (hover: hover) and (pointer: fine) {
+  .betaCta:hover {
+    background: var(--brand-apricot-hover);
+  }
 }
 
 .included {
@@ -1297,10 +1303,12 @@
   cursor: pointer;
 }
 
-.footerLink:hover,
-.footerButton:hover {
-  color: var(--brand-peach);
-  text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+  .footerLink:hover,
+  .footerButton:hover {
+    color: var(--brand-peach);
+    text-decoration: underline;
+  }
 }
 
 .footerBottom {
@@ -1391,9 +1399,11 @@
   text-decoration: none;
 }
 
-.tocLink:hover {
-  color: var(--text-primary);
-  text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+  .tocLink:hover {
+    color: var(--text-primary);
+    text-decoration: underline;
+  }
 }
 
 .article {
