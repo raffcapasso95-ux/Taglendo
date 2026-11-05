@@ -210,7 +210,7 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn }: Props) 
           </span>
           <Link href="/" className={styles.powered} aria-label="Prenotazioni con Taglendo">
             <span>{copy.footer.poweredBy}</span>
-            <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={96} height={30} style={{ height: "auto" }} />
+            <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={96} height={23} style={{ width: 96, height: "auto" }} />
           </Link>
         </div>
       </footer>

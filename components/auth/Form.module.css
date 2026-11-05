@@ -13,6 +13,9 @@
 }
 
 .forgot {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
   font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);

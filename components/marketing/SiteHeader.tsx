@@ -21,7 +21,7 @@ export function SiteHeader({ children }: { children: ReactNode }) {
     <header className={scrolled ? `${styles.header} ${styles.headerScrolled}` : styles.header}>
       <div className={styles.headerRow}>
         <Link href="/" aria-label="Taglendo, inizio pagina" className={styles.logo}>
-          <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={104} height={26} priority style={{ height: 26, width: "auto" }} />
+          <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={109} height={26} priority style={{ height: 26, width: "auto" }} />
         </Link>
         <nav className={styles.nav} aria-label="Sezioni">
           <Link href="/#come" className={styles.navLink}>{copy.nav.how}</Link>

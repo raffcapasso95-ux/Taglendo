@@ -156,7 +156,7 @@ export function ManageView(p: ManageProps) {
         </div>
         <div className={styles.footer}>
           <span>{copy.poweredBy}</span>
-          <Image src="/brand/taglendo-logo-light.svg" alt="Taglendo" width={84} height={26} style={{ height: "auto" }} />
+          <Image src="/brand/taglendo-logo-light.svg" alt="Taglendo" width={84} height={20} style={{ width: 84, height: "auto" }} />
         </div>
       </main>
     </div>

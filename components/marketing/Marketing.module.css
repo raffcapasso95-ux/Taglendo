@@ -1577,3 +1577,13 @@
     transition: none;
   }
 }
+
+/* Zone di tocco da 44 px: logo, piè di pagina e indice delle pagine legali */
+.logo,
+.footerLink,
+.footerButton,
+.tocLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+}

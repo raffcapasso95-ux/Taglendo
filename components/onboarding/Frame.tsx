@@ -27,7 +27,7 @@ export function Frame({ step, doneUpTo, title, lead, preview, actions, children 
   return (
     <div className={styles.frame}>
       <nav className={styles.nav} aria-label={copy.nav.title}>
-        <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={112} height={36} style={{ width: 112, height: "auto" }} priority />
+        <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={112} height={27} style={{ width: 112, height: "auto" }} priority />
         <p className={styles.navTitle}>{copy.nav.title}</p>
         <ol className={styles.steps}>
           {copy.nav.steps.map((label, i) => {
