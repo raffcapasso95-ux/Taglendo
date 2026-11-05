@@ -1,0 +1,55 @@
+.page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8) var(--space-6);
+  background: var(--canvas);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.logo {
+  height: 32px;
+  width: auto;
+}
+
+.title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.text {
+  margin: 0;
+  font-size: 16px;
+  line-height: var(--line-body);
+  color: var(--text-secondary);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-underline-offset: 3px;
+}
