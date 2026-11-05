@@ -6,6 +6,7 @@ import { Card } from "@/components/ui";
 import styles from "@/components/listino/Listino.module.css";
 import { signOut } from "@/lib/auth/actions";
 import { requireSalon } from "@/lib/auth/session";
+import { company } from "@/lib/site";
 import { billingEnabled } from "@/lib/billing";
 import { listinoCopy } from "@/lib/copy/listino";
 import { initials } from "@/lib/rules/agenda";
@@ -90,6 +91,24 @@ async function Content() {
             <span aria-hidden="true">›</span>
           </Link>
         </Card>
+      </section>
+
+      <section className={styles.section} aria-labelledby="help-title">
+        <h2 id="help-title" className={styles.sectionTitle}>
+          {copy.help.title}
+        </h2>
+        <Card flush>
+          <a href={`mailto:${company.email}?subject=Taglendo%3A%20segnalazione`} className={styles.navRow}>
+            <span>
+              {copy.help.row}
+              <span className={styles.navSub}>{copy.help.sub}</span>
+            </span>
+            <span aria-hidden="true">›</span>
+          </a>
+        </Card>
+      </section>
+
+      <section className={styles.section}>
         <form action={signOut}>
           <button type="submit" className={styles.logout}>
             {copy.logout}

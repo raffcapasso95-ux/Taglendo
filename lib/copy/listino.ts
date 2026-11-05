@@ -88,6 +88,7 @@ export const listinoCopy = {
     ownerOnly: "Solo titolare",
     askOwner: (owner: string) => `Per cambiarle chiedi ad ${owner}.`,
     logout: "Esci da Taglendo",
+    help: { title: "Aiuto", row: "Segnala un problema o scrivici", sub: "Ti rispondiamo noi, di persona." }, // NUOVO: canale diretto della beta
     rows: {
       listino: "Listino e orari",
       operators: "Operatori",
