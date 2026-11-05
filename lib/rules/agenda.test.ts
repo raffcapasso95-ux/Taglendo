@@ -3,10 +3,15 @@ import {
   buildDay,
   busyPercent,
   freeIntervals,
+  GRID_PX_PER_MIN,
   gridRange,
+  fitGridScale,
+  gridScale,
   gridStart,
   initials,
   operatorStatus,
+  QUIET_PX,
+  sideSummary,
   span,
   type AgendaAppt,
   type DayHours,
@@ -220,5 +225,128 @@ describe("gridRange", () => {
     const past = day(HOURS, [appt("1", "a", 500, 530)], true, 700);
     expect(gridRange(past, false).open).toBe(540);
     expect(gridRange(past, true).open).toBe(480); // con "Mostra" sì
+  });
+});
+
+describe("gridScale: scala compressa della griglia desktop", () => {
+  const PX = GRID_PX_PER_MIN;
+
+  it("senza tratti liberi lunghi è la scala lineare di sempre", () => {
+    const sc = gridScale([[540, 1140]], 540, 1140);
+    expect(sc.height).toBeCloseTo(600 * PX);
+    expect(sc.y(600)).toBeCloseTo(60 * PX);
+    expect(sc.bands.every((b) => !b.compressed)).toBe(true);
+  });
+
+  it("un tratto libero di almeno un'ora, in cui nessuno ha appuntamenti, si comprime", () => {
+    // 9:00–10:00 occupato, 10:00–13:00 libero (3 h), 13:00–14:00 occupato
+    const sc = gridScale([[540, 600], [780, 840]], 540, 840);
+    const quiet = sc.bands.filter((b) => b.compressed);
+    expect(quiet).toEqual([expect.objectContaining({ from: 600, to: 780, height: QUIET_PX })]);
+    expect(sc.height).toBeCloseTo(60 * PX + QUIET_PX + 60 * PX);
+    expect(sc.y(780) - sc.y(600)).toBeCloseTo(QUIET_PX); // la fascia compressa è alta quanto serve
+    expect(sc.y(840) - sc.y(780)).toBeCloseTo(60 * PX); // l'appuntamento dopo resta proporzionale
+  });
+
+  it("un tratto libero più corto di un'ora resta com'è", () => {
+    const sc = gridScale([[540, 600], [650, 700]], 540, 700);
+    expect(sc.bands.some((b) => b.compressed)).toBe(false);
+  });
+
+  it("gli appuntamenti di barbieri diversi si sommano: compresso solo dove nessuno lavora", () => {
+    // Andrea 9:00–9:30 e 14:00–15:00; Marco 11:00–11:30 → tra 11:30 e 14:00 nessuno (150 min), tra 9:30 e 11:00 nessuno (90 min)
+    const sc = gridScale([[540, 570], [840, 900], [660, 690]], 540, 900);
+    expect(sc.bands.filter((b) => b.compressed).map((b) => [b.from, b.to])).toEqual([[570, 660], [690, 840]]);
+  });
+
+  it("anche i tratti all'inizio e alla fine della giornata si comprimono", () => {
+    const sc = gridScale([[720, 780]], 540, 1140);
+    expect(sc.bands.map((b) => b.compressed)).toEqual([true, false, true]);
+  });
+
+  it("la posizione è continua, crescente e dentro l'altezza totale", () => {
+    const sc = gridScale([[540, 600], [780, 840]], 540, 1140);
+    let last = -1;
+    for (let m = 540; m <= 1140; m += 5) {
+      const y = sc.y(m);
+      expect(y).toBeGreaterThanOrEqual(last);
+      expect(y).toBeLessThanOrEqual(sc.height + 0.001);
+      last = y;
+    }
+    expect(sc.y(0)).toBe(0); // fuori dal giorno si ferma agli estremi
+    expect(sc.y(2000)).toBeCloseTo(sc.height);
+  });
+
+  it("senza nulla da compattare, o con la giornata tutta libera, non si rompe", () => {
+    expect(gridScale([], 540, 1140).bands).toHaveLength(1);
+    expect(gridScale([], 540, 1140).height).toBeCloseTo(QUIET_PX);
+  });
+});
+
+describe("gridScale con la pausa", () => {
+  it("la pausa si comprime da sola e non si fonde con i tratti liberi accanto", () => {
+    // 9:00–12:25 occupato, libero 12:25–13:00 (35 min), pausa 13:00–14:30, 14:30–15:30 occupato
+    const sc = gridScale([[540, 745], [870, 930]], 540, 930, GRID_PX_PER_MIN, 60, QUIET_PX, [[780, 870]]);
+    expect(sc.bands.filter((b) => b.compressed).map((b) => [b.from, b.to])).toEqual([[780, 870]]);
+    expect(sc.y(780) - sc.y(745)).toBeCloseTo(35 * GRID_PX_PER_MIN); // il buco prima della pausa resta alto
+  });
+  it("una pausa breve (sotto l'ora) resta com'è", () => {
+    const sc = gridScale([[540, 700]], 540, 900, GRID_PX_PER_MIN, 60, QUIET_PX, [[780, 810]]);
+    expect(sc.bands.filter((b) => b.compressed).map((b) => [b.from, b.to])).toEqual([[700, 780], [810, 900]].filter(([a, b]) => b - a >= 60));
+  });
+});
+
+describe("fitGridScale: la giornata sta nello spazio", () => {
+  const busy: Array<[number, number]> = [[540, 570], [600, 630], [660, 690], [720, 750], [870, 900], [930, 960], [990, 1020], [1050, 1080]];
+  it("senza misura usa la scala più comoda", () => {
+    expect(fitGridScale(busy, 540, 1140, null).height).toBeCloseTo(gridScale(busy, 540, 1140, 1.6).height);
+  });
+  it("se lo spazio è poco sceglie una scala più stretta, ma mai sotto il minimo", () => {
+    const comfy = gridScale(busy, 540, 1140, 1.6).height;
+    const fit = fitGridScale(busy, 540, 1140, comfy - 20);
+    expect(fit.height).toBeLessThanOrEqual(comfy - 20);
+    const tiny = fitGridScale(busy, 540, 1140, 10);
+    expect(tiny.height).toBeCloseTo(gridScale(busy, 540, 1140, 1.2).height);
+  });
+});
+
+describe("sideSummary: la barra laterale", () => {
+  const hours: DayHours = { closed: false, openMin: 540, closeMin: 1140, breakStartMin: 780, breakEndMin: 870 };
+  const appt = (id: string, memberId: string, start: number, end: number, status: AgendaAppt["status"], price = 2000): AgendaAppt => ({
+    id, memberId, clientName: `Cliente ${id}`, phone: null, serviceName: "Taglio", priceCents: price, startMin: start, endMin: end, status, source: "manuale",
+  });
+  const ops = [{ id: "a", name: "Andrea", chairNo: 1 }, { id: "m", name: "Marco", chairNo: 2 }];
+  const day = (nowMin: number, appts: AgendaAppt[], isToday = true) => buildDay({ date: "2026-11-05", isToday, nowMin, hours, operators: ops, appts });
+
+  it("oggi separa chi è in poltrona, chi è finito e va chiuso, e i prossimi", () => {
+    const d = day(620, [
+      appt("1", "a", 540, 570, "confermato"), // finito, da chiudere
+      appt("2", "a", 600, 630, "confermato"), // in poltrona
+      appt("3", "m", 660, 690, "confermato"), // prossimo
+      appt("4", "m", 540, 570, "completato"), // già chiuso: non compare tra i da chiudere
+    ]);
+    const s = sideSummary(d);
+    expect(s.toClose.map((a) => a.id)).toEqual(["1"]);
+    expect(s.live.map((a) => a.id)).toEqual(["2"]);
+    expect(s.upcoming.map((a) => a.id)).toEqual(["3"]);
+    expect(s.live[0]!.operatorName).toBe("Andrea");
+  });
+
+  it("l'incasso previsto conta confermati e completati, non annullati né non presentati", () => {
+    const s = sideSummary(day(500, [appt("1", "a", 540, 570, "confermato", 2000), appt("2", "a", 600, 630, "completato", 3000), appt("3", "m", 540, 570, "annullato", 5000), appt("4", "m", 600, 630, "non_presentato", 7000)]));
+    expect(s.revenueCents).toBe(5000);
+  });
+
+  it("un altro giorno: niente in poltrona né da chiudere, i primi appuntamenti in ordine, al massimo 5", () => {
+    const many = Array.from({ length: 8 }, (_, i) => appt(String(i), "a", 540 + i * 30, 570 + i * 30, "confermato"));
+    const s = sideSummary(day(0, many, false));
+    expect(s.live).toEqual([]);
+    expect(s.toClose).toEqual([]);
+    expect(s.upcoming.map((a) => a.id)).toEqual(["0", "1", "2", "3", "4"]);
+  });
+
+  it("giorno vuoto: tutto a zero", () => {
+    const s = sideSummary(day(500, []));
+    expect(s).toMatchObject({ live: [], toClose: [], upcoming: [], revenueCents: 0, fill: 0 });
   });
 });

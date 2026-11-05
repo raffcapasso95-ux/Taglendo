@@ -62,6 +62,7 @@ test.describe("Clienti", () => {
   });
 
   test("senza il permesso il barbiere non vede telefono né email", async ({ page }) => {
+    const [before] = await adminSelect<{ barbers_contacts: boolean }>("salons", `select=barbers_contacts&id=eq.${SALON}`);
     await adminUpdate("salons", `id=eq.${SALON}`, { barbers_contacts: false });
     await barber(page);
     await page.goto("/clienti");
@@ -70,7 +71,8 @@ test.describe("Clienti", () => {
     await expect(page.getByRole("link", { name: "WhatsApp" })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Chiama" })).toHaveCount(0);
     await expect(visibleText(page, "I contatti dei clienti li vede solo il titolare.")).toBeVisible();
-    await adminUpdate("salons", `id=eq.${SALON}`, { barbers_contacts: true });
+    // si rimette com'era: altri test (anche del database) contano sul valore di partenza
+    await adminUpdate("salons", `id=eq.${SALON}`, { barbers_contacts: before!.barbers_contacts });
   });
 
   test("un cliente che non esiste dà pagina non trovata", async ({ page }) => {

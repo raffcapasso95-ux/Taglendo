@@ -45,6 +45,98 @@ export const MIN_GAP = 15;
 /** Pixel per minuto nella griglia desktop (96 px l'ora). */
 export const GRID_PX_PER_MIN = 1.6;
 
+/** Un tratto senza appuntamenti lungo almeno così (minuti) viene compresso nella griglia desktop. */
+export const QUIET_MIN = 60;
+/** Altezza (px) di un tratto compresso. */
+export const QUIET_PX = 44;
+
+export type GridBand = { from: number; to: number; top: number; height: number; compressed: boolean };
+export type GridScale = {
+  /** Da minuti dalla mezzanotte alla posizione verticale (px) nella griglia. */
+  y: (min: number) => number;
+  height: number;
+  bands: GridBand[];
+};
+
+/**
+ * Scala verticale della griglia desktop, uguale per tutte le colonne: gli appuntamenti restano proporzionali
+ * al tempo (px per minuto), mentre i tratti in cui NESSUN barbiere ha appuntamenti e che durano almeno
+ * `quietMin` minuti si riducono a una fascia bassa. Così una giornata intera sta in uno schermo.
+ */
+export function gridScale(
+  busy: ReadonlyArray<readonly [number, number]>,
+  start: number,
+  end: number,
+  px: number = GRID_PX_PER_MIN,
+  quietMin: number = QUIET_MIN,
+  quietPx: number = QUIET_PX,
+  /** Pause del salone: si comprimono per conto loro e non si fondono con i tratti liberi accanto. */
+  pauses: ReadonlyArray<readonly [number, number]> = [],
+): GridScale {
+  const clip = ([x, y]: readonly [number, number]): [number, number] => [Math.max(x, start), Math.min(y, end)];
+  const inDay = (list: ReadonlyArray<readonly [number, number]>) => list.map(clip).filter(([x, y]) => y > x);
+
+  const merged: Array<[number, number]> = [];
+  for (const [a, b] of [...inDay(busy), ...inDay(pauses)].sort((p, q) => p[0] - q[0])) {
+    const last = merged[merged.length - 1];
+    if (last && a <= last[1]) last[1] = Math.max(last[1], b);
+    else merged.push([a, b]);
+  }
+  const free: Array<[number, number]> = [];
+  let cursor = start;
+  for (const [a, b] of merged) {
+    if (a > cursor) free.push([cursor, a]);
+    cursor = Math.max(cursor, b);
+  }
+  if (cursor < end) free.push([cursor, end]);
+
+  const compressed = [...free.filter(([a, b]) => b - a >= quietMin), ...inDay(pauses).filter(([a, b]) => b - a >= quietMin)].sort((p, q) => p[0] - q[0]);
+
+  const bands: GridBand[] = [];
+  let at = start;
+  let top = 0;
+  const push = (from: number, to: number, isCompressed: boolean) => {
+    if (to <= from) return;
+    const height = isCompressed ? quietPx : (to - from) * px;
+    bands.push({ from, to, top, height, compressed: isCompressed });
+    top += height;
+  };
+  for (const [a, b] of compressed) {
+    push(at, a, false);
+    push(a, b, true);
+    at = b;
+  }
+  push(at, end, false);
+
+  const y = (min: number) => {
+    const m = Math.min(Math.max(min, start), end);
+    const band = bands.find((x) => m <= x.to) ?? bands[bands.length - 1];
+    if (!band) return 0;
+    return band.top + ((m - band.from) / (band.to - band.from)) * band.height;
+  };
+  return { y, height: top, bands };
+}
+
+/** Altezze (px per minuto) provate, dalla più comoda alla più stretta, perché la giornata stia nello spazio. */
+export const GRID_PX_STEPS = [1.6, 1.5, 1.4, 1.3, 1.2] as const;
+
+/** La scala più comoda che sta in `available` px; se nemmeno la più stretta basta, quella (si scorre). */
+export function fitGridScale(
+  busy: ReadonlyArray<readonly [number, number]>,
+  start: number,
+  end: number,
+  available: number | null,
+  pauses: ReadonlyArray<readonly [number, number]> = [],
+): GridScale {
+  const make = (px: number) => gridScale(busy, start, end, px, QUIET_MIN, QUIET_PX, pauses);
+  if (available === null) return make(GRID_PX_STEPS[0]);
+  for (const px of GRID_PX_STEPS) {
+    const sc = make(px);
+    if (sc.height <= available) return sc;
+  }
+  return make(GRID_PX_STEPS[GRID_PX_STEPS.length - 1]!);
+}
+
 const fmt = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 export const clock = fmt;
 
@@ -264,4 +356,39 @@ export function buildDay(input: DayInput): DayModel {
     pastCount,
     cancelledCount: appts.filter((a) => a.status === "annullato").length,
   };
+}
+
+
+/** Un appuntamento con il barbiere a cui appartiene, per la barra laterale. */
+export type SideAppt = AgendaAppt & { operatorName: string; colorIndex: number };
+
+export type SideSummary = {
+  /** In poltrona adesso (solo oggi). */
+  live: SideAppt[];
+  /** Finiti ma ancora «confermati»: vanno chiusi con Completato o Non presentato (solo oggi). */
+  toClose: SideAppt[];
+  /** I prossimi, in ordine di orario. */
+  upcoming: SideAppt[];
+  clientCount: number;
+  /** Incasso previsto: appuntamenti confermati e completati (annullati e non presentati no). */
+  revenueCents: number;
+  /** Occupazione media dei barbieri mostrati, 0–100. */
+  fill: number;
+};
+
+export const SIDE_UPCOMING = 5;
+
+/** Cosa mostra la barra laterale dell'agenda: cosa chiudere, cosa viene dopo e i numeri della giornata. */
+export function sideSummary(day: DayModel): SideSummary {
+  const all: SideAppt[] = day.columns
+    .flatMap((c) => c.appts.map((a) => ({ ...a, operatorName: c.operator.name, colorIndex: c.colorIndex })))
+    .sort((a, b) => a.startMin - b.startMin || a.operatorName.localeCompare(b.operatorName));
+  const confirmed = all.filter((a) => a.status === "confermato");
+  const { isToday, nowMin } = day;
+  const live = isToday ? confirmed.filter((a) => a.startMin <= nowMin && nowMin < a.endMin) : [];
+  const toClose = isToday ? confirmed.filter((a) => a.endMin <= nowMin) : [];
+  const upcoming = (isToday ? confirmed.filter((a) => a.startMin > nowMin) : confirmed).slice(0, SIDE_UPCOMING);
+  const revenueCents = all.filter((a) => a.status === "confermato" || a.status === "completato").reduce((n, a) => n + a.priceCents, 0);
+  const fill = day.columns.length ? Math.round(day.columns.reduce((n, c) => n + c.fill, 0) / day.columns.length) : 0;
+  return { live, toClose, upcoming, clientCount: day.clientCount, revenueCents, fill };
 }
