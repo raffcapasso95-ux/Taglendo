@@ -240,3 +240,78 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
+
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): colonna destra --- */
+.title {
+  text-transform: none;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.list {
+  border-color: transparent;
+  box-shadow: var(--shadow-panel-soft);
+}
+
+.now .list {
+  box-shadow: none;
+  background: var(--surface-muted);
+}
+
+.free {
+  padding: 0;
+  border: 0;
+  background: none;
+  gap: var(--space-2);
+}
+
+.free .title {
+  color: var(--text-primary);
+}
+
+.freeButton {
+  padding: var(--space-2) var(--space-3);
+  border: 1.5px dashed var(--status-success-border);
+  border-radius: var(--radius-card);
+  background: none;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .freeButton:hover:not(:disabled) {
+    background: var(--status-success-bg);
+  }
+}
+
+.plus {
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--status-success-bg);
+  white-space: nowrap;
+}
+
+.numbers {
+  gap: 0;
+  padding: var(--space-3) 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+}
+
+.number {
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.number + .number {
+  border-left: 1px solid var(--border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .freeButton {
+    transition: none;
+  }
+}

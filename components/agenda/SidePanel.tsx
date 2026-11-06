@@ -15,6 +15,8 @@ import styles from "./SidePanel.module.css";
 
 /** Quanti appuntamenti «da chiudere» si mostrano subito; gli altri dietro «Altri N». */
 const TO_CLOSE_SHOWN = 3;
+/** Quanti appuntamenti in arrivo si elencano nella colonna (il resto sta nella griglia). */
+const UPCOMING_SHOWN = 3;
 
 type Status = "completato" | "non_presentato";
 
@@ -42,40 +44,59 @@ export function SidePanel({ day, title }: { day: DayModel; title: string }) {
       if (r.ok) router.refresh();
     });
 
-  const nowTitle = day.isToday ? title : "Primi appuntamenti";
   const noWork = s.live.length === 0 && s.toClose.length === 0 && s.upcoming.length === 0;
+  const upcoming = s.upcoming.slice(0, UPCOMING_SHOWN);
+  const upcomingItems = upcoming.map((a) => <Card key={a.id} onOpen={openAppointment} appt={a} tag={`${clock(a.startMin)} · ${a.serviceName}`} />);
 
   return (
     <aside className={agenda.side} aria-label="Adesso in salone">
-      <section className={styles.section} aria-labelledby="side-now">
-        <h2 id="side-now" className={styles.title}>
-          {nowTitle}
-        </h2>
-        <ul className={styles.list}>
-          {s.live.map((a) => (
-            <Card key={a.id} onOpen={openAppointment} appt={a} tag={`In poltrona · finisce alle ${clock(a.endMin)}`} live>
-              {canEdit ? <Actions appt={a} pending={pending} onClose={close} /> : null}
-            </Card>
-          ))}
-          {closeShown.map((a) => (
-            <Card key={a.id} onOpen={openAppointment} appt={a} tag={`Finito alle ${clock(a.endMin)} · da chiudere`} live>
-              {canEdit ? <Actions appt={a} pending={pending} onClose={close} /> : null}
-            </Card>
-          ))}
-          {s.toClose.length > TO_CLOSE_SHOWN ? (
-            <li className={styles.more}>
-              <button type="button" onClick={() => setAllClose(!allClose)} aria-expanded={allClose}>
-                {allClose ? "Mostra meno" : `Altri ${s.toClose.length - TO_CLOSE_SHOWN} da chiudere`}
-              </button>
-            </li>
+      {day.isToday ? (
+        <>
+          <section className={`${styles.section} ${styles.now}`} aria-labelledby="side-now">
+            <h2 id="side-now" className={styles.title}>
+              {title}
+            </h2>
+            <ul className={styles.list}>
+              {s.live.map((a) => (
+                <Card key={a.id} onOpen={openAppointment} appt={a} tag={`In poltrona · finisce alle ${clock(a.endMin)}`} live>
+                  {canEdit ? <Actions appt={a} pending={pending} onClose={close} /> : null}
+                </Card>
+              ))}
+              {closeShown.map((a) => (
+                <Card key={a.id} onOpen={openAppointment} appt={a} tag={`Finito alle ${clock(a.endMin)} · da chiudere`} live>
+                  {canEdit ? <Actions appt={a} pending={pending} onClose={close} /> : null}
+                </Card>
+              ))}
+              {s.toClose.length > TO_CLOSE_SHOWN ? (
+                <li className={styles.more}>
+                  <button type="button" onClick={() => setAllClose(!allClose)} aria-expanded={allClose}>
+                    {allClose ? "Mostra meno" : `Altri ${s.toClose.length - TO_CLOSE_SHOWN} da chiudere`}
+                  </button>
+                </li>
+              ) : null}
+              {s.live.length === 0 && s.toClose.length === 0 ? <li className={styles.empty}>Nessuno in poltrona.</li> : null}
+            </ul>
+          </section>
+          {upcoming.length > 0 ? (
+            <section className={styles.section} aria-labelledby="side-next">
+              <h2 id="side-next" className={styles.title}>
+                Prossimi
+              </h2>
+              <ul className={styles.list}>{upcomingItems}</ul>
+            </section>
           ) : null}
-          {s.live.length === 0 && s.toClose.length === 0 && day.isToday ? <li className={styles.empty}>Nessuno in poltrona.</li> : null}
-          {s.upcoming.map((a) => (
-            <Card key={a.id} onOpen={openAppointment} appt={a} tag={`${clock(a.startMin)} · ${a.serviceName}`} />
-          ))}
-          {noWork ? <li className={styles.empty}>Nessun appuntamento in programma.</li> : null}
-        </ul>
-      </section>
+        </>
+      ) : (
+        <section className={styles.section} aria-labelledby="side-now">
+          <h2 id="side-now" className={styles.title}>
+            Primi appuntamenti
+          </h2>
+          <ul className={styles.list}>
+            {upcomingItems}
+            {noWork ? <li className={styles.empty}>Nessun appuntamento in programma.</li> : null}
+          </ul>
+        </section>
+      )}
 
       {day.freeNext.length > 0 ? (
         <section className={styles.free} aria-labelledby="side-free">
