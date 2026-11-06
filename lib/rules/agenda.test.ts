@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  operatorColor,
   buildDay,
   busyPercent,
   freeIntervals,
@@ -348,5 +349,14 @@ describe("sideSummary: la barra laterale", () => {
   it("giorno vuoto: tutto a zero", () => {
     const s = sideSummary(day(500, []));
     expect(s).toMatchObject({ live: [], toClose: [], upcoming: [], revenueCents: 0, fill: 0 });
+  });
+});
+
+describe("colore dell'operatore in agenda", () => {
+  it("vale quello scelto; senza scelta dipende dall'ordine delle poltrone", () => {
+    expect(operatorColor({ color: 2 }, 0)).toBe(2);
+    expect(operatorColor({ color: 0 }, 3)).toBe(0);
+    expect(operatorColor({ color: null }, 5)).toBe(1);
+    expect(operatorColor({}, 2)).toBe(2);
   });
 });

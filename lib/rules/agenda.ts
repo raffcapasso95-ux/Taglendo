@@ -33,9 +33,14 @@ export type Operator = {
   id: string;
   name: string;
   chairNo: number;
+  /** Colore scelto in agenda (0–3); senza, dipende dall'ordine delle poltrone. */
+  color?: number | null;
   /** In chiusura (ferie) in questo giorno: la colonna c'è ma non ha spazi liberi. */
   off?: boolean;
 };
+
+/** Il colore di un barbiere in agenda: quello scelto, altrimenti per ordine di poltrona. */
+export const operatorColor = (o: Pick<Operator, "color">, index: number): number => o.color ?? index % 4;
 
 /** Occupa il tempo del barbiere: confermato o completato (come nel prototipo e in free_slots). */
 export const isActive = (s: ApptStatus) => s === "confermato" || s === "completato";
@@ -304,7 +309,7 @@ export function buildDay(input: DayInput): DayModel {
     const live = mine.filter((a) => isActive(a.status));
     return {
       operator,
-      colorIndex: i % 4,
+      colorIndex: operatorColor(operator, i),
       appts: mine,
       count: live.length,
       status: operator.off ? { kind: "free" as const, text: "Non lavora oggi" } : operatorStatus(mine, isToday, nowMin),

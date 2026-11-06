@@ -161,14 +161,14 @@ isOneToOne: true
                   ]
                 },"members": {
                   Row: {
-                    "active": boolean,"bio": string | null,"chair_no": number,"id": string,"invite_email": string | null,"invite_expires_at": string | null,"invite_token": string | null,"name": string,"photo_path": string | null,"role": Database["public"]['Enums']["role_t"],"salon_id": string,"user_id": string | null
+                    "active": boolean,"agenda_color": number | null,"bio": string | null,"bookable_online": boolean,"chair_no": number,"id": string,"invite_email": string | null,"invite_expires_at": string | null,"invite_token": string | null,"name": string,"phone": string | null,"photo_path": string | null,"role": Database["public"]['Enums']["role_t"],"salon_id": string,"user_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "active"?: boolean,"bio"?: string | null,"chair_no": number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name": string,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id": string,"user_id"?: string | null
+                    "active"?: boolean,"agenda_color"?: number | null,"bio"?: string | null,"bookable_online"?: boolean,"chair_no": number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name": string,"phone"?: string | null,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id": string,"user_id"?: string | null
                   }
                   Update: {
-                    "active"?: boolean,"bio"?: string | null,"chair_no"?: number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name"?: string,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id"?: string,"user_id"?: string | null
+                    "active"?: boolean,"agenda_color"?: number | null,"bio"?: string | null,"bookable_online"?: boolean,"chair_no"?: number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name"?: string,"phone"?: string | null,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -262,6 +262,26 @@ isOneToOne: false
       columns: ["member_id"]
 isOneToOne: false
       referencedRelation: "members"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"salon_photos": {
+                  Row: {
+                    "created_at": string,"id": string,"path": string,"salon_id": string,"sort": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"path": string,"salon_id": string,"sort"?: number
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"path"?: string,"salon_id"?: string,"sort"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "salon_photos_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
       referencedColumns: ["id"]
     }
                   ]

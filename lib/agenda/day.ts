@@ -40,8 +40,8 @@ export async function hoursFor(supabase: Client, salonId: string, date: string):
 
 /** I barbieri attivi del salone, in ordine di poltrona. */
 export async function operatorsOf(supabase: Client, salonId: string): Promise<Operator[]> {
-  const { data } = await supabase.from("members").select("id, name, chair_no").eq("salon_id", salonId).eq("active", true).order("chair_no");
-  return (data ?? []).map((m) => ({ id: m.id, name: m.name, chairNo: m.chair_no }));
+  const { data } = await supabase.from("members").select("id, name, chair_no, agenda_color").eq("salon_id", salonId).eq("active", true).order("chair_no");
+  return (data ?? []).map((m) => ({ id: m.id, name: m.name, chairNo: m.chair_no, color: m.agenda_color }));
 }
 
 /** Gli appuntamenti di un giorno (tutti gli stati) nella forma che usa l'agenda. */

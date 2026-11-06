@@ -16,6 +16,25 @@ test.describe("Profilo", () => {
     await expect(page.getByText("Andrea Rossi").first()).toBeVisible();
   });
 
+  test("telefono, colore in agenda e prenotabile online si salvano", async ({ page }) => {
+    await freshOwner(page, "Barberia Profilo Cinque");
+    await page.goto("/profilo");
+    await page.getByLabel("Telefono · facoltativo").fill("+39 340 555 0101");
+    await page.getByRole("button", { name: "Malva" }).click();
+    await page.getByRole("button", { name: "Salva", exact: true }).click();
+    await expect(page.getByText("Profilo salvato").filter({ visible: true })).toBeVisible();
+    await page.reload();
+    await expect(page.getByLabel("Telefono · facoltativo")).toHaveValue("+39 340 555 0101");
+    await expect(page.getByRole("button", { name: "Malva" })).toHaveAttribute("aria-pressed", "true");
+    const online = page.getByRole("switch", { name: /Prenotabile online/ });
+    await expect(online).toHaveAttribute("aria-checked", "true");
+    await online.click();
+    await expect(page.getByText("Non sei più prenotabile online").filter({ visible: true })).toBeVisible();
+    await page.waitForLoadState("networkidle");
+    await page.reload();
+    await expect(page.getByRole("switch", { name: /Prenotabile online/ })).toHaveAttribute("aria-checked", "false");
+  });
+
   test("cambia la password e accede con la nuova", async ({ page }) => {
     const email = await freshOwner(page, "Barberia Profilo Due");
     await page.goto("/profilo");

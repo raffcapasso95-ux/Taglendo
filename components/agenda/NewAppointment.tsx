@@ -13,7 +13,7 @@ import { setClientPhoto } from "@/lib/clients/photo";
 import { resizePhoto } from "@/lib/clients/resizeImage";
 import { formatPrice } from "@/lib/dates/format";
 import { addDays, dayNumber, monthShort, romeMinutes, weekdayShort } from "@/lib/dates/rome";
-import { clock, type Operator } from "@/lib/rules/agenda";
+import { clock, operatorColor, type Operator } from "@/lib/rules/agenda";
 import { AVATAR_COLOR_NAMES, clientInitials } from "@/lib/rules/avatar";
 import { LIMITS } from "@/lib/rules/forms";
 import { eurosText, parseEuros, quickPrices } from "@/lib/rules/price";
@@ -481,7 +481,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
               {operators.map((o, i) => (
                 <button key={o.id} type="button" className={cx(styles.person, memberId === o.id && styles.personOn)} aria-pressed={memberId === o.id} onClick={() => setMemberId(o.id)}>
                   <span className={styles.personAv}>
-                    <OperatorAvatar name={o.name} colorIndex={i} className={styles.avBig} />
+                    <OperatorAvatar name={o.name} colorIndex={operatorColor(o, i)} className={styles.avBig} />
                   </span>
                   <span className={styles.personName}>{o.name}</span>
                 </button>

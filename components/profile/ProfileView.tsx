@@ -2,17 +2,39 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition, type ReactNode } from "react";
+import { useRef, useState, useTransition, type ReactNode } from "react";
 import { PasswordField } from "@/components/auth/PasswordField";
 import listino from "@/components/listino/Listino.module.css";
+import { CameraIcon, CheckIcon, ChairIcon, ClockIcon, DownloadIcon, GlobeIcon, LockIcon, TrashIcon } from "@/components/settings/SettingsIcons";
+import settings from "@/components/settings/Settings.module.css";
 import rules from "@/components/settings/Rules.module.css";
-import { Button, Card, Field, ResponsiveDialog, ToastProvider, useToast } from "@/components/ui";
+import field from "@/components/ui/Field.module.css";
+import { Button, Field, ResponsiveDialog, ToastProvider, useToast } from "@/components/ui";
+import toggle from "@/components/ui/Toggle.module.css";
+import agenda from "@/components/agenda/Agenda.module.css";
+import { cx } from "@/components/ui/cx";
+import { resizePhoto } from "@/lib/clients/resizeImage";
 import { profileCopy as copy } from "@/lib/copy/profile";
-import { changePassword, confirmEmailChange, deleteAccount, requestEmailChange, saveName, type ProfileResult } from "@/lib/profile/actions";
+import { changePassword, confirmEmailChange, deleteAccount, requestEmailChange, saveMemberProfile, saveName, setBookableOnline, setMemberPhoto, type ProfileResult } from "@/lib/profile/actions";
+import { clientInitials } from "@/lib/rules/avatar";
 import { isDeleteConfirmed } from "@/lib/rules/profile";
 import styles from "./Profile.module.css";
 
-type Props = { name: string; email: string; passwordAgo: string; isOwner: boolean; salonName: string };
+type Props = {
+  name: string;
+  email: string;
+  phone: string;
+  color: number;
+  bookable: boolean;
+  photoUrl: string | null;
+  passwordAgo: string;
+  isOwner: boolean;
+  salonName: string;
+  chair: number;
+  hoursDays: string;
+  since: string;
+  stats: { month: string; clients: number; revenue: string; next: string | null };
+};
 
 export function ProfileView(props: Props) {
   return (
@@ -24,16 +46,43 @@ export function ProfileView(props: Props) {
 
 type Dialog = "code" | "password" | "delete" | null;
 
-function Inner({ name: initialName, email: currentEmail, passwordAgo, isOwner, salonName }: Props) {
+const OPS = ["op0", "op1", "op2", "op3"] as const;
+
+function Row({ tone, icon, label, sub, children, className }: { tone: 0 | 1 | 2 | 3; icon: ReactNode; label: string; sub?: string; children?: ReactNode; className?: string }) {
+  return (
+    <>
+      <span className={cx(settings.icon, settings[`t${tone}` as "t0"], className)}>{icon}</span>
+      <span className={settings.text}>
+        <span className={settings.label}>{label}</span>
+        {sub ? <span className={settings.sub}>{sub}</span> : null}
+      </span>
+      {children ?? (
+        <span className={settings.chev} aria-hidden="true">
+          ›
+        </span>
+      )}
+    </>
+  );
+}
+
+function Inner({ name: initialName, email: currentEmail, phone: initialPhone, color: initialColor, bookable: initialBookable, photoUrl, passwordAgo, isOwner, salonName, chair, hoursDays, since, stats }: Props) {
   const router = useRouter();
   const toast = useToast();
   const [name, setName] = useState(initialName);
   const [email, setEmail] = useState(currentEmail);
+  const [phone, setPhone] = useState(initialPhone);
+  const [color, setColor] = useState(initialColor);
+  const [bookable, setBookable] = useState(initialBookable);
   const [dialog, setDialog] = useState<Dialog>(null);
   const [pending, start] = useTransition();
-  const [errors, setErrors] = useState<{ name?: string; email?: string; form?: string }>({});
+  const [errors, setErrors] = useState<{ name?: string; email?: string; phone?: string; form?: string }>({});
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const dirty = name.trim() !== initialName || email.trim().toLowerCase() !== currentEmail.toLowerCase();
+  const dirty =
+    name.trim() !== initialName ||
+    email.trim().toLowerCase() !== currentEmail.toLowerCase() ||
+    phone.trim() !== initialPhone ||
+    color !== initialColor;
 
   const submit = () =>
     start(async () => {
@@ -42,6 +91,11 @@ function Inner({ name: initialName, email: currentEmail, passwordAgo, isOwner, s
       if (name.trim() !== initialName) {
         const r = await saveName(name);
         if (!r.ok) return setErrors(r.field === "name" ? { name: r.error } : { form: r.error });
+        saved = true;
+      }
+      if (phone.trim() !== initialPhone || color !== initialColor) {
+        const r = await saveMemberProfile({ phone, color });
+        if (!r.ok) return setErrors(r.field === "phone" ? { phone: r.error } : { form: r.error });
         saved = true;
       }
       if (email.trim().toLowerCase() !== currentEmail.toLowerCase()) {
@@ -56,25 +110,86 @@ function Inner({ name: initialName, email: currentEmail, passwordAgo, isOwner, s
       }
     });
 
+  const changePhoto = (file: File | undefined) => {
+    if (!file) return;
+    start(async () => {
+      try {
+        const blob = await resizePhoto(file);
+        const form = new FormData();
+        form.set("photo", new File([blob], "foto.jpg", { type: "image/jpeg" }));
+        const r = await setMemberPhoto(form);
+        if (!r.ok) return setErrors({ form: r.error });
+        router.refresh();
+      } catch {
+        setErrors({ form: "La foto non va bene: scegli un’immagine più piccola (JPG, PNG o WebP)." });
+      }
+    });
+  };
+
+  const toggleBookable = () => {
+    const next = !bookable;
+    setBookable(next);
+    start(async () => {
+      const r = await setBookableOnline(next);
+      if (!r.ok) {
+        setBookable(!next);
+        return setErrors({ form: r.error });
+      }
+      toast(next ? copy.onlineOn : copy.onlineOff);
+      router.refresh();
+    });
+  };
+
+  const role = `${isOwner ? copy.hero.owner : copy.hero.barber} · ${copy.hero.chair(chair)} · ${salonName}`;
+
   return (
-    <main className={listino.page}>
+    <main className={cx(listino.page, settings.page, settings.pfPage)}>
       <header className={listino.head}>
         <Link href="/impostazioni" className={rules.back}>
           ‹ {copy.back}
         </Link>
-        <p className={listino.eyebrow}>{initialName}</p>
         <h1 className={listino.title}>{copy.title}</h1>
-        <p className={listino.note}>{copy.sub}</p>
       </header>
 
-      <div className={styles.columns}>
-        <section className={listino.section} aria-labelledby="me-title">
-          <h2 id="me-title" className={listino.sectionTitle}>
-            {copy.section}
-          </h2>
-          <Card>
+      <div className={settings.pfColumns}>
+        <div className={settings.pfCol}>
+          <section className={settings.pfHero} aria-label={copy.hero.label}>
+            <div className={settings.pfAvatarWrap}>
+              <span className={settings.pfAvatar} style={photoUrl ? { backgroundImage: `url("${photoUrl}")`, backgroundSize: "cover", backgroundPosition: "center", color: "transparent" } : undefined} aria-hidden="true">
+                {clientInitials(initialName)}
+              </span>
+              <button type="button" className={settings.pfPhoto} aria-label={copy.hero.photo} onClick={() => fileRef.current?.click()}>
+                <CameraIcon />
+              </button>
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => changePhoto(e.target.files?.[0])} />
+            </div>
+            <div className={settings.pfWho}>
+              <p className={settings.pfName}>{initialName}</p>
+              <p className={settings.pfRole}>{role}</p>
+              <p className={settings.pfSince}>{copy.hero.since(since)}</p>
+            </div>
+            <dl className={settings.pfStats}>
+              <div>
+                <dt>{copy.hero.clients(stats.month)}</dt>
+                <dd>{stats.clients}</dd>
+              </div>
+              <div>
+                <dt>{copy.hero.revenue(stats.month)}</dt>
+                <dd>{stats.revenue.replace(/\s/g, "\u00a0")}</dd>
+              </div>
+              <div>
+                <dt>{copy.hero.next}</dt>
+                <dd>{stats.next ?? copy.hero.nextNone}</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section className={settings.section} aria-labelledby="me-title">
+            <h2 className={settings.title} id="me-title">
+              {copy.personal}
+            </h2>
             <form
-              className={styles.form}
+              className={settings.pfForm}
               onSubmit={(e) => {
                 e.preventDefault();
                 submit();
@@ -82,6 +197,17 @@ function Inner({ name: initialName, email: currentEmail, passwordAgo, isOwner, s
             >
               <Field label={copy.name} name="name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" maxLength={40} error={errors.name} />
               <Field label={copy.email} name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" hint={copy.emailHint} error={errors.email} />
+              <Field label={copy.phone} name="phone" type="tel" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" maxLength={20} error={errors.phone} />
+              <div className={field.field}>
+                <span className={field.label}>{copy.color}</span>
+                <div className={settings.pfColors} role="group" aria-label={copy.color}>
+                  {copy.colors.map((label, i) => (
+                    <button key={label} type="button" className={cx(settings.pfColor, agenda[OPS[i]!])} aria-pressed={color === i} aria-label={label} onClick={() => setColor(i)}>
+                      {color === i ? <CheckIcon /> : null}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {errors.form ? (
                 <p className={styles.error} role="alert">
                   {errors.form}
@@ -91,39 +217,67 @@ function Inner({ name: initialName, email: currentEmail, passwordAgo, isOwner, s
                 {copy.save}
               </Button>
             </form>
-          </Card>
-        </section>
+          </section>
+        </div>
 
-        <div className={styles.col}>
-          <section className={listino.section} aria-labelledby="sec-title">
-            <h2 id="sec-title" className={listino.sectionTitle}>
-              {copy.security}
+        <div className={settings.pfCol}>
+          <section className={settings.section} aria-labelledby="work-title">
+            <h2 className={settings.title} id="work-title">
+              {copy.work}
             </h2>
-            <Card flush>
-              <button type="button" className={listino.navRowButton} onClick={() => setDialog("password")}>
-                <span>
-                  {copy.password}
-                  <span className={listino.navSub}>{copy.passwordChanged(passwordAgo)}</span>
-                </span>
-                <span aria-hidden="true">›</span>
+            <div className={settings.group}>
+              <Link className={settings.row} href="/impostazioni/operatori">
+                <Row tone={0} icon={<ChairIcon />} label={copy.chairRow} sub={copy.hero.chair(chair)} />
+              </Link>
+              <Link className={settings.row} href="/listino/orari">
+                <Row tone={1} icon={<ClockIcon />} label={copy.hoursRow} sub={copy.hoursSub(hoursDays)} />
+              </Link>
+              <button type="button" role="switch" aria-checked={bookable} className={cx(settings.row, settings.rowButton, settings.pfSwitch)} onClick={toggleBookable}>
+                <Row tone={2} icon={<GlobeIcon />} label={copy.online} sub={copy.onlineSub}>
+                  <span className={cx(toggle.track, settings.Toggle_track)} aria-hidden="true">
+                    <span className={cx(toggle.knob, settings.Toggle_knob)} />
+                  </span>
+                </Row>
               </button>
-            </Card>
+            </div>
           </section>
 
-          <section className={listino.section} aria-labelledby="acc-title">
-            <h2 id="acc-title" className={listino.sectionTitle}>
+          <section className={settings.section} aria-labelledby="sec-title">
+            <h2 className={settings.title} id="sec-title">
+              {copy.security}
+            </h2>
+            <div className={settings.group}>
+              <button type="button" className={cx(settings.row, settings.rowButton)} onClick={() => setDialog("password")}>
+                <Row tone={3} icon={<LockIcon />} label={copy.password} sub={copy.passwordChanged(passwordAgo)} />
+              </button>
+            </div>
+          </section>
+
+          <section className={settings.section} aria-labelledby="plan-title">
+            <h2 className={settings.title} id="plan-title">
+              {copy.plan.title}
+            </h2>
+            <div className={settings.pfPlan}>
+              <div className={settings.pfPlanTop}>
+                <span className={settings.pfPlanName}>{copy.plan.name}</span>
+                <span className={settings.pfPlanBadge}>{copy.plan.badge}</span>
+              </div>
+              <p className={settings.pfPlanSub}>{copy.plan.sub}</p>
+            </div>
+          </section>
+
+          <section className={settings.section} aria-labelledby="acc-title">
+            <h2 className={settings.title} id="acc-title">
               {copy.account}
             </h2>
-            <Card flush>
-              <a href="/profilo/esporta" className={listino.navRow} download>
-                <span>{copy.export}</span>
-                <span aria-hidden="true">›</span>
+            <div className={settings.group}>
+              <a className={settings.row} href="/profilo/esporta" download>
+                <Row tone={3} icon={<DownloadIcon />} label={copy.export} sub={copy.exportSub} />
               </a>
-              <button type="button" className={`${listino.navRowButton} ${styles.dangerRow}`} onClick={() => setDialog("delete")}>
-                <span>{copy.delete}</span>
-                <span aria-hidden="true">›</span>
+              <button type="button" className={cx(settings.row, settings.rowButton, settings.rowDanger)} onClick={() => setDialog("delete")}>
+                <Row tone={3} icon={<TrashIcon />} label={copy.delete} />
               </button>
-            </Card>
+            </div>
           </section>
         </div>
       </div>

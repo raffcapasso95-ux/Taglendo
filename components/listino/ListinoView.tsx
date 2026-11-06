@@ -78,7 +78,7 @@ function Inner({ canEdit, ownerName, services }: Props) {
         <ul className={styles.services}>
           {services.map((s) => (
             <li key={s.id}>
-              <button type="button" className={styles.serviceCard} aria-label={`${copy.edit}: ${s.name}`} disabled={!canEdit} onClick={() => setEditing(s)}>
+              <button type="button" className={styles.serviceCard} disabled={!canEdit} onClick={() => setEditing(s)}>
                 <span className={styles.serviceIcon} aria-hidden="true">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <circle cx="6" cy="6.5" r="2.8" />

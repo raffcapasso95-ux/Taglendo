@@ -13,11 +13,11 @@ test.describe("Listino e orari", () => {
     await expect(text(page, "5 servizi")).toBeVisible();
 
     // cambia il prezzo di "Taglio uomo"
-    await page.getByRole("button", { name: "Modifica: Taglio uomo" }).click();
+    await page.getByRole("button", { name: /^Taglio uomo/ }).click();
     await dialog(page).getByLabel("Prezzo (€)").fill("22,50");
     await dialog(page).getByRole("button", { name: "Salva servizio" }).click();
     await expect(page.getByText("Servizio aggiornato").filter({ visible: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Modifica: Taglio uomo" })).toContainText("22,50");
+    await expect(page.getByRole("button", { name: /^Taglio uomo/ })).toContainText("22,50");
 
     // aggiunge un servizio
     await page.getByRole("button", { name: "+ Aggiungi servizio" }).click();
@@ -27,11 +27,11 @@ test.describe("Listino e orari", () => {
     await dialog(page).getByRole("button", { name: "Salva servizio" }).click();
     await expect(page.getByText("Servizio aggiunto").filter({ visible: true })).toBeVisible();
     await expect(text(page, "6 servizi")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Modifica: Colore" })).toContainText("40");
-    await expect(page.getByRole("button", { name: "Modifica: Colore" })).toContainText("60 min");
+    await expect(page.getByRole("button", { name: /^Colore/ })).toContainText("40");
+    await expect(page.getByRole("button", { name: /^Colore/ })).toContainText("60 min");
 
     // toglie "Barba": non si cancella, si nasconde
-    await page.getByRole("button", { name: "Modifica: Barba" }).click();
+    await page.getByRole("button", { name: /^Barba/ }).click();
     await dialog(page).getByRole("button", { name: "Togli dal listino" }).click();
     await expect(page.getByText("Servizio tolto dal listino").filter({ visible: true })).toBeVisible();
     await expect(text(page, "5 servizi")).toBeVisible();
@@ -108,7 +108,7 @@ test.describe("Listino e orari", () => {
     await signIn(page, "marco@barberia-saragozza.example", DEMO);
     await page.goto("/listino");
     await expect(text(page, "Per cambiarle chiedi ad Andrea.")).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Modifica/ }).first()).toBeDisabled();
+    await expect(page.locator("button[class*=serviceCard]").first()).toBeDisabled();
     await expect(page.getByRole("button", { name: "+ Aggiungi servizio" })).toHaveCount(0);
     await page.goto("/listino/orari");
     await expect(page.getByRole("button", { name: "Modifica orari di lunedì" })).toBeDisabled();

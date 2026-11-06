@@ -129,6 +129,14 @@ export const listinoCopy = {
       profile: "Profilo",
     },
     operatorsSub: "Inviti e permessi",
+    messages: "Messaggi",
+    rowSub: {
+      listino: "Servizi, prezzi e orari di ogni giorno",
+      rules: "Anticipo, annullamenti e spostamenti",
+      page: "Foto, descrizione e contatti",
+      emails: "Conferme e promemoria",
+      alerts: "Cosa ti notifichiamo e quando",
+    },
   },
   errors: {
     // NUOVO
