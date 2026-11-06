@@ -33,7 +33,7 @@ export async function freshOwner(page: Page, salon: string) {
 }
 
 /** Gli orari del giorno sono sempre tutti sulla schermata (dal ridisegno): non c'è più niente da aprire. */
-export async function showAllTimes(_page: Page) {}
+export async function showAllTimes() {}
 
 /** Sceglie un orario del giorno già mostrato. */
 export async function pickTime(page: Page, time: string) {
