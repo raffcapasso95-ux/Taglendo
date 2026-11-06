@@ -1,0 +1,7 @@
+Taglendo · schermate in HTML
+- index.html: elenco di tutte le schermate (telefono e desktop).
+- pages/: una pagina HTML per schermata (-p telefono, -d desktop).
+- css/app.css: CSS condiviso (generato dai token e dai moduli dell'app).
+- assets/: font Manrope, loghi e foto.
+Le pagine sono statiche: i link portano a rotte dell'app e non funzionano da qui.
+Per vedere la versione telefono restringi la finestra a circa 390 px.

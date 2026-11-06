@@ -83,3 +83,8 @@
 .footer > * {
   flex: 1;
 }
+
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): foglio sopra le finestre --- */
+.sheet[open] {
+  z-index: 40;
+}

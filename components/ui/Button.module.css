@@ -85,3 +85,8 @@
     background: var(--brand-apricot-hover);
   }
 }
+
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): pulsanti a pillola nel gestionale --- */
+[data-app-shell] .button {
+  border-radius: var(--radius-pill);
+}

@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 /** Ogni `var(--nome)` usato nei CSS deve essere definito da qualche parte: un nome mancante vale «niente» (es. padding 0). */
 function cssFiles(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
-    if (name === "node_modules" || name === ".next" || name.startsWith(".")) continue;
+    // design/ contiene i prototipi di riferimento (anche il CSS compilato del ridisegno), non il codice dell'app
+    if (name === "node_modules" || name === ".next" || name === "design" || name.startsWith(".")) continue;
     const path = join(dir, name);
     if (statSync(path).isDirectory()) cssFiles(path, out);
     else if (name.endsWith(".css")) out.push(path);

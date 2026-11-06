@@ -1038,3 +1038,8 @@ button.cookieRow {
     font-size: 20px;
   }
 }
+
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): avviso cookie nascosto --- */
+.cookie[hidden] {
+  display: none;
+}

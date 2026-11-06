@@ -70,9 +70,15 @@ test.describe("Agenda (sola lettura)", () => {
   test("la navigazione porta alle altre schede", async ({ page, isMobile }) => {
     await signIn(page, ANDREA, DEMO_PASSWORD);
     await page.goto("/agenda");
-    const nav = page.getByRole("navigation", { name: "Menu principale" }).filter({ visible: true });
-    await nav.getByRole("link", { name: isMobile ? "Clienti" : "Clienti" }).click();
+    // desktop: barra laterale; telefono: pulsante «Menu» che apre il pannello da destra
+    const nav = isMobile ? page.getByRole("dialog", { name: "Menu" }) : page.getByRole("navigation", { name: "Menu principale" });
+    const open = async () => {
+      if (isMobile) await page.getByRole("button", { name: "Menu" }).click();
+    };
+    await open();
+    await nav.getByRole("link", { name: "Clienti" }).click();
     await expect(page).toHaveURL(/\/clienti$/);
+    await open();
     await nav.getByRole("link", { name: "Agenda" }).click();
     await expect(page).toHaveURL(/\/agenda$/);
   });
