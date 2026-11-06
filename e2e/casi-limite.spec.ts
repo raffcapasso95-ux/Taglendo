@@ -19,7 +19,7 @@ async function chooseFirstSlot(page: Page) {
   await banner.waitFor({ timeout: 5000 }).catch(() => {});
   if (await banner.isVisible()) await banner.getByRole("button", { name: "Rifiuta" }).click();
   await card(page).getByRole("button", { name: /^Taglio uomo/ }).click();
-  const quick = card(page).getByText("Primi orari liberi").locator("..").getByRole("button").first();
+  const quick = card(page).getByRole("button", { name: /Prima disponibilità/ });
   await expect(quick).toBeVisible();
   await quick.click();
 }
@@ -28,11 +28,11 @@ async function fillData(page: Page, email: string) {
   await card(page).getByLabel("Nome e cognome").fill("Mario Rossi");
   await card(page).getByLabel("Email", { exact: true }).fill(email);
   await card(page).getByRole("checkbox", { name: /informativa privacy/ }).click();
-  await card(page).getByRole("button", { name: "Prenota", exact: true }).click();
+  await card(page).getByRole("button", { name: /^Prenota · / }).click();
 }
 
 test.describe("Prenotazione del cliente: casi limite", () => {
-  test("email non valida: l'errore compare all'uscita dal campo, non mentre si scrive", async ({ page, browser }) => {
+  test("email non valida: la riga «Mancano» la indica finché non è corretta", async ({ page, browser }) => {
     const slug = await newSalon(page, "Barberia Limite Uno");
     const visitor = await browser.newPage();
     await visitor.goto(`/${slug}`);
@@ -40,9 +40,9 @@ test.describe("Prenotazione del cliente: casi limite", () => {
     const field = card(visitor).getByLabel("Email", { exact: true });
     await field.click();
     await visitor.keyboard.type("mario@", { delay: 30 });
-    await expect(card(visitor).getByText(/Controlla l’indirizzo|indirizzo email/i)).toHaveCount(0);
-    await card(visitor).getByLabel("Nome e cognome").click(); // esce dal campo
-    await expect(field).toHaveAttribute("aria-invalid", "true");
+    await expect(visitor.getByText("Mancano: nome, email e informativa privacy.")).toBeVisible();
+    await field.fill("mario@esempio.it");
+    await expect(visitor.getByText("Mancano: nome e informativa privacy.")).toBeVisible();
     await visitor.close();
   });
 

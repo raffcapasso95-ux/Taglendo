@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import styles from "./Salon.module.css";
+import { cx } from "@/components/ui/cx";
+import styles from "./Shop.module.css";
 
-/** La barra in basso del telefono: si nasconde mentre il cliente è dentro la prenotazione, per non coprirne i campi. */
+/** La barra in basso del telefono: si abbassa mentre il cliente è dentro la prenotazione, per non coprirne i campi. */
 export function BottomBar({ hideWhileVisible, children }: { hideWhileVisible?: string; children: ReactNode }) {
   const [hidden, setHidden] = useState(false);
 
@@ -16,5 +17,9 @@ export function BottomBar({ hideWhileVisible, children }: { hideWhileVisible?: s
     return () => observer.disconnect();
   }, [hideWhileVisible]);
 
-  return <div className={hidden ? `${styles.bar} ${styles.barHidden}` : styles.bar} aria-hidden={hidden || undefined} inert={hidden}>{children}</div>;
+  return (
+    <div className={cx(styles.bar, hidden && styles.barHidden)} aria-hidden={hidden || undefined} inert={hidden}>
+      {children}
+    </div>
+  );
 }

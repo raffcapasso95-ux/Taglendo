@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { createAnonClient } from "@/lib/supabase/anon";
+import { env } from "@/lib/supabase/env";
 import type { AccessInput } from "@/lib/billing";
 import { CLOSED_DAY, dayFromRanges, type DayHours } from "@/lib/rules/hours";
 
@@ -26,6 +27,8 @@ export type PublicSalon = {
   access: AccessInput;
   services: PublicService[];
   members: PublicMember[];
+  /** Indirizzi delle foto del salone (la prima è la copertina). */
+  photos: string[];
   week: DayHours[];
 };
 
@@ -36,6 +39,7 @@ type Raw = {
   min_notice_min: number; max_advance_days: number; sub_status: AccessInput["sub_status"]; trial_ends_at: string;
   services: Array<{ id: string; name: string; duration_min: number; price_cents: number }>;
   members: Array<{ id: string; name: string; bio: string | null; photo_path: string | null; chair_no: number }>;
+  photos?: string[];
   hours: Array<{ weekday: number; closed: boolean; ranges: Array<[number, number]> }>;
 };
 
@@ -58,6 +62,7 @@ export const loadPublicSalon = cache(async (slug: string): Promise<PublicSalon |
     access: { sub_status: r.sub_status, trial_ends_at: r.trial_ends_at },
     services: r.services.map((s) => ({ id: s.id, name: s.name, durationMin: s.duration_min, priceCents: s.price_cents })),
     members: r.members.map((m) => ({ id: m.id, name: m.name, bio: m.bio, photoPath: m.photo_path, chairNo: m.chair_no })),
+    photos: (r.photos ?? []).map((path) => `${env.url()}/storage/v1/object/public/salon-photos/${path}`),
     week,
   };
 });

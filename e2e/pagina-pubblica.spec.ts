@@ -11,7 +11,7 @@ test.describe("Pagina pubblica del salone", () => {
     await page.goto(PAGE);
     await expect(page).toHaveTitle(/Barberia Saragozza/);
     await expect(page.getByRole("heading", { level: 1, name: "Barberia Saragozza" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Tre passi, un minuto." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Prenota in un minuto." })).toBeVisible();
     await expect(page.locator("#prenota-card").getByRole("button", { name: /^Taglio uomo.*20 €/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Chi ti taglia." })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Via Saragozza 48, Bologna" })).toBeVisible();
@@ -31,7 +31,7 @@ test.describe("Pagina pubblica del salone", () => {
       await page.goto(PAGE);
       await expect(page.locator("#prenota-card").getByRole("button", { name: /^Taglio uomo/ })).toBeVisible();
       await expect(page.getByText(/\d+ €/)).toHaveCount(0);
-      await expect(page.getByRole("link", { name: "Vedi i servizi" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Vedi servizi" })).toBeVisible();
     } finally {
       await adminUpdate("salons", `id=eq.${SALON}`, { show_prices: true });
     }

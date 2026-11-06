@@ -21,13 +21,13 @@ async function bookOnline(browser: Browser, slug: string, name = "Luca Bianchi")
   await banner.waitFor({ timeout: 5000 }).catch(() => {});
   if (await banner.isVisible()) await banner.getByRole("button", { name: "Rifiuta" }).click();
   await card(visitor).getByRole("button", { name: /^Taglio uomo/ }).click();
-  const quick = card(visitor).getByText("Primi orari liberi").locator("..").getByRole("button").first();
+  const quick = card(visitor).getByRole("button", { name: /Prima disponibilità/ });
   await expect(quick).toBeVisible();
   await quick.click();
   await card(visitor).getByLabel("Nome e cognome").fill(name);
   await card(visitor).getByLabel("Email", { exact: true }).fill(email);
   await card(visitor).getByRole("checkbox", { name: /informativa privacy/ }).click();
-  await card(visitor).getByRole("button", { name: "Prenota", exact: true }).click();
+  await card(visitor).getByRole("button", { name: /^Prenota · / }).click();
   await visitor.getByLabel("Codice di conferma").fill(await bookingCode(email));
   await expect(visitor.getByRole("heading", { name: /Ci vediamo/ })).toBeVisible();
   const { html } = await waitForMail(email, /^Confermato:/);

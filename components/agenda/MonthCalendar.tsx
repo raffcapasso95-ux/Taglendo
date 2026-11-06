@@ -19,12 +19,16 @@ type Props = {
   heading?: "h3" | "h4";
   /** Classe in più per la fila delle scorciatoie dei mesi. */
   monthsClassName?: string;
+  /** Sulla pagina pubblica i giorni chiusi si ricavano dagli orari, senza chiedere nulla al server. */
+  localMarks?: (month: string) => MonthMarks;
+  /** L'ultimo giorno prenotabile: dopo, i giorni sono spenti. */
+  maxDate?: string;
 };
 
 const WEEK = ["L", "M", "M", "G", "V", "S", "D"];
 
 /** Calendario del mese nello stile Taglendo: puntino sui giorni con appuntamenti, tratteggio sui giorni chiusi. */
-export function MonthCalendar({ mode, selected, today, onSelect, heading: Heading = "h3", monthsClassName }: Props) {
+export function MonthCalendar({ mode, selected, today, onSelect, heading: Heading = "h3", monthsClassName, localMarks, maxDate }: Props) {
   const [view, setView] = useState(monthOf(selected ?? today));
   const [marks, setMarks] = useState<Record<string, MonthMarks>>({});
   const asked = useRef(new Set<string>());
@@ -34,19 +38,19 @@ export function MonthCalendar({ mode, selected, today, onSelect, heading: Headin
 
   // i segni del mese (chiuso, con appuntamenti) si chiedono una volta sola per mese
   useEffect(() => {
-    if (asked.current.has(view)) return;
+    if (localMarks || asked.current.has(view)) return;
     asked.current.add(view);
     loadMonthMarks(view)
       .then((m) => setMarks((prev) => ({ ...prev, [view]: m })))
       .catch(() => asked.current.delete(view));
-  }, [view]);
+  }, [view, localMarks]);
 
   // la scorciatoia del mese attivo resta in vista
   useEffect(() => {
     gridRef.current?.parentElement?.querySelector<HTMLElement>('[aria-pressed="true"][data-cal-goto]')?.scrollIntoView({ inline: "nearest", block: "nearest" });
   }, [view]);
 
-  const current = marks[view];
+  const current = localMarks ? localMarks(view) : marks[view];
   const closed = new Set(current?.closed);
   const busy = new Set(current?.busy);
   const { lead, days } = monthGrid(view);
@@ -97,7 +101,7 @@ export function MonthCalendar({ mode, selected, today, onSelect, heading: Headin
               aria-label={`${dayLabel(d)}${isClosed ? ", chiuso" : ""}${isBusy ? ", con appuntamenti" : ""}`}
               aria-pressed={on}
               data-date={d}
-              disabled={book && (isClosed || past)}
+              disabled={book && (isClosed || past || (maxDate != null && d > maxDate))}
               onClick={() => onSelect(d)}
             >
               <span className={styles.num}>{Number(d.slice(8, 10))}</span>

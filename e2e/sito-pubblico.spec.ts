@@ -48,7 +48,7 @@ test.describe("Sito pubblico sul telefono", () => {
     const [a, b] = [await page.getByRole("link", { name: "Prenota online" }).first().boundingBox(), await page.getByRole("link", { name: "Vedi servizi e prezzi" }).boundingBox()];
     expect(Math.abs(a!.width - b!.width)).toBeLessThanOrEqual(1);
     // i barbieri non sono tre schermate: ritratti piccoli
-    const portraits = await page.locator("#barbieri figure > div").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().width));
+    const portraits = await page.locator("#barbieri [class*=portrait]").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().width));
     expect(portraits.length).toBeGreaterThan(0);
     expect(Math.max(...portraits)).toBeLessThanOrEqual(100);
   });
