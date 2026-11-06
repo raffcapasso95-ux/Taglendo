@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
+import type { DayHours } from "@/lib/rules/agenda";
 import { offlineSlots, type OfflineDay } from "./slots";
 
-const hours = { closed: false, openMin: 540, closeMin: 1140, breakStartMin: 780, breakEndMin: 870 };
+const hours: DayHours = { closed: false, openMin: 540, closeMin: 1140, breaks: [[780, 870]] };
 const day: OfflineDay = {
   date: "2026-11-05",
   hours,

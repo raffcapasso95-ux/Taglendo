@@ -83,7 +83,7 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
   const { open: dayOpen, start: g0, end } = gridRange(day, showPast);
   // scala uguale per tutte le colonne: i tratti in cui nessuno ha appuntamenti si comprimono
   const busy = day.columns.flatMap((c) => c.appts.filter((a) => a.status !== "annullato" || showCancelled).map((a): [number, number] => [a.startMin, a.endMin]));
-  const pauseBand: Array<[number, number]> = !hours.closed && hours.breakStartMin != null && hours.breakEndMin != null ? [[hours.breakStartMin, hours.breakEndMin]] : [];
+  const pauseBand: Array<[number, number]> = hours.closed ? [] : hours.breaks;
   // la scala più comoda che fa stare la giornata nello spazio dell'agenda (misurato dopo il primo disegno)
   const gridRef = useRef<HTMLDivElement>(null);
   const headRef = useRef<HTMLDivElement>(null);
@@ -110,9 +110,13 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
     hourMarks.push({ min: h * 60, top, label });
   }
   const nowTop = isToday && nowMin > g0 && nowMin < end ? y(nowMin) : null;
-  const hasBreak = !hours.closed && hours.breakStartMin != null && hours.breakEndMin != null && hours.breakEndMin > g0;
-  const breakTop = hasBreak ? y(Math.max(hours.breakStartMin!, g0)) : 0;
-  const breakH = hasBreak ? y(hours.breakEndMin!) - breakTop : 0;
+  // ogni pausa fra due fasce è una banda; quelle già finite prima dell'inizio della griglia non si disegnano
+  const breakBands = (hours.closed ? [] : hours.breaks)
+    .filter(([, to]) => to > g0)
+    .map(([from, to]) => {
+      const top = y(Math.max(from, g0));
+      return { key: from, top, height: y(to) - top };
+    });
 
   // oggi, se la griglia è più alta dello spazio, si parte dall'ora attuale
   useEffect(() => {
@@ -168,11 +172,11 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                 <div key={m.min} className={styles.hourLine} style={{ top: m.top }} />
               ))}
               {nowTop !== null ? <div className={styles.veil} style={{ height: nowTop }} /> : null}
-              {hasBreak ? (
-                <div className={styles.pause} style={{ top: breakTop, height: breakH }}>
+              {breakBands.map((band) => (
+                <div key={band.key} className={styles.pause} style={{ top: band.top, height: band.height }}>
                   Pausa
                 </div>
-              ) : null}
+              ))}
               {c.gaps
                 .filter(([, b]) => b > g0)
                 .map(([a, b]) => {
@@ -283,8 +287,8 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
     }
     for (const [a, b] of column.gaps) items.push({ kind: "gap", start: Math.max(a, isToday ? nowMin : 0), end: b, column });
   }
-  if (hours.breakStartMin != null && hours.breakEndMin != null && !(isToday && hours.breakEndMin <= nowMin)) {
-    items.push({ kind: "pause", start: hours.breakStartMin, end: hours.breakEndMin });
+  for (const [from, to] of hours.breaks) {
+    if (!(isToday && to <= nowMin)) items.push({ kind: "pause", start: from, end: to });
   }
   if (isToday && nowMin > hours.openMin && nowMin < hours.closeMin) items.push({ kind: "now", start: nowMin });
   const order = { now: 0, appt: 1, gap: 2, pause: 3 } as const;
@@ -313,7 +317,7 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
           }
           if (item.kind === "pause") {
             return (
-              <li key="pause" className={styles.pauseRow}>
+              <li key={`pause-${item.start}`} className={styles.pauseRow}>
                 Pausa {clock(item.start)}–{clock(item.end)}
               </li>
             );

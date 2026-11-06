@@ -4,7 +4,7 @@ import { addDays, dayNumber, dayRange, isValidDate, longDay, monthShort, romeDat
 import { buildDay, firstName, initials, type AgendaAppt, type DayModel, type Operator } from "@/lib/rules/agenda";
 import { signedPhotoUrls } from "@/lib/clients/photoUrls";
 import { createClient } from "@/lib/supabase/server";
-import { appointmentsOn, asHours, operatorsOf } from "./day";
+import { appointmentsOn, asHours, operatorsOf, weekHours } from "./day";
 
 export type StripDay = {
   date: string;
@@ -64,7 +64,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
   const [flags, members, hours, closures, dayAppts, stripAppts, servicesRes, clientsRes] = await Promise.all([
     supabase.from("salons").select("barbers_see_all, barbers_edit").eq("id", salon.id).single(),
     operatorsOf(supabase, salon.id),
-    supabase.from("opening_hours").select("weekday, closed, open_min, close_min, break_start_min, break_end_min").eq("salon_id", salon.id),
+    weekHours(supabase, salon.id),
     supabase.from("closures").select("starts_on, ends_on, member_id").eq("salon_id", salon.id).lte("starts_on", stripEnd).gte("ends_on", stripStart),
     appointmentsOn(supabase, salon.id, date),
     supabase
@@ -87,7 +87,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
   const operators = canSeeAll ? allOps : allOps.filter((o) => o.id === membership.id);
   const selectedOperator = params.op && operators.some((o) => o.id === params.op) ? params.op : null;
 
-  const byWeekday = new Map((hours.data ?? []).map((h) => [h.weekday, h]));
+  const byWeekday = hours;
   const closedByClosure = (d: string) => (closures.data ?? []).some((c) => c.member_id === null && c.starts_on <= d && d <= c.ends_on);
   const offToday = new Set((closures.data ?? []).filter((c) => c.member_id !== null && c.starts_on <= date && date <= c.ends_on).map((c) => c.member_id));
   const shown = (selectedOperator ? operators.filter((o) => o.id === selectedOperator) : operators).map((o) => (offToday.has(o.id) ? { ...o, off: true } : o));

@@ -6,6 +6,7 @@ import { onboardingCopy } from "@/lib/copy/onboarding";
 import { isPhone, LIMITS } from "@/lib/rules/forms";
 import { parseTime, toWeek, validateHours, type HoursError } from "@/lib/rules/hours";
 import { isValidSlug, slugify } from "@/lib/rules/slug";
+import { saveWeek } from "@/lib/hours/week";
 import { createClient } from "@/lib/supabase/server";
 
 const { errors } = onboardingCopy;
@@ -118,17 +119,7 @@ export async function saveHours(_prev: StepState, data: FormData): Promise<StepS
   }
 
   const supabase = await createClient();
-  const rows = toWeek({ days, openMin, closeMin, breakMin }).map((d, weekday) => ({
-    salon_id: salon.id,
-    weekday,
-    closed: d.closed,
-    open_min: d.openMin,
-    close_min: d.closeMin,
-    break_start_min: d.breakStartMin,
-    break_end_min: d.breakEndMin,
-  }));
-  const { error } = await supabase.from("opening_hours").upsert(rows, { onConflict: "salon_id,weekday" });
-  if (error) return { error: errors.generic };
+  if (!(await saveWeek(supabase, salon.id, toWeek({ days, openMin, closeMin, breakMin })))) return { error: errors.generic };
   if (await advanceTo(salon.id, salon.onboarding_step, 3)) return { error: errors.generic };
   redirect("/primo-avvio/3");
 }

@@ -5,7 +5,9 @@ import { requireSalon } from "@/lib/auth/session";
 import { listinoCopy } from "@/lib/copy/listino";
 import { addDays, dayRange, isValidDate, romeDate, romeMinutes, weekdayOf } from "@/lib/dates/rome";
 import { LIMITS } from "@/lib/rules/forms";
-import { outsideHours, type HoursDraft } from "@/lib/rules/listino";
+import { saveWeek } from "@/lib/hours/week";
+import { validateRanges, type Range, type WeekDay } from "@/lib/rules/hours";
+import { canSaveWeek, outsideHours } from "@/lib/rules/listino";
 import { createClient } from "@/lib/supabase/server";
 
 const { errors } = listinoCopy;
@@ -62,33 +64,21 @@ export async function removeService(id: string): Promise<{ ok: true } | Failure>
 
 /* ───────────── Orari ───────────── */
 
-export async function saveHours(d: HoursDraft): Promise<{ ok: true; outside: number } | Failure> {
+/** Salva gli orari di tutta la settimana: ogni giorno con le sue fasce. Dice anche quanti appuntamenti futuri restano fuori orario. */
+export async function saveWeekHours(week: WeekDay[]): Promise<{ ok: true; outside: number } | Failure> {
   const ctx = await owner();
   if (!ctx) return fail(errors.notOwner);
-  const days = [...new Set(d.closedDays)].filter((x) => Number.isInteger(x) && x >= 0 && x <= 6);
-  const pause = d.breakStart >= 0;
-  const valid =
-    days.length < 7 &&
-    Number.isInteger(d.open) && Number.isInteger(d.close) &&
-    d.open >= 360 && d.close <= 1320 && d.close - d.open >= 120 &&
-    (!pause || (d.breakStart >= d.open + 30 && d.breakEnd >= d.breakStart + 15 && d.breakEnd <= d.close - 30));
-  if (!valid) return fail(errors.hours);
+  if (!Array.isArray(week) || week.length !== 7) return fail(errors.hours);
+  const clean: WeekDay[] = week.map((d) => ({ closed: Boolean(d.closed), ranges: (d.ranges ?? []).map(([a, b]): Range => [Math.trunc(a), Math.trunc(b)]) }));
+  // un giorno aperto ha fasce valide; uno chiuso può tenerle (si ritrovano riaprendolo) ma devono essere valide lo stesso
+  for (const d of clean) {
+    if (d.ranges.length > 0 && validateRanges(d.ranges)) return fail(errors.hours);
+    if (!d.closed && d.ranges.length === 0) return fail(errors.hours);
+  }
+  if (!canSaveWeek(clean)) return fail(errors.hours);
 
   const { supabase, salon } = ctx;
-  const rows = Array.from({ length: 7 }, (_, weekday) => {
-    const closed = days.includes(weekday);
-    return {
-      salon_id: salon.id,
-      weekday,
-      closed,
-      open_min: closed ? null : d.open,
-      close_min: closed ? null : d.close,
-      break_start_min: closed || !pause ? null : d.breakStart,
-      break_end_min: closed || !pause ? null : d.breakEnd,
-    };
-  });
-  const { error } = await supabase.from("opening_hours").upsert(rows, { onConflict: "salon_id,weekday" });
-  if (error) return fail(errors.generic);
+  if (!(await saveWeek(supabase, salon.id, clean))) return fail(errors.generic);
 
   // Gli appuntamenti futuri confermati che restano fuori dal nuovo orario: li segnaliamo, non li tocchiamo.
   const { data: future } = await supabase
@@ -108,9 +98,10 @@ export async function saveHours(d: HoursDraft): Promise<{ ok: true; outside: num
         endMin: romeDate(end) === romeDate(start) ? romeMinutes(end) : 1440,
       };
     }),
-    { ...d, closedDays: days },
+    clean,
   );
   revalidatePath("/listino");
+  revalidatePath("/listino/orari");
   revalidatePath("/agenda");
   return { ok: true, outside };
 }

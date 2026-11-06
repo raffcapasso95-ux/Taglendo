@@ -3,7 +3,7 @@ import { gridSlots, nearestAlternatives, type Candidate } from "./slots";
 import { reminderText, whatsappLink, whatsappNumber } from "./whatsapp";
 import type { DayHours } from "./agenda";
 
-const HOURS: DayHours = { closed: false, openMin: 540, closeMin: 1140, breakStartMin: 780, breakEndMin: 870 };
+const HOURS: DayHours = { closed: false, openMin: 540, closeMin: 1140, breaks: [[780, 870]] };
 
 describe("gridSlots", () => {
   it("tutti gli orari possibili, con i liberi segnati", () => {

@@ -318,3 +318,403 @@
   font-size: 15px;
   font-weight: 700;
 }
+
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): scheda Servizi · Orari, orari diversi per giorno --- */
+.page {
+  gap: var(--space-5);
+}
+
+.sectionTitle {
+  text-transform: none;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  font-size: 17px;
+}
+
+.count {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.tabs {
+  gap: var(--space-1);
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+  display: flex;
+}
+
+.tab {
+  flex: 1 1 0;
+  min-height: var(--control-height-small);
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.tabOn {
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.services {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  gap: var(--space-2);
+  flex-direction: column;
+  display: flex;
+}
+
+.serviceCard {
+  width: 100%;
+  min-height: 72px;
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  align-items: center;
+  gap: var(--space-3);
+  display: flex;
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+.serviceCard:active {
+  transform: scale(0.99);
+}
+
+.serviceIcon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-button);
+  background: var(--brand-peach);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.serviceText {
+  min-width: 0;
+  flex: 1 1 auto;
+  gap: 2px;
+  flex-direction: column;
+  display: flex;
+}
+
+.serviceName {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.serviceDur {
+  color: var(--text-secondary);
+  font-size: 13px;
+  align-items: center;
+  gap: 4px;
+  display: inline-flex;
+}
+
+.servicePrice {
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.chev {
+  color: var(--text-secondary);
+  display: flex;
+}
+
+.add {
+  border-radius: var(--radius-card);
+}
+
+.summary {
+  padding: var(--space-4);
+  border-radius: var(--radius-panel);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  align-items: center;
+  gap: var(--space-3);
+  display: flex;
+}
+
+.summaryIcon {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--salon-hover);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.summaryMain {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.summarySub {
+  margin: 0;
+  font-size: 14px;
+  color: var(--on-plum-dim);
+}
+
+.week {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dayRow {
+  align-items: center;
+  display: flex;
+}
+
+.dayRow + .dayRow {
+  border-top: 1px solid var(--grid-line);
+}
+
+.dayMain {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 64px;
+  padding: var(--space-3) var(--space-2) var(--space-3) var(--space-4);
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  align-items: center;
+  gap: var(--space-3);
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr) auto;
+}
+
+.dayName {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.ranges {
+  gap: 6px;
+  flex-wrap: wrap;
+  display: flex;
+}
+
+.range {
+  padding: 4px var(--space-2);
+  border-radius: var(--radius-input);
+  background: var(--surface-muted);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.rangeClosed {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dayRowClosed .dayName {
+  color: var(--text-secondary);
+}
+
+.daySwitch {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  margin-right: var(--space-3);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.daySwitch[aria-checked="true"] .Toggle_track {
+  background: var(--toggle-on);
+}
+
+.daySwitch[aria-checked="true"] .Toggle_knob {
+  transform: translateX(calc(var(--toggle-width) - var(--toggle-knob) - 2 * var(--toggle-padding)));
+}
+
+.slots {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  gap: var(--space-2);
+  flex-direction: column;
+  display: flex;
+}
+
+.slot {
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+  align-items: center;
+  gap: var(--space-3);
+  display: flex;
+}
+
+.slotNum {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--brand-peach);
+  font-size: 13px;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.slotTimes {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: var(--space-2);
+  flex-direction: column;
+  display: flex;
+}
+
+.slotField {
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  display: flex;
+}
+
+.slotLabel {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.slotRemove {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  cursor: pointer;
+}
+
+.addSlot {
+  min-height: var(--control-height);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-card);
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.copyDays {
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  display: flex;
+}
+
+.copyDay {
+  min-width: 52px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.copyDay[aria-pressed="true"] {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.openToggle {
+  padding-left: 0;
+  padding-right: 0;
+  border: 0;
+  background: none;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    max-width: 760px;
+  }
+
+  .tabs {
+    align-self: flex-start;
+    min-width: 320px;
+  }
+
+  .services {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .slotTimes {
+    flex-direction: row;
+    gap: var(--space-5);
+  }
+
+  .dayMain {
+    grid-template-columns: 140px minmax(0, 1fr) auto;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .serviceCard:hover,
+  .dayMain:hover {
+    background: var(--surface-muted);
+  }
+}
+
+@media (max-width: 420px) {
+  .dayMain {
+    grid-template-columns: 84px minmax(0, 1fr) auto;
+    padding-left: var(--space-3);
+  }
+}
+
+@media (max-width: 1023px) {
+  .page {
+    padding-top: var(--space-4);
+  }
+}

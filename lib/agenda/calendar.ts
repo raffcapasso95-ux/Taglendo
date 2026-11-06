@@ -4,6 +4,7 @@ import { requireSalon } from "@/lib/auth/session";
 import { isMonthKey, monthBounds } from "@/lib/dates/calendar";
 import { addDays, dayRange, romeDate, weekdayOf } from "@/lib/dates/rome";
 import { createClient } from "@/lib/supabase/server";
+import { weekHours } from "./day";
 
 export type MonthMarks = {
   /** Giorni in cui il salone è chiuso (giorno della settimana a riposo o chiusura di tutto il salone). */
@@ -20,7 +21,7 @@ export async function loadMonthMarks(month: string): Promise<MonthMarks> {
   const { first, last } = monthBounds(month);
 
   const [hours, closures, appts] = await Promise.all([
-    supabase.from("opening_hours").select("weekday, closed, open_min, close_min").eq("salon_id", salon.id),
+    weekHours(supabase, salon.id),
     supabase.from("closures").select("starts_on, ends_on").eq("salon_id", salon.id).is("member_id", null).lte("starts_on", last).gte("ends_on", first),
     // l'accesso ai dati lo limita il database: un barbiere senza «vedere l'agenda di tutti» riceve solo i suoi
     supabase
@@ -32,12 +33,10 @@ export async function loadMonthMarks(month: string): Promise<MonthMarks> {
       .lt("starts_at", dayRange(addDays(last, 1)).start.toISOString()),
   ]);
 
-  const restDays = new Set((hours.data ?? []).filter((h) => h.closed || h.open_min == null || h.close_min == null).map((h) => h.weekday));
-  const weekdaysWithHours = new Set((hours.data ?? []).map((h) => h.weekday));
   const closed: string[] = [];
   for (let d = first; d <= last; d = addDays(d, 1)) {
-    const wd = weekdayOf(d);
-    const off = restDays.has(wd) || !weekdaysWithHours.has(wd) || (closures.data ?? []).some((c) => c.starts_on <= d && d <= c.ends_on);
+    const day = hours.get(weekdayOf(d));
+    const off = !day || day.closed || day.ranges.length === 0 || (closures.data ?? []).some((c) => c.starts_on <= d && d <= c.ends_on);
     if (off) closed.push(d);
   }
   const busy = [...new Set((appts.data ?? []).map((a) => romeDate(new Date(a.starts_at))))];

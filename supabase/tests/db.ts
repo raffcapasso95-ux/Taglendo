@@ -120,11 +120,12 @@ export async function createTestSalon(
   }
   for (let w = 0; w <= 6; w++) {
     const h = hours(w);
-    await tx.q(
-      `insert into opening_hours (salon_id, weekday, closed, open_min, close_min, break_start_min, break_end_min)
-       values ($1, $2, $3, $4, $5, $6, $7)`,
-      [salonId, w, h.closed, h.closed ? null : h.open, h.closed ? null : h.close, h.brk?.[0] ?? null, h.brk?.[1] ?? null],
-    );
+    await tx.q(`insert into opening_hours (salon_id, weekday, closed) values ($1, $2, $3)`, [salonId, w, h.closed]);
+    if (!h.closed) {
+      // la pausa è lo spazio fra due fasce
+      const ranges: Array<[number, number]> = h.brk ? [[h.open!, h.brk[0]], [h.brk[1], h.close!]] : [[h.open!, h.close!]];
+      for (const [from, to] of ranges) await tx.q(`insert into opening_ranges (salon_id, weekday, start_min, end_min) values ($1, $2, $3, $4)`, [salonId, w, from, to]);
+    }
   }
   const [service] = await tx.q<{ id: string }>(
     `insert into services (salon_id, name, duration_min, price_cents) values ($1, 'Taglio', $2, 2000) returning id`,

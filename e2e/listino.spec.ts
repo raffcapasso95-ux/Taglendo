@@ -17,7 +17,7 @@ test.describe("Listino e orari", () => {
     await dialog(page).getByLabel("Prezzo (€)").fill("22,50");
     await dialog(page).getByRole("button", { name: "Salva servizio" }).click();
     await expect(page.getByText("Servizio aggiornato").filter({ visible: true })).toBeVisible();
-    await expect(text(page, "30 min · 22,50 €")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Modifica: Taglio uomo" })).toContainText("22,50");
 
     // aggiunge un servizio
     await page.getByRole("button", { name: "+ Aggiungi servizio" }).click();
@@ -27,7 +27,8 @@ test.describe("Listino e orari", () => {
     await dialog(page).getByRole("button", { name: "Salva servizio" }).click();
     await expect(page.getByText("Servizio aggiunto").filter({ visible: true })).toBeVisible();
     await expect(text(page, "6 servizi")).toBeVisible();
-    await expect(text(page, "60 min · 40 €")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Modifica: Colore" })).toContainText("40");
+    await expect(page.getByRole("button", { name: "Modifica: Colore" })).toContainText("60 min");
 
     // toglie "Barba": non si cancella, si nasconde
     await page.getByRole("button", { name: "Modifica: Barba" }).click();
@@ -38,32 +39,49 @@ test.describe("Listino e orari", () => {
     expect(rows.length).toBeGreaterThanOrEqual(1); // il servizio c'è ancora, solo nascosto
   });
 
-  test("cambiare giorni, orari e pausa", async ({ page }) => {
+  test("orari per giorno: il lunedì si apre dal foglio con le sue fasce e si copiano su un altro giorno", async ({ page }) => {
     await freshOwner(page, "Barberia Orari");
-    await page.goto("/listino");
+    await page.goto("/listino/orari");
+    await expect(page.getByRole("heading", { level: 1, name: "Listino e orari" })).toBeVisible();
+    await expect(text(page, /^Aperto 5 giorni · 43 h a settimana$/)).toBeVisible();
 
-    await page.getByRole("button", { name: "Lunedì, chiuso" }).click(); // apre il lunedì
-    await page.getByRole("button", { name: "Apre alle prima" }).click(); // 9:00 → 8:30
-    await page.getByRole("button", { name: "Chiude alle prima" }).click(); // 19:00 → 18:30
-    await expect(text(page, "Nuovo orario: 8:30–18:30, pausa 13:00–14:30. Agenda e link si aggiornano quando salvi.")).toBeVisible();
-    await page.getByRole("button", { name: /Pausa pranzo: No/ }).click();
-    await expect(text(page, "Nuovo orario: 8:30–18:30, orario continuato. Agenda e link si aggiornano quando salvi.")).toBeVisible();
-
-    await page.getByRole("button", { name: "Salva orari" }).click();
+    await page.getByRole("button", { name: "Modifica orari di lunedì" }).click();
+    const d = dialog(page);
+    await expect(d.getByRole("heading", { name: "Lunedì", level: 2 })).toBeVisible();
+    await d.getByRole("switch", { name: /Aperto il lunedì/ }).click(); // era chiuso
+    await d.getByRole("button", { name: "Fascia 1 dalle prima" }).click(); // 9:00 → 8:45
+    await d.getByRole("button", { name: /^Togli la fascia 14:30–19:00$/ }).click(); // una fascia sola
+    await d.getByRole("button", { name: "Mar", exact: true }).click(); // vale anche per il martedì
+    await d.getByRole("button", { name: "Salva" }).click();
     await expect(page.getByText("Orari salvati").filter({ visible: true })).toBeVisible();
 
-    const rows = await adminSelect<{ weekday: number; closed: boolean; open_min: number | null; close_min: number | null; break_start_min: number | null }>(
-      "opening_hours",
-      "select=weekday,closed,open_min,close_min,break_start_min&order=weekday",
-    );
-    // il salone nuovo è l'unico con 8:30–18:30 senza pausa
-    const monday = rows.filter((r) => r.weekday === 1 && r.open_min === 510 && r.close_min === 1110);
-    expect(monday.length).toBeGreaterThanOrEqual(1);
-    expect(monday.every((r) => !r.closed && r.break_start_min === null)).toBe(true);
+    const ranges = await adminSelect<{ weekday: number; start_min: number; end_min: number }>("opening_ranges", "select=weekday,start_min,end_min&weekday=in.(1,2)&start_min=eq.525&order=weekday");
+    // il salone nuovo è l'unico con 8:45–13:00 il lunedì e il martedì
+    expect(ranges.filter((r) => r.weekday === 1 && r.end_min === 780).length).toBeGreaterThanOrEqual(1);
+    expect(ranges.filter((r) => r.weekday === 2 && r.end_min === 780).length).toBeGreaterThanOrEqual(1);
 
     // ricaricando i valori restano
     await page.reload();
-    await expect(page.getByRole("button", { name: "Lunedì" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Modifica orari di lunedì" })).toContainText("8:45–13:00");
+    await expect(page.getByRole("button", { name: "Modifica orari di martedì" })).toContainText("8:45–13:00");
+    await expect(page.getByRole("button", { name: "Modifica orari di martedì" })).not.toContainText("14:30");
+  });
+
+  test("tre fasce in un giorno e l'interruttore chiude un giorno subito", async ({ page }) => {
+    await freshOwner(page, "Barberia Tre Fasce");
+    await page.goto("/listino/orari");
+    await page.getByRole("button", { name: "Modifica orari di giovedì" }).click();
+    await dialog(page).getByRole("button", { name: "+ Aggiungi una fascia" }).click();
+    await expect(dialog(page).getByRole("listitem")).toHaveCount(3);
+    await dialog(page).getByRole("button", { name: "Salva" }).click();
+    await expect(page.getByText("Orari salvati").filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Modifica orari di giovedì" }).locator("span").filter({ hasText: /\d+:\d\d–\d+:\d\d/ })).toHaveCount(3);
+
+    // l'interruttore del giorno salva da solo
+    await page.getByRole("switch", { name: "Martedì aperto" }).click();
+    await expect(page.getByText("Orari salvati").filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Modifica orari di martedì" })).toContainText("Chiuso");
+    await expect(page.getByRole("switch", { name: "Martedì aperto" })).toHaveAttribute("aria-checked", "false");
   });
 
   test("gli appuntamenti fuori dal nuovo orario si segnalano, non si toccano", async ({ page }) => {
@@ -73,9 +91,11 @@ test.describe("Listino e orari", () => {
     await bookNewClient(page, "Mario Verdi", day, "09:00");
     await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
 
-    await page.goto("/listino");
-    for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "Apre alle dopo" }).click(); // 9:00 → 10:00
-    await page.getByRole("button", { name: "Salva orari" }).click();
+    await page.goto("/listino/orari");
+    const name = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"][new Date(`${day}T12:00:00Z`).getUTCDay()]!;
+    await page.getByRole("button", { name: `Modifica orari di ${name}` }).click();
+    for (let i = 0; i < 4; i++) await dialog(page).getByRole("button", { name: "Fascia 1 dalle dopo" }).click(); // 9:00 → 10:00
+    await dialog(page).getByRole("button", { name: "Salva" }).click();
     await expect(page.getByText("Agenda e link usano i nuovi orari · 1 appuntamento fuori orario da controllare").filter({ visible: true })).toBeVisible();
 
     // l'appuntamento è ancora lì
@@ -88,9 +108,11 @@ test.describe("Listino e orari", () => {
     await signIn(page, "marco@barberia-saragozza.example", DEMO);
     await page.goto("/listino");
     await expect(text(page, "Per cambiarle chiedi ad Andrea.")).toBeVisible();
-    await expect(page.getByRole("button", { name: /^Modifica/ })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Modifica/ }).first()).toBeDisabled();
     await expect(page.getByRole("button", { name: "+ Aggiungi servizio" })).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Lunedì, chiuso" })).toBeDisabled();
+    await page.goto("/listino/orari");
+    await expect(page.getByRole("button", { name: "Modifica orari di lunedì" })).toBeDisabled();
+    await expect(page.getByRole("switch", { name: "Lunedì aperto" })).toBeDisabled();
   });
 });
 

@@ -62,15 +62,14 @@ values
 insert into public.email_prefs (salon_id) select id from public.salons where id::text like '5a400000-%';
 
 -- Il Rasoio: lun–sab 8:30–18:30 senza pausa, domenica chiuso. Due Torri: mar–sab 9–19, pausa 13–14:30.
-insert into public.opening_hours (salon_id, weekday, closed, open_min, close_min, break_start_min, break_end_min)
-select '5a400000-0000-4000-8000-000000000001', w, w = 0,
-       case when w = 0 then null else 510 end, case when w = 0 then null else 1110 end, null, null
-from generate_series(0, 6) w;
-insert into public.opening_hours (salon_id, weekday, closed, open_min, close_min, break_start_min, break_end_min)
-select '5a400000-0000-4000-8000-000000000002', w, w in (0, 1),
-       case when w in (0, 1) then null else 540 end, case when w in (0, 1) then null else 1140 end,
-       case when w in (0, 1) then null else 780 end, case when w in (0, 1) then null else 870 end
-from generate_series(0, 6) w;
+insert into public.opening_hours (salon_id, weekday, closed)
+select '5a400000-0000-4000-8000-000000000001', w, w = 0 from generate_series(0, 6) w;
+insert into public.opening_ranges (salon_id, weekday, start_min, end_min)
+select '5a400000-0000-4000-8000-000000000001', w, 510, 1110 from generate_series(1, 6) w;
+insert into public.opening_hours (salon_id, weekday, closed)
+select '5a400000-0000-4000-8000-000000000002', w, w in (0, 1) from generate_series(0, 6) w;
+insert into public.opening_ranges (salon_id, weekday, start_min, end_min)
+select '5a400000-0000-4000-8000-000000000002', w, r.s, r.e from generate_series(2, 6) w, (values (540, 780), (870, 1140)) as r(s, e);
 
 -- ── Operatori ────────────────────────────────────────────────
 insert into public.members (id, salon_id, user_id, name, role, chair_no) values

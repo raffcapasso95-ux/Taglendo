@@ -75,14 +75,10 @@ values (
 insert into public.email_prefs (salon_id) values ('5a100000-0000-4000-8000-000000000001');
 
 -- Orari predefiniti: mar–sab 9:00–19:00, pausa 13:00–14:30, chiuso domenica e lunedì
-insert into public.opening_hours (salon_id, weekday, closed, open_min, close_min, break_start_min, break_end_min)
-select '5a100000-0000-4000-8000-000000000001', w,
-       w in (0, 1),
-       case when w in (0, 1) then null else 540 end,
-       case when w in (0, 1) then null else 1140 end,
-       case when w in (0, 1) then null else 780 end,
-       case when w in (0, 1) then null else 870 end
-from generate_series(0, 6) w;
+insert into public.opening_hours (salon_id, weekday, closed)
+select '5a100000-0000-4000-8000-000000000001', w, w in (0, 1) from generate_series(0, 6) w;
+insert into public.opening_ranges (salon_id, weekday, start_min, end_min)
+select '5a100000-0000-4000-8000-000000000001', w, r.s, r.e from generate_series(2, 6) w, (values (540, 780), (870, 1140)) as r(s, e);
 
 -- ── Operatori (poltrone) ─────────────────────────────────────
 insert into public.members (id, salon_id, user_id, name, role, chair_no, invite_email, invite_token, invite_expires_at)

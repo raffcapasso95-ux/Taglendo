@@ -1,7 +1,7 @@
 import "server-only";
 import { romeDate, romeMinutes } from "@/lib/dates/rome";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { DayHours } from "@/lib/rules/hours";
+import { CLOSED_DAY, dayFromRanges, type DayHours } from "@/lib/rules/hours";
 
 export type ManageData = {
   status: "confermato" | "completato" | "annullato" | "non_presentato";
@@ -33,11 +33,11 @@ type Raw = {
   price_cents: number; member_name: string | null; member_count: number;
   salon: {
     slug: string; name: string; address: string | null; area: string | null; phone: string; cancel_online: boolean; cancel_limit_min: number; show_prices: boolean;
-    hours: Array<{ weekday: number; closed: boolean; open_min: number | null; close_min: number | null; break_start_min: number | null; break_end_min: number | null }>;
+    hours: Array<{ weekday: number; closed: boolean; ranges: Array<[number, number]> }>;
   };
 };
 
-const CLOSED: DayHours = { closed: true, openMin: null, closeMin: null, breakStartMin: null, breakEndMin: null };
+const CLOSED: DayHours = CLOSED_DAY;
 
 /** La prenotazione di questo link, o null se il link non esiste. Non controlla ancora se è ancora valida. */
 export async function loadManage(token: string): Promise<ManageData | null> {
@@ -69,7 +69,7 @@ export async function loadManage(token: string): Promise<ManageData | null> {
       showPrices: r.salon.show_prices,
       week: Array.from({ length: 7 }, (_, d) => {
         const h = r.salon.hours.find((x) => x.weekday === d);
-        return h ? { closed: h.closed, openMin: h.open_min, closeMin: h.close_min, breakStartMin: h.break_start_min, breakEndMin: h.break_end_min } : CLOSED;
+        return h ? dayFromRanges({ closed: h.closed, ranges: h.ranges }) : CLOSED;
       }),
     },
   };

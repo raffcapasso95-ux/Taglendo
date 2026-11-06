@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatMinutes, parseTime, summarizeWeek, toWeek, validateHours, type HoursInput } from "./hours";
+import { CLOSED_DAY, dayFromRanges, formatMinutes, parseTime, rangesOf, rangesText, summarizeWeek, toWeek, validateHours, validateRanges, type HoursInput, type WeekDay } from "./hours";
 
 const DEFAULT: HoursInput = { days: [2, 3, 4, 5, 6], openMin: 540, closeMin: 1140, breakMin: { start: 780, end: 870 } };
 
@@ -48,14 +48,15 @@ describe("toWeek", () => {
   it("mette chiusi i giorni non scelti (0 = domenica)", () => {
     const week = toWeek(DEFAULT);
     expect(week.map((d) => d.closed)).toEqual([true, true, false, false, false, false, false]);
-    expect(week[2]).toEqual({ closed: false, openMin: 540, closeMin: 1140, breakStartMin: 780, breakEndMin: 870 });
-    expect(week[0]).toEqual({ closed: true, openMin: null, closeMin: null, breakStartMin: null, breakEndMin: null });
+    expect(week[2]).toEqual({ closed: false, ranges: [[540, 780], [870, 1140]] });
+    expect(week[0]).toEqual({ closed: true, ranges: [] });
+    expect(dayFromRanges(week[2]!)).toEqual({ closed: false, openMin: 540, closeMin: 1140, breaks: [[780, 870]] });
   });
 });
 
 describe("summarizeWeek", () => {
   it("raggruppa i giorni uguali come nell'anteprima del design", () => {
-    expect(summarizeWeek(toWeek(DEFAULT))).toEqual([
+    expect(summarizeWeek(toWeek(DEFAULT).map(dayFromRanges))).toEqual([
       { label: "Lunedì", value: "Chiuso" },
       { label: "Mar – Sab", value: "9:00–13:00 · 14:30–19:00" },
       { label: "Domenica", value: "Chiuso" },
@@ -64,6 +65,32 @@ describe("summarizeWeek", () => {
 
   it("senza pausa e con sette giorni aperti", () => {
     const week = toWeek({ days: [0, 1, 2, 3, 4, 5, 6], openMin: 540, closeMin: 1140, breakMin: null });
-    expect(summarizeWeek(week)).toEqual([{ label: "Lun – Dom", value: "9:00–19:00" }]);
+    expect(summarizeWeek(week.map(dayFromRanges))).toEqual([{ label: "Lun – Dom", value: "9:00–19:00" }]);
+  });
+});
+
+
+describe("fasce di un giorno", () => {
+  it("dalle fasce si ricavano apertura, chiusura e pause; senza fasce il giorno è chiuso", () => {
+    const three: WeekDay = { closed: false, ranges: [[480, 720], [780, 900], [960, 1200]] };
+    expect(dayFromRanges(three)).toEqual({ closed: false, openMin: 480, closeMin: 1200, breaks: [[720, 780], [900, 960]] });
+    expect(dayFromRanges({ closed: false, ranges: [] })).toEqual(CLOSED_DAY);
+    expect(dayFromRanges({ closed: true, ranges: [[540, 600]] })).toEqual(CLOSED_DAY);
+  });
+
+  it("dalla forma del giorno si tornano alle fasce e si scrivono", () => {
+    const day = dayFromRanges({ closed: false, ranges: [[540, 780], [870, 1140]] });
+    expect(rangesOf(day)).toEqual([[540, 780], [870, 1140]]);
+    expect(rangesText(day)).toBe("9:00–13:00 · 14:30–19:00");
+    expect(rangesText(CLOSED_DAY)).toBe("Chiuso");
+  });
+
+  it("controlla le fasce: almeno una, ben ordinate, senza sovrapposizioni, al massimo quattro", () => {
+    expect(validateRanges([])).toBe("empty");
+    expect(validateRanges([[600, 600]])).toBe("order");
+    expect(validateRanges([[540, 780], [700, 900]])).toBe("overlap");
+    expect(validateRanges([[540, 780], [780, 900]])).toBeNull(); // si toccano: nessuna pausa, va bene
+    expect(validateRanges([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10]])).toBe("too_many");
+    expect(validateRanges([[540, 780], [870, 1140]])).toBeNull();
   });
 });

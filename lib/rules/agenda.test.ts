@@ -17,7 +17,7 @@ import {
   type DayHours,
 } from "./agenda";
 
-const HOURS: DayHours = { closed: false, openMin: 540, closeMin: 1140, breakStartMin: 780, breakEndMin: 870 };
+const HOURS: DayHours = { closed: false, openMin: 540, closeMin: 1140, breaks: [[780, 870]] };
 const appt = (id: string, memberId: string, startMin: number, endMin: number, extra: Partial<AgendaAppt> = {}): AgendaAppt => ({
   id,
   memberId,
@@ -81,7 +81,7 @@ describe("freeIntervals", () => {
   });
 
   it("senza pausa", () => {
-    expect(freeIntervals({ ...HOURS, breakStartMin: null, breakEndMin: null }, [])).toEqual([[540, 1140]]);
+    expect(freeIntervals({ ...HOURS, breaks: [] }, [])).toEqual([[540, 1140]]);
   });
 });
 
@@ -173,7 +173,7 @@ describe("buildDay", () => {
       date: "2026-11-05",
       isToday: false,
       nowMin: 0,
-      hours: { ...HOURS, breakStartMin: null, breakEndMin: null, closeMin: 600 },
+      hours: { ...HOURS, breaks: [], closeMin: 600 },
       operators: [operators[0]!],
       appts: [appt("1", "a", 540, 600)],
     });
@@ -311,7 +311,7 @@ describe("fitGridScale: la giornata sta nello spazio", () => {
 });
 
 describe("sideSummary: la barra laterale", () => {
-  const hours: DayHours = { closed: false, openMin: 540, closeMin: 1140, breakStartMin: 780, breakEndMin: 870 };
+  const hours: DayHours = { closed: false, openMin: 540, closeMin: 1140, breaks: [[780, 870]] };
   const appt = (id: string, memberId: string, start: number, end: number, status: AgendaAppt["status"], price = 2000): AgendaAppt => ({
     id, memberId, clientName: `Cliente ${id}`, phone: null, serviceName: "Taglio", priceCents: price, startMin: start, endMin: end, status, source: "manuale",
   });

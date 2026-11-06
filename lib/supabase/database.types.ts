@@ -201,14 +201,14 @@ isOneToOne: true
                   ]
                 },"opening_hours": {
                   Row: {
-                    "break_end_min": number | null,"break_start_min": number | null,"close_min": number | null,"closed": boolean,"open_min": number | null,"salon_id": string,"weekday": number
+                    "closed": boolean,"salon_id": string,"weekday": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "break_end_min"?: number | null,"break_start_min"?: number | null,"close_min"?: number | null,"closed"?: boolean,"open_min"?: number | null,"salon_id": string,"weekday": number
+                    "closed"?: boolean,"salon_id": string,"weekday": number
                   }
                   Update: {
-                    "break_end_min"?: number | null,"break_start_min"?: number | null,"close_min"?: number | null,"closed"?: boolean,"open_min"?: number | null,"salon_id"?: string,"weekday"?: number
+                    "closed"?: boolean,"salon_id"?: string,"weekday"?: number
                   }
                   Relationships: [
                     {
@@ -217,6 +217,32 @@ isOneToOne: true
 isOneToOne: false
       referencedRelation: "salons"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"opening_ranges": {
+                  Row: {
+                    "end_min": number,"salon_id": string,"start_min": number,"weekday": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "end_min": number,"salon_id": string,"start_min": number,"weekday": number
+                  }
+                  Update: {
+                    "end_min"?: number,"salon_id"?: string,"start_min"?: number,"weekday"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "opening_ranges_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "opening_ranges_salon_id_weekday_fkey"
+      columns: ["salon_id","weekday"]
+isOneToOne: false
+      referencedRelation: "opening_hours"
+      referencedColumns: ["salon_id","weekday"]
     }
                   ]
                 },"push_subscriptions": {
@@ -378,6 +404,9 @@ isOneToOne: false
                            },
 "request_booking_code":
 { Args: { "p_code_hash": string,"p_email": string,"p_payload": Json,"p_salon": string }; Returns: Json
+                           },
+"set_week_hours":
+{ Args: { "p_salon": string,"p_week": Json }; Returns: undefined
                            },
 "slug_available":
 { Args: { "p_slug": string }; Returns: boolean

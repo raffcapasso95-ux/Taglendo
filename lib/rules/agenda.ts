@@ -25,8 +25,8 @@ export type DayHours = {
   closed: boolean;
   openMin: number;
   closeMin: number;
-  breakStartMin: number | null;
-  breakEndMin: number | null;
+  /** Le pause: lo spazio fra una fascia di apertura e la successiva. */
+  breaks: Array<[number, number]>;
 };
 
 export type Operator = {
@@ -190,9 +190,7 @@ export function freeIntervals(
   if (hours.closed) return [];
   let free: Interval[] = [[Math.max(hours.openMin, from), hours.closeMin]];
   free = free.filter(([a, b]) => b > a);
-  if (hours.breakStartMin != null && hours.breakEndMin != null) {
-    free = subtract(free, [hours.breakStartMin, hours.breakEndMin]);
-  }
+  for (const pause of hours.breaks) free = subtract(free, pause);
   for (const a of busy) free = subtract(free, [a.startMin, a.endMin]);
   return free.filter(([a, b]) => b - a >= minGap);
 }
@@ -220,8 +218,7 @@ export function operatorStatus(appts: AgendaAppt[], isToday: boolean, nowMin: nu
 /** Quanto della giornata di lavoro è occupato, 0–100. */
 export function busyPercent(hours: DayHours, appts: AgendaAppt[]): number {
   if (hours.closed) return 0;
-  const work =
-    hours.closeMin - hours.openMin - (hours.breakStartMin != null && hours.breakEndMin != null ? hours.breakEndMin - hours.breakStartMin : 0);
+  const work = hours.closeMin - hours.openMin - hours.breaks.reduce((sum, [a, b]) => sum + (b - a), 0);
   if (work <= 0) return 0;
   const busy = appts.filter((a) => isActive(a.status)).reduce((sum, a) => sum + (a.endMin - a.startMin), 0);
   return Math.min(100, Math.round((busy / work) * 100));

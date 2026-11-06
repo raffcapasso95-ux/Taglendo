@@ -1,12 +1,66 @@
 /** Orari in minuti dalla mezzanotte, come nel database (540 = 9:00). */
 
+/** Una fascia: [dalle, alle]. */
+export type Range = [number, number];
+
+/** Un giorno come lo si modifica e si salva: interruttore aperto/chiuso e le sue fasce. */
+export type WeekDay = { closed: boolean; ranges: Range[] };
+
+/**
+ * Un giorno come lo usano agenda e prenotazioni: da quando a quando è aperto e dove sono le pause
+ * (lo spazio fra una fascia e la successiva). Chiuso = senza orari.
+ */
 export type DayHours = {
   closed: boolean;
   openMin: number | null;
   closeMin: number | null;
-  breakStartMin: number | null;
-  breakEndMin: number | null;
+  breaks: Range[];
 };
+
+export const CLOSED_DAY: DayHours = { closed: true, openMin: null, closeMin: null, breaks: [] };
+
+/** Dalle fasce al giorno: apre alla prima, chiude all'ultima, le pause sono i vuoti in mezzo. Senza fasce il giorno è chiuso. */
+export function dayFromRanges(week: WeekDay): DayHours {
+  const ranges = [...week.ranges].sort((a, b) => a[0] - b[0]);
+  if (week.closed || ranges.length === 0) return CLOSED_DAY;
+  const breaks: Range[] = [];
+  for (let i = 1; i < ranges.length; i++) if (ranges[i]![0] > ranges[i - 1]![1]) breaks.push([ranges[i - 1]![1], ranges[i]![0]]);
+  return { closed: false, openMin: ranges[0]![0], closeMin: ranges[ranges.length - 1]![1], breaks };
+}
+
+/** Le fasce di un giorno aperto, ricavate da apertura, chiusura e pause. */
+export function rangesOf(day: DayHours): Range[] {
+  if (day.closed || day.openMin == null || day.closeMin == null) return [];
+  const out: Range[] = [];
+  let from = day.openMin;
+  for (const [a, b] of day.breaks) {
+    if (a > from) out.push([from, a]);
+    from = b;
+  }
+  if (day.closeMin > from) out.push([from, day.closeMin]);
+  return out;
+}
+
+/** «9:00–13:00 · 14:30–19:00», oppure «Chiuso». */
+export function rangesText(day: DayHours): string {
+  const ranges = rangesOf(day);
+  return ranges.length === 0 ? "Chiuso" : ranges.map(([a, b]) => `${formatMinutes(a)}–${formatMinutes(b)}`).join(" · ");
+}
+
+/** Fasce al massimo per giorno: oltre non c'è un bisogno vero. */
+export const MAX_RANGES = 4;
+
+export type RangesError = "empty" | "order" | "overlap" | "too_many";
+
+/** Controlla le fasce di un giorno aperto: almeno una, ognuna con inizio prima della fine, senza sovrapposizioni. */
+export function validateRanges(ranges: Range[]): RangesError | null {
+  if (ranges.length === 0) return "empty";
+  if (ranges.length > MAX_RANGES) return "too_many";
+  const sorted = [...ranges].sort((a, b) => a[0] - b[0]);
+  for (const [a, b] of sorted) if (a >= b || a < 0 || b > 1440) return "order";
+  for (let i = 1; i < sorted.length; i++) if (sorted[i]![0] < sorted[i - 1]![1]) return "overlap";
+  return null;
+}
 
 export type HoursInput = {
   /** Giorni di apertura, 0 = domenica … 6 = sabato. */
@@ -45,19 +99,17 @@ export function validateHours(input: HoursInput): HoursError | null {
   return null;
 }
 
-/** Una riga per giorno della settimana, pronta per opening_hours. */
-export function toWeek(input: HoursInput): DayHours[] {
+/** Una riga per giorno della settimana, pronta da salvare (da «giorni + orario unico + pausa» del primo avvio). */
+export function toWeek(input: HoursInput): WeekDay[] {
   return Array.from({ length: 7 }, (_, weekday) => {
-    if (!input.days.includes(weekday)) {
-      return { closed: true, openMin: null, closeMin: null, breakStartMin: null, breakEndMin: null };
-    }
-    return {
-      closed: false,
-      openMin: input.openMin,
-      closeMin: input.closeMin,
-      breakStartMin: input.breakMin?.start ?? null,
-      breakEndMin: input.breakMin?.end ?? null,
-    };
+    if (!input.days.includes(weekday)) return { closed: true, ranges: [] };
+    const ranges: Range[] = input.breakMin
+      ? [
+          [input.openMin, input.breakMin.start],
+          [input.breakMin.end, input.closeMin],
+        ]
+      : [[input.openMin, input.closeMin]];
+    return { closed: false, ranges: ranges.filter(([a, b]) => b > a) };
   });
 }
 
@@ -72,12 +124,7 @@ export type HoursSummaryRow = { label: string; value: string };
  */
 export function summarizeWeek(week: DayHours[]): HoursSummaryRow[] {
   const order = [1, 2, 3, 4, 5, 6, 0]; // da lunedì a domenica
-  const text = (d: DayHours) =>
-    d.closed || d.openMin == null || d.closeMin == null
-      ? "Chiuso"
-      : d.breakStartMin != null && d.breakEndMin != null
-        ? `${formatMinutes(d.openMin)}–${formatMinutes(d.breakStartMin)} · ${formatMinutes(d.breakEndMin)}–${formatMinutes(d.closeMin)}`
-        : `${formatMinutes(d.openMin)}–${formatMinutes(d.closeMin)}`;
+  const text = rangesText;
 
   const rows: Array<{ days: number[]; value: string }> = [];
   for (const day of order) {
