@@ -4,6 +4,7 @@ import { dayRange, romeDate } from "@/lib/dates/rome";
 import { env } from "@/lib/supabase/env";
 import { createClient } from "@/lib/supabase/server";
 import { buildClientRows } from "./rows";
+import { signedPhotoUrls } from "./photoUrls";
 
 async function permissions(role: "owner" | "barber", salonId: string) {
   const supabase = await createClient();
@@ -20,7 +21,7 @@ export async function loadClients() {
   const { start, end } = dayRange(today);
 
   const [clients, stats, services, members, todayAppts, perms] = await Promise.all([
-    supabase.from("clients_visible").select("id, name, phone, email, created_at").eq("salon_id", salon.id).order("name").limit(5000),
+    supabase.from("clients_visible").select("id, name, phone, email, created_at, avatar_color, photo_path").eq("salon_id", salon.id).order("name").limit(5000),
     supabase.from("client_stats").select("client_id, visits, last_visit_at, next_at, usual_service_id, usual_member_id").eq("salon_id", salon.id).limit(5000),
     supabase.from("services").select("id, name").eq("salon_id", salon.id),
     supabase.from("members").select("id, name").eq("salon_id", salon.id).eq("active", true),
@@ -34,6 +35,7 @@ export async function loadClients() {
     new Map((services.data ?? []).map((s) => [s.id, s.name])),
     new Map((members.data ?? []).map((m) => [m.id, m.name])),
     new Set((todayAppts.data ?? []).flatMap((a) => (a.client_id ? [a.client_id] : []))),
+    await signedPhotoUrls(supabase, (clients.data ?? []).map((c) => c.photo_path)),
   );
 
   return {
@@ -56,7 +58,7 @@ export async function loadClient(id: string) {
   const today = romeDate(new Date());
 
   const [client, stats, services, members, visits, next, perms] = await Promise.all([
-    supabase.from("clients_visible").select("id, name, phone, email, created_at, note").eq("id", id).eq("salon_id", salon.id).maybeSingle(),
+    supabase.from("clients_visible").select("id, name, phone, email, created_at, note, avatar_color, photo_path").eq("id", id).eq("salon_id", salon.id).maybeSingle(),
     supabase.from("client_stats").select("client_id, visits, last_visit_at, next_at, usual_service_id, usual_member_id").eq("client_id", id).maybeSingle(),
     supabase.from("services").select("id, name, duration_min, price_cents").eq("salon_id", salon.id),
     supabase.from("members").select("id, name").eq("salon_id", salon.id).eq("active", true),
@@ -87,6 +89,7 @@ export async function loadClient(id: string) {
     new Map((services.data ?? []).map((s) => [s.id, s.name])),
     new Map((members.data ?? []).map((m) => [m.id, m.name])),
     new Set(),
+    await signedPhotoUrls(supabase, [client.data.photo_path]),
   );
   const usual = stats.data?.usual_service_id ? serviceById.get(stats.data.usual_service_id) : undefined;
 

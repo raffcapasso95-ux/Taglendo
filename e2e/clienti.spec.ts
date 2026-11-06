@@ -8,7 +8,80 @@ const owner = (page: Page) => signIn(page, "andrea@barberia-saragozza.example", 
 const barber = (page: Page) => signIn(page, "marco@barberia-saragozza.example", DEMO);
 const search = (page: Page) => page.getByLabel("Cerca per nome o ultime cifre del telefono");
 
+// una piccola immagine vera (PNG 8×8) per provare il caricamento della foto
+const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEUlEQVR4nGP41JOPFTEMLQkASVh7QR5L4LAAAAAASUVORK5CYII=", "base64");
+
 test.describe("Clienti", () => {
+  test("«+ Nuovo» apre la finestra: il nome è obbligatorio, poi il cliente compare con il suo colore", async ({ page }) => {
+    await freshOwner(page, "Barberia Nuovo Cliente");
+    await page.goto("/clienti");
+    await page.getByRole("button", { name: "+ Nuovo" }).click();
+    const d = dialog(page);
+    await expect(d.getByRole("heading", { name: "Nuovo cliente", level: 2 })).toBeVisible();
+    // senza nome non salva e lo dice
+    await d.getByRole("button", { name: "Salva cliente" }).click();
+    await expect(d.getByText("Scrivi il nome del cliente.")).toBeVisible();
+    await d.getByLabel("Nome", { exact: true }).fill("Ettore Nuovo");
+    await d.getByLabel("Telefono · facoltativo, per WhatsApp").fill("+39 333 000 1111");
+    await d.getByLabel("Preferenze e note private · facoltativo").fill("Sfumatura bassa");
+    await d.getByRole("button", { name: "Lavanda" }).click();
+    await expect(d.getByText("EN", { exact: true })).toBeVisible(); // l'anteprima segue il nome
+    await d.getByRole("button", { name: "Salva cliente" }).click();
+    await expect(page.getByText("Cliente salvato").filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: /^Ettore Nuovo/ })).toBeVisible();
+    const [c] = await adminSelect<{ avatar_color: number; phone: string; note: string }>("clients", "select=avatar_color,phone,note&name=eq.Ettore Nuovo&order=created_at.desc&limit=1");
+    expect(c).toEqual({ avatar_color: 4, phone: "+39 333 000 1111", note: "Sfumatura bassa" });
+  });
+
+  test("«Salva e fissa un appuntamento» crea il cliente e apre «Nuovo appuntamento» con lui", async ({ page }) => {
+    await freshOwner(page, "Barberia Salva E Fissa");
+    await page.goto("/clienti");
+    await page.getByRole("button", { name: "+ Nuovo" }).click();
+    await dialog(page).getByLabel("Nome", { exact: true }).fill("Franco Fissa");
+    await dialog(page).getByRole("button", { name: "Salva e fissa un appuntamento" }).click();
+    await expect(dialog(page).getByRole("heading", { name: "Nuovo appuntamento", level: 2 })).toBeVisible();
+    await expect(dialog(page).getByText(/Franco Fissa/).first()).toBeVisible();
+  });
+
+  test("scheda: foto o colore dalla finestra «Foto di …»; la foto si carica e si toglie scegliendo un colore", async ({ page }) => {
+    await freshOwner(page, "Barberia Foto Cliente");
+    await page.goto("/clienti");
+    await page.getByRole("button", { name: "+ Nuovo" }).click();
+    await dialog(page).getByLabel("Nome", { exact: true }).fill("Gino Foto");
+    await dialog(page).getByRole("button", { name: "Salva cliente" }).click();
+    await page.getByRole("link", { name: /^Gino Foto/ }).click();
+    await page.getByRole("button", { name: "Cambia foto o colore di Gino Foto" }).click();
+    const d = dialog(page);
+    await expect(d.getByRole("heading", { name: "Foto di Gino", level: 2 })).toBeVisible();
+    await expect(d.getByText("Chiedi prima il permesso a Gino: la foto resta nel gestionale e non compare nella pagina pubblica.")).toBeVisible();
+    await d.locator("#pf-galleria").setInputFiles({ name: "foto.png", mimeType: "image/png", buffer: PNG });
+    await expect(page.getByText("Foto aggiunta").filter({ visible: true })).toBeVisible();
+    await d.getByRole("button", { name: "Salva" }).click();
+    await expect(page.getByText("Foto aggiornata").filter({ visible: true })).toBeVisible();
+    const [withPhoto] = await adminSelect<{ photo_path: string | null }>("clients", "select=photo_path&name=eq.Gino Foto&order=created_at.desc&limit=1");
+    expect(withPhoto!.photo_path).toMatch(/^[0-9a-f-]{36}\/[0-9a-f-]{36}-\d+\.jpg$/);
+
+    // scegliendo un colore la foto si toglie e restano le iniziali
+    await page.getByRole("button", { name: "Cambia foto o colore di Gino Foto" }).click();
+    await dialog(page).getByRole("button", { name: "Salvia" }).click();
+    await dialog(page).getByRole("button", { name: "Salva" }).click();
+    await expect(page.getByText("Foto aggiornata").filter({ visible: true })).toBeVisible();
+    await expect.poll(async () => (await adminSelect<{ photo_path: string | null; avatar_color: number }>("clients", "select=photo_path,avatar_color&name=eq.Gino Foto&order=created_at.desc&limit=1"))[0]).toEqual({ photo_path: null, avatar_color: 2 });
+  });
+
+  test("il barbiere senza permesso di modificare non vede né «+ Nuovo» né la fotocamera", async ({ page }) => {
+    await adminUpdate("salons", `id=eq.${SALON}`, { barbers_edit: false });
+    try {
+      await barber(page);
+      await page.goto("/clienti");
+      await expect(page.getByRole("button", { name: "+ Nuovo" })).toHaveCount(0);
+      await page.getByRole("link", { name: /^Luca Rossi/ }).click();
+      await expect(page.getByRole("button", { name: /^Cambia foto o colore/ })).toHaveCount(0);
+    } finally {
+      await adminUpdate("salons", `id=eq.${SALON}`, { barbers_edit: true });
+    }
+  });
+
   test("rubrica: cerca per nome, filtri e nessun risultato", async ({ page }) => {
     await owner(page);
     await page.goto("/clienti");

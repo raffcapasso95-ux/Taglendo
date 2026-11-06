@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ButtonLink, Field, ToastProvider, useToast } from "@/components/ui";
-import { initials, firstName } from "@/lib/rules/agenda";
+import { Button, ButtonLink, Field, ToastProvider, useToast } from "@/components/ui";
+import { cx } from "@/components/ui/cx";
+import avatarStyles from "@/components/ui/Avatar.module.css";
+import { firstName } from "@/lib/rules/agenda";
+import { avatarColor, clientInitials } from "@/lib/rules/avatar";
 import {
   applyFilter,
   greetingMessage,
@@ -18,6 +21,7 @@ import {
   type ClientRow,
 } from "@/lib/rules/clients";
 import { whatsappLink } from "@/lib/rules/whatsapp";
+import { NewClientDialog } from "./ClientDialogs";
 import styles from "./Clients.module.css";
 
 type Props = {
@@ -49,6 +53,7 @@ function Inner({ rows, today, multipleOperators, canEdit, isOwner, bookingUrl, s
   }, [deleted, toast, router]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<ClientFilter>("all");
+  const [creating, setCreating] = useState(false);
 
   const counts = useMemo(
     () => ({
@@ -89,8 +94,12 @@ function Inner({ rows, today, multipleOperators, canEdit, isOwner, bookingUrl, s
     return (
       <li key={c.id} className={styles.row}>
         <Link href={`/clienti/${c.id}`} className={styles.rowLink}>
-          <span className={styles.avatar} aria-hidden="true">
-            {initials(c.name)}
+          <span
+            className={cx(styles.avatar, avatarStyles[`c${avatarColor(c.name, c.avatarColor)}` as "c0"], c.photoUrl && avatarStyles.photo)}
+            style={c.photoUrl ? { backgroundImage: `url("${c.photoUrl}")` } : undefined}
+            aria-hidden="true"
+          >
+            {c.photoUrl ? null : clientInitials(c.name)}
           </span>
           <span className={styles.rowText}>
             <span className={styles.name}>{c.name}</span>
@@ -118,7 +127,7 @@ function Inner({ rows, today, multipleOperators, canEdit, isOwner, bookingUrl, s
           <p className={styles.eyebrow}>La tua rubrica</p>
           <h1 className={styles.title}>Clienti</h1>
         </div>
-        {canEdit ? <ButtonLink href="/agenda?nuovo=nuovo">+ Nuovo</ButtonLink> : null}
+        {canEdit ? <Button onClick={() => setCreating(true)}>+ Nuovo</Button> : null}
       </header>
 
       {!emptyRubric ? (
@@ -131,6 +140,13 @@ function Inner({ rows, today, multipleOperators, canEdit, isOwner, bookingUrl, s
             autoComplete="off"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            boxClassName={styles.searchBox}
+            leading={
+              <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m20 20-4.2-4.2" />
+              </svg>
+            }
           />
           <div className={styles.filters} role="group" aria-label="Filtri">
             {filters.map((f) => (
@@ -188,6 +204,8 @@ function Inner({ rows, today, multipleOperators, canEdit, isOwner, bookingUrl, s
           </div>
         </div>
       )}
+
+      {creating ? <NewClientDialog onClose={() => setCreating(false)} /> : null}
 
       {isOwner && !emptyRubric ? (
         <a className={styles.exportAll} href="/clienti/esporta" download>

@@ -1,7 +1,7 @@
 import { romeDate, romeMinutes } from "@/lib/dates/rome";
 import type { ClientRow } from "@/lib/rules/clients";
 
-type VisibleClient = { id: string | null; name: string | null; phone: string | null; email: string | null; created_at: string | null };
+type VisibleClient = { id: string | null; name: string | null; phone: string | null; email: string | null; created_at: string | null; avatar_color: number | null; photo_path: string | null };
 type Stats = {
   client_id: string | null;
   visits: number | null;
@@ -18,6 +18,7 @@ export function buildClientRows(
   serviceNames: Map<string, string>,
   memberNames: Map<string, string>,
   todayClientIds: Set<string>,
+  photoUrls: Map<string, string> = new Map(),
 ): ClientRow[] {
   const byClient = new Map(stats.filter((s) => s.client_id).map((s) => [s.client_id!, s]));
   return clients.flatMap((c) => {
@@ -38,6 +39,8 @@ export function buildClientRows(
         usualServiceName: s?.usual_service_id ? (serviceNames.get(s.usual_service_id) ?? null) : null,
         usualMemberName: s?.usual_member_id ? (memberNames.get(s.usual_member_id) ?? null) : null,
         hasToday: todayClientIds.has(c.id),
+        avatarColor: c.avatar_color,
+        photoUrl: c.photo_path ? (photoUrls.get(c.photo_path) ?? null) : null,
       },
     ];
   });

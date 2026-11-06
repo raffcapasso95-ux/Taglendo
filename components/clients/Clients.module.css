@@ -646,3 +646,225 @@
 .usual > a {
   margin-top: var(--space-3);
 }
+
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): rubrica, scheda e finestre del cliente --- */
+.searchBox {
+  padding-left: var(--space-3);
+}
+
+.searchIcon {
+  color: var(--text-secondary);
+  flex: 0 0 auto;
+}
+
+.group {
+  gap: var(--space-1);
+}
+
+.letter {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-1) var(--space-1);
+  background: var(--canvas);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.list {
+  border-color: transparent;
+  box-shadow: var(--shadow-panel-soft);
+}
+
+.row {
+  border-top-color: var(--grid-line);
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
+}
+
+.wa {
+  border-color: transparent;
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+.filter {
+  border-radius: var(--radius-pill);
+}
+
+.personCentered {
+  flex-direction: column;
+  text-align: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+.personText {
+  gap: 2px;
+  flex-direction: column;
+  display: flex;
+  align-items: center;
+}
+
+.personCentered .avatarLarge {
+  width: var(--avatar-large);
+  height: var(--avatar-large);
+  font-size: 30px;
+  background-size: cover;
+  background-position: center;
+}
+
+.avatarWrap {
+  position: relative;
+}
+
+.photoBadge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 3px solid var(--canvas);
+  border-radius: 50%;
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  cursor: pointer;
+}
+
+.quick {
+  gap: var(--space-2);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: grid;
+}
+
+.quickItem {
+  min-height: 72px;
+  padding: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-1);
+  display: flex;
+}
+
+.quickIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand-peach);
+  color: var(--text-primary);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.stat {
+  border-color: transparent;
+  box-shadow: var(--shadow-panel-soft);
+}
+
+.card {
+  border-color: transparent;
+  box-shadow: var(--shadow-panel-soft);
+}
+
+.sheetAuto {
+  height: auto;
+}
+
+.photoForm {
+  align-items: stretch;
+}
+
+.photoActions {
+  gap: var(--space-2);
+  grid-template-columns: 1fr 1fr;
+  display: grid;
+}
+
+.photoAction {
+  min-height: 72px;
+  padding: var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-1);
+  display: flex;
+  text-align: center;
+}
+
+.photoAction:focus-within {
+  outline: var(--focus-ring) solid var(--brand-apricot);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .quickItem:hover,
+  .photoAction:hover {
+    background: var(--brand-peach);
+  }
+
+  .photoBadge:hover {
+    background: var(--action-primary-hover);
+  }
+}
+
+@media (max-width: 1023px) {
+  .rowLink {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .rowLink > .avatar {
+    grid-row: span 2;
+  }
+
+  .rowLink > .chipNext,
+  .rowLink > .chip {
+    grid-column: 2;
+    justify-self: start;
+  }
+}
+
+.photoBadge {
+  right: -10px;
+  bottom: -6px;
+}
+
+@media (max-width: 1023px) {
+  .topbar {
+    top: var(--mobilebar-height);
+    margin-top: 0;
+  }
+
+  .letter {
+    top: var(--mobilebar-height);
+  }
+
+  .page {
+    padding-top: var(--space-4);
+  }
+}
