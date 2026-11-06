@@ -20,7 +20,7 @@ describe("variabili CSS", () => {
     const sources = files.map((f) => ({ f, s: readFileSync(f, "utf8") }));
     const defined = new Set(sources.flatMap(({ s }) => [...s.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]!)));
     // variabili impostate da codice (stile in linea o font di Next), non da un file CSS
-    for (const name of ["--font-manrope", "--d"]) defined.add(name);
+    for (const name of ["--font-manrope", "--d", "--v", "--avg"]) defined.add(name);
     const missing = sources.flatMap(({ f, s }) =>
       [...s.matchAll(/var\(\s*(--[a-z0-9-]+)/g)].map((m) => m[1]!).filter((v) => !defined.has(v)).map((v) => `${f.replace(process.cwd() + "/", "")}: ${v}`),
     );

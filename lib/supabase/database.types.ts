@@ -430,6 +430,9 @@ isOneToOne: false
                            },
 "slug_available":
 { Args: { "p_slug": string }; Returns: boolean
+                           },
+"stats_summary":
+{ Args: { "p_bucket"?: string,"p_from": string,"p_salon": string,"p_to": string }; Returns: Json
                            }
           }
           Enums: {

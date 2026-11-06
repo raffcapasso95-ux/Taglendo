@@ -27,9 +27,9 @@ test.describe("Accessibilità: pagine pubbliche", () => {
 });
 
 test.describe("Accessibilità: gestionale", () => {
-  test("axe su agenda, clienti, listino, impostazioni, profilo, link", async ({ page }) => {
+  test("axe su agenda, clienti, listino, impostazioni, pagina, profilo, link, statistiche", async ({ page }) => {
     await freshOwner(page, "Barberia Accessibile");
-    for (const path of ["/agenda", "/clienti", "/listino", "/impostazioni", "/impostazioni/regole", "/impostazioni/avvisi", "/profilo", "/link"]) {
+    for (const path of ["/agenda", "/clienti", "/listino", "/impostazioni", "/impostazioni/regole", "/impostazioni/avvisi", "/impostazioni/pagina", "/profilo", "/link", "/statistiche", "/statistiche?periodo=giorno"]) {
       await page.goto(path);
       await scan(page, path);
     }
