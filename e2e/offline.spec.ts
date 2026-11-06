@@ -28,7 +28,7 @@ test.describe("Senza rete", () => {
 
     await context.setOffline(true);
     await page.getByRole("button", { name: /^\+ (Nuovo appuntamento|Appuntamento)$/ }).filter({ visible: true }).click();
-    await dialog(page).getByRole("button", { name: "+ Nuovo cliente" }).click();
+    await dialog(page).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
     await dialog(page).getByLabel("Nome").fill(`Osvaldo ${run}`);
     // gli orari vengono dalla fotografia del giorno
     await pickTime(page, "11:00");
@@ -80,7 +80,7 @@ test.describe("Senza rete", () => {
     await page.goto(`/agenda?g=${day}`);
     await context.setOffline(true);
     await page.getByRole("button", { name: /^\+ (Nuovo appuntamento|Appuntamento)$/ }).filter({ visible: true }).click();
-    await dialog(page).getByRole("button", { name: "+ Nuovo cliente" }).click();
+    await dialog(page).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
     await dialog(page).getByLabel("Nome").fill(`Annalisa ${run}`);
     await pickTime(page, "12:00");
     await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();

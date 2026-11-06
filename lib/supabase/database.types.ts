@@ -25,14 +25,14 @@ export type Database = {
           Tables: {
             "appointments": {
                   Row: {
-                    "cancelled_by": string | null,"client_id": string | null,"created_at": string,"ends_at": string,"id": string,"manage_token": string,"member_id": string,"price_cents": number,"public_code": string,"reminder_sent_at": string | null,"salon_id": string,"service_id": string | null,"service_name": string,"source": Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status": Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by": string | null,"client_id": string | null,"created_at": string,"ends_at": string,"id": string,"list_price_cents": number | null,"manage_token": string,"member_id": string,"price_cents": number,"price_note": string | null,"public_code": string,"reminder_sent_at": string | null,"salon_id": string,"service_id": string | null,"service_name": string,"source": Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status": Database["public"]['Enums']["appt_status_t"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at": string,"id"?: string,"manage_token"?: string,"member_id": string,"price_cents": number,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id": string,"service_id"?: string | null,"service_name": string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status"?: Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at": string,"id"?: string,"list_price_cents"?: number | null,"manage_token"?: string,"member_id": string,"price_cents": number,"price_note"?: string | null,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id": string,"service_id"?: string | null,"service_name": string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status"?: Database["public"]['Enums']["appt_status_t"]
                   }
                   Update: {
-                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at"?: string,"id"?: string,"manage_token"?: string,"member_id"?: string,"price_cents"?: number,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id"?: string,"service_id"?: string | null,"service_name"?: string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at"?: string,"status"?: Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at"?: string,"id"?: string,"list_price_cents"?: number | null,"manage_token"?: string,"member_id"?: string,"price_cents"?: number,"price_note"?: string | null,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id"?: string,"service_id"?: string | null,"service_name"?: string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at"?: string,"status"?: Database["public"]['Enums']["appt_status_t"]
                   }
                   Relationships: [
                     {
@@ -95,14 +95,14 @@ isOneToOne: false
                   ]
                 },"clients": {
                   Row: {
-                    "created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"privacy_accepted_at": string | null,"salon_id": string
+                    "avatar_color": number | null,"created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"photo_path": string | null,"privacy_accepted_at": string | null,"salon_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"email"?: string | null,"id"?: string,"marketing_opt_in"?: boolean,"name": string,"note"?: string | null,"phone"?: string | null,"privacy_accepted_at"?: string | null,"salon_id": string
+                    "avatar_color"?: number | null,"created_at"?: string,"email"?: string | null,"id"?: string,"marketing_opt_in"?: boolean,"name": string,"note"?: string | null,"phone"?: string | null,"photo_path"?: string | null,"privacy_accepted_at"?: string | null,"salon_id": string
                   }
                   Update: {
-                    "created_at"?: string,"email"?: string | null,"id"?: string,"marketing_opt_in"?: boolean,"name"?: string,"note"?: string | null,"phone"?: string | null,"privacy_accepted_at"?: string | null,"salon_id"?: string
+                    "avatar_color"?: number | null,"created_at"?: string,"email"?: string | null,"id"?: string,"marketing_opt_in"?: boolean,"name"?: string,"note"?: string | null,"phone"?: string | null,"photo_path"?: string | null,"privacy_accepted_at"?: string | null,"salon_id"?: string
                   }
                   Relationships: [
                     {
@@ -312,14 +312,14 @@ isOneToOne: false
                   ]
                 },"clients_visible": {
                   Row: {
-                    "created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"privacy_accepted_at": string | null,"salon_id": string
+                    "avatar_color": number | null,"created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"photo_path": string | null,"privacy_accepted_at": string | null,"salon_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                           "created_at"?: string | null,"email"?: never,"id"?: string | null,"marketing_opt_in"?: boolean | null,"name"?: string | null,"note"?: string | null,"phone"?: never,"privacy_accepted_at"?: string | null,"salon_id"?: string | null
+                           "avatar_color"?: number | null,"created_at"?: string | null,"email"?: never,"id"?: string | null,"marketing_opt_in"?: boolean | null,"name"?: string | null,"note"?: string | null,"phone"?: never,"photo_path"?: string | null,"privacy_accepted_at"?: string | null,"salon_id"?: string | null
                          }
                         Update: {
-                           "created_at"?: string | null,"email"?: never,"id"?: string | null,"marketing_opt_in"?: boolean | null,"name"?: string | null,"note"?: string | null,"phone"?: never,"privacy_accepted_at"?: string | null,"salon_id"?: string | null
+                           "avatar_color"?: number | null,"created_at"?: string | null,"email"?: never,"id"?: string | null,"marketing_opt_in"?: boolean | null,"name"?: string | null,"note"?: string | null,"phone"?: never,"photo_path"?: string | null,"privacy_accepted_at"?: string | null,"salon_id"?: string | null
                          }
                         Relationships: [
                     {

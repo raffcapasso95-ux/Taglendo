@@ -2,6 +2,7 @@ import "server-only";
 import { getMembership, getUser } from "@/lib/auth/session";
 import { addDays, dayNumber, dayRange, isValidDate, longDay, monthShort, romeDate, romeMinutes, weekdayName, weekdayOf, weekdayShort } from "@/lib/dates/rome";
 import { buildDay, firstName, initials, type AgendaAppt, type DayModel, type Operator } from "@/lib/rules/agenda";
+import { signedPhotoUrls } from "@/lib/clients/photoUrls";
 import { createClient } from "@/lib/supabase/server";
 import { appointmentsOn, asHours, operatorsOf } from "./day";
 
@@ -17,7 +18,7 @@ export type StripDay = {
 };
 
 export type ServiceOption = { id: string; name: string; durationMin: number; priceCents: number };
-export type ClientOption = { id: string; name: string; phone: string | null };
+export type ClientOption = { id: string; name: string; phone: string | null; avatarColor: number | null; photoUrl: string | null };
 
 export type AgendaData = {
   salonName: string;
@@ -74,7 +75,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
       .gte("starts_at", rangeStart.toISOString())
       .lt("starts_at", stripEndAt.toISOString()),
     supabase.from("services").select("id, name, duration_min, price_cents").eq("salon_id", salon.id).eq("active", true).order("sort"),
-    supabase.from("clients_visible").select("id, name, phone").eq("salon_id", salon.id).order("name").limit(2000),
+    supabase.from("clients_visible").select("id, name, phone, avatar_color, photo_path").eq("salon_id", salon.id).order("name").limit(2000),
   ]);
 
   const isOwner = membership.role === "owner";
@@ -111,6 +112,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
     };
   });
 
+  const photoUrls = await signedPhotoUrls(supabase, (clientsRes.data ?? []).map((c) => c.photo_path));
   const userFirstName = firstName(membership.name);
   return {
     salonName: salon.name,
@@ -126,7 +128,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
     canEdit,
     salonId: salon.id,
     services: (servicesRes.data ?? []).map((x) => ({ id: x.id, name: x.name, durationMin: x.duration_min, priceCents: x.price_cents })),
-    clients: (clientsRes.data ?? []).flatMap((c) => (c.id && c.name ? [{ id: c.id, name: c.name, phone: c.phone }] : [])),
+    clients: (clientsRes.data ?? []).flatMap((c) => (c.id && c.name ? [{ id: c.id, name: c.name, phone: c.phone, avatarColor: c.avatar_color, photoUrl: c.photo_path ? (photoUrls.get(c.photo_path) ?? null) : null }] : [])),
     savedAt: now.toISOString(),
   };
 }

@@ -32,25 +32,15 @@ export async function freshOwner(page: Page, salon: string) {
   return email;
 }
 
-/** Apre la griglia completa («Altro orario o giorno» o «Cambia») se non è già aperta. */
-export async function showAllTimes(page: Page) {
-  const d = dialog(page);
-  for (const name of ["Altro orario o giorno", "Cambia orario"]) {
-    const b = d.getByRole("button", { name, exact: true });
-    if (await b.isVisible().catch(() => false)) return void (await b.click());
-  }
-}
+/** Gli orari del giorno sono sempre tutti sulla schermata (dal ridisegno): non c'è più niente da aprire. */
+export async function showAllTimes(_page: Page) {}
 
-/** Sceglie un orario del giorno già mostrato (anche tra i primi proposti). */
+/** Sceglie un orario del giorno già mostrato. */
 export async function pickTime(page: Page, time: string) {
-  const d = dialog(page);
-  const direct = d.getByRole("button", { name: time, exact: true });
-  if (!(await direct.isVisible().catch(() => false))) await showAllTimes(page);
-  await d.getByRole("button", { name: time, exact: true }).click();
+  await dialog(page).getByRole("button", { name: time, exact: true }).click();
 }
 
 export async function pickDayAndTime(page: Page, date: string, time: string) {
-  await showAllTimes(page);
   const label = `${SHORT[weekday(date)]} ${Number(date.slice(8))}`;
   await dialog(page).getByRole("button", { name: label, exact: true }).click();
   await dialog(page).getByRole("button", { name: time, exact: true }).click();
@@ -58,7 +48,7 @@ export async function pickDayAndTime(page: Page, date: string, time: string) {
 
 export async function bookNewClient(page: Page, name: string, date: string, time: string) {
   await newButton(page).click();
-  await dialog(page).getByRole("button", { name: "+ Nuovo cliente" }).click();
+  await dialog(page).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
   await dialog(page).getByLabel("Nome").fill(name);
   await pickDayAndTime(page, date, time);
   await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();

@@ -15,12 +15,16 @@ type Props = {
   selected: string | null;
   today: string;
   onSelect: (date: string) => void;
+  /** Livello del titolo del mese: h3 nel pannello, h4 dentro «Nuovo appuntamento». */
+  heading?: "h3" | "h4";
+  /** Classe in più per la fila delle scorciatoie dei mesi. */
+  monthsClassName?: string;
 };
 
 const WEEK = ["L", "M", "M", "G", "V", "S", "D"];
 
 /** Calendario del mese nello stile Taglendo: puntino sui giorni con appuntamenti, tratteggio sui giorni chiusi. */
-export function MonthCalendar({ mode, selected, today, onSelect }: Props) {
+export function MonthCalendar({ mode, selected, today, onSelect, heading: Heading = "h3", monthsClassName }: Props) {
   const [view, setView] = useState(monthOf(selected ?? today));
   const [marks, setMarks] = useState<Record<string, MonthMarks>>({});
   const asked = useRef(new Set<string>());
@@ -55,16 +59,16 @@ export function MonthCalendar({ mode, selected, today, onSelect }: Props) {
             <path d="m15 6-6 6 6 6" />
           </svg>
         </button>
-        <h3 className={styles.month} aria-live="polite">
+        <Heading className={styles.month} aria-live="polite">
           {monthTitle(view)}
-        </h3>
+        </Heading>
         <button type="button" className={styles.nav} aria-label="Mese successivo" onClick={() => setView(addMonths(view, 1))}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="m9 6 6 6-6 6" />
           </svg>
         </button>
       </div>
-      <div className={styles.months} role="group" aria-label="Vai al mese">
+      <div className={cx(styles.months, monthsClassName)} role="group" aria-label="Vai al mese">
         {monthRange(todayMonth, SHORTCUT_MONTHS).map((m) => (
           <button key={m} type="button" className={cx(styles.monthChip, m === view && styles.monthChipOn)} aria-pressed={m === view} data-cal-goto={m} onClick={() => setView(m)}>
             {monthChip(m)}

@@ -5,6 +5,25 @@ import { adminSelect, adminUpdate, seedDay, signIn, visibleText } from "./helper
 const SALON = "5a100000-0000-4000-8000-000000000001";
 
 test.describe("Appuntamenti", () => {
+  test("il prezzo si cambia dalla matita anche dopo: sconto alla cassa, il listino resta", async ({ page }) => {
+    const day = nextOpenDay();
+    await freshOwner(page, "Barberia Sconto Cassa");
+    await page.goto(`/agenda?g=${day}`);
+    await bookNewClient(page, "Carla Cassa", day, "10:00");
+    await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
+    await openAppointment(page, "Carla Cassa");
+    const d = dialog(page);
+    await expect(d.getByLabel("Prezzo per questo cliente (€)")).toBeHidden();
+    await d.getByRole("button", { name: "Cambia prezzo" }).click();
+    await d.getByRole("button", { name: "−10%" }).click();
+    await expect(page.getByText("Prezzo aggiornato").filter({ visible: true })).toBeVisible();
+    // il prezzo pieno resta accanto a quello nuovo
+    await expect(d.getByText("20 €", { exact: true })).toBeVisible();
+    await expect(d.getByText("18 €", { exact: true })).toBeVisible();
+    const [row] = await adminSelect<{ price_cents: number; list_price_cents: number }>("appointments", "select=price_cents,list_price_cents&order=created_at.desc&limit=1");
+    expect(row).toEqual({ price_cents: 1800, list_price_cents: 2000 });
+  });
+
   test("fissare, cambiare stato, spostare e annullare", async ({ page }) => {
     const day = nextOpenDay();
     await freshOwner(page, "Barberia Appuntamenti");
@@ -66,7 +85,7 @@ test.describe("Appuntamenti", () => {
     // il secondo schermo (stesso salone) sceglie le 10:00 ma non salva ancora
     const second = await secondScreen(browser, page);
     await newButton(second).click();
-    await dialog(second).getByRole("button", { name: "+ Nuovo cliente" }).click();
+    await dialog(second).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
     await dialog(second).getByLabel("Nome").fill("Anna Bianchi");
     await pickDayAndTime(second, day, "10:00");
 
@@ -100,7 +119,7 @@ test.describe("Appuntamenti", () => {
     await freshOwner(page, "Barberia Negozio");
     await page.goto("/agenda");
     await page.getByRole("button", { name: /^(Cliente in negozio|In negozio ora)$/ }).filter({ visible: true }).click();
-    await dialog(page).getByRole("button", { name: "+ Nuovo cliente" }).click();
+    await dialog(page).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
     await dialog(page).getByLabel("Nome").fill("Ragazzo con lo zaino rosso");
     await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();
 

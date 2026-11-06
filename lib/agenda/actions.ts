@@ -17,9 +17,9 @@ const { errors, conflict: conflictCopy } = agendaCopy;
 export type Alternative = { date: string; startMin: number; memberId: string };
 export type Conflict = { title: string; text: string; alternatives: Alternative[] };
 export type Failure = { ok: false; error: string; conflict?: Conflict };
-export type Created = { ok: true; id: string; clientName: string; date: string; startMin: number };
+export type Created = { ok: true; id: string; clientId: string; clientName: string; date: string; startMin: number };
 
-type NewClient = { name: string; phone?: string | null };
+type NewClient = { name: string; phone?: string | null; /** Colore delle iniziali (0–4). */ avatarColor?: number | null };
 export type CreateInput = {
   clientId?: string | null;
   newClient?: NewClient | null;
@@ -29,6 +29,9 @@ export type CreateInput = {
   date: string;
   startMin: number;
   source?: "manuale" | "in_negozio";
+  /** Prezzo diverso da quello di listino, solo per questo appuntamento (centesimi). */
+  priceCents?: number | null;
+  priceNote?: string | null;
 };
 
 const fail = (error: string, conflict?: Conflict): Failure => ({ ok: false, error, conflict });
@@ -87,14 +90,16 @@ async function resolveClient(supabase: Supabase, salonId: string, input: Pick<Cr
   if (!name || name.length > LIMITS.clientName) return { error: errors.clientName };
   const phone = input.newClient?.phone?.trim() || null;
   if (phone && !isPhone(phone)) return { error: errors.phone };
-  const { data, error } = await supabase.from("clients").insert({ salon_id: salonId, name, phone }).select("id").single();
+  const color = input.newClient?.avatarColor;
+  const avatar_color = typeof color === "number" && Number.isInteger(color) && color >= 0 && color <= 4 ? color : null;
+  const { data, error } = await supabase.from("clients").insert({ salon_id: salonId, name, phone, avatar_color }).select("id").single();
   if (error || !data) return { error: errors.generic };
   return { id: data.id, created: true, name };
 }
 
 async function insertAppointment(
   supabase: Supabase,
-  p: { salonId: string; memberId: string; clientId: string; service: { id: string; name: string; price_cents: number }; startsAt: string; endsAt: string; source: "manuale" | "in_negozio" },
+  p: { salonId: string; memberId: string; clientId: string; service: { id: string; name: string; price_cents: number }; startsAt: string; endsAt: string; source: "manuale" | "in_negozio"; price?: { cents: number; note: string | null } | null },
 ) {
   return supabase
     .from("appointments")
@@ -104,13 +109,24 @@ async function insertAppointment(
       client_id: p.clientId,
       service_id: p.service.id,
       service_name: p.service.name, // nome e prezzo si copiano nell'appuntamento
-      price_cents: p.service.price_cents,
+      // prezzo di listino copiato alla prenotazione; se il salone fa uno sconto, price_cents è quello pagato
+      list_price_cents: p.service.price_cents,
+      price_cents: p.price?.cents ?? p.service.price_cents,
+      price_note: p.price?.note ?? null,
       starts_at: p.startsAt,
       ends_at: p.endsAt,
       source: p.source,
     })
     .select("id")
     .single();
+}
+
+/** Prezzo diverso dal listino: intero in centesimi, da 0 (omaggio) a 10.000 €; il motivo fino a 60 caratteri. */
+function customPrice(input: Pick<CreateInput, "priceCents" | "priceNote">, listCents: number): { cents: number; note: string | null } | null | "invalid" {
+  if (input.priceCents == null) return null;
+  if (!Number.isInteger(input.priceCents) || input.priceCents < 0 || input.priceCents > 1_000_000) return "invalid";
+  const note = input.priceNote?.trim().slice(0, 60) || null;
+  return input.priceCents === listCents && !note ? null : { cents: input.priceCents, note };
 }
 
 /** Fissa un appuntamento. Ricontrolla gli orari liberi sul server; il vincolo del database è l'ultima parola. */
@@ -127,6 +143,9 @@ export async function createAppointment(input: CreateInput): Promise<Created | F
   const slot = rows.find((r) => r.startMin === input.startMin);
   if (!slot) return fail(conflictCopy.title, await conflictFor(supabase, salon.id, service.id, input.memberId, wanted));
 
+  const price = customPrice(input, service.price_cents);
+  if (price === "invalid") return fail(errors.generic);
+
   const client = await resolveClient(supabase, salon.id, input);
   if ("error" in client) return fail(client.error);
 
@@ -138,6 +157,7 @@ export async function createAppointment(input: CreateInput): Promise<Created | F
     startsAt: slot.startsAt,
     endsAt: slot.endsAt,
     source: input.source ?? "manuale",
+    price,
   });
   if (error || !data) {
     if (client.created) await supabase.from("clients").delete().eq("id", client.id);
@@ -146,11 +166,11 @@ export async function createAppointment(input: CreateInput): Promise<Created | F
   }
   revalidatePath("/agenda");
   const clientName = client.name ?? (await supabase.from("clients").select("name").eq("id", client.id).single()).data?.name ?? "";
-  return { ok: true, id: data.id, clientName, date: input.date, startMin: input.startMin };
+  return { ok: true, id: data.id, clientId: client.id, clientName, date: input.date, startMin: input.startMin };
 }
 
 /** "Cliente in negozio": il primo posto libero da adesso, a partire proprio da adesso se il barbiere è libero. */
-export async function walkIn(input: Pick<CreateInput, "clientId" | "newClient" | "serviceId" | "memberId">): Promise<Created | Failure> {
+export async function walkIn(input: Pick<CreateInput, "clientId" | "newClient" | "serviceId" | "memberId" | "priceCents" | "priceNote">): Promise<Created | Failure> {
   const { supabase, salon, canEdit } = await editor();
   if (!canEdit) return fail(errors.notAllowed);
   const { data: service } = await supabase.from("services").select("id, name, price_cents, duration_min").eq("id", input.serviceId).eq("salon_id", salon.id).eq("active", true).maybeSingle();
@@ -172,6 +192,9 @@ export async function walkIn(input: Pick<CreateInput, "clientId" | "newClient" |
   }
   if (!best) return fail(errors.noRoom);
 
+  const price = customPrice(input, service.price_cents);
+  if (price === "invalid") return fail(errors.generic);
+
   const client = await resolveClient(supabase, salon.id, input);
   if ("error" in client) return fail(client.error);
 
@@ -185,6 +208,7 @@ export async function walkIn(input: Pick<CreateInput, "clientId" | "newClient" |
     startsAt: startsAt.toISOString(),
     endsAt: endsAt.toISOString(),
     source: "in_negozio",
+    price,
   });
   if (error || !data) {
     if (client.created) await supabase.from("clients").delete().eq("id", client.id);
@@ -192,7 +216,7 @@ export async function walkIn(input: Pick<CreateInput, "clientId" | "newClient" |
   }
   revalidatePath("/agenda");
   const name = client.name ?? (await supabase.from("clients").select("name").eq("id", client.id).single()).data?.name ?? "";
-  return { ok: true, id: data.id, clientName: name, date: today, startMin: best.start };
+  return { ok: true, id: data.id, clientId: client.id, clientName: name, date: today, startMin: best.start };
 }
 
 export type SlotsResult = { closed: boolean; durationMin: number; slots: Array<{ startMin: number; free: boolean }> };
@@ -222,6 +246,9 @@ export type Detail = {
   serviceId: string | null;
   serviceName: string;
   priceCents: number;
+  /** Prezzo di listino copiato alla prenotazione, per il confronto con quello fatto. */
+  listPriceCents: number;
+  priceNote: string;
   date: string;
   startMin: number;
   endMin: number;
@@ -236,7 +263,7 @@ export async function getAppointment(id: string): Promise<Detail | null> {
   const { supabase } = await editor();
   const { data: a } = await supabase
     .from("appointments")
-    .select("id, client_id, service_id, service_name, price_cents, starts_at, ends_at, status, source, member_id, member:members(name), client:clients(name, note)")
+    .select("id, client_id, service_id, service_name, price_cents, list_price_cents, price_note, starts_at, ends_at, status, source, member_id, member:members(name), client:clients(name, note)")
     .eq("id", id)
     .maybeSingle();
   if (!a) return null;
@@ -256,6 +283,8 @@ export async function getAppointment(id: string): Promise<Detail | null> {
     serviceId: a.service_id,
     serviceName: a.service_name,
     priceCents: a.price_cents,
+    listPriceCents: a.list_price_cents ?? a.price_cents,
+    priceNote: a.price_note ?? "",
     date: romeDate(start),
     startMin: romeMinutes(start),
     endMin: romeDate(end) === romeDate(start) ? romeMinutes(end) : 1440,
@@ -313,3 +342,15 @@ export async function moveAppointment(input: { id: string; date: string; startMi
 }
 
 
+
+/** Cambia il prezzo di un appuntamento già fissato (sconto alla cassa, omaggio…). Il listino non cambia. */
+export async function setAppointmentPrice(input: { id: string; priceCents: number; note?: string | null }): Promise<{ ok: true; priceCents: number; priceNote: string } | Failure> {
+  const { supabase, canEdit } = await editor();
+  if (!canEdit) return fail(errors.notAllowed);
+  if (!Number.isInteger(input.priceCents) || input.priceCents < 0 || input.priceCents > 1_000_000) return fail(errors.generic);
+  const note = input.note?.trim().slice(0, 60) || null;
+  const { data, error } = await supabase.from("appointments").update({ price_cents: input.priceCents, price_note: note }).eq("id", input.id).neq("status", "annullato").select("id");
+  if (error || !data?.length) return fail(errors.generic);
+  revalidatePath("/agenda");
+  return { ok: true, priceCents: input.priceCents, priceNote: note ?? "" };
+}

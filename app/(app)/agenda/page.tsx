@@ -33,6 +33,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
       operators={data.operators}
       services={data.services}
       clients={data.clients}
+      closedDates={data.strip.filter((d) => d.closed).map((d) => d.date)}
       day={data.day}
       savedAt={data.savedAt}
       initialNew={
