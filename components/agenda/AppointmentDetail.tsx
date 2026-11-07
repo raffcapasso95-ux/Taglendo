@@ -8,25 +8,19 @@ import { agendaCopy } from "@/lib/copy/agenda";
 import {
   cancelAppointment,
   getAppointment,
-  listSlots,
-  moveAppointment,
   setAppointmentPrice,
   setAppointmentStatus,
-  type Alternative,
-  type Conflict,
   type Detail,
-  type SlotsResult,
 } from "@/lib/agenda/actions";
 import { formatPrice } from "@/lib/dates/format";
 import { longDay } from "@/lib/dates/rome";
-import { clock, firstName, type DayModel } from "@/lib/rules/agenda";
+import { clock, firstName, type DayModel, type Operator } from "@/lib/rules/agenda";
 import { reminderText, whatsappLink } from "@/lib/rules/whatsapp";
 import { offlineCopy } from "@/lib/copy/offline";
 import { useOnline } from "@/lib/offline/hooks";
 import { useAgenda } from "./AgendaProvider";
 import { dayLabel } from "./NewAppointment";
-import { DayPicker } from "./DayPicker";
-import { TimeChips } from "./TimeChips";
+import { MoveAppointment } from "./MoveAppointment";
 import { eurosText, parseEuros, quickPrices } from "@/lib/rules/price";
 import styles from "./Dialogs.module.css";
 import flow from "./Flow.module.css";
@@ -39,6 +33,8 @@ type Props = {
   canEdit: boolean;
   salonName: string;
   multipleOperators: boolean;
+  operators: Operator[];
+  closedDates: string[];
   onClose: () => void;
   /** Dopo una modifica: il messaggio per l'avviso e, se serve, il giorno da aprire. */
   onChanged: (toast: { message: string; sub?: string }, date?: string) => void;
@@ -71,7 +67,7 @@ function detailFromSnapshot(day: DayModel, id: string): Detail | null {
   return null;
 }
 
-export function AppointmentDetail({ id, today, canEdit, salonName, multipleOperators, onClose, onChanged }: Props) {
+export function AppointmentDetail({ id, today, canEdit, salonName, multipleOperators, operators, closedDates, onClose, onChanged }: Props) {
   const online = useOnline();
   const router = useRouter();
   const toast = useToast();
@@ -79,13 +75,9 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
   const [detail, setDetail] = useState<Detail | null>(null);
   const [missing, setMissing] = useState(false);
   const [mode, setMode] = useState<"view" | "move" | "cancel">("view");
-  const [date, setDate] = useState(today);
-  const [startMin, setStartMin] = useState<number | null>(null);
-  const [slots, setSlots] = useState<SlotsResult | null>(null);
   const [loading, startLoad] = useTransition();
-  const [loadingSlots, startSlots] = useTransition();
   const [working, startWork] = useTransition();
-  const [error, setError] = useState<{ message: string; conflict?: Conflict } | null>(null);
+  const [error, setError] = useState<{ message: string } | null>(null);
   const [priceOpen, setPriceOpen] = useState(false);
   const [priceText, setPriceText] = useState("");
   const [priceNote, setPriceNote] = useState("");
@@ -103,25 +95,9 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
         setDetail(d);
         setPriceText(eurosText(d.priceCents));
         setPriceNote(d.priceNote);
-        setDate(d.date >= today ? d.date : today);
       }
     });
   }, [id, today, day]);
-
-  // Orari liberi per lo spostamento (l'appuntamento stesso non conta come occupato).
-  useEffect(() => {
-    if (mode !== "move" || !detail?.serviceId) return;
-    let cancelled = false;
-    startSlots(async () => {
-      const result = await listSlots({ serviceId: detail.serviceId!, memberId: detail.memberId, date, excludeId: detail.id });
-      if (cancelled) return;
-      setSlots(result);
-      setStartMin((c) => (c !== null && result.slots.some((s) => s.startMin === c && s.free) ? c : null));
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [mode, detail, date]);
 
   const changeStatus = (status: StatusKey) => {
     if (!detail || status === detail.status) return;
@@ -162,22 +138,6 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
       else setError({ message: result.error });
     });
 
-  const confirmMove = () =>
-    detail &&
-    startMin !== null &&
-    startWork(async () => {
-      setError(null);
-      const result = await moveAppointment({ id: detail.id, date, startMin });
-      if (result.ok) onChanged({ message: agendaCopy.toasts.moved, sub: `${dayLabel(date, today, "")}, ${clock(startMin)}` }, date);
-      else setError({ message: result.error, conflict: result.conflict });
-    });
-
-  const pickAlternative = (a: Alternative) => {
-    setDate(a.date);
-    setStartMin(a.startMin);
-    setError(null);
-  };
-
   const editable = canEdit && detail !== null && detail.status !== "annullato";
 
   if (missing) {
@@ -204,17 +164,7 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
 
   const alert = error ? (
     <div className={styles.alert} role="alert">
-      <p className={styles.alertTitle}>{error.conflict?.title ?? error.message}</p>
-      {error.conflict ? <p>{error.conflict.text}</p> : null}
-      {error.conflict && error.conflict.alternatives.length > 0 ? (
-        <div className={styles.chips}>
-          {error.conflict.alternatives.map((a) => (
-            <button key={`${a.date}-${a.startMin}`} type="button" className={styles.chip} onClick={() => pickAlternative(a)}>
-              {dayLabel(a.date, today, "")} · {clock(a.startMin)}
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <p className={styles.alertTitle}>{error.message}</p>
     </div>
   ) : null;
 
@@ -243,28 +193,15 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
 
   if (mode === "move") {
     return (
-      <ResponsiveDialog
-        open
+      <MoveAppointment
+        detail={detail}
+        operators={operators}
+        closedDates={closedDates}
+        today={today}
         onClose={onClose}
-        title={copy.moveTitle(detail.memberName)}
-        footer={
-          <>
-            <Button variant="secondary" size="large" onClick={() => { setMode("view"); setError(null); }}>
-              {copy.back}
-            </Button>
-            <Button size="large" disabled={startMin === null || working} onClick={confirmMove}>
-              {copy.confirm}
-            </Button>
-          </>
-        }
-      >
-        <div className={styles.form}>
-          {alert}
-          <DayPicker value={date} today={today} onChange={setDate} />
-          <TimeChips result={slots} loading={loadingSlots} selected={startMin} onSelect={setStartMin} label={agendaCopy.form.slotsWith(detail.memberName)} />
-          <p className={styles.recap}>{startMin !== null ? copy.moveSummary(`${dayLabel(date, today, "")}, ${clock(startMin)}`) : copy.moveChoose}</p>
-        </div>
-      </ResponsiveDialog>
+        onBack={() => setMode("view")}
+        onMoved={(to) => onChanged({ message: agendaCopy.toasts.moved, sub: `${dayLabel(to.date, today, "")}, ${clock(to.startMin)}` }, to.date)}
+      />
     );
   }
 

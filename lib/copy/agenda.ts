@@ -87,9 +87,9 @@ export const agendaCopy = {
     statuses: { confermato: "Confermato", completato: "Completato", non_presentato: "Non presentato", annullato: "Annullato" },
     move: "Sposta",
     cancel: "Annulla",
-    moveTitle: (op: string) => `Nuovo orario con ${op}`,
-    moveSummary: (when: string) => `Nuovo orario: ${when}`,
-    moveChoose: "Scegli il nuovo orario.",
+    moveTitle: "Sposta appuntamento", // NUOVO: titolo della schermata «Sposta», come «Nuovo appuntamento»
+    moveNow: (when: string) => `Ora: ${when}`, // NUOVO: dove sta adesso l'appuntamento
+    moveSaving: "Sposto…",
     back: "Indietro",
     confirm: "Conferma",
     cancelAsk: (first: string) => `Annullare l’appuntamento di ${first}? L’orario torna libero anche sul link.`,

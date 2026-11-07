@@ -12,7 +12,7 @@ import type { ClientOption, ServiceOption } from "@/lib/agenda/load";
 import { setClientPhoto } from "@/lib/clients/photo";
 import { resizePhoto } from "@/lib/clients/resizeImage";
 import { formatPrice } from "@/lib/dates/format";
-import { addDays, dayNumber, monthShort, romeMinutes, weekdayShort } from "@/lib/dates/rome";
+import { dayNumber, monthShort, romeMinutes, weekdayShort } from "@/lib/dates/rome";
 import { clock, operatorColor, type Operator } from "@/lib/rules/agenda";
 import { AVATAR_COLOR_NAMES, clientInitials } from "@/lib/rules/avatar";
 import { LIMITS } from "@/lib/rules/forms";
@@ -21,7 +21,7 @@ import { offlineCopy } from "@/lib/copy/offline";
 import { useOnline } from "@/lib/offline/hooks";
 import { offlineSlots } from "@/lib/offline/slots";
 import { useAgenda } from "./AgendaProvider";
-import { MonthCalendar } from "./MonthCalendar";
+import { WhenPicker } from "./WhenPicker";
 import { OperatorAvatar } from "./OperatorAvatar";
 import dialogs from "./Dialogs.module.css";
 import styles from "./Flow.module.css";
@@ -50,8 +50,6 @@ type Props = {
 /** Quanti clienti si propongono senza che si scriva niente, e quanti con una ricerca. */
 const SUGGESTED_CLIENTS = 3;
 const SEARCH_RESULTS = 8;
-/** Quanti giorni a portata di dito, da oggi. */
-const DAYS_SHOWN = 14;
 /** Mattina e pomeriggio si dividono alle 13. */
 const NOON = 13 * 60;
 
@@ -87,7 +85,6 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
   const [memberId, setMemberId] = useState<string | "any">(prefill?.memberId ?? "any");
   const [date, setDate] = useState(prefill?.date ?? selectedDate);
   const [startMin, setStartMin] = useState<number | null>(prefill?.startMin ?? null);
-  const [calOpen, setCalOpen] = useState(false);
   const [priceOpen, setPriceOpen] = useState(false);
   const [priceCents, setPriceCents] = useState<number | null>(null); // null = prezzo di listino
   const [priceText, setPriceText] = useState("");
@@ -131,9 +128,6 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
   const service = services.find((s) => s.id === serviceId);
   const client = clients.find((c) => c.id === clientId);
   const operatorName = memberId === "any" ? null : operators.find((o) => o.id === memberId)?.name;
-  const closed = useMemo(() => new Set(closedDates), [closedDates]);
-  const days = useMemo(() => Array.from({ length: DAYS_SHOWN }, (_, i) => addDays(today, i)), [today]);
-  const outside = !days.includes(date);
 
   // Senza rete gli orari si ricavano dalla fotografia del giorno: solo quel giorno, senza chiedere al server.
   const offlineResult: SlotsResult | null = !online && service ? (date === offlineDay.date ? { closed: offlineDay.hours.closed, durationMin: service.durationMin, slots: offlineSlots(offlineDay, service.durationMin, memberId === "any" ? null : memberId, 0) } : { closed: false, durationMin: service.durationMin, slots: [] }) : null;
@@ -289,62 +283,17 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
             </p>
           ) : (
             <>
-              <div className={dialogs.whenDays}>
-                <button
-                  type="button"
-                  className={cx(dialogs.calButton, styles.Dialogs_calButton, (calOpen || outside) && dialogs.calButtonOn, (calOpen || outside) && styles.Dialogs_calButtonOn)}
-                  aria-label={flow.openCalendar}
-                  aria-expanded={calOpen}
-                  onClick={() => setCalOpen(!calOpen)}
-                >
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <rect x="3.5" y="5" width="17" height="15" rx="3" />
-                    <path d="M8 3v4M16 3v4M3.5 10h17" />
-                    <path d="M8 14h.01M12 14h.01M16 14h.01M8 17h.01M12 17h.01" />
-                  </svg>
-                  {outside ? <span className={dialogs.calButtonDate}>{`${dayNumber(date)} ${monthShort(date)}`}</span> : null}
-                </button>
-                <div className={cx(dialogs.days, styles.Dialogs_days)} role="group" aria-label={flow.day}>
-                  {days.map((d) => {
-                    const on = d === date;
-                    return (
-                      <button
-                        key={d}
-                        type="button"
-                        className={cx(on ? dialogs.dayButtonOn : dialogs.dayButton, on ? styles.Dialogs_dayButtonOn : styles.Dialogs_dayButton)}
-                        aria-pressed={on}
-                        aria-label={`${weekdayShort(d)} ${dayNumber(d)}`}
-                        disabled={closed.has(d)}
-                        onClick={() => {
-                          setDate(d);
-                          setCalOpen(false);
-                        }}
-                      >
-                        <span className={cx(dialogs.dayDow, styles.Dialogs_dayDow)}>{weekdayShort(d)}</span>{" "}
-                        <span className={cx(dialogs.dayNum, styles.Dialogs_dayNum)}>{dayNumber(d)}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className={cx(dialogs.whenCal, styles.Dialogs_whenCal)} hidden={!calOpen}>
-                {calOpen ? (
-                  <MonthCalendar
-                    mode="book"
-                    heading="h4"
-                    monthsClassName={dialogs.Calendar_months}
-                    selected={date}
-                    today={today}
-                    onSelect={(d) => {
-                      setDate(d);
-                      setCalOpen(false);
-                    }}
-                  />
-                ) : null}
-              </div>
-              <div className={cx(dialogs.whenTimes, styles.Dialogs_whenTimes)} hidden={calOpen}>
-                <p className={cx(dialogs.hint, styles.Dialogs_hint)} aria-live="polite">
-                  {!online && date !== offlineDay.date
+              <WhenPicker
+                today={today}
+                date={date}
+                onDate={setDate}
+                closedDates={closedDates}
+                startMin={startMin}
+                onTime={pickTime}
+                shown={shown}
+                loading={online && loadingSlots}
+                hint={
+                  !online && date !== offlineDay.date
                     ? offlineCopy.onlyDay(dayLabel(offlineDay.date, today, ""))
                     : online && loadingSlots && !shown
                       ? "…"
@@ -352,28 +301,9 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
                         ? copy.closed
                         : timeGroups.length === 0 && shown
                           ? copy.noSlots
-                          : flow.slotsHint(operatorName ?? copy.anyone, shortDate(date))}
-                </p>
-                {timeGroups.map((g) => (
-                  <div key={g.title} className={cx(dialogs.timeGroup, styles.Dialogs_timeGroup)}>
-                    <p className={cx(dialogs.timeGroupTitle, styles.Dialogs_timeGroupTitle)}>{g.title}</p>
-                    <div className={cx(dialogs.times, styles.Dialogs_times)} role="group" aria-label={g.title} aria-busy={online && loadingSlots}>
-                      {g.slots.map((x) => (
-                        <button
-                          key={x.startMin}
-                          type="button"
-                          disabled={!x.free}
-                          aria-pressed={startMin === x.startMin}
-                          className={cx(startMin === x.startMin ? dialogs.chipOn : x.free ? dialogs.chip : dialogs.chipOff, dialogs.time, styles.Dialogs_time, startMin === x.startMin && styles.Dialogs_chipOn, startMin !== x.startMin && !x.free && styles.Dialogs_chipOff, startMin !== x.startMin && x.free && styles.Dialogs_chip)}
-                          onClick={() => pickTime(x.startMin)}
-                        >
-                          {clock(x.startMin)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+                          : flow.slotsHint(operatorName ?? copy.anyone, shortDate(date))
+                }
+              />
             </>
           )}
         </section>

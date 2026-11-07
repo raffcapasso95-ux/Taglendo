@@ -57,8 +57,8 @@ test.describe("Appuntamenti", () => {
     await openAppointment(page, "Mario Verdi");
     await dialog(page).getByRole("button", { name: "Sposta" }).click();
     await pickTime(page, "11:00");
-    await expect(dialog(page).getByText(/Nuovo orario: .*11:00/)).toBeVisible();
-    await dialog(page).getByRole("button", { name: "Conferma" }).click();
+    await expect(dialog(page).getByText(/11:00 · Mario Verdi/)).toBeVisible();
+    await dialog(page).getByRole("button", { name: "Sposta", exact: true }).click();
     await expect(page.getByText("Appuntamento spostato").filter({ visible: true })).toBeVisible();
     const moved = await adminSelect<{ starts_at: string }>("appointments", "select=starts_at&order=created_at.desc&limit=1");
     expect(new Date(moved[0]!.starts_at).toISOString().slice(11, 16)).toMatch(/^(09|10):00$/); // 11:00 a Roma = 10:00 o 09:00 UTC
@@ -161,3 +161,41 @@ async function secondScreen(browser: Browser, first: Page) {
   await page.goto(first.url());
   return page;
 }
+
+test.describe("Sposta appuntamento", () => {
+  test("come «Nuovo appuntamento»: Quando e Con chi; «Annulla» riporta ai dettagli", async ({ page }) => {
+    const day = nextOpenDay();
+    await freshOwner(page, "Barberia Sposta Flow");
+    await page.goto(`/agenda?g=${day}`);
+    await bookNewClient(page, "Mario Verdi", day, "10:00");
+    await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
+    await openAppointment(page, "Mario Verdi");
+    await dialog(page).getByRole("button", { name: "Sposta", exact: true }).click();
+    const flow = page.getByRole("dialog", { name: "Sposta appuntamento" });
+    await expect(flow).toBeVisible();
+    await expect(flow.getByRole("heading", { name: "Quando" })).toBeVisible();
+    await expect(flow.getByText(/^Ora: .*10:00/)).toBeVisible();
+    // un solo barbiere: niente blocco «Con chi»
+    await expect(flow.getByRole("heading", { name: "Con chi" })).toHaveCount(0);
+    // finché non si sceglie un orario «Sposta» resta spento
+    await expect(flow.getByRole("button", { name: "Sposta", exact: true })).toBeDisabled();
+    await pickTime(page, "11:00");
+    await expect(flow.getByRole("button", { name: "Sposta", exact: true })).toBeEnabled();
+    // «Annulla» riporta ai dettagli, senza spostare niente
+    await flow.getByRole("button", { name: /^(Annulla|Chiudi)$/ }).filter({ visible: true }).click(); // «Annulla» su telefono, la X su desktop
+    await expect(dialog(page).getByRole("button", { name: "Sposta", exact: true })).toBeVisible();
+  });
+
+  test("con più barbieri si può scegliere anche con chi", async ({ page }) => {
+    await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
+    await page.goto("/agenda");
+    await openAppointment(page, "Pietro Lombardi");
+    await dialog(page).getByRole("button", { name: "Sposta", exact: true }).click();
+    const flow = page.getByRole("dialog", { name: "Sposta appuntamento" });
+    await expect(flow.getByRole("heading", { name: "Con chi" })).toBeVisible();
+    await expect(flow.getByRole("button", { name: /^Andrea/ })).toHaveAttribute("aria-pressed", "true");
+    await flow.getByRole("button", { name: /^Marco/ }).click();
+    await expect(flow.getByRole("button", { name: /^Marco/ })).toHaveAttribute("aria-pressed", "true");
+    await expect(flow.getByText(/· con Marco$/)).toBeVisible();
+  });
+});

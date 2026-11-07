@@ -318,7 +318,11 @@ export async function cancelAppointment(id: string): Promise<{ ok: true } | Fail
 }
 
 /** Sposta un appuntamento a un altro giorno o orario, con lo stesso barbiere. */
-export async function moveAppointment(input: { id: string; date: string; startMin: number }): Promise<{ ok: true; date: string; startMin: number } | Failure> {
+/**
+ * Sposta un appuntamento a un altro giorno e orario. `memberId` cambia anche il barbiere: senza, resta quello di prima;
+ * `null` vuol dire «chi è libero» e vince il primo libero in ordine di poltrona.
+ */
+export async function moveAppointment(input: { id: string; date: string; startMin: number; memberId?: string | null }): Promise<{ ok: true; date: string; startMin: number } | Failure> {
   const { supabase, salon, canEdit } = await editor();
   if (!canEdit) return fail(errors.notAllowed);
   if (!isValidDate(input.date)) return fail(errors.generic);
@@ -326,22 +330,25 @@ export async function moveAppointment(input: { id: string; date: string; startMi
   if (!appt || appt.status === "annullato") return fail(errors.gone);
   if (!appt.service_id) return fail(errors.generic);
 
+  const target = input.memberId === undefined ? appt.member_id : input.memberId;
   const wanted = { date: input.date, startMin: input.startMin };
-  const rows = await freeRows(supabase, salon.id, appt.service_id, appt.member_id, input.date, 1, appt.id);
+  const rows = await freeRows(supabase, salon.id, appt.service_id, target, input.date, 1, appt.id);
   const slot = rows.find((r) => r.startMin === input.startMin);
-  if (!slot) return fail(conflictCopy.title, await conflictFor(supabase, salon.id, appt.service_id, appt.member_id, wanted, appt.id));
+  if (!slot) return fail(conflictCopy.title, await conflictFor(supabase, salon.id, appt.service_id, target, wanted, appt.id));
 
   // spostato: il promemoria, se era già partito, riparte per il nuovo orario
-  const { data, error } = await supabase.from("appointments").update({ starts_at: slot.startsAt, ends_at: slot.endsAt, reminder_sent_at: null }).eq("id", appt.id).select("id");
-  if (isOverlap(error)) return fail(conflictCopy.title, await conflictFor(supabase, salon.id, appt.service_id, appt.member_id, wanted, appt.id));
+  const { data, error } = await supabase
+    .from("appointments")
+    .update({ starts_at: slot.startsAt, ends_at: slot.endsAt, member_id: slot.memberId, reminder_sent_at: null })
+    .eq("id", appt.id)
+    .select("id");
+  if (isOverlap(error)) return fail(conflictCopy.title, await conflictFor(supabase, salon.id, appt.service_id, target, wanted, appt.id));
   if (error || !data?.length) return fail(errors.generic);
   const before = new Date(appt.starts_at);
   after(() => emailMoved(appt.id, before).catch((e) => console.error("email di spostamento:", e)));
   revalidatePath("/agenda");
   return { ok: true, date: input.date, startMin: input.startMin };
 }
-
-
 
 /** Cambia il prezzo di un appuntamento già fissato (sconto alla cassa, omaggio…). Il listino non cambia. */
 export async function setAppointmentPrice(input: { id: string; priceCents: number; note?: string | null }): Promise<{ ok: true; priceCents: number; priceNote: string } | Failure> {

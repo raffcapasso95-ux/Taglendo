@@ -173,7 +173,7 @@ test.describe("Email e avvisi", () => {
     await openAppointment(page, "Luca Bianchi");
     await dialog(page).getByRole("button", { name: "Sposta" }).click();
     await dialog(page).getByRole("button", { name: /^\d{2}:\d{2}$/ }).and(page.locator(":not([disabled])")).last().click();
-    await dialog(page).getByRole("button", { name: "Conferma" }).click();
+    await dialog(page).getByRole("button", { name: "Sposta", exact: true }).click();
     await expect(page.getByText("Appuntamento spostato").filter({ visible: true })).toBeVisible();
     const moved = await waitForMail(email, /^Nuovo orario: /);
     expect(moved.html).toContain("Il tuo appuntamento è stato spostato");

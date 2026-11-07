@@ -147,6 +147,8 @@ function Inner({ canEdit, salonName, today, selectedDate, operators, services, c
           canEdit={canEdit}
           salonName={salonName}
           multipleOperators={operators.length > 1}
+          operators={operators}
+          closedDates={closedDates}
           onClose={close}
           onChanged={(t, date) => done(t.message, t.sub, date)}
         />

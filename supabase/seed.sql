@@ -222,3 +222,10 @@ join public.services s on s.id = ('5e500000-0000-4000-8000-00000000000' || r.svc
 drop schema seed_tmp cascade;
 
 commit;
+
+-- Foto del salone demo: le righe stanno qui, i file li carica `npm run db:reset` (scripts/demo-photos.mjs).
+insert into public.salon_photos (salon_id, path, sort)
+select '5a100000-0000-4000-8000-000000000001', '5a100000-0000-4000-8000-000000000001/' || f || '.jpg', i
+from unnest(array['hero', 'cambia-taglio', 'cambia-macchinetta', 'cambia-schiuma']) with ordinality as t(f, i);
+
+update public.salons set cover_path = '5a100000-0000-4000-8000-000000000001/hero.jpg' where id = '5a100000-0000-4000-8000-000000000001';
