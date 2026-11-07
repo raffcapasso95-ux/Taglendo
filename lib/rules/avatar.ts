@@ -1,7 +1,7 @@
 /** Avatar dei clienti: iniziali su un colore. Il colore è scelto dal salone o, se manca, ricavato dal nome. */
 
 /** Quanti colori ci sono: Pesca, Prugna, Salvia, Sabbia, Lavanda. */
-export const AVATAR_COLORS = 5;
+const AVATAR_COLORS = 5;
 export const AVATAR_COLOR_NAMES = ["Pesca", "Prugna", "Salvia", "Sabbia", "Lavanda"] as const;
 
 /** Lo stesso nome dà sempre lo stesso colore (senza distinguere maiuscole e accenti). */

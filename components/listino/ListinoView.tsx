@@ -15,7 +15,7 @@ import styles from "./Listino.module.css";
 
 const copy = listinoCopy;
 
-export type ServiceRow = { id: string; name: string; durationMin: number; priceCents: number };
+type ServiceRow = { id: string; name: string; durationMin: number; priceCents: number };
 
 type Props = {
   canEdit: boolean;

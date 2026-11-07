@@ -1,6 +1,6 @@
 /** Quanto deve essere lungo (px) e veloce (ms) uno scorrimento orizzontale per cambiare giorno. */
-export const SWIPE_MIN_DISTANCE = 70;
-export const SWIPE_MAX_MS = 700;
+const SWIPE_MIN_DISTANCE = 70;
+const SWIPE_MAX_MS = 700;
 
 /**
  * Cosa vuol dire un gesto: -1 = giorno prima, 1 = giorno dopo, 0 = niente.

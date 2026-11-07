@@ -11,7 +11,7 @@ type Props = {
 };
 
 /** "Città" dall'indirizzo: quello che segue l'ultima virgola, in maiuscolo. */
-export function areaFromAddress(address: string): string {
+function areaFromAddress(address: string): string {
   const i = address.lastIndexOf(",");
   return i >= 0 ? address.slice(i + 1).trim().toUpperCase() : "";
 }

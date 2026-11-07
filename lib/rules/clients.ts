@@ -29,11 +29,11 @@ export type ClientRow = {
 };
 
 /** Non vengono da 5 settimane: da richiamare. */
-export const RECALL_DAYS = 35;
+const RECALL_DAYS = 35;
 
 export type ClientFilter = "all" | "today" | "recall";
 
-export const normalizeText = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const normalizeText = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 const digitsOf = (s: string) => s.replace(/\D/g, "");
 

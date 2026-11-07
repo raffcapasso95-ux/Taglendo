@@ -48,7 +48,7 @@ export function periodTitle(period: Period, start: string): string {
 const PLURAL: Record<number, string> = { 0: "delle domeniche", 6: "dei sabati" };
 
 /** «sulla media dei giovedì» */
-export function dayAverageText(date: string): string {
+function dayAverageText(date: string): string {
   const wd = weekdayOf(date);
   return `sulla media ${PLURAL[wd] ?? `dei ${lowerFirst(weekdayName(date))}`}`;
 }

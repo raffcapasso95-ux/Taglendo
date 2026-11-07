@@ -1,6 +1,6 @@
 /** Prezzo per un cliente: sconti rapidi, lettura di quello che si scrive e riepilogo. Importi in centesimi. */
 
-export const MAX_PRICE_CENTS = 1_000_000;
+const MAX_PRICE_CENTS = 1_000_000;
 
 /** «25», «25,5», «25.50» → centesimi; vuoto o non valido → null. */
 export function parseEuros(text: string): number | null {

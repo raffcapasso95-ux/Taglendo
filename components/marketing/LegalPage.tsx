@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { company } from "@/lib/site";
 import styles from "./Marketing.module.css";
 
-export type LegalSection = { id: string; title: string; body: ReactNode };
+type LegalSection = { id: string; title: string; body: ReactNode };
 
 type Props = {
   title: string;

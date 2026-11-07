@@ -4,7 +4,7 @@ const DAY_NAMES = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", 
 const DAY_SHORT = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
 
 /** 540 → "9", 570 → "9:30" (come nelle righe brevi del design: "Mar–Sab · 9–19"). */
-export const shortTime = (min: number) => (min % 60 === 0 ? String(min / 60) : formatMinutes(min));
+const shortTime = (min: number) => (min % 60 === 0 ? String(min / 60) : formatMinutes(min));
 
 /** Telefono del salone come indirizzo `tel:`: "051 644 2190" → "tel:+390516442190". */
 export function phoneHref(phone: string): string {

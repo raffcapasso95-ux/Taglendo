@@ -5,8 +5,8 @@ import { env } from "@/lib/supabase/env";
 import type { AccessInput } from "@/lib/billing";
 import { CLOSED_DAY, dayFromRanges, type DayHours } from "@/lib/rules/hours";
 
-export type PublicService = { id: string; name: string; durationMin: number; priceCents: number };
-export type PublicMember = { id: string; name: string; bio: string | null; photoPath: string | null; chairNo: number };
+type PublicService = { id: string; name: string; durationMin: number; priceCents: number };
+type PublicMember = { id: string; name: string; bio: string | null; photoPath: string | null; chairNo: number };
 
 export type PublicSalon = {
   id: string;

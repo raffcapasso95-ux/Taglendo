@@ -293,85 +293,6 @@
 
 /* Tre cose che smetti di fare */
 
-.stop {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-4) 40px;
-  padding: 28px 0;
-  border-top: 1px solid var(--salon-line);
-}
-
-.stopText {
-  flex: 1 1 420px;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.eyebrowPeach {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--brand-peach);
-}
-
-.stopOld {
-  font-size: clamp(24px, 3vw, 40px);
-  line-height: 1.12;
-  letter-spacing: -.04em;
-  font-weight: 700;
-  color: var(--text-inverse);
-  text-wrap: balance;
-  transition: color 400ms ease var(--d, 0ms);
-}
-
-.stopOld > span {
-  background-image: linear-gradient(var(--brand-apricot), var(--brand-apricot));
-  background-repeat: no-repeat;
-  background-position: 0 58%;
-  background-size: 0% 4px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  transition: background-size var(--duration-reveal) var(--ease-reveal) var(--d, 0ms);
-}
-
-[data-seen="true"] .stopOld {
-  color: var(--on-plum-dim);
-}
-
-[data-seen="true"] .stopOld > span {
-  background-size: 100% 4px;
-}
-
-.stopNow {
-  display: flex;
-  gap: 10px;
-  align-items: baseline;
-  font-size: 19px;
-  font-weight: 600;
-}
-
-.stopNowLabel {
-  flex: none;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--brand-apricot);
-}
-
-.stopImg {
-  flex: 0 0 100%;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-card);
-}
-
 /* Prezzi */
 .chairs {
   display: flex;
@@ -847,11 +768,6 @@
     width: 64px;
   }
 
-  .stopImg {
-    flex: 0 0 220px;
-    width: 220px;
-  }
-
   .footerInner {
     padding-bottom: var(--space-8);
   }
@@ -860,8 +776,6 @@
 @media (prefers-reduced-motion: reduce) {
   .header,
 .button,
-.stopOld,
-.stopOld > span,
 .chev,
 .plan,
 .badge,

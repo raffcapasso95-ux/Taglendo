@@ -1,5 +1,5 @@
 /** Prepara la foto di un cliente nel browser: quadrato centrato da 256 px, JPEG. Così pesa poche decine di KB. */
-export const PHOTO_SIZE = 256;
+const PHOTO_SIZE = 256;
 
 export async function resizePhoto(file: File, size = PHOTO_SIZE): Promise<Blob> {
   const bitmap = await createImageBitmap(file);

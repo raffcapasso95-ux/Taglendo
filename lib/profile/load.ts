@@ -6,8 +6,6 @@ import { createClient } from "@/lib/supabase/server";
 
 export type ProfileStats = { month: string; clients: number; revenue: string; next: string | null };
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 /** I numeri della scheda: clienti e incasso del mese corrente e prossimo cliente, per chi guarda. */
 export async function profileStats(memberId: string): Promise<ProfileStats> {
   const supabase = await createClient();
@@ -44,4 +42,3 @@ export async function profileStats(memberId: string): Promise<ProfileStats> {
   };
 }
 
-export { capitalize };

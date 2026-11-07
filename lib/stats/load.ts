@@ -43,7 +43,7 @@ type Summary = {
   series: Array<{ bucket: string; revenue: number }>;
 };
 
-export type DayRow = {
+type DayRow = {
   id: string;
   time: string;
   clientName: string;

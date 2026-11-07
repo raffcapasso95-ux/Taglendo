@@ -55,7 +55,7 @@ export function readQueue(store: Store): QueueItem[] {
   }
 }
 
-export function writeQueue(store: Store, items: QueueItem[]): void {
+function writeQueue(store: Store, items: QueueItem[]): void {
   try {
     store.setItem(QUEUE_KEY, JSON.stringify(items));
   } catch {

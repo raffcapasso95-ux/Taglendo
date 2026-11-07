@@ -3,15 +3,15 @@
  * 9:00–13:00 e 14:30–20:00. La pausa è lo spazio fra due fasce.
  * Regole dei design/ridisegno-2026-11 (listino-orari, listino-orari-giorno). Giorni come nel database: 0 = domenica … 6 = sabato.
  */
-import { formatMinutes, MAX_RANGES, rangesText, dayFromRanges, type Range, type WeekDay } from "./hours";
+import { MAX_RANGES, rangesText, dayFromRanges, type Range, type WeekDay } from "./hours";
 
 /** Di quanto si muove ogni freccia, in minuti. */
 export const STEP = 15;
 /** Una fascia dura almeno questo. */
-export const MIN_RANGE = 30;
+const MIN_RANGE = 30;
 /** Prima e dopo non si apre. */
-export const EARLIEST = 360; // 6:00
-export const LATEST = 1380; // 23:00
+const EARLIEST = 360; // 6:00
+const LATEST = 1380; // 23:00
 
 export type RangeField = "from" | "to";
 
@@ -87,5 +87,3 @@ export const WEEK_ORDER = DAYS_ORDER;
 export const DAY_SHORT = SHORT;
 export const dayTitle = (weekday: number) => DAY_NAMES[weekday]!.charAt(0).toUpperCase() + DAY_NAMES[weekday]!.slice(1);
 
-/** «9:00»: l'orario in uscita dei pulsanti con le frecce. */
-export const timeText = formatMinutes;

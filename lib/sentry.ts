@@ -1,5 +1,5 @@
 /** Opzioni comuni di Sentry. Senza DSN non parte nulla: il codice resta spento. */
-export const sentryDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+const sentryDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 export const sentryOptions = {
   dsn: sentryDsn,

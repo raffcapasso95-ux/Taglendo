@@ -182,12 +182,6 @@
   text-underline-offset: 3px;
 }
 
-.recap {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
 .alert {
   display: flex;
   flex-direction: column;

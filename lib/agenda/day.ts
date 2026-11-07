@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { dayRange, isValidDate, romeDate, romeMinutes, weekdayOf } from "@/lib/dates/rome";
+import { dayRange, romeDate, romeMinutes, weekdayOf } from "@/lib/dates/rome";
 import type { AgendaAppt, DayHours, Operator } from "@/lib/rules/agenda";
 import { dayFromRanges } from "@/lib/rules/hours";
 import type { Database } from "@/lib/supabase/database.types";
@@ -72,4 +72,3 @@ export async function appointmentsOn(supabase: Client, salonId: string, date: st
   });
 }
 
-export { isValidDate };

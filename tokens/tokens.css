@@ -121,7 +121,6 @@
   --radius-field-large: 10px;
   --field-border-width: 1.5px;
   --field-border-width-focus: 2px;
-  --button-height-auth: 52px;
   --code-box-height: 58px;          /* A3: una casella per cifra */
   --code-box-gap: 8px;
   --meter-bar-height: 4px;          /* A2, A5: robustezza della password */
@@ -157,8 +156,6 @@
   --logo-tile-size: 36px;
   --grid-line: #EFE2E5;             /* linea dell'ora */
   --grid-line-soft: #F7EEEF;        /* linea della mezz'ora */
-  --grid-px-per-hour: 96px;
-  --grid-half-hour: 48px;
   --grid-time-col: 56px;
   --grid-col-min: 200px;
   --past-veil: rgba(251, 240, 233, .75);
@@ -187,30 +184,21 @@
   --salon-line-soft: rgba(255, 247, 240, .12);
   --salon-outline: rgba(255, 247, 240, .5);     /* bordo del pulsante secondario */
   --salon-hover: rgba(255, 247, 240, .1);       /* hover sui link della barra */
-  --salon-scrim: linear-gradient(to top, rgba(33, 19, 27, .92) 0%, rgba(33, 19, 27, .55) 45%, rgba(33, 19, 27, .25) 100%);
-  --salon-sign-shadow: 0 20px 40px rgba(0, 0, 0, .35);
   --salon-nail-shadow: 0 2px 0 rgba(0, 0, 0, .4);  /* ombra del chiodo del cartello */
   --plum-line: rgba(62, 37, 50, .18);            /* filetti su fondo pesca */
   --salon-cord: #A88C99;                        /* cavi del cartello */
-  --salon-content: 1200px;
   --salon-gutter: 20px;
-  --salon-header-height: 72px;
-  --salon-tilt: -4deg;
-  --salon-ease-sign: 400ms var(--ease-out);
 }
 
 /* Fase 4b — prenotazione online (Sito Barberia Saragozza.dc.html) */
 :root {
   --booking-step-size: 28px;          /* cerchio col numero del passo */
-  --booking-row-min: 44px;
   --booking-service-min: 72px;        /* riga di un servizio */
   --booking-day-min: 68px;            /* casella di un giorno */
-  --booking-slot-min: 48px;
   --booking-code-min: 68px;
   --booking-code-size: 30px;
   --booking-code-spacing: .45em;
   --duration-accordion: 300ms;        /* apertura dei passi */
-  --ease-accordion: cubic-bezier(0.77, 0, 0.175, 1);
   --check-size: 56px;                 /* ✓ finale */
 }
 
@@ -222,17 +210,12 @@
   --paper-ink: #3B3550;
   --site-header-shadow: 0 1px 0 rgba(62, 37, 50, .14), 0 8px 24px rgba(62, 37, 50, .12);
   --site-bar-bg: rgba(255, 247, 240, .94);  /* barra in basso su telefono */
-  --shadow-sticker: 0 10px 24px rgba(33, 19, 27, .22);
   --shadow-handle: 0 8px 24px rgba(33, 19, 27, .35);
-  --drop-phone: drop-shadow(0 24px 40px rgba(33, 19, 27, .35));
   --on-plum-dim: rgba(255, 247, 240, .72);  /* testo "prima" già superato, su prugna */
   --site-max: 1200px;
-  --site-hero-max: 1240px;
   --site-header-max: 1280px;
   --site-header-height: 72px;
   --site-radius: 24px;
-  --duration-reveal: 700ms;
-  --ease-reveal: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 /* Ridisegno novembre 2026 (design/ridisegno-2026-11) */
@@ -245,9 +228,6 @@
   --space-10: 40px;
   --modal-width-booking: 560px;       /* finestra «Nuovo appuntamento» a righe */
   --cal-day-size: 44px;               /* giorno del calendario mensile */
-  --time-chip-min: 60px;
-  --tab-icon-width: 56px;
-  --tab-icon-height: 30px;
   --mobilebar-height: 56px;           /* testata fissa dell'app su telefono */
   --avatar-large: 88px;
   --avatar-xl: 120px;
@@ -260,11 +240,6 @@
   --shadow-rail: 1px 0 0 #ecdcd6;
   /* statistiche */
   --chart-l0: #f7eeef;
-  --chart-l1: #ecd9dd;
-  --chart-l2: #c9a3b0;
-  --chart-l3: #8a5a6e;
-  --chart-l4: #3e2532;
-  --chart-height: 200px;
   --chart-area: #f28c6f40;
   /* pagina del salone */
   --status-open-dot: #7fd1a8;

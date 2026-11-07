@@ -3,7 +3,7 @@
 import { cx } from "./cx";
 import styles from "./Segmented.module.css";
 
-export type SegmentedOption<T extends string> = { value: T; label: string };
+type SegmentedOption<T extends string> = { value: T; label: string };
 
 type Props<T extends string> = {
   options: ReadonlyArray<SegmentedOption<T>>;

@@ -2,7 +2,7 @@ import { avatarColor, clientInitials } from "@/lib/rules/avatar";
 import { cx } from "./cx";
 import styles from "./Avatar.module.css";
 
-export type AvatarSize = "sm" | "md" | "lg" | "xl";
+type AvatarSize = "sm" | "md" | "lg" | "xl";
 
 type Props = {
   name: string;
