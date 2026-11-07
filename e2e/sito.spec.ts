@@ -13,7 +13,7 @@ test.describe("Sito commerciale", () => {
     // le immagini ci sono davvero
     const loaded = await hero.locator("img").evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.complete && i.naturalWidth > 0));
     expect(loaded.every(Boolean)).toBe(true);
-    for (const heading of ["Lo stesso venerdì, sul quaderno e su Taglendo.", "Tre passi, e i clienti prenotano da soli.", "Online o al telefono: decidi tu.", "Tre cose che smetti di fare.", "Domande frequenti"]) {
+    for (const heading of ["Lo stesso venerdì, sul quaderno e su Taglendo.", "Pronto in 3 passi.", "Online o al telefono: decidi tu.", "Tre cose che smetti di fare.", "Domande frequenti"]) {
       await expect(page.getByRole("heading", { name: heading })).toBeVisible();
     }
   });
@@ -23,8 +23,9 @@ test.describe("Sito commerciale", () => {
     const prezzi = page.locator("#prezzi");
     await expect(prezzi.getByRole("heading", { name: "Gratis durante la beta." })).toBeVisible();
     await expect(prezzi.getByText("Quando partiranno gli abbonamenti ti avvisiamo con largo anticipo")).toBeVisible();
-    await expect(prezzi.getByRole("heading", { name: "Il resto è già dentro." })).toBeVisible();
+    await expect(prezzi.getByText("Listino Taglendo")).toBeVisible();
     await expect(prezzi.getByText("Agenda per poltrona")).toBeVisible();
+    await expect(prezzi.getByText("Totale durante la beta")).toBeVisible();
     // nessuna cifra di abbonamento in pagina
     await expect(page.getByText(/9,90|19,90/)).toHaveCount(0);
     await expect(prezzi.getByRole("button", { name: "2" })).toHaveCount(0);
@@ -34,13 +35,13 @@ test.describe("Sito commerciale", () => {
     await page.goto("/");
     const handle = page.getByRole("slider", { name: /Sposta il confronto/ });
     await handle.scrollIntoViewIfNeeded();
-    await expect(handle).toHaveAttribute("aria-valuenow", "52");
+    await expect(handle).toHaveAttribute("aria-valuenow", "50");
     await handle.focus();
     await page.keyboard.press("ArrowLeft");
-    await expect(handle).toHaveAttribute("aria-valuenow", "47");
+    await expect(handle).toHaveAttribute("aria-valuenow", "45");
     await page.keyboard.press("ArrowRight");
     await page.keyboard.press("ArrowRight");
-    await expect(handle).toHaveAttribute("aria-valuenow", "57");
+    await expect(handle).toHaveAttribute("aria-valuenow", "55");
     const box = (await handle.boundingBox())!;
     const container = (await page.locator("section#prima [role=slider]").locator("..").boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -62,15 +63,26 @@ test.describe("Sito commerciale", () => {
     await expect(page.getByText(/Aprono il tuo link dal telefono/)).toBeVisible();
   });
 
-  test("l'email scritta nel sito arriva compilata nella registrazione", async ({ page }) => {
+  test("la chiusura porta alla registrazione e all'accesso", async ({ page }) => {
     await page.goto("/");
-    const form = page.locator("#inizia");
-    await form.scrollIntoViewIfNeeded();
-    await expect(form.getByText("Gratis durante la beta, niente carta di credito.")).toBeVisible();
-    await form.getByLabel("La tua email").fill("mario@barberia.it");
-    await form.getByRole("button", { name: "Prova gratis" }).click();
-    await expect(page).toHaveURL(/\/registrati\?email=mario%40barberia\.it/);
-    await expect(page.getByLabel("Email")).toHaveValue("mario@barberia.it");
+    const end = page.locator("#inizia");
+    await end.scrollIntoViewIfNeeded();
+    await expect(end.getByRole("heading", { name: "Meno telefonate, più tagli." })).toBeVisible();
+    await expect(end.getByText("Senza carta di credito")).toBeVisible();
+    await expect(end.getByRole("link", { name: "Accedi" })).toHaveAttribute("href", "/accedi");
+    await end.getByRole("link", { name: /Crea il mio link gratis/ }).click();
+    await expect(page).toHaveURL(/\/registrati/);
+  });
+
+  test("online o al telefono: l'interruttore cambia testo e anteprima", async ({ page }) => {
+    await page.goto("/");
+    const online = page.getByRole("tab", { name: "Prenotazione online" });
+    await online.scrollIntoViewIfNeeded();
+    await expect(online).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByText("Primi orari liberi")).toBeVisible();
+    await page.getByRole("tab", { name: "Solo al telefono" }).click();
+    await expect(page.getByText("Nessun appuntamento entra senza passare da te")).toBeVisible();
+    await expect(page.getByText("Primi orari liberi")).toBeHidden();
   });
 
   test("chi ha già una sessione trova «Vai all'agenda»", async ({ page }) => {
@@ -99,7 +111,7 @@ test.describe("Sito commerciale", () => {
     await expect(footer.getByRole("link", { name: "Termini di servizio" })).toHaveAttribute("href", "/termini");
     await expect(footer.getByRole("link", { name: "Cookie", exact: true })).toHaveAttribute("href", "/cookie");
     await expect(footer.getByRole("link", { name: "aiuto@taglendo.it" })).toHaveAttribute("href", "mailto:aiuto@taglendo.it");
-    await expect(footer.locator("mark")).toHaveCount(3); // ragione sociale, P.IVA, sede
+    await expect(footer.getByText(/^\[.+\]$/)).toHaveCount(3); // ragione sociale, P.IVA, sede
   });
 
   test("le pagine legali hanno indice, avviso di bozza e testi", async ({ page }) => {

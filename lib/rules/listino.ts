@@ -1,86 +1,89 @@
 /**
- * Orari del salone (scheda Listino e orari): un orario uguale per tutti i giorni aperti,
- * con pausa facoltativa. Regole e limiti da design/Taglendo App.dc.html (hStep, hToggleDay, hPause, hSave).
- * Giorni come nel database: 0 = domenica … 6 = sabato.
+ * Orari del salone (scheda «Orari» di Listino e orari): ogni giorno ha le sue fasce, per esempio
+ * 9:00–13:00 e 14:30–20:00. La pausa è lo spazio fra due fasce.
+ * Regole dei design/ridisegno-2026-11 (listino-orari, listino-orari-giorno). Giorni come nel database: 0 = domenica … 6 = sabato.
  */
-import { formatMinutes } from "./hours";
-
-export type HoursDraft = {
-  /** Giorni chiusi (0 = domenica). Non possono essere tutti e sette. */
-  closedDays: number[];
-  open: number;
-  close: number;
-  /** Pausa pranzo: inizio e fine, oppure -1 se l'orario è continuato. */
-  breakStart: number;
-  breakEnd: number;
-};
-
-export type HoursField = "open" | "close" | "breakStart" | "breakEnd";
+import { MAX_RANGES, rangesText, dayFromRanges, type Range, type WeekDay } from "./hours";
 
 /** Di quanto si muove ogni freccia, in minuti. */
-export const STEP: Record<HoursField, number> = { open: 30, close: 30, breakStart: 15, breakEnd: 15 };
+export const STEP = 15;
+/** Una fascia dura almeno questo. */
+const MIN_RANGE = 30;
+/** Prima e dopo non si apre. */
+const EARLIEST = 360; // 6:00
+const LATEST = 1380; // 23:00
 
-const LIMITS = (d: HoursDraft): Record<HoursField, [number, number]> => ({
-  open: [360, d.close - 120],
-  close: [d.open + 120, 1320],
-  breakStart: [d.open + 30, d.breakEnd - 15],
-  breakEnd: [d.breakStart + 15, d.close - 30],
-});
+export type RangeField = "from" | "to";
 
-export const hasBreak = (d: HoursDraft) => d.breakStart >= 0;
-
-/** Sposta un orario di `delta` minuti dentro i limiti (apertura 6:00, chiusura 22:00, almeno 2 ore aperto). */
-export function stepHours(d: HoursDraft, field: HoursField, delta: number): HoursDraft {
-  const [lo, hi] = LIMITS(d)[field];
-  return { ...d, [field]: Math.max(lo, Math.min(hi, d[field] + delta)) };
+/** Sposta l'inizio o la fine di una fascia di `delta` minuti, senza uscire dai limiti né toccare le fasce vicine. */
+export function stepRange(ranges: Range[], index: number, field: RangeField, delta: number): Range[] {
+  const cur = ranges[index];
+  if (!cur) return ranges;
+  const prevEnd = index > 0 ? ranges[index - 1]![1] : EARLIEST;
+  const nextStart = index < ranges.length - 1 ? ranges[index + 1]![0] : LATEST;
+  const [from, to] = cur;
+  const next: Range =
+    field === "from"
+      ? [Math.max(prevEnd, Math.min(to - MIN_RANGE, from + delta)), to]
+      : [from, Math.min(nextStart, Math.max(from + MIN_RANGE, to + delta))];
+  return ranges.map((r, i) => (i === index ? next : r));
 }
 
-/** Apre o chiude un giorno. Almeno un giorno resta aperto. */
-export function toggleDay(d: HoursDraft, weekday: number): HoursDraft {
-  const closed = d.closedDays.includes(weekday) ? d.closedDays.filter((x) => x !== weekday) : [...d.closedDays, weekday];
-  return closed.length >= 7 ? d : { ...d, closedDays: closed };
+/** Aggiunge una fascia dopo l'ultima (15:00–19:00 se c'è posto, altrimenti quello che resta). Null se non ce n'è. */
+export function addRange(ranges: Range[]): Range[] | null {
+  if (ranges.length >= MAX_RANGES) return null;
+  const lastEnd = ranges.length ? ranges[ranges.length - 1]![1] : 540;
+  const start = Math.min(ranges.length ? lastEnd + 30 : 540, LATEST - MIN_RANGE);
+  const end = Math.min(start + 240, LATEST);
+  if (end - start < MIN_RANGE || (ranges.length && lastEnd >= LATEST - MIN_RANGE - 30)) return null;
+  return [...ranges, [start, end]];
 }
 
-/** Accende la pausa (90 minuti verso le 13:00, dentro l'orario) o la toglie. */
-export function setBreak(d: HoursDraft, on: boolean): HoursDraft {
-  if (!on) return { ...d, breakStart: -1, breakEnd: -1 };
-  if (hasBreak(d)) return d;
-  const start = Math.max(d.open + 60, Math.min(780, d.close - 150));
-  return { ...d, breakStart: start, breakEnd: start + 90 };
+/** Toglie una fascia. */
+export const removeRange = (ranges: Range[], index: number): Range[] => ranges.filter((_, i) => i !== index);
+
+/** Tutta la settimana come la si salva: almeno un giorno resta aperto. */
+export function canSaveWeek(week: WeekDay[]): boolean {
+  return week.some((d) => !d.closed && d.ranges.length > 0);
 }
 
-/** "Nuovo orario: 9:00–19:00, pausa 13:00–14:30. Agenda e link si aggiornano quando salvi." */
-export function previewText(d: HoursDraft): string {
-  const pause = hasBreak(d) ? `, pausa ${formatMinutes(d.breakStart)}–${formatMinutes(d.breakEnd)}` : ", orario continuato";
-  return `Nuovo orario: ${formatMinutes(d.open)}–${formatMinutes(d.close)}${pause}. Agenda e link si aggiornano quando salvi.`;
+/** Copia le fasce di un giorno sugli altri giorni scelti, aprendoli. */
+export function copyDay(week: WeekDay[], from: number, to: number[]): WeekDay[] {
+  const src = week[from]!;
+  return week.map((d, i) => (to.includes(i) ? { closed: false, ranges: src.ranges.map((r): Range => [r[0], r[1]]) } : d));
+}
+
+const DAY_NAMES = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+
+/** «Aperto 5 giorni · 43 h a settimana» e «Oggi, venerdì: 9:00–13:00 · 14:30–19:00». */
+export function weekSummary(week: WeekDay[], todayWeekday: number): { main: string; sub: string } {
+  const days = week.map(dayFromRanges);
+  const open = days.filter((d) => !d.closed);
+  const minutes = open.reduce((sum, d) => sum + (d.closeMin! - d.openMin!) - d.breaks.reduce((s, [a, b]) => s + (b - a), 0), 0);
+  const hours = Math.round(minutes / 60);
+  const today = days[todayWeekday]!;
+  return {
+    main: `Aperto ${open.length} ${open.length === 1 ? "giorno" : "giorni"} · ${hours} h a settimana`,
+    sub: `Oggi, ${DAY_NAMES[todayWeekday]}: ${today.closed ? "chiuso" : rangesText(today)}`,
+  };
 }
 
 export type Slot = { weekday: number; startMin: number; endMin: number };
 
-/** Quanti appuntamenti restano fuori dal nuovo orario (giorno chiuso, fuori apertura, dentro la pausa). */
-export function outsideHours(appts: Slot[], d: HoursDraft): number {
-  return appts.filter(
-    (a) =>
-      d.closedDays.includes(a.weekday) ||
-      a.startMin < d.open ||
-      a.endMin > d.close ||
-      (hasBreak(d) && a.startMin < d.breakEnd && a.endMin > d.breakStart),
-  ).length;
+/** Quanti appuntamenti restano fuori dal nuovo orario (giorno chiuso, fuori dalle fasce, dentro una pausa). */
+export function outsideHours(appts: Slot[], week: WeekDay[]): number {
+  return appts.filter((a) => {
+    const day = week[a.weekday];
+    if (!day || day.closed || day.ranges.length === 0) return true;
+    return !day.ranges.some(([from, to]) => a.startMin >= from && a.endMin <= to);
+  }).length;
 }
 
 const DAYS_ORDER = [1, 2, 3, 4, 5, 6, 0]; // da lunedì a domenica
 const SHORT = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
 
-/** "Mar – Sab" / "Lun, Mer – Ven" per i giorni aperti, raggruppando quelli consecutivi. */
-export function openDaysLabel(closedDays: number[]): string {
-  const runs: Array<[number, number]> = [];
-  DAYS_ORDER.forEach((w, i) => {
-    if (closedDays.includes(w)) return;
-    const last = runs[runs.length - 1];
-    if (last && last[1] === i - 1) last[1] = i;
-    else runs.push([i, i]);
-  });
-  return runs
-    .map(([a, b]) => (a === b ? SHORT[DAYS_ORDER[a]!]! : b === a + 1 ? `${SHORT[DAYS_ORDER[a]!]}, ${SHORT[DAYS_ORDER[b]!]}` : `${SHORT[DAYS_ORDER[a]!]} – ${SHORT[DAYS_ORDER[b]!]}`))
-    .join(", ");
-}
+/** I giorni, da lunedì a domenica, nell'ordine della settimana italiana. */
+export const WEEK_ORDER = DAYS_ORDER;
+export const DAY_SHORT = SHORT;
+export const dayTitle = (weekday: number) => DAY_NAMES[weekday]!.charAt(0).toUpperCase() + DAY_NAMES[weekday]!.slice(1);
+

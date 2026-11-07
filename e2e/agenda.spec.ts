@@ -70,10 +70,53 @@ test.describe("Agenda (sola lettura)", () => {
   test("la navigazione porta alle altre schede", async ({ page, isMobile }) => {
     await signIn(page, ANDREA, DEMO_PASSWORD);
     await page.goto("/agenda");
-    const nav = page.getByRole("navigation", { name: "Menu principale" }).filter({ visible: true });
-    await nav.getByRole("link", { name: isMobile ? "Clienti" : "Clienti" }).click();
+    // desktop: barra laterale; telefono: pulsante «Menu» che apre il pannello da destra
+    const nav = isMobile ? page.getByRole("dialog", { name: "Menu" }) : page.getByRole("navigation", { name: "Menu principale" });
+    const open = async () => {
+      if (isMobile) await page.getByRole("button", { name: "Menu" }).click();
+    };
+    await open();
+    await nav.getByRole("link", { name: "Clienti" }).click();
     await expect(page).toHaveURL(/\/clienti$/);
+    await open();
     await nav.getByRole("link", { name: "Agenda" }).click();
     await expect(page).toHaveURL(/\/agenda$/);
+  });
+
+  test("il calendario mensile porta a un giorno lontano e mostra chiusi e giorni con appuntamenti", async ({ page }) => {
+    await signIn(page, ANDREA, DEMO_PASSWORD);
+    await page.goto("/agenda");
+    const open = page.getByRole("button", { name: "Apri il calendario" });
+    await open.click();
+    await expect(open).toHaveAttribute("aria-expanded", "true");
+    const cal = page.getByRole("dialog", { name: "Vai a un giorno" });
+    await expect(cal).toBeVisible();
+    // sette scorciatoie di mese; con le frecce si cambia mese
+    await expect(cal.getByRole("group", { name: "Vai al mese" }).getByRole("button")).toHaveCount(7);
+    const title = cal.getByRole("heading", { level: 3 });
+    const before = await title.textContent();
+    await cal.getByRole("button", { name: "Mese successivo" }).click();
+    await expect(title).not.toHaveText(before ?? "");
+    // i giorni chiusi (domenica e lunedì nel salone demo) lo dicono nel nome
+    await expect(cal.getByRole("button", { name: /domenica .*, chiuso/i }).first()).toBeVisible();
+    // si sceglie un giorno e «Apri …» porta lì
+    const day = cal.getByRole("button", { name: /^Mercoledì \d+ .* 20\d\d$/ }).first();
+    const label = (await day.getAttribute("aria-label")) ?? "";
+    await day.click();
+    await expect(day).toHaveAttribute("aria-pressed", "true");
+    await cal.getByRole("button", { name: /^Apri / }).click();
+    await expect(page).toHaveURL(/\/agenda\?g=\d{4}-\d{2}-\d{2}/);
+    await expect(page.getByRole("heading", { level: 1 })).toContainText(label.split(" ").slice(0, 3).join(" "));
+  });
+
+  test("Esc chiude il calendario e il fuoco torna al pulsante", async ({ page }) => {
+    await signIn(page, ANDREA, DEMO_PASSWORD);
+    await page.goto("/agenda");
+    const open = page.getByRole("button", { name: "Apri il calendario" });
+    await open.click();
+    await expect(page.getByRole("dialog", { name: "Vai a un giorno" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: "Vai a un giorno" })).toBeHidden();
+    await expect(open).toBeFocused();
   });
 });

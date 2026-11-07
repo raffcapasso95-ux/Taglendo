@@ -21,11 +21,6 @@
   color: var(--text-primary);
 }
 
-.sectionNote {
-  font-weight: 400;
-  color: var(--text-secondary);
-}
-
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -61,12 +56,6 @@
   text-decoration: line-through;
   background: var(--surface-muted);
   cursor: not-allowed;
-}
-
-.chipSub {
-  font-size: 12px;
-  font-weight: 400;
-  opacity: .85;
 }
 
 .times {
@@ -193,12 +182,6 @@
   text-underline-offset: 3px;
 }
 
-.recap {
-  margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
 .alert {
   display: flex;
   flex-direction: column;
@@ -226,8 +209,7 @@
   gap: var(--space-2);
 }
 
-.badge,
-.badgeNow {
+.badge {
   align-self: flex-start;
   padding: 5px var(--space-2);
   border-radius: 6px;
@@ -255,11 +237,6 @@
   color: var(--status-error);
 }
 
-.badgeNow {
-  background: var(--brand-apricot);
-  color: var(--brand-plum);
-}
-
 .when {
   display: flex;
   align-items: baseline;
@@ -276,14 +253,6 @@
 .whenSub {
   font-size: 14px;
   color: var(--text-secondary);
-}
-
-.who {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -.02em;
-  overflow-wrap: anywhere;
 }
 
 .sub {
@@ -357,12 +326,6 @@
 
 
 /* ── Nuovo appuntamento: orari proposti, scelta fatta e riepilogo vicino al pulsante ── */
-.footerStack {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  width: 100%;
-}
 
 .footerButtons {
   display: flex;
@@ -373,60 +336,101 @@
   flex: 1;
 }
 
-.footerStack .recap {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
-  text-wrap: balance;
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): finestre dell'agenda --- */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-.suggest {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
-  gap: var(--space-2);
+.searchBox {
+  padding-left: var(--space-3);
 }
 
-.slotBig {
-  min-height: 56px;
+.searchIcon {
+  color: var(--text-secondary);
+  flex: 0 0 auto;
+}
+
+.footerButtons > :last-child {
+  flex: 2 1 0;
+}
+
+.whenDays {
+  align-items: stretch;
+  gap: 6px;
+  display: flex;
+}
+
+.whenDays .days {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-bottom: 0;
+}
+
+.dayButton:disabled {
+  color: var(--text-secondary);
+  background: none;
+  border-style: dashed;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.calButton {
+  width: var(--day-chip-width);
+  min-height: var(--day-chip-height);
+  flex: 0 0 auto;
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-button);
+  border-radius: var(--radius-day);
   background: var(--surface);
   color: var(--text-primary);
-  font-size: 18px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  cursor: pointer;
 }
 
-.slotBig[aria-pressed="true"] {
+.calButtonOn {
   border-color: var(--brand-plum);
   background: var(--brand-plum);
   color: var(--brand-cream);
 }
 
-.picked {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--brand-plum);
-  border-radius: var(--radius-button);
-  background: var(--surface);
-}
-
-.pickedText {
-  display: flex;
+.timeGroup {
+  gap: 6px;
   flex-direction: column;
-  min-width: 0;
+  display: flex;
 }
 
-.pickedWhen {
-  font-size: 17px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.pickedSub {
-  font-size: 13px;
+.timeGroupTitle {
   color: var(--text-secondary);
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.whenTimes {
+  gap: var(--space-3);
+  flex-direction: column;
+  display: flex;
+}
+
+.whenCal .Calendar_months {
+  margin: 0;
+  padding: 2px 0;
+}
+
+.calButton {
+  flex-direction: column;
+  gap: 2px;
+}
+
+.calButtonDate {
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
 }

@@ -34,13 +34,13 @@ export const PRESET_SERVICES: ServiceDraft[] = [
 ];
 
 /** "20" o "9,50" → centesimi. Null se non è un prezzo. */
-export function parsePriceCents(text: string): number | null {
+function parsePriceCents(text: string): number | null {
   const n = Number(text.trim().replace(",", "."));
   if (!text.trim() || !Number.isFinite(n) || n < 0 || n > 9999) return null;
   return Math.round(n * 100);
 }
 
-export function parseDuration(text: string): number | null {
+function parseDuration(text: string): number | null {
   const n = Number(text.trim());
   return Number.isInteger(n) && n >= 5 && n <= 240 ? n : null;
 }

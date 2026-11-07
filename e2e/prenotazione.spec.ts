@@ -18,9 +18,9 @@ async function chooseFirstSlot(page: Page) {
   await banner.waitFor({ timeout: 5000 }).catch(() => {});
   if (await banner.isVisible()) await banner.getByRole("button", { name: "Rifiuta" }).click(); // il banner cookie copre il modulo sul telefono
   await card(page).getByRole("button", { name: /^Taglio uomo/ }).click();
-  const quick = card(page).getByText("Primi orari liberi").locator("..").getByRole("button").first();
-  await expect(quick).toBeVisible();
-  await quick.click();
+  const first = card(page).getByRole("button", { name: /Prima disponibilità/ });
+  await expect(first).toBeVisible();
+  await first.click();
 }
 
 async function fillData(page: Page, email: string, name = "Mario Rossi") {
@@ -28,7 +28,7 @@ async function fillData(page: Page, email: string, name = "Mario Rossi") {
   await card(page).getByLabel("Nome e cognome").fill(name);
   await card(page).getByLabel("Email", { exact: true }).fill(email);
   await card(page).getByRole("checkbox", { name: /informativa privacy/ }).click();
-  await card(page).getByRole("button", { name: "Prenota", exact: true }).click();
+  await card(page).getByRole("button", { name: /^Prenota · / }).click();
 }
 
 test.describe("Prenotazione online", () => {
@@ -37,7 +37,7 @@ test.describe("Prenotazione online", () => {
     const visitor = await browser.newPage();
     const email = uniqueEmail("cliente");
     await visitor.goto(`/${slug}`);
-    await expect(visitor.getByRole("heading", { name: "Tre passi, un minuto." })).toBeVisible();
+    await expect(visitor.getByRole("heading", { name: "Prenota in un minuto." })).toBeVisible();
 
     await chooseFirstSlot(visitor);
     await fillData(visitor, email);
@@ -87,13 +87,13 @@ test.describe("Prenotazione online", () => {
     await chooseFirstSlot(visitor);
     await card(visitor).getByLabel("Nome e cognome").fill("Mario Rossi");
     await card(visitor).getByLabel("Email", { exact: true }).fill("mario@example.com");
-    await card(visitor).getByRole("button", { name: "Prenota", exact: true }).click();
-    await expect(visitor.getByText("Conferma di aver letto l’informativa per prenotare.")).toBeVisible();
+    await expect(visitor.getByText("Mancano: informativa privacy.")).toBeVisible();
+    await card(visitor).getByRole("button", { name: /^Prenota · / }).click({ force: true }); // spento finché manca qualcosa: tocca lo stesso
+    await expect(visitor.getByText("Mancano: informativa privacy.")).toBeVisible();
     await expect(visitor.getByRole("heading", { name: "Controlla la tua email" })).toBeHidden();
     // email sbagliata
     await card(visitor).getByLabel("Email", { exact: true }).fill("mario@");
-    await card(visitor).getByLabel("Nome e cognome").click();
-    await expect(visitor.getByText("Controlla l’email: manca qualcosa (es. nome@esempio.it).")).toBeVisible();
+    await expect(visitor.getByText("Mancano: email e informativa privacy.")).toBeVisible();
     await visitor.close();
   });
 
@@ -130,8 +130,8 @@ test.describe("Prenotazione online", () => {
     await adminUpdate("salons", `slug=eq.${slug}`, { booking_online: false });
     const visitor = await browser.newPage();
     await visitor.goto(`/${slug}`);
-    await expect(visitor.getByRole("heading", { name: "Si prenota al telefono." })).toBeVisible();
-    await expect(visitor.getByRole("heading", { name: "Tre passi, un minuto." })).toHaveCount(0);
+    await expect(visitor.getByRole("heading", { name: "Servizi e prezzi." })).toBeVisible();
+    await expect(visitor.getByRole("heading", { name: "Prenota in un minuto." })).toHaveCount(0);
     await visitor.close();
   });
 

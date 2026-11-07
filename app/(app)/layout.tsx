@@ -7,16 +7,17 @@ import { env } from "@/lib/supabase/env";
 
 /**
  * Tutto il gestionale richiede un utente con un salone che ha finito il primo avvio,
- * e sta dentro la barra laterale (desktop) o la barra in basso (telefono).
+ * e sta dentro la barra laterale (desktop) o la testata con il menu (telefono).
  */
 async function Guard({ children }: { children: ReactNode }) {
-  const { name, salon } = await requireSalon();
+  const { name, salon, role } = await requireSalon();
   return (
     <AppShell
       salonName={salon.name}
       bookingUrl={`${env.siteUrl()}/${salon.slug}`}
       userName={name}
       userInitials={initials(name)}
+      isOwner={role === "owner"}
     >
       {children}
     </AppShell>

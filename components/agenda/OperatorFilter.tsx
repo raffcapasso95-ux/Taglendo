@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cx } from "@/components/ui/cx";
-import type { Operator } from "@/lib/rules/agenda";
+import { operatorColor, type Operator } from "@/lib/rules/agenda";
 import { OperatorAvatar } from "./OperatorAvatar";
 import styles from "./Agenda.module.css";
 
@@ -31,7 +31,7 @@ export function OperatorFilter({ operators, selected, date, today }: Props) {
           scroll={false}
         >
           <span className={styles.filterAvatar}>
-            <OperatorAvatar name={o.name} colorIndex={i} size="sm" />
+            <OperatorAvatar name={o.name} colorIndex={operatorColor(o, i)} size="sm" />
           </span>
           {o.name}
         </Link>

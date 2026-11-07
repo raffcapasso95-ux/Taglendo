@@ -45,6 +45,8 @@ type Props = {
   operators: Operator[];
   services: ServiceOption[];
   clients: ClientOption[];
+  /** Giorni di chiusura del salone nelle prossime settimane. */
+  closedDates: string[];
   day: DayModel;
   savedAt: string;
   /** Foglio “nuovo appuntamento” da aprire subito (arriva dalla scheda cliente). */
@@ -63,7 +65,7 @@ export function AgendaProvider(props: Props) {
   );
 }
 
-function Inner({ canEdit, salonName, today, selectedDate, operators, services, clients, day, savedAt, initialNew, children }: Props) {
+function Inner({ canEdit, salonName, today, selectedDate, operators, services, clients, closedDates, day, savedAt, initialNew, children }: Props) {
   const router = useRouter();
   const toast = useToast();
   const [dialog, setDialog] = useState<Dialog | null>(() => (canEdit && initialNew ? { kind: "new", prefill: initialNew } : null));
@@ -126,6 +128,7 @@ function Inner({ canEdit, salonName, today, selectedDate, operators, services, c
           operators={operators}
           services={services}
           clients={clients}
+          closedDates={closedDates}
           today={today}
           selectedDate={selectedDate}
           onClose={close}
@@ -144,6 +147,8 @@ function Inner({ canEdit, salonName, today, selectedDate, operators, services, c
           canEdit={canEdit}
           salonName={salonName}
           multipleOperators={operators.length > 1}
+          operators={operators}
+          closedDates={closedDates}
           onClose={close}
           onChanged={(t, date) => done(t.message, t.sub, date)}
         />

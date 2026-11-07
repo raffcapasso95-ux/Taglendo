@@ -58,7 +58,7 @@ test.describe("Taglendo sul telefono", () => {
   test("tenere premuto un pulsante non seleziona il testo; i contenuti restano selezionabili", async ({ page }) => {
     await freshOwner(page, "Barberia Pressione Lunga");
     await page.goto("/agenda");
-    const tab = page.getByRole("link", { name: "Clienti" }).filter({ visible: true }).first();
+    const tab = page.getByRole("button", { name: "Menu" }).filter({ visible: true }).first();
     expect(await tab.evaluate((el) => getComputedStyle(el).userSelect)).toBe("none");
     expect(await page.locator("body").evaluate((el) => getComputedStyle(el).userSelect)).not.toBe("none");
   });
@@ -89,5 +89,23 @@ test.describe("Taglendo sul telefono", () => {
     await swipe(page, [60, y], [330, y]);
     // il giorno di oggi ha l'indirizzo senza data
     await expect(page).toHaveURL(prev === romeNow().date ? /\/agenda$/ : new RegExp(`g=${prev}`));
+  });
+
+  test("il «Menu» in alto apre il pannello con le sezioni, il profilo e «Esci»; Esc lo chiude", async ({ page }) => {
+    await freshOwner(page, "Barberia Menu Telefono");
+    await page.goto("/agenda");
+    await expect(page.locator("header").getByText("Agenda", { exact: true }).first()).toBeVisible(); // nome della sezione
+    const opener = page.getByRole("button", { name: "Menu" });
+    await expect(opener).toHaveAttribute("aria-expanded", "false");
+    await opener.click();
+    const menu = page.getByRole("dialog", { name: "Menu" });
+    await expect(menu).toBeVisible();
+    for (const name of ["Agenda", "Clienti", "Statistiche", "Listino e orari", "Link di prenotazione", "Impostazioni", "Copia il link di prenotazione", "Esci"]) {
+      await expect(menu.getByText(name, { exact: true })).toBeVisible();
+    }
+    await expect(menu.getByText(/^Titolare · Barberia Menu Telefono$/)).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(opener).toBeFocused();
   });
 });

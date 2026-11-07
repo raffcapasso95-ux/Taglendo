@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import { CardsSkeleton } from "@/components/states/Skeletons";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { Card } from "@/components/ui";
+import { cx } from "@/components/ui/cx";
+import { ScissorsIcon, UsersIcon } from "@/components/app/Icons";
+import { BellIcon, CardIcon, HelpIcon, MailIcon, PageIcon, RulesIcon } from "@/components/settings/SettingsIcons";
 import styles from "@/components/listino/Listino.module.css";
+import settings from "@/components/settings/Settings.module.css";
 import { signOut } from "@/lib/auth/actions";
 import { requireSalon } from "@/lib/auth/session";
 import { company } from "@/lib/site";
@@ -16,6 +21,44 @@ export const metadata: Metadata = { title: "Impostazioni · Taglendo" };
 
 const copy = listinoCopy.settings;
 
+type Row = { href: string; label: string; sub: string; tone: 0 | 1 | 2 | 3; icon: ReactNode };
+
+/** Un gruppo di righe con icona colorata e una riga di spiegazione (Impostazioni del titolare). */
+function Group({ id, title, rows }: { id: string; title: string; rows: Row[] }) {
+  return (
+    <section className={settings.section} aria-labelledby={id}>
+      <h2 className={settings.title} id={id}>
+        {title}
+      </h2>
+      <div className={settings.group}>
+        {rows.map((r) => {
+          const inner = (
+            <>
+              <span className={cx(settings.icon, settings[`t${r.tone}` as "t0"])}>{r.icon}</span>
+              <span className={settings.text}>
+                <span className={settings.label}>{r.label}</span>
+                {r.sub ? <span className={settings.sub}>{r.sub}</span> : null}
+              </span>
+              <span className={settings.chev} aria-hidden="true">
+                ›
+              </span>
+            </>
+          );
+          return r.href.startsWith("mailto:") ? (
+            <a key={r.href} className={settings.row} href={r.href}>
+              {inner}
+            </a>
+          ) : (
+            <Link key={r.href} className={settings.row} href={r.href}>
+              {inner}
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 async function Content() {
   const { name, role, chair_no: chair, salon } = await requireSalon();
   const owner = role === "owner";
@@ -26,22 +69,61 @@ async function Content() {
     ownerName = data?.name ?? "";
   }
 
-  const rows = [
-    { href: "/listino", label: copy.rows.listino },
-    { href: "/impostazioni/operatori", label: copy.rows.operators, sub: copy.operatorsSub },
-    { href: "/impostazioni/regole", label: copy.rows.rules },
-    { href: "/impostazioni/email", label: copy.rows.emails },
-    { href: "/impostazioni/pagina", label: copy.rows.page },
-    { href: "/impostazioni/avvisi", label: copy.rows.alerts },
+  if (owner) {
     // Con i pagamenti spenti (beta gratuita) non c'è nessun abbonamento da gestire.
-    ...(billingEnabled() ? [{ href: "/impostazioni/abbonamento", label: copy.rows.subscription }] : []),
-  ];
+    const salonRows: Row[] = [
+      { href: "/listino", label: copy.rows.listino, sub: copy.rowSub.listino, tone: 0, icon: <ScissorsIcon /> },
+      { href: "/impostazioni/operatori", label: copy.rows.operators, sub: copy.operatorsSub, tone: 1, icon: <UsersIcon /> },
+      { href: "/impostazioni/regole", label: copy.rows.rules, sub: copy.rowSub.rules, tone: 2, icon: <RulesIcon /> },
+      { href: "/impostazioni/pagina", label: copy.rows.page, sub: copy.rowSub.page, tone: 3, icon: <PageIcon /> },
+      ...(billingEnabled() ? [{ href: "/impostazioni/abbonamento", label: copy.rows.subscription, sub: "", tone: 1 as const, icon: <CardIcon /> }] : []),
+    ];
+    const messageRows: Row[] = [
+      { href: "/impostazioni/email", label: copy.rows.emails, sub: copy.rowSub.emails, tone: 1, icon: <MailIcon /> },
+      { href: "/impostazioni/avvisi", label: copy.rows.alerts, sub: copy.rowSub.alerts, tone: 0, icon: <BellIcon /> },
+    ];
+    return (
+      <main className={cx(styles.page, settings.page)}>
+        <header className={styles.head}>
+          <p className={styles.eyebrow}>{name.split(/\s+/)[0]} · Titolare</p>
+          <h1 className={styles.title}>{copy.title}</h1>
+        </header>
+
+        <Link href="/profilo" className={settings.profile}>
+          <span className={settings.avatar}>{initials(name)}</span>
+          <span className={settings.text}>
+            <span className={settings.profileName}>{name}</span>
+            <span className={settings.sub}>Titolare · Poltrona {chair}</span>
+          </span>
+          <span className={settings.chev} aria-hidden="true">
+            ›
+          </span>
+        </Link>
+
+        <Group id="set-salone" title={copy.salon} rows={salonRows} />
+        <Group id="set-clienti" title={copy.messages} rows={messageRows} />
+        <Group
+          id="set-aiuto"
+          title={copy.help.title}
+          rows={[{ href: `mailto:${company.email}?subject=Taglendo%3A%20segnalazione`, label: copy.help.row, sub: copy.help.sub, tone: 2, icon: <HelpIcon /> }]}
+        />
+
+        <section className={settings.section}>
+          <form action={signOut}>
+            <button className={cx(styles.logout, settings.logout)} type="submit">
+              {copy.logout}
+            </button>
+          </form>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className={styles.page}>
       <header className={styles.head}>
         <p className={styles.eyebrow}>
-          {name.split(/\s+/)[0]} · {owner ? "Titolare" : "Barbiere"}
+          {name.split(/\s+/)[0]} · Barbiere
         </p>
         <h1 className={styles.title}>{copy.title}</h1>
       </header>
@@ -51,24 +133,14 @@ async function Content() {
           {copy.salon}
         </h2>
         <Card flush>
-          {owner
-            ? rows.map((r) => (
-                <Link key={r.href} href={r.href} className={styles.navRow}>
-                  <span>
-                    {r.label}
-                    {"sub" in r && r.sub ? <span className={styles.navSub}>{r.sub}</span> : null}
-                  </span>
-                  <span aria-hidden="true">›</span>
-                </Link>
-              ))
-            : [copy.rows.listino, copy.rows.rules].map((label) => (
-                <div key={label} className={styles.navRow}>
-                  <span>{label}</span>
-                  <span className={styles.navSub}>{copy.ownerOnly}</span>
-                </div>
-              ))}
+          {[copy.rows.listino, copy.rows.rules].map((label) => (
+            <div key={label} className={styles.navRow}>
+              <span>{label}</span>
+              <span className={styles.navSub}>{copy.ownerOnly}</span>
+            </div>
+          ))}
         </Card>
-        {!owner ? <p className={styles.note}>{copy.askOwner(ownerName)}</p> : null}
+        <p className={styles.note}>{copy.askOwner(ownerName)}</p>
       </section>
 
       <section className={styles.section} aria-labelledby="profile-title">
@@ -84,7 +156,7 @@ async function Content() {
               <span>
                 {name}
                 <span className={styles.navSub}>
-                  {owner ? "Titolare" : "Barbiere"} · Poltrona {chair}
+                  Barbiere · Poltrona {chair}
                 </span>
               </span>
             </span>

@@ -13,7 +13,7 @@ export function gridSlots(hours: DayHours, durationMin: number, freeStarts: Read
   const out: GridSlot[] = [];
   for (let t = hours.openMin; t + durationMin <= hours.closeMin; t += step) {
     if (t < from) continue;
-    if (hours.breakStartMin != null && hours.breakEndMin != null && t < hours.breakEndMin && t + durationMin > hours.breakStartMin) continue;
+    if (hours.breaks.some(([from, to]) => t < to && t + durationMin > from)) continue;
     out.push({ startMin: t, free: freeStarts.has(t) });
   }
   return out;

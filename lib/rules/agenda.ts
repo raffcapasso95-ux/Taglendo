@@ -5,7 +5,7 @@
  */
 
 export type ApptStatus = "confermato" | "completato" | "annullato" | "non_presentato";
-export type ApptSource = "manuale" | "online" | "in_negozio";
+type ApptSource = "manuale" | "online" | "in_negozio";
 
 export type AgendaAppt = {
   id: string;
@@ -25,32 +25,37 @@ export type DayHours = {
   closed: boolean;
   openMin: number;
   closeMin: number;
-  breakStartMin: number | null;
-  breakEndMin: number | null;
+  /** Le pause: lo spazio fra una fascia di apertura e la successiva. */
+  breaks: Array<[number, number]>;
 };
 
 export type Operator = {
   id: string;
   name: string;
   chairNo: number;
+  /** Colore scelto in agenda (0–3); senza, dipende dall'ordine delle poltrone. */
+  color?: number | null;
   /** In chiusura (ferie) in questo giorno: la colonna c'è ma non ha spazi liberi. */
   off?: boolean;
 };
 
+/** Il colore di un barbiere in agenda: quello scelto, altrimenti per ordine di poltrona. */
+export const operatorColor = (o: Pick<Operator, "color">, index: number): number => o.color ?? index % 4;
+
 /** Occupa il tempo del barbiere: confermato o completato (come nel prototipo e in free_slots). */
-export const isActive = (s: ApptStatus) => s === "confermato" || s === "completato";
+const isActive = (s: ApptStatus) => s === "confermato" || s === "completato";
 
 /** Spazio minimo che vale la pena mostrare come "libero", in minuti. */
-export const MIN_GAP = 15;
+const MIN_GAP = 15;
 /** Pixel per minuto nella griglia desktop (96 px l'ora). */
 export const GRID_PX_PER_MIN = 1.6;
 
 /** Un tratto senza appuntamenti lungo almeno così (minuti) viene compresso nella griglia desktop. */
-export const QUIET_MIN = 60;
+const QUIET_MIN = 60;
 /** Altezza (px) di un tratto compresso. */
 export const QUIET_PX = 44;
 
-export type GridBand = { from: number; to: number; top: number; height: number; compressed: boolean };
+type GridBand = { from: number; to: number; top: number; height: number; compressed: boolean };
 export type GridScale = {
   /** Da minuti dalla mezzanotte alla posizione verticale (px) nella griglia. */
   y: (min: number) => number;
@@ -118,7 +123,7 @@ export function gridScale(
 }
 
 /** Altezze (px per minuto) provate, dalla più comoda alla più stretta, perché la giornata stia nello spazio. */
-export const GRID_PX_STEPS = [1.6, 1.5, 1.4, 1.3, 1.2] as const;
+const GRID_PX_STEPS = [1.6, 1.5, 1.4, 1.3, 1.2] as const;
 
 /** La scala più comoda che sta in `available` px; se nemmeno la più stretta basta, quella (si scorre). */
 export function fitGridScale(
@@ -190,9 +195,7 @@ export function freeIntervals(
   if (hours.closed) return [];
   let free: Interval[] = [[Math.max(hours.openMin, from), hours.closeMin]];
   free = free.filter(([a, b]) => b > a);
-  if (hours.breakStartMin != null && hours.breakEndMin != null) {
-    free = subtract(free, [hours.breakStartMin, hours.breakEndMin]);
-  }
+  for (const pause of hours.breaks) free = subtract(free, pause);
   for (const a of busy) free = subtract(free, [a.startMin, a.endMin]);
   return free.filter(([a, b]) => b - a >= minGap);
 }
@@ -220,8 +223,7 @@ export function operatorStatus(appts: AgendaAppt[], isToday: boolean, nowMin: nu
 /** Quanto della giornata di lavoro è occupato, 0–100. */
 export function busyPercent(hours: DayHours, appts: AgendaAppt[]): number {
   if (hours.closed) return 0;
-  const work =
-    hours.closeMin - hours.openMin - (hours.breakStartMin != null && hours.breakEndMin != null ? hours.breakEndMin - hours.breakStartMin : 0);
+  const work = hours.closeMin - hours.openMin - hours.breaks.reduce((sum, [a, b]) => sum + (b - a), 0);
   if (work <= 0) return 0;
   const busy = appts.filter((a) => isActive(a.status)).reduce((sum, a) => sum + (a.endMin - a.startMin), 0);
   return Math.min(100, Math.round((busy / work) * 100));
@@ -268,7 +270,7 @@ export type Column = {
   gaps: Interval[];
 };
 
-export type FreeSpot = { memberId: string; name: string; colorIndex: number; start: number; end: number; now: boolean };
+type FreeSpot = { memberId: string; name: string; colorIndex: number; start: number; end: number; now: boolean };
 
 export type DayModel = {
   date: string;
@@ -307,7 +309,7 @@ export function buildDay(input: DayInput): DayModel {
     const live = mine.filter((a) => isActive(a.status));
     return {
       operator,
-      colorIndex: i % 4,
+      colorIndex: operatorColor(operator, i),
       appts: mine,
       count: live.length,
       status: operator.off ? { kind: "free" as const, text: "Non lavora oggi" } : operatorStatus(mine, isToday, nowMin),
@@ -376,7 +378,7 @@ export type SideSummary = {
   fill: number;
 };
 
-export const SIDE_UPCOMING = 5;
+const SIDE_UPCOMING = 5;
 
 /** Cosa mostra la barra laterale dell'agenda: cosa chiudere, cosa viene dopo e i numeri della giornata. */
 export function sideSummary(day: DayModel): SideSummary {

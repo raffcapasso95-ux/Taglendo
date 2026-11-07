@@ -5,7 +5,7 @@ import { Button, Card, Field, Toggle } from "@/components/ui";
 import { FormAlert } from "@/components/auth/FormAlert";
 import { onboardingCopy } from "@/lib/copy/onboarding";
 import { saveHours, type StepState } from "@/lib/onboarding/actions";
-import { parseTime, summarizeWeek, toWeek, validateHours } from "@/lib/rules/hours";
+import { dayFromRanges, parseTime, summarizeWeek, toWeek, validateHours } from "@/lib/rules/hours";
 import { BackLink } from "./BackLink";
 import { Frame } from "./Frame";
 import { Preview, PreviewRows, PreviewSection } from "./Preview";
@@ -42,7 +42,7 @@ export function StepHours({ doneUpTo, salon, initial: init }: Props) {
     if (openMin == null || closeMin == null) return null;
     if (breakOn && (bs == null || be == null)) return null;
     const input = { days, openMin, closeMin, breakMin: breakOn && bs != null && be != null ? { start: bs, end: be } : null };
-    return validateHours(input) ? null : summarizeWeek(toWeek(input));
+    return validateHours(input) ? null : summarizeWeek(toWeek(input).map(dayFromRanges));
   }, [days, open, close, breakOn, breakStart, breakEnd]);
   const [lastRows, setLastRows] = useState(() => rows ?? []);
   if (rows && rows !== lastRows) setLastRows(rows);

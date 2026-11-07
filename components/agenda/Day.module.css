@@ -621,3 +621,167 @@
     pointer-events: none;
   }
 }
+
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): agenda: occupato = blocco pieno, libero = spazio vuoto --- */
+.gap {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-secondary);
+  transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+}
+
+.gap .gapLabel {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.gap .gapAction,
+.gap .gapRange,
+.gap .gapRangeInline {
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.gap .gapAction {
+  order: 2;
+}
+
+.gap .gapLabel {
+  order: 1;
+}
+
+.gap .gapRangeInline {
+  order: 3;
+}
+
+.gap:focus-visible {
+  border-color: var(--status-success);
+  background: var(--gap-hover-bg);
+  color: var(--status-success-text);
+}
+
+.gap:focus-visible .gapAction,
+.gap:focus-visible .gapRange,
+.gap:focus-visible .gapRangeInline {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .gap:hover:not(:disabled) {
+    color: var(--status-success-text);
+  }
+
+  .gap:hover:not(:disabled) .gapLabel {
+    color: var(--gap-text-soft);
+  }
+
+  .gap:hover:not(:disabled) .gapAction,
+  .gap:hover:not(:disabled) .gapRange,
+  .gap:hover:not(:disabled) .gapRangeInline {
+    opacity: 1;
+  }
+}
+
+@media (hover: none) {
+  .gap .gapAction {
+    opacity: 1;
+    color: var(--status-success);
+  }
+}
+
+.block {
+  box-shadow: var(--shadow-block);
+}
+
+.blockNow {
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  box-shadow: inset 5px 0 0 var(--brand-apricot), var(--shadow-block);
+  padding-left: 14px;
+}
+
+.grid {
+  border-color: transparent;
+  box-shadow: var(--shadow-panel-soft);
+  border-radius: var(--radius-panel);
+}
+
+.colHead {
+  border-left-color: var(--grid-line);
+}
+
+.col {
+  border-left-color: var(--grid-line);
+}
+
+.gapRow {
+  background: var(--canvas);
+  border-top-color: transparent;
+  padding: var(--space-1) 0;
+  color: var(--status-success-text);
+}
+
+.gapRow + .gapRow {
+  padding-top: 0;
+}
+
+.gapRow .rowButton {
+  min-height: var(--tap-min);
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-1);
+  border: 1.5px dashed var(--status-success-border);
+  border-radius: var(--radius-block);
+  grid-template-columns: 44px minmax(0, 1fr);
+}
+
+.gapRow .rowTime {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.gapRowText {
+  grid-column: 2 / 3;
+  flex-flow: row wrap;
+  align-items: baseline;
+  column-gap: var(--space-2);
+  font-size: 13px;
+}
+
+.gapRowText::before {
+  content: "+";
+  font-weight: 700;
+}
+
+.rows > .gapRow:first-child,
+.rows > .gapRow:last-child {
+  border-radius: 0;
+}
+
+.gapRow + .apptRow,
+.gapRow + .pauseRow,
+.gapRow + .nowRow {
+  border-top: 0;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+.apptRow:has(+ .gapRow),
+.pauseRow:has(+ .gapRow),
+.nowRow:has(+ .gapRow) {
+  border-bottom-left-radius: var(--radius-card);
+  border-bottom-right-radius: var(--radius-card);
+}
+
+.gapRow + .apptRow:has(+ .gapRow) {
+  border-radius: var(--radius-card);
+}
+
+.apptRow {
+  box-shadow: 0 1px 0 var(--border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gap,
+  .gap * {
+    transition: none;
+  }
+}

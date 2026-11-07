@@ -1,4 +1,4 @@
-export const DELETE_WORD = "ELIMINA";
+const DELETE_WORD = "ELIMINA";
 
 /** La parola di conferma va scritta intera: maiuscole o minuscole non contano, gli spazi ai bordi nemmeno. */
 export const isDeleteConfirmed = (typed: string) => typed.trim().toUpperCase() === DELETE_WORD;

@@ -25,14 +25,14 @@ export type Database = {
           Tables: {
             "appointments": {
                   Row: {
-                    "cancelled_by": string | null,"client_id": string | null,"created_at": string,"ends_at": string,"id": string,"manage_token": string,"member_id": string,"price_cents": number,"public_code": string,"reminder_sent_at": string | null,"salon_id": string,"service_id": string | null,"service_name": string,"source": Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status": Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by": string | null,"client_id": string | null,"created_at": string,"ends_at": string,"id": string,"list_price_cents": number | null,"manage_token": string,"member_id": string,"price_cents": number,"price_note": string | null,"public_code": string,"reminder_sent_at": string | null,"salon_id": string,"service_id": string | null,"service_name": string,"source": Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status": Database["public"]['Enums']["appt_status_t"]
                   }
                   ComputedFields: never
                   Insert: {
-                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at": string,"id"?: string,"manage_token"?: string,"member_id": string,"price_cents": number,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id": string,"service_id"?: string | null,"service_name": string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status"?: Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at": string,"id"?: string,"list_price_cents"?: number | null,"manage_token"?: string,"member_id": string,"price_cents": number,"price_note"?: string | null,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id": string,"service_id"?: string | null,"service_name": string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status"?: Database["public"]['Enums']["appt_status_t"]
                   }
                   Update: {
-                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at"?: string,"id"?: string,"manage_token"?: string,"member_id"?: string,"price_cents"?: number,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id"?: string,"service_id"?: string | null,"service_name"?: string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at"?: string,"status"?: Database["public"]['Enums']["appt_status_t"]
+                    "cancelled_by"?: string | null,"client_id"?: string | null,"created_at"?: string,"ends_at"?: string,"id"?: string,"list_price_cents"?: number | null,"manage_token"?: string,"member_id"?: string,"price_cents"?: number,"price_note"?: string | null,"public_code"?: string,"reminder_sent_at"?: string | null,"salon_id"?: string,"service_id"?: string | null,"service_name"?: string,"source"?: Database["public"]['Enums']["appt_source_t"],"starts_at"?: string,"status"?: Database["public"]['Enums']["appt_status_t"]
                   }
                   Relationships: [
                     {
@@ -95,14 +95,14 @@ isOneToOne: false
                   ]
                 },"clients": {
                   Row: {
-                    "created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"privacy_accepted_at": string | null,"salon_id": string
+                    "avatar_color": number | null,"created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"photo_path": string | null,"privacy_accepted_at": string | null,"salon_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"email"?: string | null,"id"?: string,"marketing_opt_in"?: boolean,"name": string,"note"?: string | null,"phone"?: string | null,"privacy_accepted_at"?: string | null,"salon_id": string
+                    "avatar_color"?: number | null,"created_at"?: string,"email"?: string | null,"id"?: string,"marketing_opt_in"?: boolean,"name": string,"note"?: string | null,"phone"?: string | null,"photo_path"?: string | null,"privacy_accepted_at"?: string | null,"salon_id": string
                   }
                   Update: {
-                    "created_at"?: string,"email"?: string | null,"id"?: string,"marketing_opt_in"?: boolean,"name"?: string,"note"?: string | null,"phone"?: string | null,"privacy_accepted_at"?: string | null,"salon_id"?: string
+                    "avatar_color"?: number | null,"created_at"?: string,"email"?: string | null,"id"?: string,"marketing_opt_in"?: boolean,"name"?: string,"note"?: string | null,"phone"?: string | null,"photo_path"?: string | null,"privacy_accepted_at"?: string | null,"salon_id"?: string
                   }
                   Relationships: [
                     {
@@ -161,14 +161,14 @@ isOneToOne: true
                   ]
                 },"members": {
                   Row: {
-                    "active": boolean,"bio": string | null,"chair_no": number,"id": string,"invite_email": string | null,"invite_expires_at": string | null,"invite_token": string | null,"name": string,"photo_path": string | null,"role": Database["public"]['Enums']["role_t"],"salon_id": string,"user_id": string | null
+                    "active": boolean,"agenda_color": number | null,"bio": string | null,"bookable_online": boolean,"chair_no": number,"id": string,"invite_email": string | null,"invite_expires_at": string | null,"invite_token": string | null,"name": string,"phone": string | null,"photo_path": string | null,"role": Database["public"]['Enums']["role_t"],"salon_id": string,"user_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "active"?: boolean,"bio"?: string | null,"chair_no": number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name": string,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id": string,"user_id"?: string | null
+                    "active"?: boolean,"agenda_color"?: number | null,"bio"?: string | null,"bookable_online"?: boolean,"chair_no": number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name": string,"phone"?: string | null,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id": string,"user_id"?: string | null
                   }
                   Update: {
-                    "active"?: boolean,"bio"?: string | null,"chair_no"?: number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name"?: string,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id"?: string,"user_id"?: string | null
+                    "active"?: boolean,"agenda_color"?: number | null,"bio"?: string | null,"bookable_online"?: boolean,"chair_no"?: number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name"?: string,"phone"?: string | null,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -201,14 +201,14 @@ isOneToOne: true
                   ]
                 },"opening_hours": {
                   Row: {
-                    "break_end_min": number | null,"break_start_min": number | null,"close_min": number | null,"closed": boolean,"open_min": number | null,"salon_id": string,"weekday": number
+                    "closed": boolean,"salon_id": string,"weekday": number
                   }
                   ComputedFields: never
                   Insert: {
-                    "break_end_min"?: number | null,"break_start_min"?: number | null,"close_min"?: number | null,"closed"?: boolean,"open_min"?: number | null,"salon_id": string,"weekday": number
+                    "closed"?: boolean,"salon_id": string,"weekday": number
                   }
                   Update: {
-                    "break_end_min"?: number | null,"break_start_min"?: number | null,"close_min"?: number | null,"closed"?: boolean,"open_min"?: number | null,"salon_id"?: string,"weekday"?: number
+                    "closed"?: boolean,"salon_id"?: string,"weekday"?: number
                   }
                   Relationships: [
                     {
@@ -217,6 +217,32 @@ isOneToOne: true
 isOneToOne: false
       referencedRelation: "salons"
       referencedColumns: ["id"]
+    }
+                  ]
+                },"opening_ranges": {
+                  Row: {
+                    "end_min": number,"salon_id": string,"start_min": number,"weekday": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "end_min": number,"salon_id": string,"start_min": number,"weekday": number
+                  }
+                  Update: {
+                    "end_min"?: number,"salon_id"?: string,"start_min"?: number,"weekday"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "opening_ranges_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "opening_ranges_salon_id_weekday_fkey"
+      columns: ["salon_id","weekday"]
+isOneToOne: false
+      referencedRelation: "opening_hours"
+      referencedColumns: ["salon_id","weekday"]
     }
                   ]
                 },"push_subscriptions": {
@@ -236,6 +262,26 @@ isOneToOne: false
       columns: ["member_id"]
 isOneToOne: false
       referencedRelation: "members"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"salon_photos": {
+                  Row: {
+                    "created_at": string,"id": string,"path": string,"salon_id": string,"sort": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"path": string,"salon_id": string,"sort"?: number
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"path"?: string,"salon_id"?: string,"sort"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "salon_photos_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
       referencedColumns: ["id"]
     }
                   ]
@@ -312,14 +358,14 @@ isOneToOne: false
                   ]
                 },"clients_visible": {
                   Row: {
-                    "created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"privacy_accepted_at": string | null,"salon_id": string
+                    "avatar_color": number | null,"created_at": string,"email": string | null,"id": string,"marketing_opt_in": boolean,"name": string,"note": string | null,"phone": string | null,"photo_path": string | null,"privacy_accepted_at": string | null,"salon_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                           "created_at"?: string | null,"email"?: never,"id"?: string | null,"marketing_opt_in"?: boolean | null,"name"?: string | null,"note"?: string | null,"phone"?: never,"privacy_accepted_at"?: string | null,"salon_id"?: string | null
+                           "avatar_color"?: number | null,"created_at"?: string | null,"email"?: never,"id"?: string | null,"marketing_opt_in"?: boolean | null,"name"?: string | null,"note"?: string | null,"phone"?: never,"photo_path"?: string | null,"privacy_accepted_at"?: string | null,"salon_id"?: string | null
                          }
                         Update: {
-                           "created_at"?: string | null,"email"?: never,"id"?: string | null,"marketing_opt_in"?: boolean | null,"name"?: string | null,"note"?: string | null,"phone"?: never,"privacy_accepted_at"?: string | null,"salon_id"?: string | null
+                           "avatar_color"?: number | null,"created_at"?: string | null,"email"?: never,"id"?: string | null,"marketing_opt_in"?: boolean | null,"name"?: string | null,"note"?: string | null,"phone"?: never,"photo_path"?: string | null,"privacy_accepted_at"?: string | null,"salon_id"?: string | null
                          }
                         Relationships: [
                     {
@@ -379,8 +425,14 @@ isOneToOne: false
 "request_booking_code":
 { Args: { "p_code_hash": string,"p_email": string,"p_payload": Json,"p_salon": string }; Returns: Json
                            },
+"set_week_hours":
+{ Args: { "p_salon": string,"p_week": Json }; Returns: undefined
+                           },
 "slug_available":
 { Args: { "p_slug": string }; Returns: boolean
+                           },
+"stats_summary":
+{ Args: { "p_bucket"?: string,"p_from": string,"p_salon": string,"p_to": string }; Returns: Json
                            }
           }
           Enums: {

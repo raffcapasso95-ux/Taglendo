@@ -1,10 +1,10 @@
-import { formatMinutes, type DayHours } from "./hours";
+import { formatMinutes, rangesOf, rangesText, type DayHours } from "./hours";
 
 const DAY_NAMES = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
 const DAY_SHORT = ["Dom", "Lun", "Mar", "Mer", "Gio", "Ven", "Sab"];
 
 /** 540 → "9", 570 → "9:30" (come nelle righe brevi del design: "Mar–Sab · 9–19"). */
-export const shortTime = (min: number) => (min % 60 === 0 ? String(min / 60) : formatMinutes(min));
+const shortTime = (min: number) => (min % 60 === 0 ? String(min / 60) : formatMinutes(min));
 
 /** Telefono del salone come indirizzo `tel:`: "051 644 2190" → "tel:+390516442190". */
 export function phoneHref(phone: string): string {
@@ -38,14 +38,7 @@ export type HoursLine = { day: string; time: string; today: boolean };
 /** Le righe degli orari, da lunedì a domenica, con "Chiuso" nei giorni di riposo. */
 export function hoursLines(week: DayHours[], todayWeekday: number): HoursLine[] {
   return [1, 2, 3, 4, 5, 6, 0].map((d) => {
-    const h = week[d]!;
-    const time =
-      h.closed || h.openMin == null || h.closeMin == null
-        ? "Chiuso"
-        : h.breakStartMin != null && h.breakEndMin != null
-          ? `${formatMinutes(h.openMin)}–${formatMinutes(h.breakStartMin)} · ${formatMinutes(h.breakEndMin)}–${formatMinutes(h.closeMin)}`
-          : `${formatMinutes(h.openMin)}–${formatMinutes(h.closeMin)}`;
-    return { day: DAY_NAMES[d]!, time, today: d === todayWeekday };
+    return { day: DAY_NAMES[d]!, time: rangesText(week[d]!), today: d === todayWeekday };
   });
 }
 
@@ -53,11 +46,9 @@ export function hoursLines(week: DayHours[], todayWeekday: number): HoursLine[] 
 export function typicalHoursLine(week: DayHours[]): string {
   const order = [1, 2, 3, 4, 5, 6, 0];
   const text = (d: DayHours) =>
-    d.closed || d.openMin == null || d.closeMin == null
-      ? ""
-      : d.breakStartMin != null && d.breakEndMin != null
-        ? `${shortTime(d.openMin)}–${shortTime(d.breakStartMin)} e ${shortTime(d.breakEndMin)}–${shortTime(d.closeMin)}`
-        : `${shortTime(d.openMin)}–${shortTime(d.closeMin)}`;
+    rangesOf(d)
+      .map(([a, b]) => `${shortTime(a)}–${shortTime(b)}`)
+      .join(" e ");
   const groups: Array<{ days: number[]; value: string }> = [];
   for (const day of order) {
     const value = text(week[day]!);
@@ -79,10 +70,10 @@ export function openSign(week: DayHours[], weekday: number, nowMin: number): Ope
   const today = week[weekday]!;
   const isOpenDay = !today.closed && today.openMin != null && today.closeMin != null;
   if (isOpenDay) {
-    const inBreak = today.breakStartMin != null && today.breakEndMin != null && nowMin >= today.breakStartMin && nowMin < today.breakEndMin;
-    if (inBreak) return { open: false, title: "Pausa", line: `riapriamo alle ${formatMinutes(today.breakEndMin!)}` };
+    const pause = today.breaks.find(([from, to]) => nowMin >= from && nowMin < to);
+    if (pause) return { open: false, title: "Pausa", line: `riapriamo alle ${formatMinutes(pause[1])}` };
     if (nowMin >= today.openMin! && nowMin < today.closeMin!) {
-      const next = today.breakStartMin != null && nowMin < today.breakStartMin ? today.breakStartMin : today.closeMin!;
+      const next = today.breaks.find(([from]) => nowMin < from)?.[0] ?? today.closeMin!;
       return { open: true, title: "Aperto", line: `oggi fino alle ${formatMinutes(next)}` };
     }
     if (nowMin < today.openMin!) return { open: false, title: "Chiuso", line: `apriamo alle ${formatMinutes(today.openMin!)}` };

@@ -5,6 +5,25 @@ import { adminSelect, adminUpdate, seedDay, signIn, visibleText } from "./helper
 const SALON = "5a100000-0000-4000-8000-000000000001";
 
 test.describe("Appuntamenti", () => {
+  test("il prezzo si cambia dalla matita anche dopo: sconto alla cassa, il listino resta", async ({ page }) => {
+    const day = nextOpenDay();
+    await freshOwner(page, "Barberia Sconto Cassa");
+    await page.goto(`/agenda?g=${day}`);
+    await bookNewClient(page, "Carla Cassa", day, "10:00");
+    await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
+    await openAppointment(page, "Carla Cassa");
+    const d = dialog(page);
+    await expect(d.getByLabel("Prezzo per questo cliente (€)")).toBeHidden();
+    await d.getByRole("button", { name: "Cambia prezzo" }).click();
+    await d.getByRole("button", { name: "−10%" }).click();
+    await expect(page.getByText("Prezzo aggiornato").filter({ visible: true })).toBeVisible();
+    // il prezzo pieno resta accanto a quello nuovo
+    await expect(d.getByText("20 €", { exact: true })).toBeVisible();
+    await expect(d.getByText("18 €", { exact: true })).toBeVisible();
+    const [row] = await adminSelect<{ price_cents: number; list_price_cents: number }>("appointments", "select=price_cents,list_price_cents&order=created_at.desc&limit=1");
+    expect(row).toEqual({ price_cents: 1800, list_price_cents: 2000 });
+  });
+
   test("fissare, cambiare stato, spostare e annullare", async ({ page }) => {
     const day = nextOpenDay();
     await freshOwner(page, "Barberia Appuntamenti");
@@ -38,8 +57,8 @@ test.describe("Appuntamenti", () => {
     await openAppointment(page, "Mario Verdi");
     await dialog(page).getByRole("button", { name: "Sposta" }).click();
     await pickTime(page, "11:00");
-    await expect(dialog(page).getByText(/Nuovo orario: .*11:00/)).toBeVisible();
-    await dialog(page).getByRole("button", { name: "Conferma" }).click();
+    await expect(dialog(page).getByText(/11:00 · Mario Verdi/)).toBeVisible();
+    await dialog(page).getByRole("button", { name: "Sposta", exact: true }).click();
     await expect(page.getByText("Appuntamento spostato").filter({ visible: true })).toBeVisible();
     const moved = await adminSelect<{ starts_at: string }>("appointments", "select=starts_at&order=created_at.desc&limit=1");
     expect(new Date(moved[0]!.starts_at).toISOString().slice(11, 16)).toMatch(/^(09|10):00$/); // 11:00 a Roma = 10:00 o 09:00 UTC
@@ -66,7 +85,7 @@ test.describe("Appuntamenti", () => {
     // il secondo schermo (stesso salone) sceglie le 10:00 ma non salva ancora
     const second = await secondScreen(browser, page);
     await newButton(second).click();
-    await dialog(second).getByRole("button", { name: "+ Nuovo cliente" }).click();
+    await dialog(second).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
     await dialog(second).getByLabel("Nome").fill("Anna Bianchi");
     await pickDayAndTime(second, day, "10:00");
 
@@ -100,7 +119,7 @@ test.describe("Appuntamenti", () => {
     await freshOwner(page, "Barberia Negozio");
     await page.goto("/agenda");
     await page.getByRole("button", { name: /^(Cliente in negozio|In negozio ora)$/ }).filter({ visible: true }).click();
-    await dialog(page).getByRole("button", { name: "+ Nuovo cliente" }).click();
+    await dialog(page).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
     await dialog(page).getByLabel("Nome").fill("Ragazzo con lo zaino rosso");
     await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();
 
@@ -142,3 +161,41 @@ async function secondScreen(browser: Browser, first: Page) {
   await page.goto(first.url());
   return page;
 }
+
+test.describe("Sposta appuntamento", () => {
+  test("come «Nuovo appuntamento»: Quando e Con chi; «Annulla» riporta ai dettagli", async ({ page }) => {
+    const day = nextOpenDay();
+    await freshOwner(page, "Barberia Sposta Flow");
+    await page.goto(`/agenda?g=${day}`);
+    await bookNewClient(page, "Mario Verdi", day, "10:00");
+    await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
+    await openAppointment(page, "Mario Verdi");
+    await dialog(page).getByRole("button", { name: "Sposta", exact: true }).click();
+    const flow = page.getByRole("dialog", { name: "Sposta appuntamento" });
+    await expect(flow).toBeVisible();
+    await expect(flow.getByRole("heading", { name: "Quando" })).toBeVisible();
+    await expect(flow.getByText(/^Ora: .*10:00/)).toBeVisible();
+    // un solo barbiere: niente blocco «Con chi»
+    await expect(flow.getByRole("heading", { name: "Con chi" })).toHaveCount(0);
+    // finché non si sceglie un orario «Sposta» resta spento
+    await expect(flow.getByRole("button", { name: "Sposta", exact: true })).toBeDisabled();
+    await pickTime(page, "11:00");
+    await expect(flow.getByRole("button", { name: "Sposta", exact: true })).toBeEnabled();
+    // «Annulla» riporta ai dettagli, senza spostare niente
+    await flow.getByRole("button", { name: /^(Annulla|Chiudi)$/ }).filter({ visible: true }).click(); // «Annulla» su telefono, la X su desktop
+    await expect(dialog(page).getByRole("button", { name: "Sposta", exact: true })).toBeVisible();
+  });
+
+  test("con più barbieri si può scegliere anche con chi", async ({ page }) => {
+    await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
+    await page.goto("/agenda");
+    await openAppointment(page, "Pietro Lombardi");
+    await dialog(page).getByRole("button", { name: "Sposta", exact: true }).click();
+    const flow = page.getByRole("dialog", { name: "Sposta appuntamento" });
+    await expect(flow.getByRole("heading", { name: "Con chi" })).toBeVisible();
+    await expect(flow.getByRole("button", { name: /^Andrea/ })).toHaveAttribute("aria-pressed", "true");
+    await flow.getByRole("button", { name: /^Marco/ }).click();
+    await expect(flow.getByRole("button", { name: /^Marco/ })).toHaveAttribute("aria-pressed", "true");
+    await expect(flow.getByText(/· con Marco$/)).toBeVisible();
+  });
+});

@@ -10,7 +10,7 @@ type ShowToast = (message: string, detail?: string) => void;
 const ToastContext = createContext<ShowToast | null>(null);
 
 /** Quanto resta visibile un avviso (Taglendo App.dc.html: 2,8 s). */
-export const TOAST_VISIBLE_MS = 2800;
+const TOAST_VISIBLE_MS = 2800;
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toast, setToast] = useState<ToastMessage | null>(null);

@@ -15,9 +15,14 @@ type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "size"> & {
   size?: "default" | "large";
   /** Elemento a destra dentro il campo (es. "Mostra" per la password). Solo con size="large". */
   trailing?: ReactNode;
+  /** Elemento a sinistra dentro il campo (es. la lente della ricerca). Solo con size="large". */
+  leading?: ReactNode;
+  /** Classi in più per il riquadro del campo e per l'etichetta (solo con size="large" per il riquadro). */
+  boxClassName?: string;
+  labelClassName?: string;
 };
 
-export function Field({ label, hint, error, id, size = "default", trailing, className, ...input }: Props) {
+export function Field({ label, hint, error, id, size = "default", trailing, leading, boxClassName, labelClassName, className, ...input }: Props) {
   const autoId = useId();
   const inputId = id ?? autoId;
   const hintId = hint ? `${inputId}-hint` : undefined;
@@ -36,11 +41,12 @@ export function Field({ label, hint, error, id, size = "default", trailing, clas
 
   return (
     <div className={cx(styles.field, size === "large" && styles.fieldLarge, className)}>
-      <label htmlFor={inputId} className={styles.label}>
+      <label htmlFor={inputId} className={cx(styles.label, labelClassName)}>
         {label}
       </label>
       {size === "large" ? (
-        <div className={cx(styles.box, error && styles.boxInvalid)}>
+        <div className={cx(styles.box, error && styles.boxInvalid, boxClassName)}>
+          {leading}
           {control}
           {trailing}
         </div>

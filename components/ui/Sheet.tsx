@@ -12,12 +12,14 @@ type Props = {
   children: ReactNode;
   /** Pulsanti in fondo, sempre visibili. */
   footer?: ReactNode;
+  /** Classe in più per il riquadro (una finestra che ha bisogno di misure sue). */
+  className?: string;
 };
 
 const CLOSE_MS = 240; // --duration-sheet-close
 
 /** Foglio dal basso per il telefono (Taglendo App.dc.html). */
-export function Sheet({ open, onClose, title, children, footer }: Props) {
+export function Sheet({ open, onClose, title, children, footer, className }: Props) {
   const { ref, visible } = useDialog(open, onClose, CLOSE_MS);
   const titleId = useId();
 
@@ -25,7 +27,7 @@ export function Sheet({ open, onClose, title, children, footer }: Props) {
     <dialog
       ref={ref}
       aria-labelledby={titleId}
-      className={cx(styles.sheet, visible && styles.open)}
+      className={cx(styles.sheet, visible && styles.open, className)}
     >
       <div className={styles.handle} aria-hidden="true">
         <span />

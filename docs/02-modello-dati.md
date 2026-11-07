@@ -55,14 +55,22 @@ create table members (                       -- operatori = poltrone
   unique (salon_id, chair_no)
 );
 
-create table opening_hours (
+create table opening_hours (                 -- l'interruttore del giorno
   salon_id uuid references salons on delete cascade,
   weekday int check (weekday between 0 and 6), -- 0 = domenica
   closed boolean not null default false,
-  open_min int, close_min int,                -- minuti dalla mezzanotte: 540 = 9:00
-  break_start_min int, break_end_min int,
   primary key (salon_id, weekday)
 );
+
+create table opening_ranges (                -- le fasce di ogni giorno (ridisegno novembre 2026)
+  salon_id uuid not null, weekday int not null,
+  start_min int not null, end_min int not null,  -- minuti dalla mezzanotte: 540 = 9:00
+  primary key (salon_id, weekday, start_min),
+  check (start_min < end_min),
+  exclude using gist (salon_id with =, weekday with =, int4range(start_min, end_min) with &&),
+  foreign key (salon_id, weekday) references opening_hours on delete cascade
+);
+-- La «pausa pranzo» è lo spazio fra due fasce. Si salva con set_week_hours(salone, settimana): o tutto o niente, solo il titolare.
 
 create table closures (
   id uuid primary key default gen_random_uuid(),

@@ -75,14 +75,10 @@ values (
 insert into public.email_prefs (salon_id) values ('5a100000-0000-4000-8000-000000000001');
 
 -- Orari predefiniti: mar–sab 9:00–19:00, pausa 13:00–14:30, chiuso domenica e lunedì
-insert into public.opening_hours (salon_id, weekday, closed, open_min, close_min, break_start_min, break_end_min)
-select '5a100000-0000-4000-8000-000000000001', w,
-       w in (0, 1),
-       case when w in (0, 1) then null else 540 end,
-       case when w in (0, 1) then null else 1140 end,
-       case when w in (0, 1) then null else 780 end,
-       case when w in (0, 1) then null else 870 end
-from generate_series(0, 6) w;
+insert into public.opening_hours (salon_id, weekday, closed)
+select '5a100000-0000-4000-8000-000000000001', w, w in (0, 1) from generate_series(0, 6) w;
+insert into public.opening_ranges (salon_id, weekday, start_min, end_min)
+select '5a100000-0000-4000-8000-000000000001', w, r.s, r.e from generate_series(2, 6) w, (values (540, 780), (870, 1140)) as r(s, e);
 
 -- ── Operatori (poltrone) ─────────────────────────────────────
 insert into public.members (id, salon_id, user_id, name, role, chair_no, invite_email, invite_token, invite_expires_at)
@@ -226,3 +222,10 @@ join public.services s on s.id = ('5e500000-0000-4000-8000-00000000000' || r.svc
 drop schema seed_tmp cascade;
 
 commit;
+
+-- Foto del salone demo: le righe stanno qui, i file li carica `npm run db:reset` (scripts/demo-photos.mjs).
+insert into public.salon_photos (salon_id, path, sort)
+select '5a100000-0000-4000-8000-000000000001', '5a100000-0000-4000-8000-000000000001/' || f || '.jpg', i
+from unnest(array['hero', 'cambia-taglio', 'cambia-macchinetta', 'cambia-schiuma']) with ordinality as t(f, i);
+
+update public.salons set cover_path = '5a100000-0000-4000-8000-000000000001/hero.jpg' where id = '5a100000-0000-4000-8000-000000000001';

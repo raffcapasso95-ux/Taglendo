@@ -7,7 +7,17 @@ export type QueuedCreate = {
   id: string;
   kind: "create";
   at: number;
-  input: { clientId?: string; newClient?: { name: string; phone: string | null }; serviceId: string; memberId: string | null; date: string; startMin: number };
+  input: {
+    clientId?: string;
+    newClient?: { name: string; phone: string | null; avatarColor?: number | null };
+    serviceId: string;
+    memberId: string | null;
+    date: string;
+    startMin: number;
+    /** Prezzo diverso dal listino, in centesimi, e il suo motivo. */
+    priceCents?: number | null;
+    priceNote?: string | null;
+  };
   label: { client: string; service: string };
   error?: string;
 };
@@ -45,7 +55,7 @@ export function readQueue(store: Store): QueueItem[] {
   }
 }
 
-export function writeQueue(store: Store, items: QueueItem[]): void {
+function writeQueue(store: Store, items: QueueItem[]): void {
   try {
     store.setItem(QUEUE_KEY, JSON.stringify(items));
   } catch {

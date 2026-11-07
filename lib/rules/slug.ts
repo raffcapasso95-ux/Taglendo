@@ -1,11 +1,11 @@
 /** Link riservati alle rotte del sito. Va tenuto uguale a salons_slug_not_reserved nel database. */
-export const RESERVED_SLUGS = [
+const RESERVED_SLUGS = [
   "accedi", "registrati", "verifica", "password", "nuova-password", "invito", "primo-avvio", "pronto",
   "agenda", "clienti", "link", "listino", "impostazioni", "profilo",
   "privacy", "termini", "cookie", "api", "auth", "dev", "admin", "app", "www", "taglendo",
 ] as const;
 
-export const SLUG_MAX_LENGTH = 60;
+const SLUG_MAX_LENGTH = 60;
 
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
@@ -24,7 +24,7 @@ export function slugify(name: string): string {
   return isReserved(slug) ? `${slug}-salone` : slug;
 }
 
-export function isReserved(slug: string): boolean {
+function isReserved(slug: string): boolean {
   return (RESERVED_SLUGS as readonly string[]).includes(slug);
 }
 

@@ -22,14 +22,18 @@ export type ClientRow = {
   usualMemberName: string | null;
   /** Ha un appuntamento oggi (qualunque stato tranne annullato). */
   hasToday: boolean;
+  /** Colore delle iniziali scelto dal salone (0–4); senza, si ricava dal nome. */
+  avatarColor: number | null;
+  /** Foto (indirizzo firmato) se c'è. */
+  photoUrl: string | null;
 };
 
 /** Non vengono da 5 settimane: da richiamare. */
-export const RECALL_DAYS = 35;
+const RECALL_DAYS = 35;
 
 export type ClientFilter = "all" | "today" | "recall";
 
-export const normalizeText = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const normalizeText = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 const digitsOf = (s: string) => s.replace(/\D/g, "");
 

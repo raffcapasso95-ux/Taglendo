@@ -27,10 +27,12 @@ type Props = {
   title: string;
   children: ReactNode;
   footer?: ReactNode;
+  /** Classe in più per il riquadro quando è un foglio (telefono). */
+  sheetClassName?: string;
 };
 
 /** Foglio dal basso sul telefono, finestra centrata su desktop. */
-export function ResponsiveDialog(props: Props) {
+export function ResponsiveDialog({ sheetClassName, ...props }: Props) {
   const desktop = useIsDesktop();
-  return desktop ? <Modal {...props} /> : <Sheet {...props} />;
+  return desktop ? <Modal {...props} /> : <Sheet {...props} className={sheetClassName} />;
 }

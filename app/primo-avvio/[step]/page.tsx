@@ -6,7 +6,8 @@ import { StepHours, type HoursInitial } from "@/components/onboarding/StepHours"
 import { PRESET_SERVICES, StepServices, type ServiceDraft } from "@/components/onboarding/StepServices";
 import { StepSalon } from "@/components/onboarding/StepSalon";
 import { requireSalon } from "@/lib/auth/session";
-import { formatMinutes } from "@/lib/rules/hours";
+import { loadWeek } from "@/lib/hours/week";
+import { dayFromRanges, formatMinutes } from "@/lib/rules/hours";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Primo avvio · Taglendo" };
@@ -44,17 +45,17 @@ async function Content({ params }: { params: Promise<{ step: string }> }) {
   }
 
   if (step === 2) {
-    const { data } = await supabase.from("opening_hours").select("*").eq("salon_id", salon.id).order("weekday");
-    const rows = data ?? [];
-    const openDays = rows.filter((r) => !r.closed);
-    const ref = openDays[0];
+    const week = (await loadWeek(supabase, salon.id)).map(dayFromRanges);
+    const openDays = week.map((d, weekday) => ({ d, weekday })).filter(({ d }) => !d.closed);
+    const ref = openDays[0]?.d;
+    const firstBreak = ref?.breaks[0];
     const initial: HoursInitial = {
-      days: openDays.map((r) => r.weekday),
-      open: formatMinutes(ref?.open_min ?? 540),
-      close: formatMinutes(ref?.close_min ?? 1140),
-      breakOn: ref ? ref.break_start_min != null : true,
-      breakStart: formatMinutes(ref?.break_start_min ?? 780),
-      breakEnd: formatMinutes(ref?.break_end_min ?? 870),
+      days: openDays.map(({ weekday }) => weekday),
+      open: formatMinutes(ref?.openMin ?? 540),
+      close: formatMinutes(ref?.closeMin ?? 1140),
+      breakOn: ref ? firstBreak != null : true,
+      breakStart: formatMinutes(firstBreak?.[0] ?? 780),
+      breakEnd: formatMinutes(firstBreak?.[1] ?? 870),
     };
     return <StepHours doneUpTo={doneUpTo} salon={preview} initial={initial} />;
   }

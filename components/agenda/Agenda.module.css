@@ -498,3 +498,99 @@
     touch-action: pan-y;
   }
 }
+
+/* --- Ridisegno novembre 2026 (design/ridisegno-2026-11/css/app.css): agenda: pulsante calendario, colonna destra essenziale --- */
+.dateRow {
+  align-items: stretch;
+  gap: 6px;
+  min-width: 0;
+  display: flex;
+}
+
+.dateRow .strip {
+  margin-left: 0;
+  padding-left: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.calButton {
+  min-width: var(--day-chip-width);
+  min-height: var(--day-chip-height);
+  padding: 0 var(--space-2);
+  flex: 0 0 auto;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  display: flex;
+}
+
+.calButtonText {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.calButtonOn {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+@media (min-width: 1024px) {
+  .dateRow {
+    flex: 1 1 0;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .calButton:hover:not(.calButtonOn) {
+    background: var(--brand-peach);
+  }
+}
+
+.side {
+  border-left: 0;
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-5) var(--space-6) 0;
+}
+
+[data-app-shell] .dayChip {
+  border-radius: var(--radius-card);
+  border-color: transparent;
+  box-shadow: 0 0 0 1px var(--border-subtle);
+}
+
+[data-app-shell] .dayChipOn {
+  box-shadow: none;
+}
+
+[data-app-shell] .dayChipClosed {
+  box-shadow: none;
+}
+
+@media (min-width: 1024px) {
+  [data-app-shell] .filter {
+    border-radius: var(--radius-pill);
+  }
+
+  [data-app-shell] .filterItem {
+    border-radius: var(--radius-pill);
+  }
+}
+
+.phoneBar {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .main {
+    padding-top: var(--space-4);
+  }
+}

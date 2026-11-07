@@ -2,8 +2,9 @@ import "server-only";
 import { getMembership, getUser } from "@/lib/auth/session";
 import { addDays, dayNumber, dayRange, isValidDate, longDay, monthShort, romeDate, romeMinutes, weekdayName, weekdayOf, weekdayShort } from "@/lib/dates/rome";
 import { buildDay, firstName, initials, type AgendaAppt, type DayModel, type Operator } from "@/lib/rules/agenda";
+import { signedPhotoUrls } from "@/lib/clients/photoUrls";
 import { createClient } from "@/lib/supabase/server";
-import { appointmentsOn, asHours, operatorsOf } from "./day";
+import { appointmentsOn, asHours, operatorsOf, weekHours } from "./day";
 
 export type StripDay = {
   date: string;
@@ -17,7 +18,7 @@ export type StripDay = {
 };
 
 export type ServiceOption = { id: string; name: string; durationMin: number; priceCents: number };
-export type ClientOption = { id: string; name: string; phone: string | null };
+export type ClientOption = { id: string; name: string; phone: string | null; avatarColor: number | null; photoUrl: string | null };
 
 export type AgendaData = {
   salonName: string;
@@ -63,7 +64,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
   const [flags, members, hours, closures, dayAppts, stripAppts, servicesRes, clientsRes] = await Promise.all([
     supabase.from("salons").select("barbers_see_all, barbers_edit").eq("id", salon.id).single(),
     operatorsOf(supabase, salon.id),
-    supabase.from("opening_hours").select("weekday, closed, open_min, close_min, break_start_min, break_end_min").eq("salon_id", salon.id),
+    weekHours(supabase, salon.id),
     supabase.from("closures").select("starts_on, ends_on, member_id").eq("salon_id", salon.id).lte("starts_on", stripEnd).gte("ends_on", stripStart),
     appointmentsOn(supabase, salon.id, date),
     supabase
@@ -74,7 +75,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
       .gte("starts_at", rangeStart.toISOString())
       .lt("starts_at", stripEndAt.toISOString()),
     supabase.from("services").select("id, name, duration_min, price_cents").eq("salon_id", salon.id).eq("active", true).order("sort"),
-    supabase.from("clients_visible").select("id, name, phone").eq("salon_id", salon.id).order("name").limit(2000),
+    supabase.from("clients_visible").select("id, name, phone, avatar_color, photo_path").eq("salon_id", salon.id).order("name").limit(2000),
   ]);
 
   const isOwner = membership.role === "owner";
@@ -86,7 +87,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
   const operators = canSeeAll ? allOps : allOps.filter((o) => o.id === membership.id);
   const selectedOperator = params.op && operators.some((o) => o.id === params.op) ? params.op : null;
 
-  const byWeekday = new Map((hours.data ?? []).map((h) => [h.weekday, h]));
+  const byWeekday = hours;
   const closedByClosure = (d: string) => (closures.data ?? []).some((c) => c.member_id === null && c.starts_on <= d && d <= c.ends_on);
   const offToday = new Set((closures.data ?? []).filter((c) => c.member_id !== null && c.starts_on <= date && date <= c.ends_on).map((c) => c.member_id));
   const shown = (selectedOperator ? operators.filter((o) => o.id === selectedOperator) : operators).map((o) => (offToday.has(o.id) ? { ...o, off: true } : o));
@@ -111,6 +112,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
     };
   });
 
+  const photoUrls = await signedPhotoUrls(supabase, (clientsRes.data ?? []).map((c) => c.photo_path));
   const userFirstName = firstName(membership.name);
   return {
     salonName: salon.name,
@@ -126,7 +128,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
     canEdit,
     salonId: salon.id,
     services: (servicesRes.data ?? []).map((x) => ({ id: x.id, name: x.name, durationMin: x.duration_min, priceCents: x.price_cents })),
-    clients: (clientsRes.data ?? []).flatMap((c) => (c.id && c.name ? [{ id: c.id, name: c.name, phone: c.phone }] : [])),
+    clients: (clientsRes.data ?? []).flatMap((c) => (c.id && c.name ? [{ id: c.id, name: c.name, phone: c.phone, avatarColor: c.avatar_color, photoUrl: c.photo_path ? (photoUrls.get(c.photo_path) ?? null) : null }] : [])),
     savedAt: now.toISOString(),
   };
 }

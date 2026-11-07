@@ -3,40 +3,47 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Button, Card, Field, ResponsiveDialog, Segmented, ToastProvider, useToast } from "@/components/ui";
+import { Button, Field, ResponsiveDialog, ToastProvider, useToast } from "@/components/ui";
+import { cx } from "@/components/ui/cx";
 import dialog from "@/components/agenda/Dialogs.module.css";
-import { removeService, saveHours, saveService } from "@/lib/listino/actions";
+import { removeService, saveService } from "@/lib/listino/actions";
 import { listinoCopy } from "@/lib/copy/listino";
 import { formatPrice } from "@/lib/dates/format";
-import { formatMinutes } from "@/lib/rules/hours";
 import { LIMITS } from "@/lib/rules/forms";
 import { span } from "@/lib/rules/agenda";
-import { hasBreak, previewText, setBreak, STEP, stepHours, toggleDay, type HoursDraft, type HoursField } from "@/lib/rules/listino";
 import styles from "./Listino.module.css";
 
 const copy = listinoCopy;
 
-export type ServiceRow = { id: string; name: string; durationMin: number; priceCents: number };
+type ServiceRow = { id: string; name: string; durationMin: number; priceCents: number };
 
 type Props = {
   canEdit: boolean;
   ownerName: string;
   services: ServiceRow[];
-  hours: HoursDraft;
-  operatorNames: string;
 };
 
 const DURATIONS = [15, 20, 25, 30, 40, 45, 50, 60, 75, 90, 120];
-/** Da lunedì a domenica, come nei design. */
-const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
-const LETTER = ["D", "L", "M", "M", "G", "V", "S"];
-const DAY_NAME = ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"];
 
 const priceText = (cents: number) => String(cents / 100).replace(".", ",");
 const parsePrice = (text: string): number | null => {
   const n = Number(text.trim().replace(",", "."));
   return text.trim() && Number.isFinite(n) && n >= 0 && n <= 9999 ? Math.round(n * 100) : null;
 };
+
+/** Le due schede di «Listino e orari»: Servizi e Orari. */
+export function ListinoTabs({ active }: { active: "services" | "hours" }) {
+  return (
+    <nav className={styles.tabs} aria-label={copy.tabs.label}>
+      <Link href="/listino" className={cx(styles.tab, active === "services" && styles.tabOn)} aria-current={active === "services" ? "page" : undefined}>
+        {copy.tabs.services}
+      </Link>
+      <Link href="/listino/orari" className={cx(styles.tab, active === "hours" && styles.tabOn)} aria-current={active === "hours" ? "page" : undefined}>
+        {copy.tabs.hours}
+      </Link>
+    </nav>
+  );
+}
 
 export function ListinoView(props: Props) {
   return (
@@ -46,46 +53,10 @@ export function ListinoView(props: Props) {
   );
 }
 
-function Inner({ canEdit, ownerName, services, hours, operatorNames }: Props) {
+function Inner({ canEdit, ownerName, services }: Props) {
   const router = useRouter();
   const toast = useToast();
-  const [draft, setDraft] = useState<HoursDraft | null>(null);
   const [editing, setEditing] = useState<ServiceRow | "new" | null>(null);
-  const [saving, startSave] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-
-  const current = draft ?? hours;
-  const edit = (next: HoursDraft) => setDraft(next);
-
-  const saveHoursNow = () =>
-    draft &&
-    startSave(async () => {
-      setError(null);
-      const result = await saveHours(draft);
-      if (!result.ok) return setError(result.error);
-      setDraft(null);
-      toast(copy.toasts.hoursSaved, copy.toasts.hoursSavedSub(result.outside));
-      router.refresh();
-    });
-
-  const stepper = (field: HoursField, label: string) => (
-    <div key={field} className={styles.row}>
-      <span className={styles.rowLabel}>{label}</span>
-      {canEdit ? (
-        <span className={styles.stepper}>
-          <button type="button" className={styles.stepButton} aria-label={`${label} ${copy.before}`} onClick={() => edit(stepHours(current, field, -STEP[field]))}>
-            −
-          </button>
-          <output className={styles.stepValue}>{formatMinutes(current[field])}</output>
-          <button type="button" className={styles.stepButton} aria-label={`${label} ${copy.after}`} onClick={() => edit(stepHours(current, field, STEP[field]))}>
-            +
-          </button>
-        </span>
-      ) : (
-        <span className={styles.stepValue}>{formatMinutes(current[field])}</span>
-      )}
-    </div>
-  );
 
   return (
     <main className={styles.page}>
@@ -95,6 +66,8 @@ function Inner({ canEdit, ownerName, services, hours, operatorNames }: Props) {
         {!canEdit ? <p className={styles.note}>{copy.barberNote(ownerName)}</p> : null}
       </header>
 
+      <ListinoTabs active="services" />
+
       <section className={styles.section} aria-labelledby="services-title">
         <div className={styles.sectionHead}>
           <h2 id="services-title" className={styles.sectionTitle}>
@@ -102,23 +75,37 @@ function Inner({ canEdit, ownerName, services, hours, operatorNames }: Props) {
           </h2>
           <span className={styles.count}>{copy.serviceCount(services.length)}</span>
         </div>
-        <Card flush>
+        <ul className={styles.services}>
           {services.map((s) => (
-            <div key={s.id} className={styles.service}>
-              <div className={styles.serviceText}>
-                <p className={styles.serviceName}>{s.name}</p>
-                <p className={styles.serviceMeta}>
-                  {s.durationMin} min · {formatPrice(s.priceCents)}
-                </p>
-              </div>
-              {canEdit ? (
-                <button type="button" className={styles.link} aria-label={`${copy.edit}: ${s.name}`} onClick={() => setEditing(s)}>
-                  {copy.edit}
-                </button>
-              ) : null}
-            </div>
+            <li key={s.id}>
+              <button type="button" className={styles.serviceCard} disabled={!canEdit} onClick={() => setEditing(s)}>
+                <span className={styles.serviceIcon} aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="6" cy="6.5" r="2.8" />
+                    <circle cx="6" cy="17.5" r="2.8" />
+                    <path d="M8.3 8.2 20 18M8.3 15.8 20 6" />
+                  </svg>
+                </span>
+                <span className={styles.serviceText}>
+                  <span className={styles.serviceName}>{s.name}</span>
+                  <span className={styles.serviceDur}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="8.5" />
+                      <path d="M12 7.5V12l3 2" />
+                    </svg>
+                    {s.durationMin} min
+                  </span>
+                </span>
+                <span className={styles.servicePrice}>{formatPrice(s.priceCents)}</span>
+                <span className={styles.chev} aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="m9 6 6 6-6 6" />
+                  </svg>
+                </span>
+              </button>
+            </li>
           ))}
-        </Card>
+        </ul>
         {canEdit ? (
           <button type="button" className={styles.add} onClick={() => setEditing("new")}>
             {copy.addService}
@@ -126,86 +113,6 @@ function Inner({ canEdit, ownerName, services, hours, operatorNames }: Props) {
         ) : null}
         <p className={styles.note}>{copy.serviceNote}</p>
       </section>
-
-      <section className={styles.section} aria-labelledby="days-title">
-        <h2 id="days-title" className={styles.sectionTitle}>
-          {copy.days}
-        </h2>
-        <div className={styles.days} role="group" aria-label={copy.days}>
-          {DAY_ORDER.map((w) => {
-            const open = !current.closedDays.includes(w);
-            return (
-              <button
-                key={w}
-                type="button"
-                className={styles.day}
-                aria-pressed={open}
-                aria-label={`${DAY_NAME[w]}${open ? "" : ", chiuso"}`}
-                disabled={!canEdit}
-                onClick={() => edit(toggleDay(current, w))}
-              >
-                {LETTER[w]}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className={styles.section} aria-labelledby="hours-title">
-        <h2 id="hours-title" className={styles.sectionTitle}>
-          {copy.hours}
-        </h2>
-        <Card flush>
-          {stepper("open", copy.rows.open)}
-          {stepper("close", copy.rows.close)}
-          {hasBreak(current) ? stepper("breakStart", copy.rows.breakStart) : null}
-          {hasBreak(current) ? stepper("breakEnd", copy.rows.breakEnd) : null}
-        </Card>
-        {canEdit ? (
-          <Segmented
-            label={copy.pause}
-            value={hasBreak(current) ? "on" : "off"}
-            onChange={(v) => edit(setBreak(current, v === "on"))}
-            options={[
-              { value: "on", label: `${copy.pause}: ${copy.yes}` },
-              { value: "off", label: `${copy.pause}: ${copy.no}` },
-            ]}
-            fullWidth
-          />
-        ) : (
-          <p className={styles.note}>
-            {hasBreak(current) ? `${copy.pause} ${formatMinutes(current.breakStart)}–${formatMinutes(current.breakEnd)}` : "Orario continuato"}
-          </p>
-        )}
-      </section>
-
-      <Card flush>
-        <Link href="/listino/chiusure" className={styles.navRow}>
-          <span>{copy.closures}</span>
-          <span aria-hidden="true">›</span>
-        </Link>
-        <Link href="/impostazioni/operatori" className={styles.navRow}>
-          <span>
-            {copy.operators}
-            <span className={styles.navSub}>{operatorNames}</span>
-          </span>
-          <span aria-hidden="true">›</span>
-        </Link>
-      </Card>
-
-      {draft ? (
-        <div className={styles.dirty} role="region" aria-label={copy.saveHours}>
-          <p className={styles.dirtyText}>{error ?? previewText(draft)}</p>
-          <div className={styles.dirtyButtons}>
-            <Button variant="secondary" size="large" onClick={() => { setDraft(null); setError(null); }}>
-              {copy.cancel}
-            </Button>
-            <Button size="large" disabled={saving} onClick={saveHoursNow}>
-              {copy.saveHours}
-            </Button>
-          </div>
-        </div>
-      ) : null}
 
       {editing ? <ServiceDialog key={editing === "new" ? "new" : editing.id} service={editing === "new" ? null : editing} onClose={() => setEditing(null)} onDone={(message, sub) => { setEditing(null); toast(message, sub); router.refresh(); }} /> : null}
     </main>

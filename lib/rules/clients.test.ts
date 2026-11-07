@@ -28,6 +28,8 @@ const row = (extra: Partial<ClientRow> = {}): ClientRow => ({
   usualServiceName: "Taglio uomo",
   usualMemberName: "Andrea",
   hasToday: false,
+  avatarColor: null,
+  photoUrl: null,
   ...extra,
 });
 

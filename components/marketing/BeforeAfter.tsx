@@ -8,10 +8,10 @@ const copy = marketingCopy.before;
 const clamp = (n: number) => Math.max(4, Math.min(96, n));
 
 /** "Prima e dopo": a sinistra il quaderno, a destra l'agenda; si trascina la maniglia o si usano le frecce. */
-export function BeforeAfter() {
+export function BeforeAfter({ extra }: { extra?: { root?: string; paper?: string; handle?: string; tagLeft?: string; tagRight?: string } } = {}) {
   const box = useRef<HTMLDivElement>(null);
   const dragging = useRef(false);
-  const [pos, setPos] = useState(52);
+  const [pos, setPos] = useState(50);
 
   const setFrom = (e: PointerEvent<HTMLDivElement>) => {
     const r = box.current?.getBoundingClientRect();
@@ -27,7 +27,7 @@ export function BeforeAfter() {
   return (
     <div
       ref={box}
-      className={styles.compare}
+      className={[styles.compare, extra?.root].filter(Boolean).join(" ")}
       onPointerDown={(e) => {
         dragging.current = true;
         e.currentTarget.setPointerCapture?.(e.pointerId);
@@ -39,9 +39,9 @@ export function BeforeAfter() {
     >
       <picture className={styles.compareAfter}>
         <source media="(min-width: 820px)" srcSet="/images/shot-agenda-desktop.png" />
-        <img src="/images/shot-agenda-mobile.png" alt={copy.afterAlt} draggable={false} width={780} height={1688} loading="lazy" decoding="async" />
+        <img src="/images/shot-agenda-mobile.png" alt={copy.afterAlt} draggable={false} width={780} height={1688} decoding="async" />
       </picture>
-      <div className={styles.paper} style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
+      <div className={[styles.paper, extra?.paper].filter(Boolean).join(" ")} style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
         <div className={styles.paperMargin} />
         <span className={styles.paperTitle}>{copy.day}</span>
         {copy.paper.map(([t, x, note, struck], i) => (
@@ -52,13 +52,13 @@ export function BeforeAfter() {
           </div>
         ))}
       </div>
-      <span className={`${styles.tag} ${styles.tagLeft}`} style={{ opacity: pos > 16 ? 1 : 0 }}>{copy.notebook}</span>
-      <span className={`${styles.tag} ${styles.tagRight}`} style={{ opacity: pos < 84 ? 1 : 0 }}>{copy.app}</span>
+      <span className={`${styles.tag} ${extra?.tagLeft ?? styles.tagLeft}`} style={{ opacity: pos > 16 ? 1 : 0 }}>{copy.notebook}</span>
+      <span className={`${styles.tag} ${extra?.tagRight ?? styles.tagRight}`} style={{ opacity: pos < 84 ? 1 : 0 }}>{copy.app}</span>
       <div className={styles.line} style={{ left: `${pos}%` }} />
       <button
         type="button"
         role="slider"
-        className={styles.handle}
+        className={[styles.handle, extra?.handle].filter(Boolean).join(" ")}
         style={{ left: `${pos}%` }}
         aria-label={copy.handle}
         aria-valuemin={0}

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { DayHours } from "./hours";
 import { fromPriceCents, hoursLines, mapsHref, openSign, phoneHref, shortHours, typicalHoursLine } from "./publicPage";
 
-const closed: DayHours = { closed: true, openMin: null, closeMin: null, breakStartMin: null, breakEndMin: null };
-const open: DayHours = { closed: false, openMin: 540, closeMin: 1140, breakStartMin: 780, breakEndMin: 870 };
+const closed: DayHours = { closed: true, openMin: null, closeMin: null, breaks: [] };
+const open: DayHours = { closed: false, openMin: 540, closeMin: 1140, breaks: [[780, 870]] };
 // come Barberia Saragozza: domenica e lunedì chiuso, mar–sab 9–13 e 14:30–19
 const week = [closed, closed, open, open, open, open, open];
 

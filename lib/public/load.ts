@@ -1,11 +1,12 @@
 import "server-only";
 import { cache } from "react";
 import { createAnonClient } from "@/lib/supabase/anon";
+import { env } from "@/lib/supabase/env";
 import type { AccessInput } from "@/lib/billing";
-import type { DayHours } from "@/lib/rules/hours";
+import { CLOSED_DAY, dayFromRanges, type DayHours } from "@/lib/rules/hours";
 
-export type PublicService = { id: string; name: string; durationMin: number; priceCents: number };
-export type PublicMember = { id: string; name: string; bio: string | null; photoPath: string | null; chairNo: number };
+type PublicService = { id: string; name: string; durationMin: number; priceCents: number };
+type PublicMember = { id: string; name: string; bio: string | null; photoPath: string | null; chairNo: number };
 
 export type PublicSalon = {
   id: string;
@@ -26,6 +27,8 @@ export type PublicSalon = {
   access: AccessInput;
   services: PublicService[];
   members: PublicMember[];
+  /** Indirizzi delle foto del salone (la prima è la copertina). */
+  photos: string[];
   week: DayHours[];
 };
 
@@ -36,10 +39,11 @@ type Raw = {
   min_notice_min: number; max_advance_days: number; sub_status: AccessInput["sub_status"]; trial_ends_at: string;
   services: Array<{ id: string; name: string; duration_min: number; price_cents: number }>;
   members: Array<{ id: string; name: string; bio: string | null; photo_path: string | null; chair_no: number }>;
-  hours: Array<{ weekday: number; closed: boolean; open_min: number | null; close_min: number | null; break_start_min: number | null; break_end_min: number | null }>;
+  photos?: string[];
+  hours: Array<{ weekday: number; closed: boolean; ranges: Array<[number, number]> }>;
 };
 
-const CLOSED: DayHours = { closed: true, openMin: null, closeMin: null, breakStartMin: null, breakEndMin: null };
+const CLOSED: DayHours = CLOSED_DAY;
 
 /** Il salone con questo link, o null se non c'è (o è stato eliminato). */
 export const loadPublicSalon = cache(async (slug: string): Promise<PublicSalon | null> => {
@@ -49,7 +53,7 @@ export const loadPublicSalon = cache(async (slug: string): Promise<PublicSalon |
   const r = data as unknown as Raw;
   const week: DayHours[] = Array.from({ length: 7 }, (_, d) => {
     const h = r.hours.find((x) => x.weekday === d);
-    return h ? { closed: h.closed, openMin: h.open_min, closeMin: h.close_min, breakStartMin: h.break_start_min, breakEndMin: h.break_end_min } : CLOSED;
+    return h ? dayFromRanges({ closed: h.closed, ranges: h.ranges }) : CLOSED;
   });
   return {
     id: r.id, slug: r.slug, name: r.name, address: r.address, area: r.area, phone: r.phone, description: r.description,
@@ -58,6 +62,7 @@ export const loadPublicSalon = cache(async (slug: string): Promise<PublicSalon |
     access: { sub_status: r.sub_status, trial_ends_at: r.trial_ends_at },
     services: r.services.map((s) => ({ id: s.id, name: s.name, durationMin: s.duration_min, priceCents: s.price_cents })),
     members: r.members.map((m) => ({ id: m.id, name: m.name, bio: m.bio, photoPath: m.photo_path, chairNo: m.chair_no })),
+    photos: (r.photos ?? []).map((path) => `${env.url()}/storage/v1/object/public/salon-photos/${path}`),
     week,
   };
 });
