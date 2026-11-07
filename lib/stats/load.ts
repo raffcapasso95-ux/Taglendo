@@ -89,7 +89,10 @@ export async function loadStats(params: { periodo?: string; data?: string }): Pr
   const nextStart = shiftPeriod(period, start, 1);
 
   const call = async (from: string, to: string, bucket: "day" | "month") => {
-    const { data } = await supabase.rpc("stats_summary", { p_salon: salon.id, ...rangeIso(from, to), p_bucket: bucket });
+    const { data, error } = await supabase.rpc("stats_summary", { p_salon: salon.id, ...rangeIso(from, to), p_bucket: bucket });
+    // senza questo controllo un errore del database (per esempio una migrazione non ancora applicata) diventava
+    // «Cannot read properties of null» più sotto, e in Sentry non si capiva perché
+    if (error || !data) throw new Error(`Statistiche non disponibili: ${error ? `${error.code ?? ""} ${error.message}`.trim() : "il salone non risulta"}`);
     return data as unknown as Summary;
   };
 
