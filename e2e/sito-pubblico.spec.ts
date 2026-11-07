@@ -69,4 +69,16 @@ test.describe("Sito pubblico sul telefono", () => {
       expect(small, path).toEqual([]);
     }
   });
+
+  test("a 320 px niente scorre di lato: home, accesso e pagina del salone", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    for (const path of ["/", "/accedi", "/registrati", "/barberia-saragozza"]) {
+      await page.goto(path, { waitUntil: "networkidle" });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), path).toBeLessThanOrEqual(0);
+    }
+    // la testata della home sta tutta nello schermo
+    await page.goto("/", { waitUntil: "networkidle" });
+    const right = await page.getByRole("banner").getByRole("link", { name: "Prova gratis" }).evaluate((a) => Math.round(a.getBoundingClientRect().right));
+    expect(right).toBeLessThanOrEqual(320);
+  });
 });

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { freshOwner } from "./agenda-helpers";
+import { freshOwner, nextOpenDay } from "./agenda-helpers";
 import { adminInsert, adminSelect } from "./helpers";
 
 const PAGE = "/barberia-saragozza";
@@ -56,6 +56,26 @@ test.describe("Pagina del salone: prenotazione a passi", () => {
     await expect(cal).toBeVisible();
     await cal.locator("button[data-date]:not([disabled])").nth(2).click();
     await expect(card(page).getByRole("group", { name: /Mattina|Pomeriggio/ }).first()).toBeVisible();
+  });
+});
+
+test.describe("Pagina del salone: giorni pieni", () => {
+  test("un giorno di ferie dice «pieno» e «Vai al prossimo giorno libero» porta a un giorno con orari", async ({ page }) => {
+    await freshOwner(page, "Barberia Ferie Pubbliche");
+    const [salon] = await adminSelect<{ id: string; slug: string }>("salons", "select=id,slug&name=eq.Barberia Ferie Pubbliche&order=created_at.desc&limit=1");
+    const closedDay = nextOpenDay();
+    await adminInsert("closures", { salon_id: salon!.id, starts_on: closedDay, ends_on: closedDay });
+    await page.goto(`/${salon!.slug}`);
+    await rejectCookies(page);
+    await card(page).getByRole("button", { name: /^Taglio uomo/ }).click();
+    const n = Number(closedDay.slice(8));
+    const day = card(page).getByRole("group", { name: "Giorno" }).getByRole("button", { name: new RegExp(`(^| )${n}$`) });
+    await day.click();
+    await expect(card(page).getByText("Questo giorno è pieno.")).toBeVisible();
+    await card(page).getByRole("button", { name: "Vai al prossimo giorno libero" }).click();
+    await expect(card(page).getByText("Questo giorno è pieno.")).toBeHidden();
+    await expect(card(page).getByRole("group", { name: /Mattina|Pomeriggio/ }).first()).toBeVisible();
+    await expect(day).toHaveAttribute("aria-pressed", "false");
   });
 });
 

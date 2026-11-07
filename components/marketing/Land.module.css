@@ -1737,3 +1737,10 @@
 .fWord::before {
   content: "taglendo";
 }
+
+/* Su schermi stretti (320 px) «Accedi» sta nel piè di pagina e nel menu di chi è già dentro: la testata deve starci */
+@media (max-width: 359px) {
+  .page .login {
+    display: none;
+  }
+}

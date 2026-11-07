@@ -99,7 +99,7 @@ function Inner({ canEdit, ownerName, week, todayWeekday, operatorNames }: Props)
             const off = day.closed || day.ranges.length === 0;
             return (
               <li key={w} className={cx(styles.dayRow, off && styles.dayRowClosed)}>
-                <button type="button" className={styles.dayMain} aria-label={hours.editDay(dayTitle(w))} disabled={!canEdit} onClick={() => setEditing(w)}>
+                <button type="button" className={styles.dayMain} disabled={!canEdit} onClick={() => setEditing(w)}>
                   <span className={styles.dayName}>{dayTitle(w)}</span>
                   <span className={styles.ranges}>
                     {off ? (
@@ -112,6 +112,7 @@ function Inner({ canEdit, ownerName, week, todayWeekday, operatorNames }: Props)
                       ))
                     )}
                   </span>
+                  <span className="visually-hidden">, {hours.editHint}</span>
                   <span className={styles.chev} aria-hidden="true">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                       <path d="m9 6 6 6-6 6" />

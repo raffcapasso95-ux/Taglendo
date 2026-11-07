@@ -53,7 +53,7 @@ export default function HomeLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className={styles.page} data-land="">
       <LandEffects />
-      <header className={styles.header}>
+      <header className={styles.header} data-land-header="">
         <div className={styles.headerRow}>
           <Link href="/" aria-label="Taglendo, inizio pagina" className={styles.logo}>
             <Image src="/brand/taglendo-icon.svg" alt="" width={34} height={34} className={styles.logoIcon} priority />

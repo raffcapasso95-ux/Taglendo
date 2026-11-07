@@ -807,6 +807,11 @@
     min-height: 72px;
   }
 
+  /* l'intestazione della prenotazione si ferma proprio sotto la testata, che qui è più alta */
+  .wzHead {
+    top: 72px;
+  }
+
   .hero {
     padding: var(--space-16) 0;
   }

@@ -158,7 +158,12 @@
 }
 
 .mbBrand {
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  margin-left: calc((var(--tap-min) - 32px) / -2);
   flex: 0 0 auto;
+  justify-content: center;
+  align-items: center;
   display: flex;
 }
 

@@ -45,7 +45,7 @@ test.describe("Listino e orari", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Listino e orari" })).toBeVisible();
     await expect(text(page, /^Aperto 5 giorni · 43 h a settimana$/)).toBeVisible();
 
-    await page.getByRole("button", { name: "Modifica orari di lunedì" }).click();
+    await page.getByRole("button", { name: /^lunedì/i }).click();
     const d = dialog(page);
     await expect(d.getByRole("heading", { name: "Lunedì", level: 2 })).toBeVisible();
     await d.getByRole("switch", { name: /Aperto il lunedì/ }).click(); // era chiuso
@@ -62,25 +62,25 @@ test.describe("Listino e orari", () => {
 
     // ricaricando i valori restano
     await page.reload();
-    await expect(page.getByRole("button", { name: "Modifica orari di lunedì" })).toContainText("8:45–13:00");
-    await expect(page.getByRole("button", { name: "Modifica orari di martedì" })).toContainText("8:45–13:00");
-    await expect(page.getByRole("button", { name: "Modifica orari di martedì" })).not.toContainText("14:30");
+    await expect(page.getByRole("button", { name: /^lunedì/i })).toContainText("8:45–13:00");
+    await expect(page.getByRole("button", { name: /^martedì/i })).toContainText("8:45–13:00");
+    await expect(page.getByRole("button", { name: /^martedì/i })).not.toContainText("14:30");
   });
 
   test("tre fasce in un giorno e l'interruttore chiude un giorno subito", async ({ page }) => {
     await freshOwner(page, "Barberia Tre Fasce");
     await page.goto("/listino/orari");
-    await page.getByRole("button", { name: "Modifica orari di giovedì" }).click();
+    await page.getByRole("button", { name: /^giovedì/i }).click();
     await dialog(page).getByRole("button", { name: "+ Aggiungi una fascia" }).click();
     await expect(dialog(page).getByRole("listitem")).toHaveCount(3);
     await dialog(page).getByRole("button", { name: "Salva" }).click();
     await expect(page.getByText("Orari salvati").filter({ visible: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Modifica orari di giovedì" }).locator("span").filter({ hasText: /\d+:\d\d–\d+:\d\d/ })).toHaveCount(3);
+    await expect(page.getByRole("button", { name: /^giovedì/i }).locator("span").filter({ hasText: /\d+:\d\d–\d+:\d\d/ })).toHaveCount(3);
 
     // l'interruttore del giorno salva da solo
     await page.getByRole("switch", { name: "Martedì aperto" }).click();
     await expect(page.getByText("Orari salvati").filter({ visible: true })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Modifica orari di martedì" })).toContainText("Chiuso");
+    await expect(page.getByRole("button", { name: /^martedì/i })).toContainText("Chiuso");
     await expect(page.getByRole("switch", { name: "Martedì aperto" })).toHaveAttribute("aria-checked", "false");
   });
 
@@ -93,7 +93,7 @@ test.describe("Listino e orari", () => {
 
     await page.goto("/listino/orari");
     const name = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"][new Date(`${day}T12:00:00Z`).getUTCDay()]!;
-    await page.getByRole("button", { name: `Modifica orari di ${name}` }).click();
+    await page.getByRole("button", { name: new RegExp(`^${name}`, "i") }).click();
     for (let i = 0; i < 4; i++) await dialog(page).getByRole("button", { name: "Fascia 1 dalle dopo" }).click(); // 9:00 → 10:00
     await dialog(page).getByRole("button", { name: "Salva" }).click();
     await expect(page.getByText("Agenda e link usano i nuovi orari · 1 appuntamento fuori orario da controllare").filter({ visible: true })).toBeVisible();
@@ -111,7 +111,7 @@ test.describe("Listino e orari", () => {
     await expect(page.locator("button[class*=serviceCard]").first()).toBeDisabled();
     await expect(page.getByRole("button", { name: "+ Aggiungi servizio" })).toHaveCount(0);
     await page.goto("/listino/orari");
-    await expect(page.getByRole("button", { name: "Modifica orari di lunedì" })).toBeDisabled();
+    await expect(page.getByRole("button", { name: /^lunedì/i })).toBeDisabled();
     await expect(page.getByRole("switch", { name: "Lunedì aperto" })).toBeDisabled();
   });
 });
@@ -165,6 +165,13 @@ test.describe("Ferie e chiusure", () => {
 });
 
 test.describe("Impostazioni", () => {
+  test("durante la beta «Abbonamento» non porta a una pagina vuota: si torna alle impostazioni", async ({ page }) => {
+    await freshOwner(page, "Barberia Beta Gratis");
+    await page.goto("/impostazioni/abbonamento");
+    await expect(page).toHaveURL(/\/impostazioni$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Impostazioni" })).toBeVisible();
+  });
+
   test("l'indice porta alle sezioni e non mostra l'abbonamento nella beta gratuita", async ({ page }) => {
     await signIn(page, "andrea@barberia-saragozza.example", DEMO);
     await page.goto("/impostazioni");

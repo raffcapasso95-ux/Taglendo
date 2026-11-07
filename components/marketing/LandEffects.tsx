@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 /**
  * Il movimento della home, tutto in un punto: entrata a cascata del titolo, sezioni che compaiono allo scorrimento (una volta sola),
- * e la barra «Prova gratis» del telefono, che c'è solo dopo l'apertura e fino alla chiusura.
+ * la testata che si colora appena si scorre e la barra «Prova gratis» del telefono, che c'è solo dopo l'apertura e fino alla chiusura.
  * Con `prefers-reduced-motion` non parte niente: la pagina si legge ferma.
  */
 export function LandEffects() {
@@ -14,9 +14,12 @@ export function LandEffects() {
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!calm && "IntersectionObserver" in window) page.setAttribute("data-motion", "on");
 
+    const header = page.querySelector<HTMLElement>("[data-land-header]");
     const bar = page.querySelector<HTMLElement>("[data-land-bar]");
     const hero = page.querySelector<HTMLElement>("[data-land-hero]");
     const onScroll = () => {
+      // la testata è trasparente sulla foto dell'apertura e prugna appena si scorre: così si legge anche sulle sezioni chiare
+      header?.setAttribute("data-scrolled", window.scrollY > 24 ? "true" : "false");
       const end = page.querySelector("#inizia")?.getBoundingClientRect().top ?? 1e9;
       const past = hero ? window.scrollY > hero.offsetHeight - 80 && end > window.innerHeight - 40 : false;
       bar?.setAttribute("data-hidden", past ? "false" : "true");
