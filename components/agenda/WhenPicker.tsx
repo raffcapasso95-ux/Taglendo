@@ -5,16 +5,18 @@ import { cx } from "@/components/ui/cx";
 import { agendaCopy } from "@/lib/copy/agenda";
 import type { SlotsResult } from "@/lib/agenda/actions";
 import { addDays, dayNumber, monthShort, weekdayShort } from "@/lib/dates/rome";
-import { clock } from "@/lib/rules/agenda";
+import { clock, operatorColor, type Operator } from "@/lib/rules/agenda";
 import { MonthCalendar } from "./MonthCalendar";
+import { OperatorAvatar } from "./OperatorAvatar";
 import dialogs from "./Dialogs.module.css";
 import styles from "./Flow.module.css";
 
 const flow = agendaCopy.flow;
 /** Quanti giorni a portata di dito, da oggi. */
 const DAYS_SHOWN = 14;
-/** Mattina e pomeriggio si dividono alle 13. */
+/** Mattina e pomeriggio si dividono alle 13, pomeriggio e sera alle 18. */
 const NOON = 13 * 60;
+const EVENING = 18 * 60;
 
 type Props = {
   today: string;
@@ -29,17 +31,30 @@ type Props = {
   loading: boolean;
   /** La frase sopra gli orari: dice anche quando mancano o il giorno è chiuso. */
   hint: string;
+  /** I barbieri del salone, per i tondi di chi è libero. */
+  operators?: Operator[];
+  /** Con «Chiunque»: sotto ogni orario i tondi di chi è libero. */
+  showWho?: boolean;
 };
 
-/** Il «Quando» della schermata: fila di giorni, calendario dei mesi e orari liberi divisi in mattina e pomeriggio. */
-export function WhenPicker({ today, date, onDate, closedDates, startMin, onTime, shown, loading, hint }: Props) {
+/**
+ * Il «Quando» della schermata: fila di giorni, calendario dei mesi e orari divisi in mattina, pomeriggio e sera.
+ * Si vedono gli orari liberi, in una griglia, con il conto per gruppo; gli occupati solo a richiesta.
+ * Con «Chiunque» (`showWho`) ogni orario mostra i tondi di chi è libero: si capisce chi prenderebbe l'appuntamento.
+ */
+export function WhenPicker({ today, date, onDate, closedDates, startMin, onTime, shown, loading, hint, operators = [], showWho = false }: Props) {
   const [calOpen, setCalOpen] = useState(false);
+  const [showBusy, setShowBusy] = useState(false);
   const closed = useMemo(() => new Set(closedDates), [closedDates]);
   const days = useMemo(() => Array.from({ length: DAYS_SHOWN }, (_, i) => addDays(today, i)), [today]);
+  const people = useMemo(() => new Map(operators.map((o, i) => [o.id, { id: o.id, name: o.name, colorIndex: operatorColor(o, i) }])), [operators]);
   const outside = !days.includes(date);
+  const all = shown?.slots ?? [];
+  const busyCount = all.filter((x) => !x.free).length;
   const timeGroups = [
-    { title: flow.morning, slots: shown?.slots.filter((x) => x.startMin < NOON) ?? [] },
-    { title: flow.afternoon, slots: shown?.slots.filter((x) => x.startMin >= NOON) ?? [] },
+    { title: flow.morning, slots: all.filter((x) => x.startMin < NOON) },
+    { title: flow.afternoon, slots: all.filter((x) => x.startMin >= NOON && x.startMin < EVENING) },
+    { title: flow.evening, slots: all.filter((x) => x.startMin >= EVENING) },
   ].filter((g) => g.slots.length > 0);
 
   return (
@@ -101,25 +116,54 @@ export function WhenPicker({ today, date, onDate, closedDates, startMin, onTime,
         <p className={cx(dialogs.hint, styles.Dialogs_hint)} aria-live="polite">
           {hint}
         </p>
-        {timeGroups.map((g) => (
-          <div key={g.title} className={cx(dialogs.timeGroup, styles.Dialogs_timeGroup)}>
-            <p className={cx(dialogs.timeGroupTitle, styles.Dialogs_timeGroupTitle)}>{g.title}</p>
-            <div className={cx(dialogs.times, styles.Dialogs_times)} role="group" aria-label={g.title} aria-busy={loading}>
-              {g.slots.map((x) => (
-                <button
-                  key={x.startMin}
-                  type="button"
-                  disabled={!x.free}
-                  aria-pressed={startMin === x.startMin}
-                  className={cx(startMin === x.startMin ? dialogs.chipOn : x.free ? dialogs.chip : dialogs.chipOff, dialogs.time, styles.Dialogs_time, startMin === x.startMin && styles.Dialogs_chipOn, startMin !== x.startMin && !x.free && styles.Dialogs_chipOff, startMin !== x.startMin && x.free && styles.Dialogs_chip)}
-                  onClick={() => onTime(x.startMin)}
-                >
-                  {clock(x.startMin)}
-                </button>
-              ))}
+        {timeGroups.map((g) => {
+          const freeHere = g.slots.filter((x) => x.free).length;
+          // gli occupati si vedono solo a richiesta; quello già scelto resta sempre in vista
+          const visible = showBusy ? g.slots : g.slots.filter((x) => x.free || x.startMin === startMin);
+          return (
+            <div key={g.title} className={cx(dialogs.timeGroup, styles.Dialogs_timeGroup)}>
+              <p className={cx(dialogs.timeGroupTitle, styles.Dialogs_timeGroupTitle, dialogs.timeGroupHead)}>
+                <span>{g.title}</span>
+                <span className={dialogs.timeGroupCount}>{freeHere > 0 ? flow.freeCount(freeHere) : flow.allBusy}</span>
+              </p>
+              {visible.length > 0 ? (
+                <div className={cx(dialogs.times, styles.Dialogs_times)} role="group" aria-label={g.title} aria-busy={loading}>
+                  {visible.map((x) => {
+                    const on = startMin === x.startMin;
+                    const who = showWho && x.free ? x.memberIds.map((id) => people.get(id)).filter((p) => p !== undefined) : [];
+                    const describe = !x.free ? flow.busy : who.length > 0 ? flow.freeWith(who.map((p) => p.name).join(", ")) : undefined;
+                    return (
+                      <button
+                        key={x.startMin}
+                        type="button"
+                        disabled={!x.free}
+                        aria-pressed={on}
+                        aria-label={clock(x.startMin)}
+                        title={describe}
+                        className={cx(on ? dialogs.chipOn : x.free ? dialogs.chip : dialogs.chipOff, dialogs.time, styles.Dialogs_time, on && styles.Dialogs_chipOn, !on && !x.free && styles.Dialogs_chipOff, !on && x.free && styles.Dialogs_chip, who.length > 0 && dialogs.timeWithWho)}
+                        onClick={() => onTime(x.startMin)}
+                      >
+                        <span aria-hidden="true">{clock(x.startMin)}</span>
+                        {who.length > 0 ? (
+                          <span className={dialogs.timeWho} aria-hidden="true">
+                            {who.map((p) => (
+                              <OperatorAvatar key={p.id} name={p.name} colorIndex={p.colorIndex} size="sm" className={dialogs.timeWhoAvatar} />
+                            ))}
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
             </div>
-          </div>
-        ))}
+          );
+        })}
+        {busyCount > 0 ? (
+          <button type="button" className={dialogs.busyToggle} aria-pressed={showBusy} onClick={() => setShowBusy(!showBusy)}>
+            {showBusy ? flow.hideBusy : flow.showBusy}
+          </button>
+        ) : null}
       </div>
     </>
   );

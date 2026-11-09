@@ -150,24 +150,11 @@ export function MoveAppointment({ detail, operators, closedDates, today, onClose
           </div>
         ) : null}
 
-        <section className={styles.block} data-block="quando" aria-labelledby="mv-quando">
-          <div className={styles.blockHead}>
-            <span className={styles.num} aria-hidden="true">
-              1
-            </span>
-            <h3 className={styles.blockTitle} id="mv-quando">
-              {flow.when}
-            </h3>
-          </div>
-          <p className={dialogs.hint}>{detailCopy.moveNow(`${shortDate(detail.date)} · ${clock(detail.startMin)} · ${detail.memberName}`)}</p>
-          <WhenPicker today={today} date={date} onDate={setDate} closedDates={closedDates} startMin={startMin} onTime={setStartMin} shown={slots} loading={loadingSlots} hint={hint} />
-        </section>
-
         {operators.length > 1 ? (
           <section className={styles.block} data-block="conchi" aria-labelledby="mv-conchi">
             <div className={styles.blockHead}>
               <span className={styles.num} aria-hidden="true">
-                2
+                1
               </span>
               <h3 className={styles.blockTitle} id="mv-conchi">
                 {flow.withWhom}
@@ -198,6 +185,19 @@ export function MoveAppointment({ detail, operators, closedDates, today, onClose
             </div>
           </section>
         ) : null}
+        <section className={styles.block} data-block="quando" aria-labelledby="mv-quando">
+          <div className={styles.blockHead}>
+            <span className={styles.num} aria-hidden="true">
+              {operators.length > 1 ? 2 : 1}
+            </span>
+            <h3 className={styles.blockTitle} id="mv-quando">
+              {flow.when}
+            </h3>
+          </div>
+          <p className={dialogs.hint}>{detailCopy.moveNow(`${shortDate(detail.date)} · ${clock(detail.startMin)} · ${detail.memberName}`)}</p>
+          <WhenPicker today={today} date={date} onDate={setDate} closedDates={closedDates} startMin={startMin} onTime={setStartMin} shown={slots} loading={loadingSlots} hint={hint} operators={operators} showWho={operators.length > 1 && memberId === "any"} />
+        </section>
+
       </div>
 
       <footer className={styles.footer}>

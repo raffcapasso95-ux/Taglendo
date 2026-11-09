@@ -421,6 +421,62 @@
   display: flex;
 }
 
+/* titolo del gruppo con il conto dei liberi a destra: «Mattina · 11 liberi» */
+.timeGroupHead {
+  gap: var(--space-2);
+  justify-content: space-between;
+  align-items: baseline;
+  display: flex;
+}
+
+.timeGroupCount {
+  color: var(--status-success-text);
+  font-weight: 600;
+}
+
+/* con «Chiunque»: sotto l'ora i tondi di chi è libero */
+.timeWithWho {
+  min-height: 60px;
+  gap: 3px;
+}
+
+.timeWho {
+  gap: 3px;
+  justify-content: center;
+  display: flex;
+}
+
+.timeWho .timeWhoAvatar {
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+}
+
+/* sul prugna dell'orario scelto il tondo prugna resterebbe invisibile: un filo panna lo stacca */
+.chipOn .timeWhoAvatar {
+  box-shadow: 0 0 0 1.5px var(--brand-cream);
+}
+
+.busyToggle {
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  align-self: flex-start;
+  cursor: pointer;
+}
+
+.busyToggle:focus-visible {
+  outline: var(--focus-ring) solid var(--brand-apricot);
+  outline-offset: 2px;
+}
+
 .whenCal .Calendar_months {
   margin: 0;
   padding: 2px 0;

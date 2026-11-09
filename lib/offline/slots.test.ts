@@ -27,6 +27,13 @@ describe("orari liberi senza rete", () => {
   it("chiunque: basta che sia libero uno dei due", () => {
     expect(free(null)).toContain(585);
   });
+  it("ogni orario dice chi è libero: con «Chiunque» si vede chi prenderebbe l'appuntamento", () => {
+    const at = (min: number, memberId: string | null = null) => offlineSlots(day, 30, memberId).find((s) => s.startMin === min);
+    expect(at(540)?.memberIds).toEqual(["a", "b"]); // tutti e due liberi
+    expect(at(585)?.memberIds).toEqual(["b"]); // «a» è occupato
+    expect(at(585, "a")).toMatchObject({ free: false, memberIds: [] });
+    expect(at(540, "b")?.memberIds).toEqual(["b"]); // con un barbiere scelto, solo lui
+  });
   it("un servizio lungo cerca spazi più grandi", () => {
     expect(free("a", 90)).not.toContain(540);
     expect(free("a", 90)).toContain(660);

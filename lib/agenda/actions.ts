@@ -219,7 +219,8 @@ export async function walkIn(input: Pick<CreateInput, "clientId" | "newClient" |
   return { ok: true, id: data.id, clientId: client.id, clientName: name, date: today, startMin: best.start };
 }
 
-export type SlotsResult = { closed: boolean; durationMin: number; slots: Array<{ startMin: number; free: boolean }> };
+/** `memberIds`: chi è libero a quell'ora (con «Chiunque» si mostra chi prenderebbe l'appuntamento). */
+export type SlotsResult = { closed: boolean; durationMin: number; slots: Array<{ startMin: number; free: boolean; memberIds: string[] }> };
 
 /** Gli orari di un giorno per il selettore: i liberi si scelgono, gli occupati si mostrano barrati. */
 export async function listSlots(input: { serviceId: string; memberId: string | null; date: string; excludeId?: string | null }): Promise<SlotsResult> {
@@ -232,9 +233,11 @@ export async function listSlots(input: { serviceId: string; memberId: string | n
   const hours = await hoursFor(supabase, salon.id, input.date);
   if (hours.closed) return { closed: true, durationMin: service.duration_min, slots: [] };
   const rows = await freeRows(supabase, salon.id, input.serviceId, input.memberId, input.date, 1, input.excludeId);
-  const free = new Set(rows.map((r) => r.startMin));
+  const byStart = new Map<number, string[]>();
+  for (const r of rows) byStart.set(r.startMin, [...(byStart.get(r.startMin) ?? []), r.memberId]);
   const from = input.date === romeDate(now) ? romeMinutes(now) : 0;
-  return { closed: false, durationMin: service.duration_min, slots: gridSlots(hours, service.duration_min, free, from) };
+  const slots = gridSlots(hours, service.duration_min, new Set(byStart.keys()), from).map((s) => ({ ...s, memberIds: byStart.get(s.startMin) ?? [] }));
+  return { closed: false, durationMin: service.duration_min, slots };
 }
 
 export type Detail = {

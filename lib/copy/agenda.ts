@@ -55,7 +55,15 @@ export const agendaCopy = {
     day: "Giorno",
     morning: "Mattina",
     afternoon: "Pomeriggio",
-    slotsHint: (who: string, day: string) => `Orari con ${who} · ${day} · Barrato = occupato`,
+    slotsHint: (who: string, day: string) => `Orari liberi con ${who} · ${day}`, // NUOVO: gli occupati sono nascosti, non più barrati
+    // NUOVO: la vista degli orari (gruppi con il conto dei liberi, occupati a richiesta, chi è libero con «Chiunque»)
+    evening: "Sera",
+    freeCount: (n: number) => (n === 1 ? "1 libero" : `${n} liberi`),
+    allBusy: "Tutto occupato",
+    showBusy: "Mostra anche gli occupati",
+    hideBusy: "Nascondi gli occupati",
+    busy: "occupato",
+    freeWith: (names: string) => `libero: ${names}`,
     service: "Servizio",
     barber: "Barbiere",
     anyoneSub: "il primo libero",
