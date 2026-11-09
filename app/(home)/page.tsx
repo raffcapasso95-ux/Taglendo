@@ -139,20 +139,6 @@ export default function Page() {
                 <Image src="/images/hero-agenda.jpg" alt={copy.hero.phoneTitle} width={1170} height={2400} priority sizes="(min-width: 1024px) 320px, 78vw" className={styles.phoneShot} draggable={false} />
               </div>
             </div>
-            {/* il biglietto fermo racconta cosa succede: un cliente ha prenotato dal link mentre lavoravi */}
-            <div className={styles.phoneToast} aria-hidden="true">
-              <span className={styles.phoneToastIcon}>
-                <Icon size={18}>
-                  <path d="m5 12 5 5 9-10" />
-                </Icon>
-              </span>
-              <span className={styles.phoneToastText}>
-                <strong>{copy.hero.phoneToastTitle}</strong>
-                <span>
-                  {copy.hero.phoneToastText} · <em className={styles.phoneToastTag}>{copy.hero.phoneToastTag}</em>
-                </span>
-              </span>
-            </div>
           </div>
         </div>
         <a className={styles.scrollHint} href="#come" aria-label={copy.hero.scroll}>
