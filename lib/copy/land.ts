@@ -1,6 +1,6 @@
 /** Testi della home del sito, dal ridisegno di novembre 2026 (giri 11–17). */
 export const landCopy = {
-  nav: { how: "Come funziona", before: "Prima e dopo", prices: "Prezzi", faq: "Domande", signIn: "Accedi", try: "Prova gratis", toApp: "Vai all’agenda" },
+  nav: { how: "Come funziona", before: "Prima e dopo", prices: "Prezzi", faq: "Domande", signIn: "Accedi", try: "Prova gratis" },
   hero: {
     kicker: "App per barberie da 1 a 3 poltrone",
     lines: [["La", "tua", "agenda"], ["online,"]] as const,
@@ -12,7 +12,8 @@ export const landCopy = {
     noteBetaSub: "Zero commissioni · senza carta",
     noteLive: "Da 9,90 € al mese + IVA",
     noteLiveSub: "Zero commissioni · senza carta per provare",
-    phoneTitle: "Agenda di Taglendo",
+    phoneTitle: "Agenda di Taglendo: la giornata di Andrea, martedì 10 novembre",
+    phoneTime: "9:41", // NUOVO: l'ora nella barra di stato del telefono
     scroll: "Scopri come funziona",
   },
   tape: {

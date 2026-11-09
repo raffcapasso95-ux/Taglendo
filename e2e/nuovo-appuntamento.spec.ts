@@ -1,22 +1,25 @@
 import { expect, test } from "@playwright/test";
 import { bookNewClient, dialog, freshOwner, newButton, nextOpenDay } from "./agenda-helpers";
-import { adminSelect } from "./helpers";
+import { adminSelect, signIn } from "./helpers";
 
 /** Nuovo appuntamento (ridisegno novembre 2026): una schermata con quattro blocchi sempre aperti e il riepilogo in fondo. */
 test.describe("Nuovo appuntamento", () => {
-  test("quattro blocchi numerati, giorni e orari divisi in mattina e pomeriggio, riepilogo che dice cosa manca", async ({ page }) => {
+  test("blocchi numerati (Cosa, Quando, Per chi), giorni e orari liberi divisi in mattina e pomeriggio, riepilogo che dice cosa manca", async ({ page }) => {
     await freshOwner(page, "Barberia Flusso Semplice");
     const day = nextOpenDay();
     await page.goto(`/agenda?g=${day}`);
     await newButton(page).click();
     const d = dialog(page);
     await expect(d.getByRole("heading", { name: "Nuovo appuntamento", level: 2 })).toBeVisible();
-    // un solo barbiere: niente blocco «Con chi», quindi tre blocchi (Quando, Cosa, Per chi)
-    for (const h of ["Quando", "Cosa", "Per chi"]) await expect(d.getByRole("heading", { name: h, level: 3 })).toBeVisible();
+    // un solo barbiere: niente blocco «Con chi», quindi tre blocchi, nell'ordine Cosa, Quando, Per chi
+    await expect(d.getByRole("heading", { level: 3 })).toHaveText(["Cosa", "Quando", "Per chi"]);
     await expect(d.getByRole("heading", { name: "Con chi" })).toHaveCount(0);
     await expect(d.getByRole("group", { name: "Mattina" })).toBeVisible();
     await expect(d.getByRole("group", { name: "Pomeriggio" })).toBeVisible();
-    await expect(d.getByText(/^Orari con Chiunque · .* · Barrato = occupato$/)).toBeVisible();
+    await expect(d.getByText(/^Orari liberi con Chiunque · .*$/)).toBeVisible();
+    // ogni gruppo dice quanti orari liberi ha; un solo barbiere: niente tondi di chi è libero
+    await expect(d.getByText(/^\d+ liber[oi]$/).first()).toBeVisible();
+    await expect(d.getByRole("group", { name: "Mattina" }).getByRole("button").first()).not.toHaveAttribute("title", /libero:/);
     await expect(d.getByRole("group", { name: "Giorno" }).getByRole("button")).toHaveCount(14);
     await expect(d.getByRole("button", { name: "Apri il calendario" })).toHaveAttribute("aria-expanded", "false");
 
@@ -80,6 +83,37 @@ test.describe("Nuovo appuntamento", () => {
     // scelto il giorno tornano gli orari, e il pulsante del calendario resta acceso con la data
     await expect(d.getByRole("group", { name: "Mattina" })).toBeVisible();
     await expect(d.getByRole("button", { name: "Apri il calendario" })).toContainText(/\d+ [a-z]{3}/);
+  });
+
+  test("più barbieri: prima Con chi, poi Quando; con «Chiunque» ogni orario dice chi è libero, scelto un barbiere solo i suoi", async ({ page }) => {
+    await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo"); // Barberia Saragozza: 3 poltrone
+    const day = nextOpenDay();
+    await page.goto(`/agenda?g=${day}`);
+    await newButton(page).click();
+    const d = dialog(page);
+    await expect(d.getByRole("heading", { level: 3 })).toHaveText(["Cosa", "Con chi", "Quando", "Per chi"]);
+
+    // «Chiunque»: sotto ogni orario i tondi di chi è libero (anche nel titolo, per chi usa il lettore di schermo)
+    const morning = d.getByRole("group", { name: "Mattina" });
+    const firstFree = morning.getByRole("button").first();
+    await expect(firstFree).toHaveAttribute("title", /^libero: (Andrea|Marco|Simone)/);
+    const anyCount = await morning.getByRole("button").count();
+
+    // scelto Marco: gli orari sono solo i suoi, senza tondi, e il suggerimento lo dice
+    await d.getByRole("group", { name: "Barbiere" }).getByRole("button", { name: /^Marco/ }).click();
+    await expect(d.getByText(/^Orari liberi con Marco · /)).toBeVisible();
+    await expect(morning.getByRole("button").first()).not.toHaveAttribute("title", /libero:/);
+    expect(await morning.getByRole("button").count()).toBeLessThanOrEqual(anyCount);
+
+    // gli occupati non si vedono finché non li si chiede; poi sono spenti
+    const toggle = d.getByRole("button", { name: "Mostra anche gli occupati" });
+    if (await toggle.isVisible()) {
+      const before = await d.getByRole("button", { disabled: true, name: /^\d\d:\d\d$/ }).count();
+      expect(before).toBe(0);
+      await toggle.click();
+      await expect(d.getByRole("button", { name: "Nascondi gli occupati" })).toHaveAttribute("aria-pressed", "true");
+      expect(await d.getByRole("button", { disabled: true, name: /^\d\d:\d\d$/ }).count()).toBeGreaterThan(0);
+    }
   });
 
   test("con il prezzo cambiato dalla matita il riepilogo dice «invece di» e il database tiene i due prezzi", async ({ page }) => {

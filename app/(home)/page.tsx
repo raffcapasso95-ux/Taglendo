@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment, type ReactNode } from "react";
+import { Fragment, Suspense, type ReactNode } from "react";
+import { getAccount } from "@/components/marketing/AuthLinks";
 import { BeforeAfter } from "@/components/marketing/BeforeAfter";
 import { ModeSwitch } from "@/components/marketing/ModeSwitch";
-import { PhoneDemo } from "@/components/marketing/PhoneDemo";
 import { Ticker } from "@/components/marketing/Ticker";
 import { PricingPlans } from "@/components/marketing/PricingPlans";
 import { cx } from "@/components/ui/cx";
@@ -42,6 +42,38 @@ function Words({ words, from }: { words: readonly string[]; from: number }) {
       </span>{" "}
     </Fragment>
   ));
+}
+
+function GuestHeroCta({ live }: { live: boolean }) {
+  return (
+    <>
+      <Link className={cx(styles.btn, styles.btnLight)} href="#inizia">
+        {copy.hero.cta} <Arrow />
+      </Link>
+      <span className={styles.heroNote}>
+        <strong>{live ? copy.hero.noteLive : copy.hero.noteBeta}</strong>
+        <span>{live ? copy.hero.noteLiveSub : copy.hero.noteBetaSub}</span>
+      </span>
+    </>
+  );
+}
+
+/** Chi è già dentro non deve vedere «Prova gratis»: lo salutiamo e lo mandiamo all'agenda. */
+async function HeroCta({ live }: { live: boolean }) {
+  const account = await getAccount();
+  if (!account) return <GuestHeroCta live={live} />;
+  const first = account.name.split(" ")[0] || account.name;
+  return (
+    <>
+      <Link className={cx(styles.btn, styles.btnLight)} href="/agenda">
+        {marketingCopy.account.heroCta} <Arrow />
+      </Link>
+      <span className={styles.heroNote}>
+        <strong>{marketingCopy.account.heroHello(first)}</strong>
+        {account.salonName ? <span>{account.salonName}</span> : null}
+      </span>
+    </>
+  );
 }
 
 export default function Page() {
@@ -82,19 +114,29 @@ export default function Page() {
               {copy.hero.lead}
             </p>
             <div className={cx(styles.heroCta, styles.rise)} style={{ "--i": 9 } as React.CSSProperties}>
-              <Link className={cx(styles.btn, styles.btnLight)} href="#inizia">
-                {copy.hero.cta} <Arrow />
-              </Link>
-              <span className={styles.heroNote}>
-                <strong>{live ? copy.hero.noteLive : copy.hero.noteBeta}</strong>
-                <span>{live ? copy.hero.noteLiveSub : copy.hero.noteBetaSub}</span>
-              </span>
+              <Suspense fallback={<GuestHeroCta live={live} />}>
+                <HeroCta live={live} />
+              </Suspense>
             </div>
           </div>
           <div className={cx(styles.heroDemo, styles.rise)} style={{ "--i": 6 } as React.CSSProperties}>
             <div className={styles.phone}>
               <div className={styles.phoneScreen}>
-                <PhoneDemo title={copy.hero.phoneTitle} />
+                <div className={styles.phoneStatus} aria-hidden="true">
+                  <span>{copy.hero.phoneTime}</span>
+                  <span className={styles.phoneIsland} />
+                  <svg width="46" height="12" viewBox="0 0 46 12" fill="currentColor">
+                    <rect x="0" y="7" width="3" height="5" rx="1" />
+                    <rect x="5" y="5" width="3" height="7" rx="1" />
+                    <rect x="10" y="3" width="3" height="9" rx="1" />
+                    <rect x="15" y="1" width="3" height="11" rx="1" />
+                    <rect x="23" y="1.5" width="19" height="9" rx="2.5" fill="none" stroke="currentColor" strokeOpacity=".45" />
+                    <rect x="25" y="3.5" width="13" height="5" rx="1.2" />
+                    <rect x="43.2" y="4.5" width="1.6" height="3" rx=".8" fillOpacity=".45" />
+                  </svg>
+                </div>
+                {/* schermata vera dell'agenda, ferma: niente video che parte da solo */}
+                <Image src="/images/hero-agenda.jpg" alt={copy.hero.phoneTitle} width={1170} height={2400} priority sizes="(min-width: 1024px) 320px, 78vw" className={styles.phoneShot} draggable={false} />
               </div>
             </div>
           </div>

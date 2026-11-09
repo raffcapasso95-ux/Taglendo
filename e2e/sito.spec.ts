@@ -85,13 +85,34 @@ test.describe("Sito commerciale", () => {
     await expect(page.getByText("Primi orari liberi")).toBeHidden();
   });
 
-  test("chi ha già una sessione trova «Vai all'agenda»", async ({ page }) => {
+  test("chi ha già una sessione trova il suo tondo con il menu dell'account", async ({ page }) => {
     await page.goto("/");
     await expect(page.getByRole("banner").getByRole("link", { name: "Prova gratis" })).toBeVisible();
     await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
     await page.goto("/");
-    await expect(page.getByRole("banner").getByRole("link", { name: "Vai all’agenda" })).toHaveAttribute("href", "/agenda");
-    await expect(page.getByRole("banner").getByRole("link", { name: "Accedi", exact: true })).toHaveCount(0);
+    const banner = page.getByRole("banner");
+    await expect(banner.getByRole("link", { name: "Accedi", exact: true })).toHaveCount(0);
+    await expect(banner.getByRole("link", { name: "Prova gratis" })).toHaveCount(0);
+    // nella sezione in alto: niente «Prova gratis», si torna all'agenda
+    await expect(page.getByRole("main").getByRole("link", { name: "Apri l’agenda" })).toHaveAttribute("href", "/agenda");
+    await expect(page.getByText("Bentornato, Andrea")).toBeVisible();
+
+    const trigger = banner.getByRole("button", { name: /Il tuo account/ });
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await trigger.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+    await expect(banner.getByText("Titolare · Barberia Saragozza")).toBeVisible();
+    await expect(banner.getByRole("link", { name: "Apri l’agenda" })).toHaveAttribute("href", "/agenda");
+    await expect(banner.getByRole("link", { name: "Impostazioni" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await expect(trigger).toBeFocused();
+
+    // anche nelle pagine del sito (testata chiara)
+    await page.goto("/privacy");
+    await page.getByRole("banner").getByRole("button", { name: /Il tuo account/ }).click();
+    await page.getByRole("banner").getByRole("link", { name: "Apri l’agenda" }).click();
+    await expect(page).toHaveURL(/\/agenda$/);
   });
 
   test("il banner cookie del sito si può rifiutare e riaprire dal piè di pagina", async ({ page, context }) => {

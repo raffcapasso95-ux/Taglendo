@@ -4,7 +4,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { LandEffects } from "@/components/marketing/LandEffects";
 import { CookieConsent } from "@/components/salon/CookieConsent";
-import { getUser } from "@/lib/auth/session";
+import { AccountMenu } from "@/components/marketing/AccountMenu";
+import { getAccount } from "@/components/marketing/AuthLinks";
 import { landCopy as copy } from "@/lib/copy/land";
 import { marketingCopy } from "@/lib/copy/marketing";
 import { company, isPlaceholder } from "@/lib/site";
@@ -23,14 +24,10 @@ function Field({ value }: { value: string }) {
   return isPlaceholder(value) ? <span className={styles.fPlaceholder}>{value}</span> : <>{value}</>;
 }
 
+/** Chi è già dentro vede il tondo con le sue iniziali (menu con agenda, impostazioni, Esci), come in un'app. */
 async function AuthActions() {
-  const user = await getUser();
-  if (user)
-    return (
-      <Link className={`${styles.btn} ${styles.btnSmall}`} href="/agenda">
-        {copy.nav.toApp}
-      </Link>
-    );
+  const account = await getAccount();
+  if (account) return <AccountMenu account={account} tone="dark" />;
   return <GuestActions />;
 }
 

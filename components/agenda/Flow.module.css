@@ -138,21 +138,25 @@
 }
 
 .cards,
-.people,
-.block .Dialogs_times {
+.people {
   margin: 0 calc(-1 * var(--space-4));
   padding: 2px var(--space-4) var(--space-1);
   gap: var(--space-2);
   scrollbar-width: none;
   overflow-x: auto;
   display: flex;
-  grid-template-columns: none;
   scroll-snap-type: x proximity;
 }
 
+/* gli orari in griglia anche sul telefono: si vedono tutti insieme, senza scorrere di lato */
+.block .Dialogs_times {
+  gap: var(--space-2);
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  display: grid;
+}
+
 .cards::-webkit-scrollbar,
-.people::-webkit-scrollbar,
-.block .Dialogs_times::-webkit-scrollbar {
+.people::-webkit-scrollbar {
   display: none;
 }
 
@@ -164,7 +168,6 @@
   background: var(--surface);
   border: 1px solid var(--border-subtle);
   font-size: 15px;
-  scroll-snap-align: start;
 }
 
 .block .Dialogs_chipOn.Dialogs_time {
@@ -452,13 +455,6 @@
     padding-right: var(--space-6);
   }
 
-  .block .Dialogs_times {
-    margin: 0;
-    padding: 0;
-    flex-wrap: wrap;
-    overflow: visible;
-  }
-
   .footer {
     padding: var(--space-4) var(--space-6);
     flex-direction: row;
@@ -499,8 +495,7 @@
 }
 
 .cards,
-.people,
-.block .Dialogs_times {
+.people {
   scroll-padding-inline: var(--space-4);
 }
 

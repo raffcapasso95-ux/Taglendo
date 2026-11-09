@@ -50,8 +50,6 @@ type Props = {
 /** Quanti clienti si propongono senza che si scriva niente, e quanti con una ricerca. */
 const SUGGESTED_CLIENTS = 3;
 const SEARCH_RESULTS = 8;
-/** Mattina e pomeriggio si dividono alle 13. */
-const NOON = 13 * 60;
 
 const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
@@ -65,7 +63,9 @@ export function dayLabel(date: string, today: string, tomorrow: string): string 
 
 /**
  * «Nuovo appuntamento» e «Cliente in negozio»: una schermata sola con quattro blocchi sempre aperti
- * (Quando, Cosa, Con chi, Per chi) e il riepilogo con «Fissa l'appuntamento» in fondo.
+ * (Cosa, Con chi, Quando, Per chi) e il riepilogo con «Fissa l'appuntamento» in fondo.
+ * Prima il servizio e il barbiere, poi l'ora: gli orari mostrati sono quelli liberi per chi fa il servizio,
+ * e con «Chiunque» ogni orario mostra chi è libero.
  * Su telefono occupa tutto lo schermo (il tasto indietro la chiude); su desktop è un pannello a destra.
  */
 export function NewAppointment({ mode, prefill, operators, services, clients, closedDates, today, selectedDate, onClose, onCreated, onQueued }: Props) {
@@ -155,10 +155,8 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
   }, [clients, query]);
 
   const shown = online ? slots : offlineResult;
-  const timeGroups = [
-    { title: flow.morning, slots: shown?.slots.filter((x) => x.startMin < NOON) ?? [] },
-    { title: flow.afternoon, slots: shown?.slots.filter((x) => x.startMin >= NOON) ?? [] },
-  ].filter((g) => g.slots.length > 0);
+  /** Più barbieri: c'è il blocco «Con chi», e con «Chiunque» gli orari dicono chi è libero. */
+  const multi = operators.length > 1;
 
   // prezzo: quello di listino, o quello fatto per questo cliente
   const listCents = service?.priceCents ?? 0;
@@ -267,51 +265,10 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
           </div>
         ) : null}
 
-        <section className={styles.block} data-block="quando" aria-labelledby="fl-quando">
-          <div className={styles.blockHead}>
-            <span className={styles.num} aria-hidden="true">
-              1
-            </span>
-            <h3 className={styles.blockTitle} id="fl-quando">
-              {flow.when}
-            </h3>
-          </div>
-          {walkInMode ? (
-            <p className={styles.now}>
-              <span className={styles.stepBadge}>{flow.nowBadge}</span>
-              <span className={styles.nowText}>{flow.startNow(nowText)}</span>
-            </p>
-          ) : (
-            <>
-              <WhenPicker
-                today={today}
-                date={date}
-                onDate={setDate}
-                closedDates={closedDates}
-                startMin={startMin}
-                onTime={pickTime}
-                shown={shown}
-                loading={online && loadingSlots}
-                hint={
-                  !online && date !== offlineDay.date
-                    ? offlineCopy.onlyDay(dayLabel(offlineDay.date, today, ""))
-                    : online && loadingSlots && !shown
-                      ? "…"
-                      : shown?.closed
-                        ? copy.closed
-                        : timeGroups.length === 0 && shown
-                          ? copy.noSlots
-                          : flow.slotsHint(operatorName ?? copy.anyone, shortDate(date))
-                }
-              />
-            </>
-          )}
-        </section>
-
         <section className={styles.block} data-block="cosa" aria-labelledby="fl-cosa">
           <div className={styles.blockHead}>
             <span className={styles.num} aria-hidden="true">
-              2
+              1
             </span>
             <h3 className={styles.blockTitle} id="fl-cosa">
               {flow.what}
@@ -384,11 +341,11 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
           ) : null}
         </section>
 
-        {operators.length > 1 ? (
+        {multi ? (
           <section className={styles.block} data-block="conchi" aria-labelledby="fl-conchi">
             <div className={styles.blockHead}>
               <span className={styles.num} aria-hidden="true">
-                3
+                2
               </span>
               <h3 className={styles.blockTitle} id="fl-conchi">
                 {flow.withWhom}
@@ -420,10 +377,53 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
           </section>
         ) : null}
 
+        <section className={styles.block} data-block="quando" aria-labelledby="fl-quando">
+          <div className={styles.blockHead}>
+            <span className={styles.num} aria-hidden="true">
+              {multi ? 3 : 2}
+            </span>
+            <h3 className={styles.blockTitle} id="fl-quando">
+              {flow.when}
+            </h3>
+          </div>
+          {walkInMode ? (
+            <p className={styles.now}>
+              <span className={styles.stepBadge}>{flow.nowBadge}</span>
+              <span className={styles.nowText}>{flow.startNow(nowText)}</span>
+            </p>
+          ) : (
+            <>
+              <WhenPicker
+                today={today}
+                date={date}
+                onDate={setDate}
+                closedDates={closedDates}
+                startMin={startMin}
+                onTime={pickTime}
+                shown={shown}
+                loading={online && loadingSlots}
+                operators={operators}
+                showWho={multi && memberId === "any"}
+                hint={
+                  !online && date !== offlineDay.date
+                    ? offlineCopy.onlyDay(dayLabel(offlineDay.date, today, ""))
+                    : online && loadingSlots && !shown
+                      ? "…"
+                      : shown?.closed
+                        ? copy.closed
+                        : shown && !shown.slots.some((x) => x.free)
+                          ? copy.noSlots
+                          : flow.slotsHint(operatorName ?? copy.anyone, shortDate(date))
+                }
+              />
+            </>
+          )}
+        </section>
+
         <section ref={clientBlock} className={styles.block} data-block="cliente" aria-labelledby="fl-cliente">
           <div className={styles.blockHead}>
             <span className={styles.num} aria-hidden="true">
-              {operators.length > 1 ? 4 : 3}
+              {multi ? 4 : 3}
             </span>
             <h3 className={styles.blockTitle} id="fl-cliente">
               {flow.forWhom}
