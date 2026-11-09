@@ -514,12 +514,16 @@ export function ShopBooking({ slug, phone, privacyHref, services, members, showP
                         className={cx(styles.day, d === activeDay && styles.dayOn)}
                         aria-pressed={d === activeDay}
                         disabled={!open}
-                        aria-label={`${top} ${dayNumber(d)}${open ? "" : `, ${copy.when.closed}`}`}
                         onClick={() => pickDay(d)}
                       >
-                        <span className={styles.dayTop}>{top}</span>
+                        <span className={styles.dayTop}>{top}</span>{" "}
                         <span className={styles.dayNum}>{dayNumber(d)}</span>
-                        {open ? null : <span className={styles.dayClosed}>{copy.when.closed}</span>}
+                        {open ? null : (
+                          <>
+                            {" "}
+                            <span className={styles.dayClosed}>{copy.when.closed}</span>
+                          </>
+                        )}
                       </button>
                     );
                   })}

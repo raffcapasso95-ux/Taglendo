@@ -58,7 +58,7 @@ test.describe("Nuovo appuntamento", () => {
     await bookNewClient(page, "Primo Cliente", day, "09:00"); // senza appuntamenti l'agenda non mostra i buchi
     await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
     await expect(page.getByText("Primo Cliente", { exact: true }).filter({ visible: true }).first()).toBeVisible();
-    await page.getByRole("button", { name: /^Fissa con/ }).filter({ visible: true }).first().click();
+    await page.getByRole("button", { name: /fissa con/i }).filter({ visible: true }).first().click();
     const d = dialog(page);
     await expect(d).toBeVisible();
     await expect(d.getByText(/^[A-Z][a-z]{2} \d+ [a-z]{3} · \d\d:\d\d · Scegli il cliente$/)).toBeVisible(); // quando già scelto

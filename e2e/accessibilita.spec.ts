@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { freshOwner } from "./agenda-helpers";
+import { bookNewClient, freshOwner, nextOpenDay, openAppointment } from "./agenda-helpers";
 import { adminSelect } from "./helpers";
 
 /** Controllo automatico (axe) delle regole WCAG A e AA: nessuna violazione. */
@@ -94,5 +94,46 @@ test.describe("Accessibilità: finestre, tastiera, movimento", () => {
     await page.goto(`/${salon!.slug}`);
     await expect(page.locator("html")).toHaveAttribute("lang", "it");
     await expect(page.locator("h1")).toHaveCount(1);
+  });
+});
+
+test.describe("Accessibilità: percorsi nuovi del ridisegno", () => {
+  test("axe sui passi della prenotazione pubblica", async ({ page }) => {
+    await page.goto("/barberia-saragozza");
+    const banner = page.getByRole("dialog", { name: "Cookie" });
+    await banner.waitFor({ timeout: 5000 }).catch(() => {});
+    if (await banner.isVisible()) await banner.getByRole("button", { name: "Rifiuta" }).click();
+    const card = page.locator("#prenota-card");
+    // ogni passo entra con una breve animazione: si controlla a passo fermo, non a metà dissolvenza
+    const settle = () => page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => null))));
+    await card.getByRole("button", { name: /^Barba/ }).click();
+    await settle();
+    await scan(page, "salone: con chi");
+    await card.getByRole("button", { name: /^Chi è libero prima/ }).click();
+    await expect(card.getByRole("button", { name: /Prima disponibilità/ })).toBeVisible();
+    await settle();
+    await scan(page, "salone: quando");
+    await card.getByRole("button", { name: /Altre/ }).click();
+    await settle();
+    await scan(page, "salone: calendario");
+    await card.getByRole("button", { name: /Prima disponibilità/ }).click();
+    await settle();
+    await scan(page, "salone: i tuoi dati");
+  });
+
+  test("axe su Sposta appuntamento e sulla scheda dell'appuntamento", async ({ page }) => {
+    const day = nextOpenDay();
+    await freshOwner(page, "Barberia Axe Sposta");
+    await page.goto(`/agenda?g=${day}`);
+    await bookNewClient(page, "Mario Verdi", day, "10:00");
+    await expect(page.getByText("Appuntamento fissato").filter({ visible: true })).toBeVisible();
+    await openAppointment(page, "Mario Verdi");
+    const settle = () => page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => null))));
+    await settle();
+    await scan(page, "dettaglio appuntamento");
+    await page.getByRole("dialog").getByRole("button", { name: "Sposta", exact: true }).click();
+    await expect(page.getByRole("dialog", { name: "Sposta appuntamento" })).toBeVisible();
+    await settle();
+    await scan(page, "sposta appuntamento");
   });
 });

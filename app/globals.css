@@ -106,3 +106,13 @@ button:disabled {
     animation-duration: 1ms !important;
   }
 }
+
+/* Testo solo per i lettori di schermo: c'è nel nome del controllo ma non si vede */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

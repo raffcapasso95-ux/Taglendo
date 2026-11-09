@@ -17,7 +17,7 @@ export const listinoCopy = {
     weekHint: "tocca un giorno per cambiarlo",
     note: "Ogni giorno può avere orari suoi e più fasce, per esempio una pausa pranzo. I giorni chiusi non compaiono nella pagina di prenotazione.",
     closed: "Chiuso",
-    editDay: (day: string) => `Modifica orari di ${day.toLowerCase()}`,
+    editHint: "modifica gli orari",
     dayOpen: (day: string) => `${day} aperto`,
     closuresSub: "Giorni o periodi in cui il salone è chiuso",
     perOperator: "Orari dei singoli operatori",

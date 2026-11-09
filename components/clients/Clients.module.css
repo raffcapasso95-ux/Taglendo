@@ -200,9 +200,6 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: var(
-    --brand-peach
-  );
   font-size: 14px;
   font-weight: 700;
 }
@@ -418,7 +415,6 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--brand-peach);
   font-size: 22px;
   font-weight: 700;
 }

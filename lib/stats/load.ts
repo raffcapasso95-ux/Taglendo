@@ -89,13 +89,25 @@ export async function loadStats(params: { periodo?: string; data?: string }): Pr
   const nextStart = shiftPeriod(period, start, 1);
 
   const call = async (from: string, to: string, bucket: "day" | "month") => {
-    const { data } = await supabase.rpc("stats_summary", { p_salon: salon.id, ...rangeIso(from, to), p_bucket: bucket });
+    const { data, error } = await supabase.rpc("stats_summary", { p_salon: salon.id, ...rangeIso(from, to), p_bucket: bucket });
+    // senza questo controllo un errore del database (per esempio una migrazione non ancora applicata) diventava
+    // «Cannot read properties of null» più sotto, e in Sentry non si capiva perché
+    if (error || !data) throw new Error(`Statistiche non disponibili: ${error ? `${error.code ?? ""} ${error.message}`.trim() : "il salone non risulta"}`);
     return data as unknown as Summary;
   };
 
   const bucket = period === "anno" ? "month" : "day";
   const operatorsPromise = operatorsOf(supabase, salon.id);
-  const [cur, prev, operators] = await Promise.all([call(start, end, bucket), period === "giorno" ? Promise.resolve(null) : call(prevStart, start, "day"), operatorsPromise]);
+  // un periodo ancora in corso (il mese a metà) si confronta con lo stesso tratto del periodo prima, non con tutto il periodo prima
+  const inProgress = end > addDays(today, 1);
+  let prevEnd = start;
+  if (inProgress && period !== "giorno") {
+    let elapsed = 0;
+    for (let d = start; d <= today; d = addDays(d, 1)) elapsed++;
+    const sameSpan = addDays(prevStart, elapsed);
+    prevEnd = sameSpan < start ? sameSpan : start;
+  }
+  const [cur, prev, operators] = await Promise.all([call(start, end, bucket), period === "giorno" ? Promise.resolve(null) : call(prevStart, prevEnd, "day"), operatorsPromise]);
 
   // il giorno si confronta con la media dei suoi simili (stesso giorno della settimana, ultime 8 settimane, giorni con incassi)
   let before = prev?.revenue ?? 0;
@@ -236,7 +248,7 @@ export async function loadStats(params: { periodo?: string; data?: string }): Pr
     nextHref: nextStart <= today ? href(period, nextStart) : null,
     heroLabel,
     revenue: formatPrice(cur.revenue),
-    delta: delta(cur.revenue, before, comparedWith(period, start)),
+    delta: delta(cur.revenue, before, comparedWith(period, start) + (inProgress && period !== "giorno" ? " (stessi giorni)" : "")),
     stats,
     chart,
     note,

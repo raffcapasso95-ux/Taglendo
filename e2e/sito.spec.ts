@@ -159,4 +159,19 @@ test.describe("Sito commerciale", () => {
     else await expect(page.getByText("App per barbieri")).toBeHidden();
     await expect(bar.first()).toBeVisible();
   });
+
+  test("la testata resta in vista mentre si scorre e diventa prugna (si legge anche sulle sezioni chiare)", async ({ page }) => {
+    await page.goto("/", { waitUntil: "networkidle" });
+    const header = page.getByRole("banner");
+    const bg = () => header.evaluate((h) => getComputedStyle(h).backgroundColor);
+    expect(await bg()).toBe("rgba(0, 0, 0, 0)"); // sull'apertura è trasparente, sopra la foto
+    await page.locator("#prezzi").scrollIntoViewIfNeeded();
+    await expect(header).toHaveAttribute("data-scrolled", "true");
+    expect(await bg()).not.toBe("rgba(0, 0, 0, 0)");
+    const top = await header.evaluate((h) => Math.round(h.getBoundingClientRect().top));
+    expect(top).toBe(0);
+    await expect(header.getByRole("link", { name: "Prova gratis" })).toBeVisible();
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await expect(header).toHaveAttribute("data-scrolled", "false");
+  });
 });

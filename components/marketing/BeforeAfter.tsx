@@ -39,7 +39,7 @@ export function BeforeAfter({ extra }: { extra?: { root?: string; paper?: string
     >
       <picture className={styles.compareAfter}>
         <source media="(min-width: 820px)" srcSet="/images/shot-agenda-desktop.png" />
-        <img src="/images/shot-agenda-mobile.png" alt={copy.afterAlt} draggable={false} width={780} height={1688} decoding="async" />
+        <img src="/images/shot-agenda-mobile.png" alt={copy.afterAlt} draggable={false} width={780} height={1688} loading="lazy" decoding="async" />
       </picture>
       <div className={[styles.paper, extra?.paper].filter(Boolean).join(" ")} style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
         <div className={styles.paperMargin} />

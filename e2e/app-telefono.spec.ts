@@ -108,4 +108,17 @@ test.describe("Taglendo sul telefono", () => {
     await expect(menu).toBeHidden();
     await expect(opener).toBeFocused();
   });
+
+  test("a 320 px i due pulsanti fissi dell'agenda stanno nello schermo e il marchio ha un'area di tocco da 44 px", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await freshOwner(page, "Barberia Schermo Stretto");
+    await page.goto("/agenda");
+    for (const name of ["In negozio ora", "+ Appuntamento"]) {
+      const right = await page.getByRole("button", { name }).evaluate((b) => Math.round(b.getBoundingClientRect().right));
+      expect(right, name).toBeLessThanOrEqual(320);
+    }
+    const logo = await page.getByRole("link", { name: /Taglendo, vai all’agenda/ }).evaluate((a) => ({ w: a.getBoundingClientRect().width, h: a.getBoundingClientRect().height }));
+    expect(logo.w).toBeGreaterThanOrEqual(44);
+    expect(logo.h).toBeGreaterThanOrEqual(44);
+  });
 });

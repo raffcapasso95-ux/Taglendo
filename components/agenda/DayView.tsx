@@ -190,7 +190,6 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                       className={styles.gap}
                       style={{ top: gapTop, height: gapH }}
                       disabled={!canEdit}
-                      aria-label={`Fissa con ${c.operator.name} ${clock(from)}–${clock(b)}`}
                       onClick={() => openNew({ date: day.date, memberId: c.operator.id, startMin: Math.max(from, isToday ? Math.ceil(nowMin / 5) * 5 : 0) })}
                     >
                       <span className={styles.gapLine}>
@@ -207,6 +206,7 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                           {clock(from)}–{clock(b)}
                         </span>
                       ) : null}
+                      <span className="visually-hidden">, fissa con {c.operator.name}</span>
                     </button>
                   );
                 })}
@@ -329,7 +329,6 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
                   type="button"
                   className={styles.rowButton}
                   disabled={!canEdit}
-                  aria-label={`Fissa con ${item.column.operator.name} ${clock(item.start)}–${clock(item.end)}`}
                   onClick={() => openNew({ date: day.date, memberId: item.column.operator.id, startMin: Math.max(item.start, isToday ? Math.ceil(nowMin / 5) * 5 : 0) })}
                 >
                   <span className={styles.rowTime}>{clock(item.start)}</span>
@@ -340,6 +339,7 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
                       {clock(item.start)}–{clock(item.end)}
                     </span>
                   </span>
+                  <span className="visually-hidden">, fissa con {item.column.operator.name}</span>
                 </button>
               </li>
             );
