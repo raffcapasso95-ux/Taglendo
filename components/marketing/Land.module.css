@@ -1724,15 +1724,163 @@
   }
 }
 
-/* La schermata dell'agenda dentro la cornice del telefono: ferma, tagliata in basso come uno schermo vero */
+/* ── Il telefono dell'apertura: cornice, barra di stato, schermata ferma e biglietto «Nuova prenotazione» ── */
+.heroDemo {
+  position: relative;
+  justify-self: center;
+}
+
+.page .phone {
+  position: relative;
+  width: min(var(--land-phone-w), 74vw);
+  padding: 9px;
+  border-radius: 50px;
+  background: var(--brand-plum);
+  box-shadow:
+    inset 0 0 0 1.5px var(--plum-hover-dark),
+    0 0 0 1px var(--home-rule-light),
+    var(--shadow-shot);
+}
+
+/* tasti laterali: accensione a destra, volume a sinistra */
+.page .phone::before,
+.page .phone::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--plum-hover-dark);
+}
+
+.page .phone::before {
+  top: 120px;
+  right: -3px;
+  height: 64px;
+}
+
+.page .phone::after {
+  top: 100px;
+  left: -3px;
+  height: 92px;
+}
+
+.page .phoneScreen {
+  height: min(600px, 66svh);
+  min-height: 0;
+  padding: 0;
+  border-radius: 41px;
+  flex-direction: column;
+  display: flex;
+}
+
+.phoneStatus {
+  position: relative;
+  flex: none;
+  height: 42px;
+  padding: 4px 24px 0 30px;
+  background: var(--canvas);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+}
+
+.phoneIsland {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  width: 31%;
+  height: 26px;
+  transform: translateX(-50%);
+  border-radius: var(--radius-pill);
+  background: var(--brand-plum);
+}
+
+/* La schermata dell'agenda: ferma, tagliata in basso come uno schermo vero */
 .phoneShot {
   width: 100%;
-  height: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
   object-fit: cover;
   object-position: top center;
   pointer-events: none;
   user-select: none;
   display: block;
+}
+
+.phoneToast {
+  position: absolute;
+  left: -28px;
+  bottom: 7%;
+  max-width: 250px;
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-float);
+  gap: var(--space-3);
+  align-items: center;
+  display: flex;
+}
+
+.phoneToastIcon {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.phoneToastText {
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1.35;
+  flex-direction: column;
+  display: flex;
+}
+
+.phoneToastText strong {
+  font-size: 14px;
+}
+
+.phoneToastText > span {
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.phoneToastTag {
+  color: var(--status-success-text);
+  font-style: normal;
+  font-weight: 600;
+}
+
+@media (max-width: 1023px) {
+  .phoneToast {
+    left: -12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .phoneToast {
+    left: -4px;
+    max-width: calc(100% + 4px);
+  }
+
+  .phoneToastText > span {
+    white-space: normal;
+  }
+
+  .phoneStatus {
+    padding: 4px 18px 0 22px;
+    font-size: 13px;
+  }
 }
 
 /* La scritta di sfondo è decorazione: sta nel CSS, così non conta come testo da leggere */

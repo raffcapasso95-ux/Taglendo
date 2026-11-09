@@ -122,9 +122,36 @@ export default function Page() {
           <div className={cx(styles.heroDemo, styles.rise)} style={{ "--i": 6 } as React.CSSProperties}>
             <div className={styles.phone}>
               <div className={styles.phoneScreen}>
+                <div className={styles.phoneStatus} aria-hidden="true">
+                  <span>{copy.hero.phoneTime}</span>
+                  <span className={styles.phoneIsland} />
+                  <svg width="46" height="12" viewBox="0 0 46 12" fill="currentColor">
+                    <rect x="0" y="7" width="3" height="5" rx="1" />
+                    <rect x="5" y="5" width="3" height="7" rx="1" />
+                    <rect x="10" y="3" width="3" height="9" rx="1" />
+                    <rect x="15" y="1" width="3" height="11" rx="1" />
+                    <rect x="23" y="1.5" width="19" height="9" rx="2.5" fill="none" stroke="currentColor" strokeOpacity=".45" />
+                    <rect x="25" y="3.5" width="13" height="5" rx="1.2" />
+                    <rect x="43.2" y="4.5" width="1.6" height="3" rx=".8" fillOpacity=".45" />
+                  </svg>
+                </div>
                 {/* schermata vera dell'agenda, ferma: niente video che parte da solo */}
-                <Image src="/images/shot-agenda-mobile.png" alt={copy.hero.phoneTitle} width={780} height={1688} priority sizes="(min-width: 1024px) 320px, 78vw" className={styles.phoneShot} draggable={false} />
+                <Image src="/images/hero-agenda.jpg" alt={copy.hero.phoneTitle} width={1170} height={2400} priority sizes="(min-width: 1024px) 320px, 78vw" className={styles.phoneShot} draggable={false} />
               </div>
+            </div>
+            {/* il biglietto fermo racconta cosa succede: un cliente ha prenotato dal link mentre lavoravi */}
+            <div className={styles.phoneToast} aria-hidden="true">
+              <span className={styles.phoneToastIcon}>
+                <Icon size={18}>
+                  <path d="m5 12 5 5 9-10" />
+                </Icon>
+              </span>
+              <span className={styles.phoneToastText}>
+                <strong>{copy.hero.phoneToastTitle}</strong>
+                <span>
+                  {copy.hero.phoneToastText} · <em className={styles.phoneToastTag}>{copy.hero.phoneToastTag}</em>
+                </span>
+              </span>
             </div>
           </div>
         </div>

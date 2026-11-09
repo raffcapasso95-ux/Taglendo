@@ -235,6 +235,11 @@
   display: flex;
 }
 
+/* sul filtro scelto (prugna) il tondo prugna del primo barbiere sparirebbe: un filo panna lo stacca */
+.filterOn .filterAvatar > * {
+  box-shadow: 0 0 0 1.5px var(--brand-cream);
+}
+
 /* Cerchio con l'iniziale */
 .avatar {
   flex: none;

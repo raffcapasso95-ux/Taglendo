@@ -12,7 +12,12 @@ export const landCopy = {
     noteBetaSub: "Zero commissioni · senza carta",
     noteLive: "Da 9,90 € al mese + IVA",
     noteLiveSub: "Zero commissioni · senza carta per provare",
-    phoneTitle: "Agenda di Taglendo",
+    phoneTitle: "Agenda di Taglendo: la giornata di Andrea, martedì 10 novembre",
+    // NUOVO: il biglietto fermo appoggiato al telefono
+    phoneTime: "9:41",
+    phoneToastTitle: "Nuova prenotazione",
+    phoneToastText: "Paolo Neri · Mer 11, 10:30",
+    phoneToastTag: "online",
     scroll: "Scopri come funziona",
   },
   tape: {
