@@ -1,6 +1,6 @@
 /** Testi della home del sito, dal ridisegno di novembre 2026 (giri 11–17). */
 export const landCopy = {
-  nav: { how: "Come funziona", before: "Prima e dopo", prices: "Prezzi", faq: "Domande", signIn: "Accedi", try: "Prova gratis", toApp: "Vai all’agenda" },
+  nav: { how: "Come funziona", before: "Prima e dopo", prices: "Prezzi", faq: "Domande", signIn: "Accedi", try: "Prova gratis" },
   hero: {
     kicker: "App per barberie da 1 a 3 poltrone",
     lines: [["La", "tua", "agenda"], ["online,"]] as const,

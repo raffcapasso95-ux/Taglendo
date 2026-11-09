@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment, type ReactNode } from "react";
+import { Fragment, Suspense, type ReactNode } from "react";
+import { getAccount } from "@/components/marketing/AuthLinks";
 import { BeforeAfter } from "@/components/marketing/BeforeAfter";
 import { ModeSwitch } from "@/components/marketing/ModeSwitch";
-import { PhoneDemo } from "@/components/marketing/PhoneDemo";
 import { Ticker } from "@/components/marketing/Ticker";
 import { PricingPlans } from "@/components/marketing/PricingPlans";
 import { cx } from "@/components/ui/cx";
@@ -42,6 +42,38 @@ function Words({ words, from }: { words: readonly string[]; from: number }) {
       </span>{" "}
     </Fragment>
   ));
+}
+
+function GuestHeroCta({ live }: { live: boolean }) {
+  return (
+    <>
+      <Link className={cx(styles.btn, styles.btnLight)} href="#inizia">
+        {copy.hero.cta} <Arrow />
+      </Link>
+      <span className={styles.heroNote}>
+        <strong>{live ? copy.hero.noteLive : copy.hero.noteBeta}</strong>
+        <span>{live ? copy.hero.noteLiveSub : copy.hero.noteBetaSub}</span>
+      </span>
+    </>
+  );
+}
+
+/** Chi è già dentro non deve vedere «Prova gratis»: lo salutiamo e lo mandiamo all'agenda. */
+async function HeroCta({ live }: { live: boolean }) {
+  const account = await getAccount();
+  if (!account) return <GuestHeroCta live={live} />;
+  const first = account.name.split(" ")[0] || account.name;
+  return (
+    <>
+      <Link className={cx(styles.btn, styles.btnLight)} href="/agenda">
+        {marketingCopy.account.heroCta} <Arrow />
+      </Link>
+      <span className={styles.heroNote}>
+        <strong>{marketingCopy.account.heroHello(first)}</strong>
+        {account.salonName ? <span>{account.salonName}</span> : null}
+      </span>
+    </>
+  );
 }
 
 export default function Page() {
@@ -82,19 +114,16 @@ export default function Page() {
               {copy.hero.lead}
             </p>
             <div className={cx(styles.heroCta, styles.rise)} style={{ "--i": 9 } as React.CSSProperties}>
-              <Link className={cx(styles.btn, styles.btnLight)} href="#inizia">
-                {copy.hero.cta} <Arrow />
-              </Link>
-              <span className={styles.heroNote}>
-                <strong>{live ? copy.hero.noteLive : copy.hero.noteBeta}</strong>
-                <span>{live ? copy.hero.noteLiveSub : copy.hero.noteBetaSub}</span>
-              </span>
+              <Suspense fallback={<GuestHeroCta live={live} />}>
+                <HeroCta live={live} />
+              </Suspense>
             </div>
           </div>
           <div className={cx(styles.heroDemo, styles.rise)} style={{ "--i": 6 } as React.CSSProperties}>
             <div className={styles.phone}>
               <div className={styles.phoneScreen}>
-                <PhoneDemo title={copy.hero.phoneTitle} />
+                {/* schermata vera dell'agenda, ferma: niente video che parte da solo */}
+                <Image src="/images/shot-agenda-mobile.png" alt={copy.hero.phoneTitle} width={780} height={1688} priority sizes="(min-width: 1024px) 320px, 78vw" className={styles.phoneShot} draggable={false} />
               </div>
             </div>
           </div>

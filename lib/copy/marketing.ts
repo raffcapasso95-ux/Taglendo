@@ -3,7 +3,19 @@
  * NUOVO = non nel design (beta gratuita, pagine legali oltre il primo paragrafo).
  */
 export const marketingCopy = {
-  nav: { how: "Come funziona", before: "Prima e dopo", prices: "Prezzi", faq: "Domande", signIn: "Accedi", try: "Prova gratis", toApp: "Vai all’agenda" /* NUOVO */ },
+  nav: { how: "Come funziona", before: "Prima e dopo", prices: "Prezzi", faq: "Domande", signIn: "Accedi", try: "Prova gratis" },
+  /** NUOVO: il menu di chi è già dentro, nella testata del sito al posto di «Vai all'agenda». */
+  account: {
+    open: "Il tuo account",
+    owner: "Titolare",
+    barber: "Barbiere",
+    agenda: "Apri l’agenda",
+    settings: "Impostazioni",
+    profile: "Profilo",
+    logout: "Esci",
+    heroCta: "Apri l’agenda",
+    heroHello: (name: string) => `Bentornato, ${name}`,
+  },
   before: {
     day: "Venerdì 30",
     notebook: "Quaderno",

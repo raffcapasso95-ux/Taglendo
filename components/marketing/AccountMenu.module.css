@@ -1,0 +1,208 @@
+/* Il menu di chi è già dentro, nella testata del sito. Solo token di tokens/tokens.css. */
+
+.root {
+  position: relative;
+}
+
+.trigger {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2) 0 var(--space-1);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font: inherit;
+  gap: var(--space-1);
+  align-items: center;
+  display: inline-flex;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color var(--duration-fast) var(--ease-out), transform var(--duration-press) var(--ease-out);
+}
+
+.trigger:active {
+  transform: scale(0.96);
+}
+
+.trigger:focus-visible {
+  outline: var(--focus-ring) solid var(--brand-apricot);
+  outline-offset: 2px;
+}
+
+/* sul prugna della home: il tondo pesca si stacca dal fondo, la freccia è panna */
+.triggerDark {
+  background: transparent;
+  color: var(--brand-cream);
+}
+
+/* sulle pagine chiare: fondo bianco con bordo, freccia prugna */
+.triggerLight {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border-subtle);
+  color: var(--text-primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .triggerDark:hover {
+    background: var(--plum-hover-dark);
+  }
+
+  .triggerLight:hover {
+    background: var(--surface-muted);
+  }
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+
+.chevron {
+  flex: none;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.trigger[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+.panel {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  width: min(300px, calc(100vw - 2 * var(--space-4)));
+  padding: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--border-subtle), var(--shadow-card);
+  transform-origin: top right;
+  animation: menu-in var(--duration-fast) var(--ease-out);
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+}
+
+.who {
+  padding: var(--space-3);
+  margin-bottom: var(--space-1);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: var(--space-3);
+  align-items: center;
+  display: flex;
+}
+
+.avatarBig {
+  width: 44px;
+  height: 44px;
+  font-size: 16px;
+}
+
+.whoText {
+  min-width: 0;
+  flex-direction: column;
+  display: flex;
+}
+
+.whoName {
+  font-size: 16px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.whoRole {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.item {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  gap: var(--space-3);
+  align-items: center;
+  display: flex;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.item:focus-visible {
+  outline: var(--focus-ring) solid var(--brand-apricot);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .item:hover {
+    background: var(--surface-muted);
+  }
+}
+
+/* l'agenda è la voce che si usa: prugna pieno, come il pulsante principale */
+.itemMain {
+  margin-bottom: var(--space-1);
+  background: var(--action-primary);
+  color: var(--text-inverse);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .itemMain:hover {
+    background: var(--action-primary-hover);
+  }
+}
+
+.itemIcon {
+  width: 24px;
+  flex: none;
+  justify-content: center;
+  display: inline-flex;
+}
+
+.foot {
+  margin-top: var(--space-1);
+  padding-top: var(--space-1);
+  border-top: 1px solid var(--border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    animation: none;
+  }
+
+  .trigger,
+  .chevron {
+    transition: none;
+  }
+}

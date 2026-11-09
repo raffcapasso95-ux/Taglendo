@@ -1724,12 +1724,14 @@
   }
 }
 
-/* Il video dell'agenda dentro la cornice del telefono */
-.phoneVideo {
+/* La schermata dell'agenda dentro la cornice del telefono: ferma, tagliata in basso come uno schermo vero */
+.phoneShot {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center;
   pointer-events: none;
+  user-select: none;
   display: block;
 }
 
