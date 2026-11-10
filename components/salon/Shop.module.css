@@ -2053,3 +2053,12 @@
 .brand {
   min-height: var(--tap-min);
 }
+
+/* NUOVO: il logo del salone al posto delle iniziali */
+.brandLogo {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  object-fit: cover;
+}

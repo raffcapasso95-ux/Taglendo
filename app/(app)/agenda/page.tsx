@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { AgendaProvider } from "@/components/agenda/AgendaProvider";
 import { AutoRefresh } from "@/components/agenda/AutoRefresh";
 import { DayHeader } from "@/components/agenda/DayHeader";
-import { DayStrip } from "@/components/agenda/DayStrip";
 import { DayView } from "@/components/agenda/DayView";
 import { PhoneActions } from "@/components/agenda/HeaderActions";
 import { OperatorFilter } from "@/components/agenda/OperatorFilter";
@@ -12,6 +11,7 @@ import { SidePanel } from "@/components/agenda/SidePanel";
 import styles from "@/components/agenda/Agenda.module.css";
 import { PendingAppointments } from "@/components/offline/PendingAppointments";
 import { SwipeDays } from "@/components/agenda/SwipeDays";
+import { WeekBar } from "@/components/agenda/WeekBar";
 import { loadAgenda } from "@/lib/agenda/load";
 import { weekdayName } from "@/lib/dates/rome";
 import { clock } from "@/lib/rules/agenda";
@@ -51,6 +51,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
       <div className={styles.main}>
         <DayHeader
           salonName={data.salonName}
+          salonLogo={data.salonLogo}
           userInitials={data.userInitials}
           greeting={data.greeting}
           longDate={data.longDate}
@@ -58,7 +59,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
           showToday={!day.isToday}
         />
         <div className={styles.controls}>
-          <DayStrip days={data.strip} selected={day.date} today={data.today} operator={data.selectedOperator} />
+          <WeekBar week={data.week} selected={day.date} today={data.today} operator={data.selectedOperator} />
           <OperatorFilter operators={data.operators} selected={data.selectedOperator} date={day.date} today={data.today} />
         </div>
         <PendingAppointments date={day.date} />

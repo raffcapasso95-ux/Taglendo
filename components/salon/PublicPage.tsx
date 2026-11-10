@@ -67,9 +67,14 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn }: Props) 
       <header className={styles.header}>
         <div className={`${styles.wrap} ${styles.headerRow}`}>
           <a href="#top" className={styles.brand}>
-            <span className={styles.brandMark} aria-hidden="true">
-              {initials(salon.name)}
-            </span>
+            {salon.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={salon.logoUrl} alt="" width={40} height={40} className={styles.brandLogo} />
+            ) : (
+              <span className={styles.brandMark} aria-hidden="true">
+                {initials(salon.name)}
+              </span>
+            )}
             <span className={styles.brandText}>
               <span className={styles.brandName}>{salon.name}</span>
               {salon.area ? <span className={styles.brandArea}>{salon.area}</span> : null}

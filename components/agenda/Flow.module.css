@@ -939,3 +939,48 @@
 .clientPicked .clientSub {
   white-space: normal;
 }
+
+/* «Nuovo cliente» prende il posto dell'elenco: titolo e «Annulla» in alto, ben visibili */
+.newClient {
+  background: var(--surface);
+  box-shadow: 0 0 0 1.5px var(--brand-plum);
+}
+
+.newClientHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.newClientTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.newClientCancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .newClientCancel:hover {
+    background: var(--brand-peach);
+  }
+}
+
+.clientRowNew .clientName {
+  color: var(--text-primary);
+}

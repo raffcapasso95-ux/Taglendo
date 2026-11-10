@@ -692,3 +692,60 @@
     grid-row: span 2;
   }
 }
+
+/* NUOVO: logo del salone in «Pagina del salone» */
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+}
+
+.logoImg,
+.logoEmpty {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-card);
+  object-fit: cover;
+}
+
+.logoEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.logoSide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.logoButtons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logoRemove {
+  min-height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}

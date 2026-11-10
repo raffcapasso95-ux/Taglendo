@@ -15,7 +15,8 @@ import { clock, firstName } from "@/lib/rules/agenda";
 import { avatarColor, clientInitials } from "@/lib/rules/avatar";
 import { clientSinceLine, greetingMessage, isRecall, recallMessage, usualLine } from "@/lib/rules/clients";
 import { whatsappLink } from "@/lib/rules/whatsapp";
-import { ClientPhotoDialog, EditClientDialog } from "./ClientDialogs";
+import { ClientPhotoDialog } from "./ClientDialogs";
+import { ClientInfo } from "./ClientInfo";
 import styles from "./Clients.module.css";
 
 type Props = NonNullable<Data>;
@@ -33,7 +34,6 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [photoOpen, setPhotoOpen] = useState(false);
-  const [editOpen, setEditOpen] = useState(false);
   const [text, setText] = useState(note);
   const [saved, setSaved] = useState(note);
   const [error, setError] = useState<string | null>(null);
@@ -73,11 +73,6 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
         <Link href="/clienti" className={styles.back}>
           ‹ Clienti
         </Link>
-        {canEdit ? (
-          <button type="button" className={styles.editButton} onClick={() => setEditOpen(true)}>
-            Modifica
-          </button>
-        ) : null}
       </div>
 
       <header className={cx(styles.person, styles.personCentered)}>
@@ -140,6 +135,8 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
         </nav>
       ) : null}
 
+      <ClientInfo clientId={row.id} name={row.name} phone={row.phone} email={row.email} canEdit={canEdit} canSeeContacts={canSeeContacts} />
+
       <dl className={styles.stats}>
         <div className={styles.stat}>
           <dt>Visite</dt>
@@ -170,20 +167,6 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
         ) : null}
       </section>
 
-      <section className={styles.card} aria-label="Contatti">
-        {canSeeContacts ? (
-          row.phone ? (
-            <a className={styles.contact} href={`tel:${row.phone.replace(/\s/g, "")}`}>
-              {row.phone}
-            </a>
-          ) : (
-            <p className={styles.sub}>Nessun telefono salvato per questo cliente.</p>
-          )
-        ) : (
-          <p className={styles.sub}>I contatti dei clienti li vede solo il titolare.</p>
-        )}
-        {canSeeContacts && row.email ? <p className={styles.contact}>{row.email}</p> : null}
-      </section>
 
       {next && nextDate ? (
         <section className={styles.card} aria-label="Prossimo appuntamento">
@@ -274,7 +257,6 @@ function Inner({ isOwner, row, note, today, createdDate, usual, usualMemberId, v
         </section>
       ) : null}
 
-      {editOpen ? <EditClientDialog clientId={row.id} name={row.name} phone={row.phone} email={row.email} canSeeContacts={canSeeContacts} onClose={() => setEditOpen(false)} /> : null}
       {photoOpen ? <ClientPhotoDialog clientId={row.id} name={row.name} color={row.avatarColor} photoUrl={row.photoUrl} onClose={() => setPhotoOpen(false)} /> : null}
 
       {confirming ? (

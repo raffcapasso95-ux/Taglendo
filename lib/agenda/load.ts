@@ -1,6 +1,7 @@
+import { salonLogoUrl } from "@/lib/salon/logo";
 import "server-only";
 import { getMembership, getUser } from "@/lib/auth/session";
-import { addDays, dayNumber, dayRange, isValidDate, longDay, monthShort, romeDate, romeMinutes, weekdayName, weekdayOf, weekdayShort } from "@/lib/dates/rome";
+import { addDays, dayNumber, dayRange, isValidDate, longDay, monthShort, monthYear, romeDate, romeMinutes, weekdayName, weekdayOf, weekdayShort } from "@/lib/dates/rome";
 import { buildDay, firstName, initials, type AgendaAppt, type DayModel, type Operator } from "@/lib/rules/agenda";
 import { signedPhotoUrls } from "@/lib/clients/photoUrls";
 import { createClient } from "@/lib/supabase/server";
@@ -23,12 +24,16 @@ export type ClientOption = { id: string; name: string; phone: string | null; ava
 
 export type AgendaData = {
   salonName: string;
+  /** NUOVO: logo del salone (o null: si mostrano le iniziali). */
+  salonLogo: string | null;
   userFirstName: string;
   userInitials: string;
   greeting: string;
   longDate: string;
   day: DayModel;
   strip: StripDay[];
+  /** NUOVO: la settimana (lunedì–domenica) del giorno scelto, con mese e settimane vicine. */
+  week: { days: StripDay[]; label: string; prev: string; next: string };
   /** Tutti i barbieri visibili a chi guarda (per il filtro e la colonna "Adesso in salone"). */
   operators: Operator[];
   selectedOperator: string | null;
@@ -59,14 +64,18 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
 
   const stripStart = date < today ? date : today;
   const stripEnd = addDays(stripStart, STRIP_DAYS);
-  const { start: rangeStart } = dayRange(stripStart);
-  const { start: stripEndAt } = dayRange(stripEnd);
+  const weekStart = addDays(date, -((weekdayOf(date) + 6) % 7));
+  const weekEnd = addDays(weekStart, 7);
+  const fromDay = weekStart < stripStart ? weekStart : stripStart;
+  const toDay = weekEnd > stripEnd ? weekEnd : stripEnd;
+  const { start: rangeStart } = dayRange(fromDay);
+  const { start: stripEndAt } = dayRange(toDay);
 
   const [flags, members, hours, closures, dayAppts, stripAppts, servicesRes, clientsRes, statsRes] = await Promise.all([
     supabase.from("salons").select("barbers_see_all, barbers_edit").eq("id", salon.id).single(),
     operatorsOf(supabase, salon.id),
     weekHours(supabase, salon.id),
-    supabase.from("closures").select("starts_on, ends_on, member_id").eq("salon_id", salon.id).lte("starts_on", stripEnd).gte("ends_on", stripStart),
+    supabase.from("closures").select("starts_on, ends_on, member_id").eq("salon_id", salon.id).lte("starts_on", toDay).gte("ends_on", fromDay),
     appointmentsOn(supabase, salon.id, date),
     supabase
       .from("appointments")
@@ -100,8 +109,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
   const day = buildDay({ date, isToday, nowMin: romeMinutes(now), hours: dayHours, operators: shown, appts });
 
   const withAppts = new Set((stripAppts.data ?? []).map((a) => romeDate(new Date(a.starts_at))));
-  const strip: StripDay[] = Array.from({ length: STRIP_DAYS }, (_, i) => {
-    const d = addDays(stripStart, i);
+  const stripDay = (d: string): StripDay => {
     const closed = closedByClosure(d) || asHours(byWeekday.get(weekdayOf(d))).closed;
     return {
       date: d,
@@ -112,19 +120,28 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
       hasAppointments: withAppts.has(d),
       label: `${longDay(d)}${closed ? ", chiuso" : ""}`,
     };
-  });
+  };
+  const strip: StripDay[] = Array.from({ length: STRIP_DAYS }, (_, i) => stripDay(addDays(stripStart, i)));
+  const week = {
+    days: Array.from({ length: 7 }, (_, i) => stripDay(addDays(weekStart, i))),
+    label: monthYear(date),
+    prev: addDays(date, -7),
+    next: addDays(date, 7),
+  };
 
   const lastVisit = new Map((statsRes.data ?? []).flatMap((r) => (r.client_id && r.last_visit_at ? [[r.client_id, romeDate(new Date(r.last_visit_at))] as const] : [])));
   const photoUrls = await signedPhotoUrls(supabase, (clientsRes.data ?? []).map((c) => c.photo_path));
   const userFirstName = firstName(membership.name);
   return {
     salonName: salon.name,
+    salonLogo: salonLogoUrl(salon.logo_path),
     userFirstName,
     userInitials: initials(membership.name),
     greeting: isToday ? `Buongiorno, ${userFirstName}` : `Agenda di ${weekdayName(date).toLowerCase()}`,
     longDate: longDay(date),
     day,
     strip,
+    week,
     operators,
     selectedOperator,
     today,
