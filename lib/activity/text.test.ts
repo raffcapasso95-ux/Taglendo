@@ -26,9 +26,9 @@ describe("notifiche: i testi", () => {
     expect(dayGroup("2026-11-09T08:00:00Z", TODAY, "2026-11-09")).toBe("Ieri");
     expect(dayGroup("2026-11-07T08:00:00Z", TODAY, "2026-11-09")).toBe("Sab 7 nov");
   });
-  it("non lette: dopo l'ultima lettura e non fatte da me", () => {
-    expect(isUnread(row({}), null, "m2")).toBe(true);
-    expect(isUnread(row({}), null, "m1")).toBe(false);
-    expect(isUnread(row({}), "2026-11-10T09:00:00Z", "m2")).toBe(false);
+  it("non lette: tutto ciò che è successo dopo l'ultima lettura, anche fatto da me", () => {
+    expect(isUnread(row({}), null)).toBe(true);
+    expect(isUnread(row({}), "2026-11-10T07:00:00Z")).toBe(true);
+    expect(isUnread(row({}), "2026-11-10T09:00:00Z")).toBe(false);
   });
 });

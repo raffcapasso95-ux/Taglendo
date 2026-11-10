@@ -141,14 +141,14 @@ isOneToOne: false
                   ]
                 },"closures": {
                   Row: {
-                    "ends_on": string,"id": string,"member_id": string | null,"note": string | null,"salon_id": string,"starts_on": string
+                    "ends_on": string,"holiday": string | null,"id": string,"member_id": string | null,"note": string | null,"salon_id": string,"starts_on": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "ends_on": string,"id"?: string,"member_id"?: string | null,"note"?: string | null,"salon_id": string,"starts_on": string
+                    "ends_on": string,"holiday"?: string | null,"id"?: string,"member_id"?: string | null,"note"?: string | null,"salon_id": string,"starts_on": string
                   }
                   Update: {
-                    "ends_on"?: string,"id"?: string,"member_id"?: string | null,"note"?: string | null,"salon_id"?: string,"starts_on"?: string
+                    "ends_on"?: string,"holiday"?: string | null,"id"?: string,"member_id"?: string | null,"note"?: string | null,"salon_id"?: string,"starts_on"?: string
                   }
                   Relationships: [
                     {
@@ -313,14 +313,14 @@ isOneToOne: false
                   ]
                 },"salons": {
                   Row: {
-                    "address": string | null,"area": string | null,"barbers_contacts": boolean,"barbers_edit": boolean,"barbers_see_all": boolean,"booking_online": boolean,"cancel_limit_min": number,"cancel_online": boolean,"cover_path": string | null,"created_at": string,"deleted_at": string | null,"description": string | null,"id": string,"instagram": string | null,"logo_path": string | null,"max_advance_days": number,"min_notice_min": number,"name": string,"onboarding_step": number,"phone": string | null,"plan": Database["public"]['Enums']["plan_t"],"show_prices": boolean,"slot_step_min": number,"slug": string,"stripe_customer_id": string | null,"stripe_subscription_id": string | null,"sub_status": Database["public"]['Enums']["sub_status_t"],"timezone": string,"trial_ends_at": string,"vat_number": string | null
+                    "address": string | null,"area": string | null,"barbers_contacts": boolean,"barbers_edit": boolean,"barbers_see_all": boolean,"booking_online": boolean,"cancel_limit_min": number,"cancel_online": boolean,"closed_holidays": (string)[],"cover_path": string | null,"created_at": string,"deleted_at": string | null,"description": string | null,"id": string,"instagram": string | null,"logo_path": string | null,"max_advance_days": number,"min_notice_min": number,"name": string,"onboarding_step": number,"patron_day": string | null,"patron_name": string | null,"phone": string | null,"plan": Database["public"]['Enums']["plan_t"],"show_prices": boolean,"slot_step_min": number,"slug": string,"stripe_customer_id": string | null,"stripe_subscription_id": string | null,"sub_status": Database["public"]['Enums']["sub_status_t"],"timezone": string,"trial_ends_at": string,"vat_number": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name": string,"onboarding_step"?: number,"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"show_prices"?: boolean,"slot_step_min"?: number,"slug": string,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
+                    "address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name": string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"show_prices"?: boolean,"slot_step_min"?: number,"slug": string,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
                   }
                   Update: {
-                    "address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name"?: string,"onboarding_step"?: number,"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"show_prices"?: boolean,"slot_step_min"?: number,"slug"?: string,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
+                    "address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name"?: string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"show_prices"?: boolean,"slot_step_min"?: number,"slug"?: string,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
                   }
                   Relationships: [
                     

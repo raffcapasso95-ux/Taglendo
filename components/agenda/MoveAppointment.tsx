@@ -38,7 +38,8 @@ export function MoveAppointment({ detail, operators, closedDates, today, onClose
   const desktop = useIsDesktop();
   const [memberId, setMemberId] = useState<string | "any">(detail.memberId);
   const [date, setDate] = useState(detail.date >= today ? detail.date : today);
-  const [startMin, setStartMin] = useState<number | null>(null);
+  // si parte dall'orario che l'appuntamento ha adesso, già segnato tra gli orari
+  const [startMin, setStartMin] = useState<number | null>(detail.date >= today ? detail.startMin : null);
   const [slots, setSlots] = useState<SlotsResult | null>(null);
   const [loadingSlots, startSlots] = useTransition();
   const [saving, startSave] = useTransition();
@@ -86,7 +87,7 @@ export function MoveAppointment({ detail, operators, closedDates, today, onClose
     return () => {
       cancelled = true;
     };
-  }, [detail.id, detail.serviceId, memberId, date]);
+  }, [detail.id, detail.serviceId, detail.startMin, detail.endMin, memberId, date]);
 
   const operatorName = memberId === "any" ? null : operators.find((o) => o.id === memberId)?.name;
   const noSlots = slots !== null && slots.slots.every((s) => !s.free);
@@ -99,6 +100,7 @@ export function MoveAppointment({ detail, operators, closedDates, today, onClose
   ]
     .filter(Boolean)
     .join(" · ");
+  const unchanged = date === detail.date && startMin === detail.startMin && memberId === detail.memberId;
   const hint = loadingSlots && !slots ? "…" : slots?.closed ? copy.closed : noSlots ? copy.noSlots : flow.slotsHint(operatorName ?? copy.anyone, shortDate(date));
 
   const save = () =>
@@ -208,7 +210,7 @@ export function MoveAppointment({ detail, operators, closedDates, today, onClose
           </span>
           <span className={styles.sumSub}>{subLabel}</span>
         </div>
-        <Button size="large" className={styles.confirm} disabled={startMin === null || saving} onClick={save}>
+        <Button size="large" className={styles.confirm} disabled={startMin === null || unchanged || saving} onClick={save}>
           {saving ? detailCopy.moveSaving : detailCopy.move}
         </Button>
       </footer>

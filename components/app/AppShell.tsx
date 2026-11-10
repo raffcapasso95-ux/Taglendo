@@ -11,6 +11,7 @@ import { SwRegister } from "@/components/offline/SwRegister";
 import { clearOfflineData } from "@/lib/offline/clear";
 import { romeDate } from "@/lib/dates/rome";
 import { SessionGuard } from "./SessionGuard";
+import { useUnread } from "./useUnread";
 import {
   CalendarIcon,
   CheckIcon,
@@ -89,8 +90,11 @@ const firstName = (name: string) => name.split(" ")[0] ?? name;
  * Su telefono nessuna barra in basso: testata fissa con il nome della sezione e «Menu»,
  * che apre un pannello da destra con le sezioni, il profilo e «Esci».
  */
-export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwner, unread, children }: Props) {
+const bellLabel = (n: number) => (n === 0 ? "Notifiche" : n === 1 ? "Notifiche, 1 nuova" : `Notifiche, ${n} nuove`);
+
+export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwner, unread: unreadFromServer, children }: Props) {
   const pathname = usePathname();
+  const unread = useUnread(unreadFromServer, pathname);
   const search = useSearchParams();
   const [copied, setCopied] = useState(false);
   // il menu è «aperto» solo sulla pagina in cui l'hai aperto: cambiando pagina si chiude da solo
@@ -177,7 +181,7 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
             href="/notifiche"
             className={cx(styles.railItem, isCurrent(pathname, "/notifiche") && styles.railItemActive)}
             aria-current={isCurrent(pathname, "/notifiche") ? "page" : undefined}
-            aria-label={unread ? `Notifiche, ${unread} nuove` : "Notifiche"}
+            aria-label={bellLabel(unread)}
             data-label="Notifiche"
           >
             <BellNavIcon />
@@ -217,7 +221,7 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
               Oggi
             </Link>
           )}
-          <Link href="/notifiche" className={styles.mbBell} aria-label={unread ? `Notifiche, ${unread} nuove` : "Notifiche"}>
+          <Link href="/notifiche" className={styles.mbBell} aria-label={bellLabel(unread)}>
             <BellNavIcon />
             {unread ? <span className={styles.badge}>{unread > 9 ? "9+" : unread}</span> : null}
           </Link>

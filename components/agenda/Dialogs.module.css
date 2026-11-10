@@ -492,3 +492,38 @@
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* Scheda dell'appuntamento: ora e stato sulla stessa riga, servizio e prezzo sulla stessa riga */
+.whenRow {
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  display: flex;
+}
+
+.whenRow .badge {
+  align-self: center;
+  flex: 0 0 auto;
+}
+
+.subRow {
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  flex-wrap: wrap;
+  display: flex;
+}
+
+.subRow .sub {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.subPrice {
+  flex: 0 0 auto;
+}
+
+/* sul telefono la scheda è alta quanto serve (fino al 92% dello schermo) */
+.sheetAuto {
+  height: auto;
+}
