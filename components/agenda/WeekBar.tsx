@@ -48,8 +48,8 @@ export function WeekBar({ week, selected, today, operator }: Props) {
               aria-label={`${d.weekday} ${d.number}, ${d.label}${isToday ? ", oggi" : ""}`}
               scroll={false}
             >
-              <span className={styles.dayDow}>{d.weekday}</span>
-              <span className={styles.dayNum}>{d.number}</span>
+              {/* gli spazi tengono il testo visibile («Mer 11») dentro il nome accessibile */}
+              <span className={styles.dayDow}>{d.weekday}</span> <span className={styles.dayNum}>{d.number}</span>{" "}
               <span className={styles.daySub}>{d.hasAppointments ? <span className={styles.dot} aria-hidden="true" /> : null}</span>
             </Link>
           );

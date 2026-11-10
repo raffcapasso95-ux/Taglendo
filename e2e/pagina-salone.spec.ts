@@ -38,7 +38,10 @@ test.describe("Pagina del salone", () => {
   test("il logo si carica, compare in agenda e sulla pagina pubblica, e si toglie", async ({ page, browser }) => {
     await freshOwner(page, "Barberia Col Logo");
     await page.goto("/impostazioni/pagina");
-    await page.getByLabel("Carica il logo").setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: PNG });
+    // si clicca il pulsante come farebbe una persona: così si aspetta anche che la pagina sia pronta
+    const chooser = page.waitForEvent("filechooser");
+    await page.getByRole("button", { name: "Carica il logo" }).click();
+    await (await chooser).setFiles({ name: "logo.png", mimeType: "image/png", buffer: PNG });
     await expect(page.getByText("Logo salvato").filter({ visible: true })).toBeVisible();
     await expect(page.getByRole("img", { name: "Logo di Barberia Col Logo" })).toBeVisible();
     await page.goto("/agenda");
