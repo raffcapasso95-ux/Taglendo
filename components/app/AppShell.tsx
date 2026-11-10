@@ -161,6 +161,7 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
               aria-current={isCurrent(pathname, item.href) ? "page" : undefined}
               aria-label={item.label}
               data-label={item.label}
+              data-tour={item.href === "/clienti" ? "clients" : item.href === "/salone" ? "salon" : undefined}
             >
               {item.icon(22)}
             </Link>
@@ -201,7 +202,7 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
               Oggi
             </Link>
           )}
-          <button ref={openerRef} type="button" className={styles.mbMenu} aria-controls="app-menu" aria-expanded={menuOpen} onClick={() => setOpenAt(pathname)}>
+          <button ref={openerRef} type="button" data-tour="menu" className={styles.mbMenu} aria-controls="app-menu" aria-expanded={menuOpen} onClick={() => setOpenAt(pathname)}>
             <MenuIcon />
             <span>Menu</span>
           </button>

@@ -24,12 +24,37 @@
 /* Giorno vuoto o chiuso */
 .empty {
   display: flex;
+  flex: 1;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: var(--space-2);
+  min-height: 320px;
   padding: var(--space-8) var(--space-4);
   border: 1px dashed var(--border-strong);
   border-radius: var(--radius-card);
+  background: var(--surface);
   text-align: center;
+}
+
+.emptyIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: var(--space-2);
+  border-radius: 50%;
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+}
+
+.emptyActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .emptyTitle {

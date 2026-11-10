@@ -78,6 +78,11 @@ export const agendaCopy = {
     searchClientLong: "Nome, cognome o telefono",
     newClient: "Nuovo cliente",
     cancelNew: "Annulla", // NUOVO: torna all'elenco dei clienti
+    // NUOVO: «Salva cliente» nel riquadro Nuovo cliente
+    saveClient: "Salva cliente",
+    savingClient: "Salvataggio…",
+    clientSaved: "Cliente salvato in rubrica",
+    saveClientHint: "Lo trovi in Clienti e resta scelto per questo appuntamento.",
     recentClients: "Venuti di recente",
     foundClients: "Risultati",
     phoneTail: (digits: string) => `tel. ··· ${digits}`,

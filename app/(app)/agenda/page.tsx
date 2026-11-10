@@ -3,6 +3,7 @@ import { AgendaSkeleton } from "@/components/states/Skeletons";
 import { Suspense } from "react";
 import { AgendaProvider } from "@/components/agenda/AgendaProvider";
 import { AutoRefresh } from "@/components/agenda/AutoRefresh";
+import { AgendaTour } from "@/components/tour/AgendaTour";
 import { DayHeader } from "@/components/agenda/DayHeader";
 import { DayView } from "@/components/agenda/DayView";
 import { PhoneActions } from "@/components/agenda/HeaderActions";
@@ -18,8 +19,8 @@ import { clock } from "@/lib/rules/agenda";
 
 export const metadata: Metadata = { title: "Agenda · Taglendo" };
 
-async function Content({ searchParams }: { searchParams: Promise<{ g?: string; op?: string; nuovo?: string; servizio?: string; barbiere?: string; nome?: string }> }) {
-  const { g, op, nuovo, servizio, barbiere, nome } = await searchParams;
+async function Content({ searchParams }: { searchParams: Promise<{ g?: string; op?: string; nuovo?: string; servizio?: string; barbiere?: string; nome?: string; guida?: string }> }) {
+  const { g, op, nuovo, servizio, barbiere, nome, guida } = await searchParams;
   const data = await loadAgenda({ date: g, op });
   if (!data) return null;
   const { day } = data;
@@ -71,6 +72,7 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
       <SidePanel day={day} title={day.isToday ? `Adesso in salone · ${clock(day.nowMin)}` : "Primo cliente"} />
       <PhoneActions />
       <AutoRefresh />
+      {(!data.tourSeen && !nuovo) || guida ? <AgendaTour firstName={data.userFirstName} show /> : null}
     </div>
     </AgendaProvider>
   );

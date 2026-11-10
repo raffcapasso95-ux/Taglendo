@@ -6,6 +6,7 @@ import {
   freeIntervals,
   GRID_PX_PER_MIN,
   gridRange,
+  fillScale,
   fitGridScale,
   gridScale,
   gridStart,
@@ -294,6 +295,25 @@ describe("gridScale con la pausa", () => {
   it("una pausa breve (sotto l'ora) resta com'è", () => {
     const sc = gridScale([[540, 700]], 540, 900, GRID_PX_PER_MIN, 60, QUIET_PX, [[780, 810]]);
     expect(sc.bands.filter((b) => b.compressed).map((b) => [b.from, b.to])).toEqual([[700, 780], [810, 900]].filter(([a, b]) => b - a >= 60));
+  });
+});
+
+describe("fillScale: con pochi appuntamenti la griglia riempie lo spazio", () => {
+  it("i tratti liberi compressi si allargano e la griglia arriva in fondo", () => {
+    const busy: Array<[number, number]> = [[885, 915]]; // un solo appuntamento, 14:45–15:15
+    const sc = fitGridScale(busy, 720, 1140, 600, [[780, 870]]);
+    expect(sc.height).toBeCloseTo(600, 0);
+    // l'appuntamento resta proporzionato (al massimo il doppio della scala comoda)
+    expect(sc.y(915) - sc.y(885)).toBeLessThanOrEqual(30 * 1.6 * 2 + 0.5);
+    // ordine delle ore rispettato
+    expect(sc.y(780)).toBeLessThan(sc.y(870));
+    expect(sc.y(870)).toBeLessThan(sc.y(885));
+  });
+
+  it("se lo spazio è enorme non gonfia la griglia oltre il doppio", () => {
+    const sc = gridScale([[600, 630]], 540, 660, 1.6);
+    const filled = fillScale(sc, 5000, 1.6);
+    expect(filled.height).toBeLessThanOrEqual(120 * 1.6 * 2 + 1);
   });
 });
 

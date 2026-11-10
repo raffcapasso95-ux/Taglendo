@@ -45,6 +45,8 @@ export type AgendaData = {
   clients: ClientOption[];
   /** Quando è stata disegnata questa agenda: la "salvata alle…" della barra offline. */
   savedAt: string;
+  /** NUOVO: la guida al primo accesso non è ancora stata vista (o saltata) da questo account. */
+  tourSeen: boolean;
 };
 
 const STRIP_DAYS = 28;
@@ -150,5 +152,6 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
     services: (servicesRes.data ?? []).map((x) => ({ id: x.id, name: x.name, durationMin: x.duration_min, priceCents: x.price_cents })),
     clients: (clientsRes.data ?? []).flatMap((c) => (c.id && c.name ? [{ id: c.id, name: c.name, phone: c.phone, avatarColor: c.avatar_color, photoUrl: c.photo_path ? (photoUrls.get(c.photo_path) ?? null) : null, lastVisit: lastVisit.get(c.id) ?? null }] : [])),
     savedAt: now.toISOString(),
+    tourSeen: user.user_metadata?.tour_seen === true,
   };
 }

@@ -49,7 +49,7 @@ insert into auth.users (
 )
 select '00000000-0000-0000-0000-000000000000', u.id, 'authenticated', 'authenticated', u.email,
        extensions.crypt('taglendo-demo', extensions.gen_salt('bf')), now(),
-       '{"provider":"email","providers":["email"]}', jsonb_build_object('name', u.name), now(), now(),
+       '{"provider":"email","providers":["email"]}', jsonb_build_object('name', u.name, 'tour_seen', true), now(), now(),
        '', '', '', ''
 from (values
   ('a0000000-0000-4000-8000-000000000001'::uuid, 'andrea@barberia-saragozza.example', 'Andrea'),

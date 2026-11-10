@@ -182,4 +182,20 @@ test.describe("Nuovo appuntamento", () => {
     await expect(list).toBeVisible();
     await expect(d.getByText(/Scegli il cliente/)).toBeVisible(); // il nome scritto non resta come cliente
   });
+
+  test("«Salva cliente» mette il nuovo cliente in rubrica e lo sceglie", async ({ page }) => {
+    await freshOwner(page, "Barberia Salva Cliente");
+    await page.goto("/agenda");
+    await newButton(page).click();
+    const d = dialog(page);
+    await d.getByRole("button", { name: "Nuovo cliente" }).click();
+    const panel = d.getByRole("group", { name: "Nuovo cliente" });
+    const name = `Cesare Salvato ${Date.now().toString(36)}`;
+    await panel.getByLabel("Nome", { exact: true }).fill(name);
+    await panel.getByRole("button", { name: "Salva cliente" }).click();
+    await expect(page.getByText("Cliente salvato in rubrica").filter({ visible: true })).toBeVisible();
+    await expect(panel).toHaveCount(0);
+    await expect(d.getByText(name, { exact: true })).toBeVisible(); // scelto
+    expect(await adminSelect("clients", `select=id&name=eq.${encodeURIComponent(name)}`)).toHaveLength(1);
+  });
 });

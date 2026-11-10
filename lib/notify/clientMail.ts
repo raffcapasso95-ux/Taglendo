@@ -23,6 +23,8 @@ export async function emailConfirmedBySalon(appointmentId: string): Promise<bool
     salonName: c.salon.name,
     firstName: (c.clientName ?? "").split(" ")[0] ?? "",
     weekday: weekdayName(c.date).toLowerCase(),
+    day: reminderDayWord(c.date, romeDate(new Date()), addDays(romeDate(new Date()), 1)),
+    logoUrl: c.salon.logoUrl,
     when: whenShort(c.date, c.startMin),
     subjectWhen: whenLong(c.date, c.startMin),
     service: `${c.serviceName}${c.durationMin ? ` · ${span(c.durationMin)}` : ""}`,

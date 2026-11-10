@@ -14,6 +14,7 @@ import { requireSalon } from "@/lib/auth/session";
 import { company } from "@/lib/site";
 import { billingEnabled } from "@/lib/billing";
 import { listinoCopy } from "@/lib/copy/listino";
+import { tourCopy } from "@/lib/copy/tour";
 import { initials } from "@/lib/rules/agenda";
 import { createClient } from "@/lib/supabase/server";
 
@@ -61,7 +62,10 @@ async function Content() {
         <SettingsGroup
           id="set-aiuto"
           title={copy.help.title}
-          rows={[{ href: `mailto:${company.email}?subject=Taglendo%3A%20segnalazione`, label: copy.help.row, sub: copy.help.sub, tone: 2, icon: <HelpIcon /> }]}
+          rows={[
+            { href: "/agenda?guida=1", label: tourCopy.again, sub: tourCopy.againSub, tone: 1, icon: <HelpIcon /> },
+            { href: `mailto:${company.email}?subject=Taglendo%3A%20segnalazione`, label: copy.help.row, sub: copy.help.sub, tone: 2, icon: <HelpIcon /> },
+          ]}
         />
 
         <section className={settings.section}>
@@ -126,6 +130,13 @@ async function Content() {
           {copy.help.title}
         </h2>
         <Card flush>
+          <Link href="/agenda?guida=1" className={styles.navRow}>
+            <span>
+              {tourCopy.again}
+              <span className={styles.navSub}>{tourCopy.againSub}</span>
+            </span>
+            <span aria-hidden="true">›</span>
+          </Link>
           <a href={`mailto:${company.email}?subject=Taglendo%3A%20segnalazione`} className={styles.navRow}>
             <span>
               {copy.help.row}

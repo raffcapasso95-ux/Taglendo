@@ -209,3 +209,18 @@
     display: inline;
   }
 }
+
+/* NUOVO: frase di guida sopra e sotto l'editor degli orari */
+.lead {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+/* NUOVO: nome ed email del barbiere uno sotto l'altro */
+.chair {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

@@ -13,10 +13,12 @@ export function HeaderActions() {
   if (!canEdit) return null;
   return (
     <div className={styles.headerActions}>
-      <Button variant="secondary" onClick={openWalkIn}>
+      <Button variant="secondary" onClick={openWalkIn} data-tour="walkin">
         {copy.walkIn}
       </Button>
-      <Button onClick={() => openNew()}>{copy.add}</Button>
+      <Button onClick={() => openNew()} data-tour="new">
+        {copy.add}
+      </Button>
     </div>
   );
 }
@@ -27,10 +29,10 @@ export function PhoneActions() {
   if (!canEdit) return null;
   return (
     <div className={styles.phoneActions}>
-      <Button variant="secondary" size="large" onClick={openWalkIn}>
+      <Button variant="secondary" size="large" onClick={openWalkIn} data-tour="walkin">
         {copy.walkInPhone}
       </Button>
-      <Button size="large" onClick={() => openNew()}>
+      <Button size="large" onClick={() => openNew()} data-tour="new">
         {copy.addPhone}
       </Button>
     </div>
