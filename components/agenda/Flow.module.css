@@ -997,3 +997,31 @@
   font-size: 14px;
   font-weight: 600;
 }
+
+/* NUOVO: durata dell'appuntamento, a passi di 5 minuti */
+.durStepper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.durStep {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 20px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.durValue {
+  min-width: 72px;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

@@ -260,6 +260,22 @@ test.describe("Email e avvisi", () => {
   });
 });
 
+test("«Notifiche»: una prenotazione online accende la campanella; aprendo la pagina si legge e si spegne", async ({ page, browser }) => {
+  const { slug } = await newSalon(page, "Barberia Campanella");
+  const { visitor } = await bookOnline(browser, slug, "Paolo Campana");
+  await visitor.close();
+  await page.goto("/agenda");
+  const bell = page.getByRole("link", { name: /^Notifiche, \d+ nuove$/ }).filter({ visible: true }).first();
+  await expect(bell).toBeVisible();
+  await bell.click();
+  await expect(page.getByRole("heading", { level: 1, name: "Notifiche" })).toBeVisible();
+  await expect(page.getByText("Nuova prenotazione online").first()).toBeVisible();
+  await expect(page.getByText(/Paolo Campana · Taglio uomo/).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /^Notifiche, \d+ nuove$/ }).filter({ visible: true })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("link", { name: "Notifiche", exact: true }).filter({ visible: true }).first()).toBeVisible();
+});
+
 test("le chiavi delle notifiche sono coerenti", async ({ request }) => {
   const r = await request.get("/api/cron/run?job=none", { headers: { Authorization: CRON } });
   expect((await r.json()).push).toBe("ok");

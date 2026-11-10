@@ -16,6 +16,7 @@ import {
   CheckIcon,
   CheckMarkIcon,
   CloseIcon,
+  BellNavIcon,
   CopyIcon,
   HomeIcon,
   StoreIcon,
@@ -51,6 +52,7 @@ const MENU: Item[] = [
   { href: "/statistiche", label: "Statistiche", icon: (s) => <StatsIcon size={s} />, ownerOnly: true },
   { href: "/listino", label: "Listino e orari", icon: (s) => <ScissorsIcon size={s} /> },
   { href: "/salone", label: "Salone", icon: (s) => <StoreIcon size={s} /> },
+  { href: "/notifiche", label: "Notifiche", icon: (s) => <BellNavIcon size={s} /> },
   { href: "/impostazioni", label: "Impostazioni", icon: (s) => <SettingsRaysIcon size={s} /> },
 ];
 
@@ -61,6 +63,7 @@ const TITLES: [string, string][] = [
   ["/statistiche", "Statistiche"],
   ["/listino", "Listino e orari"],
   ["/salone", "Salone"],
+  ["/notifiche", "Notifiche"],
   ["/impostazioni", "Impostazioni"],
   ["/profilo", "Profilo"],
 ];
@@ -73,6 +76,8 @@ type Props = {
   userInitials: string;
   /** Statistiche e il resto del titolare: il barbiere non li vede. */
   isOwner: boolean;
+  /** NUOVO: notifiche non lette (campanella). */
+  unread: number;
   children: ReactNode;
 };
 
@@ -84,7 +89,7 @@ const firstName = (name: string) => name.split(" ")[0] ?? name;
  * Su telefono nessuna barra in basso: testata fissa con il nome della sezione e «Menu»,
  * che apre un pannello da destra con le sezioni, il profilo e «Esci».
  */
-export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwner, children }: Props) {
+export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwner, unread, children }: Props) {
   const pathname = usePathname();
   const search = useSearchParams();
   const [copied, setCopied] = useState(false);
@@ -168,6 +173,16 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
           ))}
         </div>
         <div className={cx(styles.group, styles.groupBottom)}>
+          <Link
+            href="/notifiche"
+            className={cx(styles.railItem, isCurrent(pathname, "/notifiche") && styles.railItemActive)}
+            aria-current={isCurrent(pathname, "/notifiche") ? "page" : undefined}
+            aria-label={unread ? `Notifiche, ${unread} nuove` : "Notifiche"}
+            data-label="Notifiche"
+          >
+            <BellNavIcon />
+            {unread ? <span className={styles.badge}>{unread > 9 ? "9+" : unread}</span> : null}
+          </Link>
           <button type="button" className={styles.railItem} onClick={copy} aria-label="Copia il link di prenotazione" data-label={copied ? "Link copiato" : "Copia link di prenotazione"}>
             {copied ? <CheckIcon /> : <CopyIcon />}
           </button>
@@ -202,6 +217,10 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
               Oggi
             </Link>
           )}
+          <Link href="/notifiche" className={styles.mbBell} aria-label={unread ? `Notifiche, ${unread} nuove` : "Notifiche"}>
+            <BellNavIcon />
+            {unread ? <span className={styles.badge}>{unread > 9 ? "9+" : unread}</span> : null}
+          </Link>
           <button ref={openerRef} type="button" data-tour="menu" className={styles.mbMenu} aria-controls="app-menu" aria-expanded={menuOpen} onClick={() => setOpenAt(pathname)}>
             <MenuIcon />
             <span>Menu</span>

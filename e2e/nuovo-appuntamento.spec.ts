@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { bookNewClient, dialog, freshOwner, newButton, nextOpenDay } from "./agenda-helpers";
+import { bookNewClient, dialog, freshOwner, newButton, nextOpenDay, pickDayAndTime } from "./agenda-helpers";
 import { adminSelect, signIn } from "./helpers";
 
 /** Nuovo appuntamento (ridisegno novembre 2026): una schermata con quattro blocchi sempre aperti e il riepilogo in fondo. */
@@ -197,5 +197,27 @@ test.describe("Nuovo appuntamento", () => {
     await expect(panel).toHaveCount(0);
     await expect(d.getByText(name, { exact: true })).toBeVisible(); // scelto
     expect(await adminSelect("clients", `select=id&name=eq.${encodeURIComponent(name)}`)).toHaveLength(1);
+  });
+
+  test("durata a scelta: 40 minuti invece di 30, solo per questo appuntamento", async ({ page }) => {
+    await freshOwner(page, "Barberia Durata");
+    const day = nextOpenDay();
+    await page.goto("/agenda");
+    await newButton(page).click();
+    const d = dialog(page);
+    await d.getByRole("button", { name: /^Taglio uomo/ }).click();
+    await d.getByRole("button", { name: "Cambia durata" }).click();
+    await d.getByRole("button", { name: "+10 min" }).click();
+    await expect(d.getByText("40 min").filter({ visible: true }).first()).toBeVisible();
+    await pickDayAndTime(page, day, "18:15"); // 18:15 + 40 = 18:55, ancora dentro l'orario
+    await expect(d.getByRole("button", { name: "18:30", exact: true })).toHaveCount(0); // 18:30 + 40 sforerebbe
+    await d.getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
+    const name = `Durata ${Date.now().toString(36)}`;
+    await d.getByLabel("Nome", { exact: true }).fill(name);
+    await d.getByRole("button", { name: "Fissa l’appuntamento" }).click();
+    await expect(d).toHaveCount(0);
+    const [client] = await adminSelect<{ id: string }>("clients", `select=id&name=eq.${encodeURIComponent(name)}`);
+    const [appt] = await adminSelect<{ starts_at: string; ends_at: string }>("appointments", `select=starts_at,ends_at&client_id=eq.${client!.id}`);
+    expect((new Date(appt!.ends_at).getTime() - new Date(appt!.starts_at).getTime()) / 60000).toBe(40);
   });
 });

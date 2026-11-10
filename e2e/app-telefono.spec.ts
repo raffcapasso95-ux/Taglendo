@@ -100,7 +100,7 @@ test.describe("Taglendo sul telefono", () => {
     await opener.click();
     const menu = page.getByRole("dialog", { name: "Menu" });
     await expect(menu).toBeVisible();
-    for (const name of ["Agenda", "Clienti", "Statistiche", "Listino e orari", "Salone", "Impostazioni", "Sito di Taglendo", "Copia il link di prenotazione", "Esci"]) {
+    for (const name of ["Agenda", "Clienti", "Statistiche", "Listino e orari", "Salone", "Notifiche", "Impostazioni", "Sito di Taglendo", "Copia il link di prenotazione", "Esci"]) {
       await expect(menu.getByText(name, { exact: true })).toBeVisible();
     }
     await expect(menu.getByText(/^Titolare · Barberia Menu Telefono$/)).toBeVisible();

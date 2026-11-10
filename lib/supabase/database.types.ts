@@ -23,7 +23,33 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "appointments": {
+            "activity": {
+                  Row: {
+                    "actor_member_id": string | null,"actor_name": string | null,"appointment_id": string | null,"by_client": boolean,"client_name": string | null,"created_at": string,"id": string,"kind": string,"member_id": string | null,"member_name": string | null,"old_member_name": string | null,"old_starts_at": string | null,"salon_id": string,"service_name": string | null,"starts_at": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "actor_member_id"?: string | null,"actor_name"?: string | null,"appointment_id"?: string | null,"by_client"?: boolean,"client_name"?: string | null,"created_at"?: string,"id"?: string,"kind": string,"member_id"?: string | null,"member_name"?: string | null,"old_member_name"?: string | null,"old_starts_at"?: string | null,"salon_id": string,"service_name"?: string | null,"starts_at"?: string | null
+                  }
+                  Update: {
+                    "actor_member_id"?: string | null,"actor_name"?: string | null,"appointment_id"?: string | null,"by_client"?: boolean,"client_name"?: string | null,"created_at"?: string,"id"?: string,"kind"?: string,"member_id"?: string | null,"member_name"?: string | null,"old_member_name"?: string | null,"old_starts_at"?: string | null,"salon_id"?: string,"service_name"?: string | null,"starts_at"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "activity_appointment_id_fkey"
+      columns: ["appointment_id"]
+isOneToOne: false
+      referencedRelation: "appointments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "activity_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"appointments": {
                   Row: {
                     "cancelled_by": string | null,"client_id": string | null,"created_at": string,"ends_at": string,"id": string,"list_price_cents": number | null,"manage_token": string,"member_id": string,"price_cents": number,"price_note": string | null,"public_code": string,"reminder_sent_at": string | null,"salon_id": string,"service_id": string | null,"service_name": string,"source": Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status": Database["public"]['Enums']["appt_status_t"]
                   }
@@ -161,14 +187,14 @@ isOneToOne: true
                   ]
                 },"members": {
                   Row: {
-                    "active": boolean,"agenda_color": number | null,"bio": string | null,"bookable_online": boolean,"chair_no": number,"id": string,"invite_email": string | null,"invite_expires_at": string | null,"invite_token": string | null,"name": string,"phone": string | null,"photo_path": string | null,"role": Database["public"]['Enums']["role_t"],"salon_id": string,"user_id": string | null
+                    "active": boolean,"activity_seen_at": string | null,"agenda_color": number | null,"bio": string | null,"bookable_online": boolean,"chair_no": number,"id": string,"invite_email": string | null,"invite_expires_at": string | null,"invite_token": string | null,"name": string,"phone": string | null,"photo_path": string | null,"role": Database["public"]['Enums']["role_t"],"salon_id": string,"user_id": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "active"?: boolean,"agenda_color"?: number | null,"bio"?: string | null,"bookable_online"?: boolean,"chair_no": number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name": string,"phone"?: string | null,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id": string,"user_id"?: string | null
+                    "active"?: boolean,"activity_seen_at"?: string | null,"agenda_color"?: number | null,"bio"?: string | null,"bookable_online"?: boolean,"chair_no": number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name": string,"phone"?: string | null,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id": string,"user_id"?: string | null
                   }
                   Update: {
-                    "active"?: boolean,"agenda_color"?: number | null,"bio"?: string | null,"bookable_online"?: boolean,"chair_no"?: number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name"?: string,"phone"?: string | null,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id"?: string,"user_id"?: string | null
+                    "active"?: boolean,"activity_seen_at"?: string | null,"agenda_color"?: number | null,"bio"?: string | null,"bookable_online"?: boolean,"chair_no"?: number,"id"?: string,"invite_email"?: string | null,"invite_expires_at"?: string | null,"invite_token"?: string | null,"name"?: string,"phone"?: string | null,"photo_path"?: string | null,"role"?: Database["public"]['Enums']["role_t"],"salon_id"?: string,"user_id"?: string | null
                   }
                   Relationships: [
                     {
@@ -398,9 +424,12 @@ isOneToOne: false
 { Args: { "p_client": string }; Returns: number
                            },
 "free_slots":
-{ Args: { "p_days": number,"p_exclude"?: string,"p_from": string,"p_member": string,"p_public"?: boolean,"p_salon": string,"p_service": string,"p_step"?: number }; Returns: {
+{ Args: { "p_days": number,"p_duration"?: number,"p_exclude"?: string,"p_from": string,"p_member": string,"p_public"?: boolean,"p_salon": string,"p_service": string,"p_step"?: number }; Returns: {
               "ends_at": string,"member_id": string,"starts_at": string
             }[]
+                           },
+"mark_activity_seen":
+{ Args: { "p_salon": string }; Returns: undefined
                            },
 "pending_invites":
 { Args: { "p_salon": string }; Returns: {

@@ -12,7 +12,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/agenda", "/clienti", "/link", "/salone", "/statistiche", "/listino", "/impostazioni", "/profilo", "/primo-avvio", "/pronto", "/invito/", "/accedi", "/verifica", "/password", "/nuova-password", "/auth/", "/*/prenotazione/"],
+        disallow: ["/api/", "/agenda", "/clienti", "/link", "/salone", "/statistiche", "/notifiche", "/listino", "/impostazioni", "/profilo", "/primo-avvio", "/pronto", "/invito/", "/accedi", "/verifica", "/password", "/nuova-password", "/auth/", "/*/prenotazione/"],
       },
     ],
     sitemap: `${base}/sitemap.xml`,

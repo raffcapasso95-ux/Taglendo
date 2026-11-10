@@ -6,7 +6,7 @@ import type { Database } from "@/lib/supabase/database.types";
 
 /** Aree che richiedono l'accesso. Il controllo vero (salone, ruolo) lo fa il livello dati. */
 const PROTECTED = [
-  "/agenda", "/clienti", "/link", "/salone", "/statistiche", "/listino", "/impostazioni", "/profilo", "/primo-avvio", "/pronto",
+  "/agenda", "/clienti", "/link", "/salone", "/statistiche", "/notifiche", "/listino", "/impostazioni", "/profilo", "/primo-avvio", "/pronto",
   "/nuova-password",
 ];
 /** Pagine per chi non è ancora entrato: se hai già una sessione vai in agenda. */

@@ -25,3 +25,16 @@ describe("prezzo per il cliente", () => {
     expect(quickPrices(3000).map((q) => q.label)).toEqual(["Prezzo pieno", "−10%", "−20%", "Omaggio"]);
   });
 });
+
+describe("durata a scelta per un appuntamento", () => {
+  it("sta tra 5 e 480 minuti, a passi di 5", async () => {
+    const { clampDuration } = await import("./price");
+    expect(clampDuration(42)).toBe(40);
+    expect(clampDuration(0)).toBe(5);
+    expect(clampDuration(999)).toBe(480);
+  });
+  it("le scorciatoie partono dal listino: 30 → 40, 45, 50", async () => {
+    const { quickDurations } = await import("./price");
+    expect(quickDurations(30).map((q) => q.minutes)).toEqual([30, 40, 45, 50]);
+  });
+});
