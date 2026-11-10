@@ -59,8 +59,9 @@ async function Content({ searchParams }: { searchParams: Promise<{ g?: string; o
           showToday={!day.isToday}
         />
         <div className={styles.controls}>
-          <WeekBar week={data.week} selected={day.date} today={data.today} operator={data.selectedOperator} />
-          <OperatorFilter operators={data.operators} selected={data.selectedOperator} date={day.date} today={data.today} />
+          <WeekBar week={data.week} selected={day.date} today={data.today} operator={data.selectedOperator}>
+            <OperatorFilter operators={data.operators} selected={data.selectedOperator} date={day.date} today={data.today} />
+          </WeekBar>
         </div>
         <PendingAppointments date={day.date} />
         <SwipeDays date={day.date} today={data.today} operator={data.selectedOperator}>
