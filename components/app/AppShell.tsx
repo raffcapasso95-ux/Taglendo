@@ -17,6 +17,7 @@ import {
   CheckMarkIcon,
   CloseIcon,
   CopyIcon,
+  HomeIcon,
   StoreIcon,
   LogoutIcon,
   LogoutMenuIcon,
@@ -28,6 +29,9 @@ import {
   UsersIcon,
 } from "./Icons";
 import styles from "./AppShell.module.css";
+
+/** NUOVO: dal gestionale si torna al sito di Taglendo (logo su computer, voce del menu su telefono). */
+const HOME_LABEL = "Sito di Taglendo";
 
 type Item = { href: string; label: string; icon: (size?: number) => ReactNode; ownerOnly?: boolean };
 
@@ -145,9 +149,9 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
   return (
     <div className={styles.shell} data-app-shell>
       <nav className={styles.rail} aria-label="Menu principale">
-        <div className={styles.logo} data-label={salonName}>
-          <Image src="/brand/taglendo-icon.svg" alt="Taglendo" width={36} height={36} className={styles.logoImage} />
-        </div>
+        <Link href="/" className={styles.logo} data-label={HOME_LABEL} aria-label={HOME_LABEL}>
+          <Image src="/brand/taglendo-icon.svg" alt="" width={36} height={36} className={styles.logoImage} />
+        </Link>
         <div className={styles.group}>
           {rail.map((item) => (
             <Link
@@ -255,6 +259,12 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
           })}
         </nav>
         <div className={styles.menuFoot}>
+          <Link href="/" className={styles.menuLink}>
+            <span className={styles.menuLinkIcon} aria-hidden="true">
+              <HomeIcon />
+            </span>
+            <span className={styles.menuLinkText}>{HOME_LABEL}</span>
+          </Link>
           <button type="button" className={styles.menuLink} onClick={copy}>
             <span className={styles.menuLinkIcon} aria-hidden="true">
               <CopyIcon />

@@ -212,4 +212,43 @@ test.describe("Clienti · dati e privacy", () => {
     const rows = await adminSelect<{ status: string; client_id: string | null }>("appointments", "select=status,client_id&service_name=neq.zz&order=created_at.desc&limit=1");
     expect(rows[0]).toMatchObject({ status: "annullato", client_id: null });
   });
+
+  test("«Modifica» nella scheda cambia nome, telefono ed email del cliente", async ({ page }) => {
+    await freshOwner(page, "Barberia Modifica Cliente");
+    await page.goto("/clienti");
+    await page.getByRole("button", { name: "+ Nuovo" }).click();
+    await dialog(page).getByLabel("Nome", { exact: true }).fill("Bruno Prima");
+    await dialog(page).getByRole("button", { name: "Salva cliente" }).click();
+    await page.getByRole("link", { name: /^Bruno Prima/ }).click();
+    await page.getByRole("button", { name: "Modifica" }).click();
+    const d = dialog(page);
+    await expect(d.getByRole("heading", { name: "Modifica cliente", level: 2 })).toBeVisible();
+    await d.getByLabel("Nome e cognome").fill("Bruno Dopo");
+    await d.getByLabel(/^Telefono/).fill("+39 333 444 5555");
+    await d.getByLabel(/^Email/).fill("non-una-email");
+    await d.getByRole("button", { name: "Salva", exact: true }).click();
+    await expect(d.getByText("L’email non sembra giusta.")).toBeVisible();
+    await d.getByLabel(/^Email/).fill("Bruno.Dopo@Example.com");
+    await d.getByRole("button", { name: "Salva", exact: true }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Bruno Dopo" })).toBeVisible();
+    await expect(page.getByText("bruno.dopo@example.com")).toBeVisible();
+    const [c] = await adminSelect<{ phone: string; email: string }>("clients", "select=phone,email&name=eq.Bruno Dopo&order=created_at.desc&limit=1");
+    expect(c).toEqual({ phone: "+39 333 444 5555", email: "bruno.dopo@example.com" });
+  });
+
+  test("il barbiere senza il permesso dei contatti cambia solo il nome", async ({ page }) => {
+    const [salon] = await adminSelect<{ barbers_contacts: boolean; barbers_edit: boolean }>("salons", `select=barbers_contacts,barbers_edit&id=eq.${SALON}`);
+    await adminUpdate("salons", `id=eq.${SALON}`, { barbers_contacts: false, barbers_edit: true });
+    try {
+      await barber(page);
+      const [c] = await adminSelect<{ id: string }>("clients", `select=id&salon_id=eq.${SALON}&order=name&limit=1`);
+      await page.goto(`/clienti/${c!.id}`);
+      await page.getByRole("button", { name: "Modifica" }).click();
+      await expect(dialog(page).getByLabel("Nome e cognome")).toBeVisible();
+      await expect(dialog(page).getByLabel(/^Telefono/)).toHaveCount(0);
+      await expect(dialog(page).getByText("Telefono ed email li cambia chi può vedere i contatti dei clienti.")).toBeVisible();
+    } finally {
+      await adminUpdate("salons", `id=eq.${SALON}`, salon!);
+    }
+  });
 });

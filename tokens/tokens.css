@@ -9,6 +9,8 @@
   --canvas: #FFF7F0;
   --surface: #FFFFFF;
   --surface-muted: #FBF0E9;
+  /* popup, schede, menu e avvisi: bianchi, per staccarsi dal fondo panna della pagina */
+  --surface-overlay: #FFFFFF;
   --text-primary: #3E2532;
   --text-secondary: #725C66;
   --text-inverse: #FFF7F0;
