@@ -265,15 +265,22 @@ test("«Notifiche»: una prenotazione online accende la campanella; aprendo la p
   const { visitor } = await bookOnline(browser, slug, "Paolo Campana");
   await visitor.close();
   await page.goto("/agenda");
-  const bell = page.getByRole("link", { name: /^Notifiche, \d+ nuove$/ }).filter({ visible: true }).first();
+  const bell = page.getByRole("link", { name: /^Notifiche, \d+ nuov[ae]$/ }).filter({ visible: true }).first();
   await expect(bell).toBeVisible();
   await bell.click();
   await expect(page.getByRole("heading", { level: 1, name: "Notifiche" })).toBeVisible();
   await expect(page.getByText("Nuova prenotazione online").first()).toBeVisible();
   await expect(page.getByText(/Paolo Campana · Taglio uomo/).first()).toBeVisible();
-  await expect(page.getByRole("link", { name: /^Notifiche, \d+ nuove$/ }).filter({ visible: true })).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /^Notifiche, \d+ nuov[ae]$/ }).filter({ visible: true })).toHaveCount(0);
   await page.reload();
   await expect(page.getByRole("link", { name: "Notifiche", exact: true }).filter({ visible: true }).first()).toBeVisible();
+
+  // una novità mentre il gestionale è aperto: la campanella si accende senza ricaricare la pagina
+  await page.goto("/agenda");
+  const second = await bookOnline(browser, slug, "Rita Campana");
+  await second.visitor.close();
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect(page.getByRole("link", { name: "Notifiche, 1 nuova" }).filter({ visible: true }).first()).toBeVisible();
 });
 
 test("le chiavi delle notifiche sono coerenti", async ({ request }) => {

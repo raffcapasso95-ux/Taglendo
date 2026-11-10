@@ -724,6 +724,7 @@
 .priceFields {
   gap: var(--space-3);
   grid-template-columns: minmax(0, 1fr);
+  align-items: end; /* l'etichetta del prezzo va a capo: i due campi restano sulla stessa riga */
   display: grid;
 }
 
@@ -1024,4 +1025,80 @@
   font-weight: 700;
   text-align: center;
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Pannello compatto: meno spazio, stesse cose ─────────────────────────────── */
+.tweaks {
+  gap: var(--space-1) var(--space-5);
+  flex-wrap: wrap;
+  align-items: center;
+  display: flex;
+}
+
+.scroll {
+  gap: var(--space-5);
+}
+
+.block {
+  gap: var(--space-2);
+}
+
+.blockTitle {
+  font-size: 18px;
+}
+
+/* «Con chi»: pillole con il tondo piccolo al posto dei tondi grandi */
+.person {
+  width: auto;
+  min-height: var(--tap-min);
+  padding: 4px var(--space-3) 4px 4px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  gap: var(--space-2);
+  flex-direction: row;
+  transition: background var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+}
+
+.personAv,
+.avBig,
+.person .anyAv {
+  width: 32px;
+  height: 32px;
+  font-size: 14px;
+}
+
+.personOn {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.personOn .personAv {
+  box-shadow: none;
+}
+
+.personOn .personAv::after {
+  content: none;
+}
+
+.personName {
+  font-size: 14px;
+}
+
+.person .personSub {
+  display: none;
+}
+
+.footer .sumMain,
+.footer .sumSub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .person {
+    transition: none;
+  }
 }

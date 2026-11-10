@@ -12,12 +12,12 @@ async function seenAt(memberId: string): Promise<string | null> {
   return data?.activity_seen_at ?? null;
 }
 
-/** Quante notifiche non lette (al massimo 99): per la campanella. Le proprie azioni non contano. */
+/** Quante notifiche non lette (al massimo 99): per la campanella. Contano anche le proprie azioni. */
 export async function unreadActivity(): Promise<number> {
   const { id, salon } = await requireSalon();
   const supabase = await createClient();
   const seen = await seenAt(id);
-  let q = supabase.from("activity").select("id", { count: "exact", head: true }).eq("salon_id", salon.id).or(`actor_member_id.is.null,actor_member_id.neq.${id}`);
+  let q = supabase.from("activity").select("id", { count: "exact", head: true }).eq("salon_id", salon.id);
   if (seen) q = q.gt("created_at", seen);
   const { count } = await q;
   return Math.min(count ?? 0, 99);
@@ -33,6 +33,6 @@ export async function loadActivity() {
     supabase.from("members").select("id", { count: "exact", head: true }).eq("salon_id", salon.id).eq("active", true),
   ]);
   const today = romeDate(new Date());
-  const rows = ((data ?? []) as ActivityRow[]).map((r) => ({ ...r, unread: isUnread(r, seen, id) }));
+  const rows = ((data ?? []) as ActivityRow[]).map((r) => ({ ...r, unread: isUnread(r, seen) }));
   return { salonId: salon.id, rows, today, yesterday: addDays(today, -1), multi: (count ?? 0) > 1 };
 }

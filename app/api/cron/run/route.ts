@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { romeDate } from "@/lib/dates/rome";
+import { runHolidaySync } from "@/lib/holidays/sync";
 import { runReminders } from "@/lib/notify/reminders";
 import { vapidStatus } from "@/lib/notify/push";
 import { runSummaries } from "@/lib/notify/staff";
@@ -28,9 +29,11 @@ async function handle(request: Request) {
   // ?job=reminders|summaries lancia un lavoro a mano, a qualunque ora (serve comunque il segreto)
   const forced = new URL(request.url).searchParams.get("job");
   const jobs = forced ? { summaries: forced === "summaries", reminders: forced === "reminders" } : dueJobs(romeHour(now));
-  const result = { date: romeDate(now), summaries: 0, reminders: 0, purged: 0, push: vapidStatus() };
+  const result = { date: romeDate(now), summaries: 0, reminders: 0, purged: 0, holidays: 0, push: vapidStatus() };
   if (jobs.summaries) result.summaries = await runSummaries(now);
   if (jobs.reminders) result.reminders = await runReminders(now);
+  // alle 3 di notte (o a mano con ?job=festivita) si preparano le chiusure delle feste per l'anno che entra
+  if (forced === "festivita" || (!forced && romeHour(now) === 3)) result.holidays = await runHolidaySync(createAdminClient(), now);
   // i saloni eliminati da più di 30 giorni si cancellano (ogni ora è un controllo leggero)
   if (!forced) {
     const { data } = await createAdminClient().rpc("purge_deleted_salons");

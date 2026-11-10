@@ -139,6 +139,7 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
     });
 
   const editable = canEdit && detail !== null && detail.status !== "annullato";
+  const priceEditable = editable && online;
 
   if (missing) {
     return (
@@ -150,7 +151,7 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
 
   if (!detail) {
     return (
-      <ResponsiveDialog open onClose={onClose} title="Appuntamento">
+      <ResponsiveDialog open onClose={onClose} sheetClassName={styles.sheetAuto} title="Appuntamento">
         <p className={styles.hint} aria-busy={loading}>…</p>
       </ResponsiveDialog>
     );
@@ -173,6 +174,7 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
       <ResponsiveDialog
         open
         onClose={onClose}
+        sheetClassName={styles.sheetAuto}
         title={agendaCopy.detail.cancel}
         footer={
           <>
@@ -209,6 +211,7 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
     <ResponsiveDialog
       open
       onClose={onClose}
+      sheetClassName={styles.sheetAuto}
       title={detail.clientName}
       footer={
         editable ? (
@@ -230,23 +233,27 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
       <div className={styles.form}>
         {alert}
         <div className={styles.head}>
-          <span className={styles.badge} data-status={detail.status}>
-            {copy.statuses[detail.status]}
-          </span>
-          <div className={styles.when}>
-            <span className={styles.whenTime}>{clock(detail.startMin)}</span>
-            <span className={styles.whenSub}>
-              –{clock(detail.endMin)} · {detail.date === today ? "oggi" : longDay(detail.date)}
+          <div className={styles.whenRow}>
+            <div className={styles.when}>
+              <span className={styles.whenTime}>{clock(detail.startMin)}</span>
+              <span className={styles.whenSub}>
+                –{clock(detail.endMin)} · {detail.date === today ? "oggi" : longDay(detail.date)}
+              </span>
+            </div>
+            <span className={styles.badge} data-status={detail.status}>
+              {copy.statuses[detail.status]}
             </span>
           </div>
-          <p className={styles.sub}>
-            {detail.serviceName} · {formatPrice(detail.priceCents)}
-            {multipleOperators ? ` · con ${detail.memberName}` : ""}
-            {detail.source === "online" ? ` · ${copy.online}` : ""}
-          </p>
-          {editable && online ? (
-            <div className={flow.priceBox}>
-              <div className={cx(flow.price, detail.priceCents !== detail.listPriceCents && flow.priceChanged)}>
+          {/* servizio e prezzo sulla stessa riga: il prezzo si cambia con la matita accanto */}
+          <div className={styles.subRow}>
+            <p className={styles.sub}>
+              {detail.serviceName}
+              {priceEditable ? "" : ` · ${formatPrice(detail.priceCents)}`}
+              {multipleOperators ? ` · con ${detail.memberName}` : ""}
+              {detail.source === "online" ? ` · ${copy.online}` : ""}
+            </p>
+            {priceEditable ? (
+              <div className={cx(flow.price, styles.subPrice, detail.priceCents !== detail.listPriceCents && flow.priceChanged)}>
                 <span className={flow.priceLabel}>{agendaCopy.flow.price}</span>
                 <span className={flow.priceValue}>
                   <span className={flow.priceOld} hidden={detail.priceCents === detail.listPriceCents}>
@@ -261,30 +268,32 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
                   </svg>
                 </button>
               </div>
-              <div className={flow.priceEditor} id="det-prezzo" hidden={!priceOpen}>
-                <div className={flow.quicks} role="group" aria-label={agendaCopy.flow.quick}>
-                  {quickPrices(detail.listPriceCents).map((q) => (
-                    <button
-                      key={q.key}
-                      type="button"
-                      className={cx(flow.quick, detail.priceCents === q.cents && flow.quickOn)}
-                      aria-pressed={detail.priceCents === q.cents}
-                      disabled={working}
-                      onClick={() => {
-                        setPriceText(eurosText(q.cents));
-                        savePrice(q.cents, priceNote);
-                      }}
-                    >
-                      {q.label}
-                    </button>
-                  ))}
-                </div>
-                <div className={flow.priceFields}>
-                  <Field size="large" label={agendaCopy.flow.priceField} inputMode="decimal" value={priceText} onChange={(e) => setPriceText(e.target.value)} onBlur={() => savePrice(parseEuros(priceText), priceNote)} />
-                  <Field size="large" label={agendaCopy.flow.noteField} maxLength={60} value={priceNote} placeholder={agendaCopy.flow.notePlaceholder} onChange={(e) => setPriceNote(e.target.value)} onBlur={() => savePrice(parseEuros(priceText), priceNote)} />
-                </div>
-                <p className={styles.hint}>{agendaCopy.flow.priceHint}</p>
+            ) : null}
+          </div>
+          {priceEditable ? (
+            <div className={flow.priceEditor} id="det-prezzo" hidden={!priceOpen}>
+              <div className={flow.quicks} role="group" aria-label={agendaCopy.flow.quick}>
+                {quickPrices(detail.listPriceCents).map((q) => (
+                  <button
+                    key={q.key}
+                    type="button"
+                    className={cx(flow.quick, detail.priceCents === q.cents && flow.quickOn)}
+                    aria-pressed={detail.priceCents === q.cents}
+                    disabled={working}
+                    onClick={() => {
+                      setPriceText(eurosText(q.cents));
+                      savePrice(q.cents, priceNote);
+                    }}
+                  >
+                    {q.label}
+                  </button>
+                ))}
               </div>
+              <div className={flow.priceFields}>
+                <Field size="large" label={agendaCopy.flow.priceField} inputMode="decimal" value={priceText} onChange={(e) => setPriceText(e.target.value)} onBlur={() => savePrice(parseEuros(priceText), priceNote)} />
+                <Field size="large" label={agendaCopy.flow.noteField} maxLength={60} value={priceNote} placeholder={agendaCopy.flow.notePlaceholder} onChange={(e) => setPriceNote(e.target.value)} onBlur={() => savePrice(parseEuros(priceText), priceNote)} />
+              </div>
+              <p className={styles.hint}>{agendaCopy.flow.priceHint}</p>
             </div>
           ) : null}
         </div>

@@ -63,5 +63,4 @@ export function dayGroup(iso: string, today: string, yesterday: string): string 
 }
 
 /** Non letta: arrivata dopo l'ultima lettura e non fatta da chi guarda. */
-export const isUnread = (r: Pick<ActivityRow, "created_at" | "actor_member_id">, seenAt: string | null, me: string) =>
-  r.actor_member_id !== me && (!seenAt || r.created_at > seenAt);
+export const isUnread = (r: Pick<ActivityRow, "created_at">, seenAt: string | null) => !seenAt || r.created_at > seenAt;

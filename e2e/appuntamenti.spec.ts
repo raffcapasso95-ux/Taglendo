@@ -177,7 +177,8 @@ test.describe("Sposta appuntamento", () => {
     await expect(flow.getByText(/^Ora: .*10:00/)).toBeVisible();
     // un solo barbiere: niente blocco «Con chi»
     await expect(flow.getByRole("heading", { name: "Con chi" })).toHaveCount(0);
-    // finché non si sceglie un orario «Sposta» resta spento
+    // l'orario di adesso è già segnato; finché non se ne sceglie un altro «Sposta» resta spento
+    await expect(flow.getByRole("button", { name: "10:00", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(flow.getByRole("button", { name: "Sposta", exact: true })).toBeDisabled();
     await pickTime(page, "11:00");
     await expect(flow.getByRole("button", { name: "Sposta", exact: true })).toBeEnabled();

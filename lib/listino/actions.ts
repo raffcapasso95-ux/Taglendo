@@ -9,6 +9,8 @@ import { saveWeek } from "@/lib/hours/week";
 import { validateRanges, type Range, type WeekDay } from "@/lib/rules/hours";
 import { canSaveWeek, outsideHours } from "@/lib/rules/listino";
 import { createClient } from "@/lib/supabase/server";
+import { syncHolidayClosures } from "@/lib/holidays/sync";
+import { isHolidayKey, isPatronDay, upcomingHolidays } from "@/lib/rules/holidays";
 
 const { errors } = listinoCopy;
 
@@ -170,6 +172,53 @@ export async function deleteClosure(id: string): Promise<{ ok: true } | Failure>
   if (!ctx) return fail(errors.notOwner);
   const { error } = await ctx.supabase.from("closures").delete().eq("id", id).eq("salon_id", ctx.salon.id);
   if (error) return fail(errors.generic);
+  revalidatePath("/listino/chiusure");
+  revalidatePath("/agenda");
+  return { ok: true };
+}
+
+/* ───────────── Festività ───────────── */
+
+/** Accende o spegne «Chiuso» per una festa: vale ogni anno. Se si chiude, gli appuntamenti già presenti in quel giorno. */
+export async function setHolidayClosed(key: string, closed: boolean): Promise<{ ok: true; impacted: Impacted[] } | Failure> {
+  const ctx = await owner();
+  if (!ctx) return fail(errors.notOwner);
+  if (!isHolidayKey(key)) return fail(errors.generic);
+  const { supabase, salon } = ctx;
+  const { data: current } = await supabase.from("salons").select("closed_holidays, patron_day, patron_name").eq("id", salon.id).maybeSingle();
+  if (!current) return fail(errors.generic);
+  const set = new Set(current.closed_holidays ?? []);
+  if (closed) set.add(key);
+  else set.delete(key);
+  const { error } = await supabase.from("salons").update({ closed_holidays: [...set] }).eq("id", salon.id);
+  if (error) return fail(errors.generic);
+  await syncHolidayClosures(supabase, salon.id);
+  revalidatePath("/listino/chiusure");
+  revalidatePath("/agenda");
+  if (!closed) return { ok: true, impacted: [] };
+  const patron = current.patron_day ? { day: current.patron_day, name: current.patron_name } : null;
+  const next = upcomingHolidays(romeDate(new Date()), patron).find((h) => h.key === key);
+  return { ok: true, impacted: next ? await closureImpact({ startsOn: next.date, endsOn: next.date, memberId: null }) : [] };
+}
+
+/** Il santo patrono della città: giorno («MM-GG») e nome. Con `day` null si toglie (e le sue chiusure con lui). */
+export async function savePatron(input: { day: string | null; name: string }): Promise<{ ok: true } | Failure> {
+  const ctx = await owner();
+  if (!ctx) return fail(errors.notOwner);
+  if (input.day !== null && !isPatronDay(input.day)) return fail(errors.dates);
+  const name = input.name.trim().slice(0, 60) || null;
+  const { supabase, salon } = ctx;
+  const { data: current } = await supabase.from("salons").select("closed_holidays").eq("id", salon.id).maybeSingle();
+  const set = new Set(current?.closed_holidays ?? []);
+  // un patrono nuovo parte già «chiuso» (si aggiunge per questo); tolto il patrono, sparisce anche la scelta
+  if (input.day) set.add("patrono");
+  else set.delete("patrono");
+  const { error } = await supabase
+    .from("salons")
+    .update({ patron_day: input.day, patron_name: input.day ? name : null, closed_holidays: [...set] })
+    .eq("id", salon.id);
+  if (error) return fail(errors.generic);
+  await syncHolidayClosures(supabase, salon.id);
   revalidatePath("/listino/chiusure");
   revalidatePath("/agenda");
   return { ok: true };

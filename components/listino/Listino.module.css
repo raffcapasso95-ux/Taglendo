@@ -683,3 +683,16 @@
     padding-top: var(--space-4);
   }
 }
+
+/* NUOVO: festività, una riga con interruttore per festa */
+.holidayRow {
+  cursor: pointer;
+}
+
+.holidayRow + .holidayRow {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.patronSelect {
+  width: 100%;
+}

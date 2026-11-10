@@ -350,31 +350,54 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
           </div>
           {service ? (
             <>
-              <div className={cx(styles.price, changed && styles.priceChanged)}>
-                <span className={styles.priceLabel}>{flow.price}</span>
-                <span className={styles.priceValue}>
-                  <span className={styles.priceOld} hidden={!changed}>
-                    {formatPrice(listCents)}
+              {/* prezzo e durata sulla stessa riga; si apre un solo riquadro alla volta */}
+              <div className={styles.tweaks}>
+                <div className={cx(styles.price, changed && styles.priceChanged)}>
+                  <span className={styles.priceLabel}>{flow.price}</span>
+                  <span className={styles.priceValue}>
+                    <span className={styles.priceOld} hidden={!changed}>
+                      {formatPrice(listCents)}
+                    </span>
+                    <strong>{formatPrice(finalCents)}</strong>
                   </span>
-                  <strong>{formatPrice(finalCents)}</strong>
-                </span>
-                <button
-                  type="button"
-                  className={styles.priceEdit}
-                  aria-label={flow.changePrice}
-                  title={flow.changePrice}
-                  aria-expanded={priceOpen}
-                  aria-controls="fl-prezzo"
-                  onClick={() => {
-                    if (!priceOpen && priceText === "") setPriceText(eurosText(finalCents));
-                    setPriceOpen(!priceOpen);
-                  }}
-                >
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M4 20h4L19 9l-4-4L4 16z" />
-                    <path d="m13.5 6.5 4 4" />
-                  </svg>
-                </button>
+                  <button
+                    type="button"
+                    className={styles.priceEdit}
+                    aria-label={flow.changePrice}
+                    title={flow.changePrice}
+                    aria-expanded={priceOpen}
+                    aria-controls="fl-prezzo"
+                    onClick={() => {
+                      if (!priceOpen && priceText === "") setPriceText(eurosText(finalCents));
+                      setPriceOpen(!priceOpen);
+                      setDurOpen(false);
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M4 20h4L19 9l-4-4L4 16z" />
+                      <path d="m13.5 6.5 4 4" />
+                    </svg>
+                  </button>
+                </div>
+                {/* NUOVO: la durata, come il prezzo: si cambia solo per questo appuntamento */}
+                <div className={cx(styles.price, durationMin !== null && durationMin !== service.durationMin && styles.priceChanged)}>
+                  <span className={styles.priceLabel}>{flow.duration}</span>
+                  <span className={styles.priceValue}>
+                    <span className={styles.priceOld} hidden={durationMin === null || durationMin === service.durationMin}>
+                      {service.durationMin} min
+                    </span>
+                    <strong>{durationMin ?? service.durationMin} min</strong>
+                  </span>
+                  <button type="button" className={styles.priceEdit} aria-label={flow.changeDuration} title={flow.changeDuration} aria-expanded={durOpen} aria-controls="fl-durata" onClick={() => {
+                      setDurOpen(!durOpen);
+                      setPriceOpen(false);
+                    }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M4 20h4L19 9l-4-4L4 16z" />
+                      <path d="m13.5 6.5 4 4" />
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div className={styles.priceEditor} id="fl-prezzo" hidden={!priceOpen}>
                 <div className={styles.quicks} role="group" aria-label={flow.quick}>
@@ -389,22 +412,6 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
                   <Field size="large" label={flow.noteField} maxLength={60} value={priceNote} placeholder={flow.notePlaceholder} onChange={(e) => setPriceNote(e.target.value)} />
                 </div>
                 <p className={cx(dialogs.hint)}>{flow.priceHint}</p>
-              </div>
-              {/* NUOVO: la durata, come il prezzo: si cambia solo per questo appuntamento */}
-              <div className={cx(styles.price, durationMin !== null && durationMin !== service.durationMin && styles.priceChanged)}>
-                <span className={styles.priceLabel}>{flow.duration}</span>
-                <span className={styles.priceValue}>
-                  <span className={styles.priceOld} hidden={durationMin === null || durationMin === service.durationMin}>
-                    {service.durationMin} min
-                  </span>
-                  <strong>{durationMin ?? service.durationMin} min</strong>
-                </span>
-                <button type="button" className={styles.priceEdit} aria-label={flow.changeDuration} title={flow.changeDuration} aria-expanded={durOpen} aria-controls="fl-durata" onClick={() => setDurOpen(!durOpen)}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M4 20h4L19 9l-4-4L4 16z" />
-                    <path d="m13.5 6.5 4 4" />
-                  </svg>
-                </button>
               </div>
               <div className={styles.priceEditor} id="fl-durata" hidden={!durOpen}>
                 <div className={styles.quicks} role="group" aria-label={flow.durationQuick}>

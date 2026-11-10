@@ -6,6 +6,7 @@
   - pausa 13:00–14:30;
   - chiuso domenica e lunedì.
 - **Orari proposti:** ogni `slot_step_min` (15 o 30 minuti). Un orario è libero se il servizio intero entra prima della chiusura, non tocca pause o chiusure e non si sovrappone a un appuntamento confermato dello stesso operatore.
+- **Festività** (Ferie e chiusure): il titolare accende le feste nazionali in cui il salone è chiuso (Pasqua e Pasquetta comprese, San Francesco dal 2026) e può aggiungere il santo patrono. La scelta vale ogni anno: le chiusure di tutto il salone si creano da sole, da oggi alla fine dell'anno prossimo, al momento della scelta e ogni notte. Spenta una festa, le sue chiusure future spariscono; le passate restano.
 - **Preavviso minimo:** `min_notice_min`. **Anticipo massimo:** `max_advance_days`.
 - **“Nessuna preferenza” sul barbiere:** si assegna il primo operatore libero, nell'ordine delle poltrone.
 - **Orario conteso:** se due clienti confermano lo stesso slot, vince il primo. Il secondo vede l'avviso con 3 orari alternativi vicini (stato “Slot conteso” nel prototipo).
