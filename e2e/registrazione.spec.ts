@@ -42,6 +42,17 @@ test.describe("Registrazione e primo avvio", () => {
     expect(members).toEqual([{ name: "Giulia Neri", role: "owner" }]);
     const services = await adminSelect("services", `select=name&salon_id=eq.${salon!.id}`);
     expect(services).toHaveLength(5); // "Taglio lungo" era spento
+
+    // al primo ingresso in agenda c'è la guida; saltata, non torna più
+    await page.goto("/agenda");
+    const tour = page.getByRole("dialog", { name: "Guida all’agenda" });
+    await expect(tour.getByRole("heading", { name: "Benvenuto in Taglendo, Giulia!" })).toBeVisible();
+    await tour.getByRole("button", { name: "Salta la guida" }).click();
+    await expect(tour).toHaveCount(0);
+    await page.waitForTimeout(500);
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1 }).filter({ visible: true }).first()).toBeVisible();
+    await expect(page.getByRole("dialog", { name: "Guida all’agenda" })).toHaveCount(0);
   });
 
   test("non si salta un passo del primo avvio", async ({ page }) => {

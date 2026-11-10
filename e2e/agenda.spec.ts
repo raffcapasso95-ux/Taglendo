@@ -135,4 +135,23 @@ test.describe("Agenda (sola lettura)", () => {
     await expect(page).toHaveURL(/\/agenda$/);
     await expect(days.getByRole("link", { name: /, oggi$/ })).toHaveAttribute("aria-current", "date");
   });
+
+  test("la guida si rivede da Impostazioni: un passo alla volta fino a «Tutto pronto!»", async ({ page }) => {
+    await signIn(page, ANDREA, DEMO_PASSWORD);
+    await page.goto("/agenda");
+    await expect(page.getByRole("dialog", { name: "Guida all’agenda" })).toHaveCount(0); // gli account demo l'hanno già vista
+    await page.goto("/impostazioni");
+    await page.getByRole("main").getByRole("link", { name: /Rivedi la guida all’agenda/ }).click();
+    const tour = page.getByRole("dialog", { name: "Guida all’agenda" });
+    await tour.getByRole("button", { name: "Inizia la guida" }).click();
+    await expect(tour.getByText(/^1 di \d+$/)).toBeVisible();
+    await expect(tour.getByRole("heading", { name: "Fissa un appuntamento" })).toBeVisible();
+    for (let i = 0; i < 12 && (await tour.getByRole("button", { name: "Avanti" }).count()); i++) {
+      await tour.getByRole("button", { name: "Avanti" }).click();
+    }
+    await expect(tour.getByRole("heading", { name: "Tutto pronto!" })).toBeVisible();
+    await tour.getByRole("button", { name: "Inizia a lavorare" }).click();
+    await expect(tour).toHaveCount(0);
+    await expect(page).toHaveURL(/\/agenda$/);
+  });
 });

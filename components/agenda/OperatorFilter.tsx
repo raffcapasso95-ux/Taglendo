@@ -18,7 +18,7 @@ const hrefFor = (date: string, today: string, operator: string | null) => {
 export function OperatorFilter({ operators, selected, date, today }: Props) {
   if (operators.length < 2) return null;
   return (
-    <nav className={styles.filter} aria-label="Barbieri">
+    <nav className={styles.filter} aria-label="Barbieri" data-tour="barbers">
       <Link href={hrefFor(date, today, null)} className={cx(styles.filterItem, selected === null && styles.filterOn)} aria-current={selected === null ? "true" : undefined} scroll={false}>
         Tutti
       </Link>

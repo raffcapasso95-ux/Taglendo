@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Button, ButtonLink } from "@/components/ui";
 import { cx } from "@/components/ui/cx";
 import {
   clock,
@@ -21,14 +22,37 @@ import styles from "./Day.module.css";
 type Props = { day: DayModel; weekdayName: string; multiple: boolean };
 
 /** Giorno chiuso o senza appuntamenti: lo dice e suggerisce cosa fare. */
+/** Giornata senza appuntamenti: riempie lo spazio dell'agenda e propone cosa fare (fissare, condividere il link). */
 function Empty({ day, weekdayName }: { day: DayModel; weekdayName: string }) {
+  const { canEdit, openNew } = useAgenda();
   const closed = day.closed;
   return (
     <div className={styles.empty}>
+      <span className={styles.emptyIcon} aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3.5" y="5" width="17" height="15" rx="3" />
+          <path d="M8 3v4M16 3v4M3.5 10h17" />
+          {closed ? <path d="M9.5 13.5l5 4M14.5 13.5l-5 4" /> : <path d="M12 13v4M10 15h4" />}
+        </svg>
+      </span>
       <h2 className={styles.emptyTitle}>{closed ? `${weekdayName}: salone chiuso` : day.isToday ? "Nessun appuntamento oggi" : "Nessun appuntamento"}</h2>
       <p className={styles.emptyText}>
         {closed ? "Puoi cambiare giorni di apertura e chiusure da Listino e orari." : "Fissa il primo cliente o condividi il link per ricevere prenotazioni."}
       </p>
+      {closed ? (
+        <div className={styles.emptyActions}>
+          <ButtonLink href="/listino/orari" variant="secondary">
+            Apri gli orari
+          </ButtonLink>
+        </div>
+      ) : (
+        <div className={styles.emptyActions}>
+          {canEdit ? <Button onClick={() => openNew({ date: day.date })}>+ Fissa un appuntamento</Button> : null}
+          <ButtonLink href="/salone" variant="secondary">
+            Condividi il link
+          </ButtonLink>
+        </div>
+      )}
     </div>
   );
 }
@@ -46,14 +70,14 @@ export function DayView({ day, weekdayName, multiple }: Props) {
           {weekdayName}: salone chiuso · {plural(toMove, "appuntamento da spostare", "appuntamenti da spostare")}
         </p>
       ) : null}
-      <div className={styles.desktopOnly}>
+      <div className={styles.desktopOnly} data-tour="day">
         {empty ? (
           <Empty day={day} weekdayName={weekdayName} />
         ) : (
           <DeskGrid day={day} showPast={showPast} setShowPast={setShowPast} showCancelled={showCancelled} setShowCancelled={setShowCancelled} />
         )}
       </div>
-      <div className={styles.phoneOnly}>
+      <div className={styles.phoneOnly} data-tour="day">
         {empty ? (
           <Empty day={day} weekdayName={weekdayName} />
         ) : (

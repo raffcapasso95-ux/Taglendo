@@ -137,9 +137,45 @@ export function fitGridScale(
   if (available === null) return make(GRID_PX_STEPS[0]);
   for (const px of GRID_PX_STEPS) {
     const sc = make(px);
-    if (sc.height <= available) return sc;
+    if (sc.height <= available) return fillScale(sc, available, px);
   }
   return make(GRID_PX_STEPS[GRID_PX_STEPS.length - 1]!);
+}
+
+/** Quanto può crescere al massimo la griglia per riempire lo spazio: oltre, gli appuntamenti diventerebbero enormi. */
+const MAX_FILL = 2;
+
+/**
+ * NUOVO: con pochi appuntamenti la griglia compressa resta bassa e sotto avanza spazio vuoto.
+ * Prima i tratti compressi (liberi e pause) tornano verso la loro altezza naturale, in proporzione alla durata;
+ * se avanza ancora spazio, tutta la griglia si allunga, fino al doppio.
+ */
+export function fillScale(sc: GridScale, available: number, px: number): GridScale {
+  const extra = available - sc.height;
+  if (extra <= 1 || sc.bands.length === 0) return sc;
+  const room = sc.bands.map((b) => (b.compressed ? Math.max(0, (b.to - b.from) * px - b.height) : 0));
+  const totalRoom = room.reduce((s, r) => s + r, 0);
+  const grow = Math.min(extra, totalRoom);
+  let bands = sc.bands.map((b, i) => ({ ...b, height: b.height + (totalRoom > 0 ? (room[i]! / totalRoom) * grow : 0) }));
+  const used = bands.reduce((s, b) => s + b.height, 0);
+  if (used < available) {
+    const k = Math.min(available / used, MAX_FILL);
+    bands = bands.map((b) => ({ ...b, height: b.height * k }));
+  }
+  let top = 0;
+  bands = bands.map((b) => {
+    const out = { ...b, top };
+    top += b.height;
+    return out;
+  });
+  const y = (min: number) => {
+    const first = bands[0]!;
+    const last = bands[bands.length - 1]!;
+    const m = Math.min(Math.max(min, first.from), last.to);
+    const band = bands.find((x) => m <= x.to) ?? last;
+    return band.top + ((m - band.from) / (band.to - band.from)) * band.height;
+  };
+  return { y, height: top, bands };
 }
 
 const fmt = (m: number) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;

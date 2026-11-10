@@ -53,7 +53,8 @@ export async function createVerifiedUser(email: string, name = "Andrea Conti") {
   const res = await fetch(`${url}/auth/v1/admin/users`, {
     method: "POST",
     headers: { apikey: key, Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password: PASSWORD, email_confirm: true, user_metadata: { name } }),
+    // la guida al primo accesso la prova un test apposito: agli altri utenti di prova non si mostra
+    body: JSON.stringify({ email, password: PASSWORD, email_confirm: true, user_metadata: { name, tour_seen: true } }),
   });
   if (!res.ok) throw new Error(`Utente non creato: ${await res.text()}`);
 }

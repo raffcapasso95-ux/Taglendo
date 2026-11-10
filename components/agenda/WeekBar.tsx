@@ -21,7 +21,7 @@ const Arrow = ({ dir }: { dir: "prev" | "next" }) => (
  */
 export function WeekBar({ week, selected, today, operator, children }: Props) {
   return (
-    <div className={styles.week}>
+    <div className={styles.week} data-tour="week">
       <p className={styles.weekMonth}>{week.label}</p>
       <nav className={styles.weekNav} aria-label="Settimane">
         <Link href={agendaHref(week.prev, today, operator)} className={styles.weekArrow} aria-label="Settimana prima" scroll={false}>
