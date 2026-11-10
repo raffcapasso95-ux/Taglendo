@@ -72,6 +72,26 @@ type ViewProps = {
   setShowCancelled: (v: boolean) => void;
 };
 
+/** NUOVO: etichetta ben visibile per gli appuntamenti chiusi (completato, non presentato, annullato). */
+const STATE: Partial<Record<AgendaAppt["status"], { label: string; icon: string }>> = {
+  completato: { label: "Completato", icon: "M5 12.5l4.5 4.5L19 7.5" },
+  non_presentato: { label: "Non presentato", icon: "M12 7v6M12 17h.01" },
+  annullato: { label: "Annullato", icon: "M7 7l10 10M17 7 7 17" },
+};
+
+function StateTag({ status }: { status: AgendaAppt["status"] }) {
+  const s = STATE[status];
+  if (!s) return null;
+  return (
+    <span className={cx(styles.stateTag, styles[`state_${status}` as "state_completato"])}>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d={s.icon} />
+      </svg>
+      {s.label}
+    </span>
+  );
+}
+
 const blockClass = (a: AgendaAppt, current: boolean) =>
   a.status === "annullato" ? styles.blockCanceled : a.status === "completato" ? styles.blockDone : a.status === "non_presentato" ? styles.blockNoShow : current ? styles.blockNow : styles.block;
 
@@ -220,14 +240,15 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                     <button
                       key={a.id}
                       type="button"
-                      className={cx(blockClass(a, current), a.status === "annullato" && styles.struck)}
+                      className={blockClass(a, current)}
                       style={{ top, height: h }}
                       title={`${clock(a.startMin)}–${clock(a.endMin)} · ${a.clientName} · ${a.serviceName}`}
                       onClick={() => openAppointment(a.id)}
                     >
                       <span className={styles.blockLine}>
                         <span className={styles.blockTime}>{clock(a.startMin)}</span>
-                        <span className={styles.blockName}>{a.clientName}</span>
+                        <span className={cx(styles.blockName, a.status === "annullato" && styles.struck)}>{a.clientName}</span>
+                        <StateTag status={a.status} />
                       </span>
                       {h >= 44 ? <span className={styles.blockSvc}>{a.serviceName}</span> : null}
                     </button>
@@ -347,7 +368,7 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
           const { appt: a, column } = item;
           const current = isToday && a.status === "confermato" && a.startMin <= nowMin && nowMin < a.endMin;
           return (
-            <li key={`${a.id}-${i}`} className={cx(styles.apptRow, current && styles.apptRowNow, a.status === "annullato" && styles.apptRowCanceled)}>
+            <li key={`${a.id}-${i}`} className={cx(styles.apptRow, current && styles.apptRowNow, a.status === "annullato" && styles.apptRowCanceled, a.status === "completato" && styles.apptRowDone, a.status === "non_presentato" && styles.apptRowNoShow)}>
               <button type="button" className={styles.rowButton} onClick={() => openAppointment(a.id)}>
               <span className={styles.rowTime}>
                 {clock(a.startMin)}
@@ -355,11 +376,11 @@ function PhoneList({ day, multiple, showPast, setShowPast, showCancelled, setSho
               </span>
               <span className={styles.apptMain}>
                 <span className={cx(styles.apptName, a.status === "annullato" && styles.struck)}>{a.clientName}</span>
-                <span className={styles.apptMeta}>
-                  {current
-                    ? `In poltrona · mancano ${span(a.endMin - nowMin)}`
-                    : `${a.serviceName} · ${a.endMin - a.startMin} min · ${formatPrice(a.priceCents)}`}
-                  {a.status === "completato" ? " · Completato" : a.status === "non_presentato" ? " · Non presentato" : a.status === "annullato" ? " · Annullato" : ""}
+                <span className={cx(styles.apptMeta, STATE[a.status] && styles.apptMetaTagged)}>
+                  <StateTag status={a.status} />
+                  <span className={styles.apptMetaText}>
+                    {current ? `In poltrona · mancano ${span(a.endMin - nowMin)}` : `${a.serviceName} · ${a.endMin - a.startMin} min · ${formatPrice(a.priceCents)}`}
+                  </span>
                 </span>
               </span>
               {multiple ? (

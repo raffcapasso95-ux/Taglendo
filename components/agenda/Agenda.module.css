@@ -600,7 +600,8 @@
   }
 }
 
-/* --- NUOVO: settimana con frecce (mese, ‹ Oggi ›, calendario) e barbieri su una riga propria --- */
+/* --- NUOVO: settimana compatta. Computer: una riga (mese, ‹ Oggi ›, sette giorni, calendario, barbieri;
+   se lo spazio non basta i barbieri vanno a capo). Telefono: giorni sopra, frecce/calendario e barbieri sotto. --- */
 .controls {
   flex-direction: column;
   align-items: stretch;
@@ -608,22 +609,18 @@
 
 .week {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
   gap: var(--space-2);
   min-width: 0;
 }
 
-.weekTop {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
 .weekMonth {
+  display: none;
   margin: 0;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .weekNav {
@@ -648,7 +645,8 @@
 }
 
 .weekToday {
-  padding: 0 var(--space-4);
+  display: none;
+  padding: 0 var(--space-3);
   font-size: 14px;
   font-weight: 700;
 }
@@ -657,7 +655,12 @@
   border-color: var(--brand-plum);
 }
 
-.weekNav .calButton {
+/* sul telefono «Oggi» compare solo quando si guarda un altro giorno */
+.weekTodayAway {
+  display: inline-flex;
+}
+
+.week .calButton {
   min-width: var(--tap-min);
   min-height: var(--tap-min);
   padding: 0 var(--space-3);
@@ -667,11 +670,14 @@
   border-radius: var(--radius-pill);
 }
 
-.weekNav .calButtonText {
+.week .calButtonText {
+  display: none;
   font-size: 14px;
 }
 
 .weekDays {
+  order: -1;
+  flex: 1 1 100%;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: var(--space-1);
@@ -682,14 +688,27 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: var(--day-chip-height);
-  padding: var(--space-1) 0;
+  min-height: var(--control-height);
+  padding: 2px 0;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-card);
   background: var(--surface);
   color: var(--text-primary);
   text-decoration: none;
+  line-height: 1.1;
   transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.weekDay .dayDow {
+  font-size: 10px;
+}
+
+.weekDay .dayNum {
+  font-size: 15px;
+}
+
+.weekDay .daySub {
+  height: 6px;
 }
 
 .weekDayToday {
@@ -717,35 +736,37 @@
   }
 }
 
-/* barbieri: pillole con il tondo colorato, anche su computer */
-.controls .filter {
-  flex: none;
+/* barbieri: pillole con il tondo colorato; sul telefono scorrono di lato accanto a frecce e calendario */
+.week .filter {
+  flex: 1 1 0;
+  min-width: 0;
   gap: var(--space-2);
-  padding: 2px var(--space-4);
+  margin: 0;
+  padding: 2px 0;
   border-radius: 0;
   background: transparent;
 }
 
-.controls .filterItem {
+.week .filterItem {
   min-height: var(--tap-min);
-  padding: 0 var(--space-4) 0 6px;
+  padding: 0 var(--space-3) 0 6px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-pill);
   background: var(--surface);
-  font-size: 15px;
+  font-size: 14px;
 }
 
-.controls .filterItem:first-child {
-  padding-left: var(--space-4);
+.week .filterItem:first-child {
+  padding-left: var(--space-3);
 }
 
-.controls .filterOn {
+.week .filterOn {
   border-color: var(--brand-plum);
   background: var(--brand-plum);
   color: var(--brand-cream);
 }
 
-.controls .filterAvatar {
+.week .filterAvatar {
   display: flex;
 }
 
@@ -753,25 +774,36 @@
   .controls {
     flex-direction: column;
     align-items: stretch;
-    gap: var(--space-2);
   }
 
-  .controls .filter {
-    padding: 2px 0;
-  }
-
-  .weekDays {
-    gap: var(--space-2);
-  }
-}
-
-@media (max-width: 400px) {
-  .weekNav .calButtonText {
-    display: none;
+  .week {
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
   }
 
   .weekToday {
-    padding: 0 var(--space-3);
+    display: inline-flex;
+  }
+
+  .weekDays {
+    order: 0;
+    flex: 1 1 340px;
+    max-width: 560px;
+  }
+
+  .week .calButtonText {
+    display: inline;
+  }
+
+  .week .filter {
+    flex: 0 1 auto;
+  }
+}
+
+/* computer stretto: il calendario resta un'icona, così giorni e frecce stanno su una riga */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .week .calButtonText {
+    display: none;
   }
 }
 

@@ -785,3 +785,102 @@
     transition: none;
   }
 }
+
+/* --- NUOVO: appuntamenti chiusi ben riconoscibili (colore pieno, barra a sinistra, etichetta con icona) --- */
+.stateTag {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.state_completato {
+  background: var(--status-success);
+  color: var(--surface);
+}
+
+.state_non_presentato {
+  background: var(--status-warning);
+  color: var(--surface);
+}
+
+.state_annullato {
+  background: var(--status-error);
+  color: var(--surface);
+}
+
+/* sul telefono l'etichetta apre la seconda riga, così il nome resta intero */
+.apptMetaTagged {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.apptMetaTagged .stateTag {
+  margin-left: 0;
+}
+
+.apptRowDone {
+  background: var(--status-success-bg);
+  box-shadow: inset 4px 0 0 var(--status-success);
+}
+
+.apptRowNoShow {
+  background: var(--badge-noshow-bg);
+  box-shadow: inset 4px 0 0 var(--status-warning);
+}
+
+.apptRowCanceled {
+  opacity: 1;
+  background: var(--status-error-bg);
+  box-shadow: inset 4px 0 0 var(--status-error);
+}
+
+.apptRowCanceled .apptName,
+.apptRowCanceled .apptMeta {
+  color: var(--status-error);
+}
+
+@media (min-width: 1024px) {
+  .blockDone {
+    border-color: var(--status-success-border);
+    background: var(--status-success-bg);
+    color: var(--status-success-text);
+    box-shadow: inset 4px 0 0 var(--status-success);
+  }
+
+  .blockNoShow {
+    border-color: var(--status-warning);
+    background: var(--badge-noshow-bg);
+    color: var(--status-warning);
+    box-shadow: inset 4px 0 0 var(--status-warning);
+  }
+
+  .blockCanceled {
+    opacity: 1;
+    border: 1px dashed var(--status-error);
+    background: var(--status-error-bg);
+    color: var(--status-error);
+    box-shadow: inset 4px 0 0 var(--status-error);
+  }
+
+  .blockLine .stateTag {
+    align-self: center;
+  }
+}
+
+.apptMetaText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

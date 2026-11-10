@@ -1,11 +1,12 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { cx } from "@/components/ui/cx";
 import type { AgendaData } from "@/lib/agenda/load";
 import { AgendaCalendar } from "./AgendaCalendar";
 import { agendaHref } from "./href";
 import styles from "./Agenda.module.css";
 
-type Props = { week: AgendaData["week"]; selected: string; today: string; operator: string | null };
+type Props = { week: AgendaData["week"]; selected: string; today: string; operator: string | null; children?: ReactNode };
 
 const Arrow = ({ dir }: { dir: "prev" | "next" }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -14,27 +15,25 @@ const Arrow = ({ dir }: { dir: "prev" | "next" }) => (
 );
 
 /**
- * NUOVO: la settimana del giorno scelto. In alto mese, «‹ Oggi ›» e calendario; sotto i sette giorni a tutta riga.
- * I giorni chiusi sono più chiari; il puntino dice che ci sono appuntamenti.
+ * NUOVO: la settimana del giorno scelto, compatta. Su computer una riga sola: mese, «‹ Oggi ›», sette giorni,
+ * calendario e (in `children`) i barbieri. Sul telefono i giorni sopra, frecce, calendario e barbieri sotto.
+ * I giorni chiusi sono tratteggiati; il puntino dice che ci sono appuntamenti.
  */
-export function WeekBar({ week, selected, today, operator }: Props) {
+export function WeekBar({ week, selected, today, operator, children }: Props) {
   return (
     <div className={styles.week}>
-      <div className={styles.weekTop}>
-        <p className={styles.weekMonth}>{week.label}</p>
-        <nav className={styles.weekNav} aria-label="Settimane">
-          <Link href={agendaHref(week.prev, today, operator)} className={styles.weekArrow} aria-label="Settimana prima" scroll={false}>
-            <Arrow dir="prev" />
-          </Link>
-          <Link href={agendaHref(today, today, operator)} className={cx(styles.weekToday, selected === today && styles.weekTodayOn)} aria-current={selected === today ? "date" : undefined} scroll={false}>
-            Oggi
-          </Link>
-          <Link href={agendaHref(week.next, today, operator)} className={styles.weekArrow} aria-label="Settimana dopo" scroll={false}>
-            <Arrow dir="next" />
-          </Link>
-          <AgendaCalendar selected={selected} today={today} operator={operator} />
-        </nav>
-      </div>
+      <p className={styles.weekMonth}>{week.label}</p>
+      <nav className={styles.weekNav} aria-label="Settimane">
+        <Link href={agendaHref(week.prev, today, operator)} className={styles.weekArrow} aria-label="Settimana prima" scroll={false}>
+          <Arrow dir="prev" />
+        </Link>
+        <Link href={agendaHref(today, today, operator)} className={cx(styles.weekToday, selected === today ? styles.weekTodayOn : styles.weekTodayAway)} aria-current={selected === today ? "date" : undefined} scroll={false}>
+          Oggi
+        </Link>
+        <Link href={agendaHref(week.next, today, operator)} className={styles.weekArrow} aria-label="Settimana dopo" scroll={false}>
+          <Arrow dir="next" />
+        </Link>
+      </nav>
       <nav className={styles.weekDays} aria-label="Giorni">
         {week.days.map((d) => {
           const current = d.date === selected;
@@ -55,6 +54,8 @@ export function WeekBar({ week, selected, today, operator }: Props) {
           );
         })}
       </nav>
+      <AgendaCalendar selected={selected} today={today} operator={operator} />
+      {children}
     </div>
   );
 }
