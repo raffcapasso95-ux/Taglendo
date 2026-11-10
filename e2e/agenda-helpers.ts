@@ -55,8 +55,18 @@ export async function bookNewClient(page: Page, name: string, date: string, time
 }
 
 export async function openAppointment(page: Page, name: string) {
-  // testo esatto: l'avviso dopo il salvataggio contiene lo stesso nome dentro una frase più lunga
-  await page.getByText(name, { exact: true }).filter({ visible: true }).first().click();
-  await expect(dialog(page)).toBeVisible();
+  // oggi le ore già passate sono nascoste (in griglia e in elenco): si mostrano prima di cercare l'appuntamento,
+  // altrimenti il click finisce sulla barra che le copre (dipendeva dall'ora in cui girava il test)
+  const showPast = page.getByText("Mostra", { exact: true }).filter({ visible: true });
+  if (await showPast.count()) await showPast.first().click();
+  // il pulsante dell'appuntamento (griglia, elenco o colonna di destra): il solo testo del nome può stare anche
+  // dove non si clicca, e l'avviso dopo il salvataggio contiene lo stesso nome dentro una frase più lunga
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const target = page.getByRole("button", { name: new RegExp(`(^|\\s)${escaped}(\\s|$)`) }).filter({ visible: true }).first();
+  // subito dopo il caricamento la pagina può non rispondere ancora ai click: si riprova finché la scheda si apre
+  await expect(async () => {
+    if (!(await dialog(page).isVisible())) await target.click();
+    await expect(dialog(page)).toBeVisible({ timeout: 2000 });
+  }).toPass({ timeout: 15000 });
 }
 
