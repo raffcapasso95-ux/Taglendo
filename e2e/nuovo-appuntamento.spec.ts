@@ -163,4 +163,23 @@ test.describe("Nuovo appuntamento", () => {
     await expect(dialog(page)).toBeHidden();
     await expect(page).toHaveURL(/\/agenda$/);
   });
+
+  test("«Nuovo cliente» prende il posto dell'elenco e «Annulla» ci riporta", async ({ page }) => {
+    await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
+    await page.goto("/agenda");
+    await newButton(page).click();
+    const d = dialog(page);
+    const list = d.getByRole("group", { name: "Clienti salvati" });
+    await expect(list).toBeVisible();
+    await d.getByRole("button", { name: "Nuovo cliente" }).click();
+    const panel = d.getByRole("group", { name: "Nuovo cliente" });
+    await expect(panel).toBeVisible();
+    await expect(list).toHaveCount(0); // l'elenco lascia il posto al modulo
+    await expect(panel.getByLabel("Nome", { exact: true })).toBeFocused();
+    await panel.getByLabel("Nome", { exact: true }).fill("Qualcuno");
+    await panel.getByRole("button", { name: "Annulla" }).click();
+    await expect(panel).toHaveCount(0);
+    await expect(list).toBeVisible();
+    await expect(d.getByText(/Scegli il cliente/)).toBeVisible(); // il nome scritto non resta come cliente
+  });
 });

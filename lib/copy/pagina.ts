@@ -4,6 +4,13 @@ export const paginaCopy = {
   title: "Pagina del salone",
   open: "Apri",
   photos: "Foto del salone",
+  // NUOVO: logo
+  logo: "Logo",
+  logoHint: "Si vede in alto nell’agenda e sulla tua pagina. Meglio un’immagine quadrata.",
+  logoAdd: "Carica il logo",
+  logoChange: "Cambia logo",
+  logoRemove: "Togli il logo",
+  logoSaved: "Logo salvato",
   count: (n: number) => `${n} di 8`,
   cover: "Copertina",
   makeCover: "Usa come copertina",

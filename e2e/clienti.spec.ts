@@ -213,27 +213,34 @@ test.describe("Clienti · dati e privacy", () => {
     expect(rows[0]).toMatchObject({ status: "annullato", client_id: null });
   });
 
-  test("«Modifica» nella scheda cambia nome, telefono ed email del cliente", async ({ page }) => {
+  test("«Modifica dati» nel riquadro «Dati del cliente» cambia nome, telefono ed email sul posto", async ({ page }) => {
     await freshOwner(page, "Barberia Modifica Cliente");
     await page.goto("/clienti");
     await page.getByRole("button", { name: "+ Nuovo" }).click();
     await dialog(page).getByLabel("Nome", { exact: true }).fill("Bruno Prima");
     await dialog(page).getByRole("button", { name: "Salva cliente" }).click();
     await page.getByRole("link", { name: /^Bruno Prima/ }).click();
-    await page.getByRole("button", { name: "Modifica" }).click();
-    const d = dialog(page);
-    await expect(d.getByRole("heading", { name: "Modifica cliente", level: 2 })).toBeVisible();
-    await d.getByLabel("Nome e cognome").fill("Bruno Dopo");
-    await d.getByLabel(/^Telefono/).fill("+39 333 444 5555");
-    await d.getByLabel(/^Email/).fill("non-una-email");
-    await d.getByRole("button", { name: "Salva", exact: true }).click();
-    await expect(d.getByText("L’email non sembra giusta.")).toBeVisible();
-    await d.getByLabel(/^Email/).fill("Bruno.Dopo@Example.com");
-    await d.getByRole("button", { name: "Salva", exact: true }).click();
+    const card = page.getByRole("region", { name: "Dati del cliente" });
+    await expect(card.getByText("Non salvato")).toBeVisible(); // telefono
+    await card.getByRole("button", { name: "Modifica dati" }).click();
+    await expect(card.getByLabel("Nome e cognome")).toBeFocused();
+    await card.getByLabel("Nome e cognome").fill("Bruno Dopo");
+    await card.getByLabel(/^Telefono/).fill("+39 333 444 5555");
+    await card.getByLabel(/^Email/).fill("non-una-email");
+    await card.getByRole("button", { name: "Salva", exact: true }).click();
+    await expect(card.getByText("L’email non sembra giusta.")).toBeVisible();
+    await card.getByLabel(/^Email/).fill("Bruno.Dopo@Example.com");
+    await card.getByRole("button", { name: "Salva", exact: true }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Bruno Dopo" })).toBeVisible();
-    await expect(page.getByText("bruno.dopo@example.com")).toBeVisible();
+    await expect(card.getByText("bruno.dopo@example.com")).toBeVisible();
+    await expect(card.getByRole("button", { name: "Modifica dati" })).toBeVisible();
     const [c] = await adminSelect<{ phone: string; email: string }>("clients", "select=phone,email&name=eq.Bruno Dopo&order=created_at.desc&limit=1");
     expect(c).toEqual({ phone: "+39 333 444 5555", email: "bruno.dopo@example.com" });
+    // «Annulla» chiude senza salvare
+    await card.getByRole("button", { name: "Modifica dati" }).click();
+    await card.getByLabel("Nome e cognome").fill("Nome Scartato");
+    await card.getByRole("button", { name: "Annulla" }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Bruno Dopo" })).toBeVisible();
   });
 
   test("il barbiere senza il permesso dei contatti cambia solo il nome", async ({ page }) => {
@@ -243,10 +250,11 @@ test.describe("Clienti · dati e privacy", () => {
       await barber(page);
       const [c] = await adminSelect<{ id: string }>("clients", `select=id&salon_id=eq.${SALON}&order=name&limit=1`);
       await page.goto(`/clienti/${c!.id}`);
-      await page.getByRole("button", { name: "Modifica" }).click();
-      await expect(dialog(page).getByLabel("Nome e cognome")).toBeVisible();
-      await expect(dialog(page).getByLabel(/^Telefono/)).toHaveCount(0);
-      await expect(dialog(page).getByText("Telefono ed email li cambia chi può vedere i contatti dei clienti.")).toBeVisible();
+      const card = page.getByRole("region", { name: "Dati del cliente" });
+      await card.getByRole("button", { name: "Modifica dati" }).click();
+      await expect(card.getByLabel("Nome e cognome")).toBeVisible();
+      await expect(card.getByLabel(/^Telefono/)).toHaveCount(0);
+      await expect(card.getByText("Telefono ed email li cambia chi può vedere i contatti dei clienti.")).toBeVisible();
     } finally {
       await adminUpdate("salons", `id=eq.${SALON}`, salon!);
     }

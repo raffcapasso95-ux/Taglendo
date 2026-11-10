@@ -24,14 +24,33 @@ test.describe("Pagina del salone", () => {
     await expect(page.getByRole("switch", { name: /Mostra i prezzi/ })).toHaveAttribute("aria-checked", "false");
 
     await expect(page.getByText("0 di 8")).toBeVisible();
-    await page.locator('input[type="file"]').setInputFiles({ name: "uno.png", mimeType: "image/png", buffer: PNG });
+    await page.locator('input[type="file"]:not([aria-label])').setInputFiles({ name: "uno.png", mimeType: "image/png", buffer: PNG });
     await expect(page.getByText("1 di 8")).toBeVisible();
-    await page.locator('input[type="file"]').setInputFiles({ name: "due.png", mimeType: "image/png", buffer: PNG });
+    await page.locator('input[type="file"]:not([aria-label])').setInputFiles({ name: "due.png", mimeType: "image/png", buffer: PNG });
     await expect(page.getByText("2 di 8")).toBeVisible();
     await expect(page.getByText("Copertina", { exact: true })).toHaveCount(1);
     await page.getByRole("button", { name: "Usa come copertina" }).click();
     await expect(page.getByText("Copertina", { exact: true })).toHaveCount(1);
     await page.getByRole("button", { name: "Togli la foto" }).first().click();
     await expect(page.getByText("1 di 8")).toBeVisible();
+  });
+
+  test("il logo si carica, compare in agenda e sulla pagina pubblica, e si toglie", async ({ page, browser }) => {
+    await freshOwner(page, "Barberia Col Logo");
+    await page.goto("/impostazioni/pagina");
+    await page.getByLabel("Carica il logo").setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: PNG });
+    await expect(page.getByText("Logo salvato").filter({ visible: true })).toBeVisible();
+    await expect(page.getByRole("img", { name: "Logo di Barberia Col Logo" })).toBeVisible();
+    await page.goto("/agenda");
+    const badge = page.getByRole("link", { name: "Barberia Col Logo", exact: true }).filter({ visible: true }).first();
+    await expect(badge.locator("img")).toHaveAttribute("src", /salon-photos\/.+\/logo-/);
+    const slug = (await page.evaluate(() => fetch("/salone").then((r) => r.text()))).match(/barberia-col-logo[a-z0-9-]*/)?.[0] ?? "barberia-col-logo";
+    const visitor = await browser.newPage();
+    await visitor.goto(`/${slug}`);
+    await expect(visitor.locator("header img[src*='/logo-']").first()).toBeVisible();
+    await visitor.close();
+    await page.goto("/impostazioni/pagina");
+    await page.getByRole("button", { name: "Togli il logo" }).click();
+    await expect(page.getByRole("img", { name: "Logo di Barberia Col Logo" })).toHaveCount(0);
   });
 });

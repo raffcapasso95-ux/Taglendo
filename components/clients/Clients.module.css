@@ -869,3 +869,94 @@
     background: var(--brand-peach);
   }
 }
+
+/* NUOVO: riquadro «Dati del cliente», modificabile sul posto */
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+}
+
+.infoHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.infoTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.editButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.infoList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  font-size: 15px;
+}
+
+.infoRow + .infoRow {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.infoRow dt {
+  color: var(--text-secondary);
+}
+
+.infoRow dd {
+  margin: 0;
+  font-weight: 700;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.infoRow a {
+  color: var(--text-primary);
+}
+
+.infoEmpty {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.infoForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.infoError {
+  margin: 0;
+  color: var(--status-error);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.infoActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.infoActions > * {
+  flex: 1;
+}

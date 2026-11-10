@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type InputHTMLAttributes, type ReactNode } from "react";
+import { useId, type InputHTMLAttributes, type ReactNode, type Ref } from "react";
 import { cx } from "./cx";
 import styles from "./Field.module.css";
 
@@ -20,6 +20,8 @@ type Props = Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "size"> & {
   /** Classi in più per il riquadro del campo e per l'etichetta (solo con size="large" per il riquadro). */
   boxClassName?: string;
   labelClassName?: string;
+  /** Per mettere il cursore nel campo dall'esterno. */
+  ref?: Ref<HTMLInputElement>;
 };
 
 export function Field({ label, hint, error, id, size = "default", trailing, leading, boxClassName, labelClassName, className, ...input }: Props) {

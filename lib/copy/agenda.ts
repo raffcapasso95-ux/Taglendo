@@ -77,6 +77,7 @@ export const agendaCopy = {
     // NUOVO: la scelta del cliente è un elenco con nome intero, ultime cifre del telefono e ultima visita
     searchClientLong: "Nome, cognome o telefono",
     newClient: "Nuovo cliente",
+    cancelNew: "Annulla", // NUOVO: torna all'elenco dei clienti
     recentClients: "Venuti di recente",
     foundClients: "Risultati",
     phoneTail: (digits: string) => `tel. ··· ${digits}`,

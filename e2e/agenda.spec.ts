@@ -119,4 +119,20 @@ test.describe("Agenda (sola lettura)", () => {
     await expect(page.getByRole("dialog", { name: "Vai a un giorno" })).toBeHidden();
     await expect(open).toBeFocused();
   });
+
+  test("la settimana: mese, sette giorni, frecce e «Oggi»; il salone in alto", async ({ page }) => {
+    await signIn(page, ANDREA, DEMO_PASSWORD);
+    await page.goto("/agenda");
+    await expect(page.getByRole("link", { name: "Barberia Saragozza", exact: true }).filter({ visible: true }).first()).toBeVisible();
+    const days = page.getByRole("navigation", { name: "Giorni" });
+    await expect(days.getByRole("link")).toHaveCount(7);
+    await expect(days.getByRole("link", { name: /, oggi$/ })).toHaveAttribute("aria-current", "date");
+    const weeks = page.getByRole("navigation", { name: "Settimane" });
+    await weeks.getByRole("link", { name: "Settimana dopo" }).click();
+    await expect(page).toHaveURL(/\/agenda\?g=\d{4}-\d{2}-\d{2}/);
+    await expect(days.getByRole("link", { name: /, oggi$/ })).toHaveCount(0);
+    await weeks.getByRole("link", { name: "Oggi" }).click();
+    await expect(page).toHaveURL(/\/agenda$/);
+    await expect(days.getByRole("link", { name: /, oggi$/ })).toHaveAttribute("aria-current", "date");
+  });
 });

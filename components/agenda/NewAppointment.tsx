@@ -234,7 +234,20 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
     setError(null);
   };
 
-  const showAvatarPreview = newMode && !clientId;
+  // «Nuovo cliente» prende il posto dell'elenco: il cursore va subito nel nome; «Annulla» riporta all'elenco
+  const newNameRef = useRef<HTMLInputElement>(null);
+  const openedNew = useRef(newMode);
+  useEffect(() => {
+    if (newMode && !openedNew.current) newNameRef.current?.focus();
+    openedNew.current = newMode;
+  }, [newMode]);
+  const cancelNew = () => {
+    setNewMode(false);
+    setNewName("");
+    setNewPhone("");
+    setNewEmail("");
+    setPhoto(null);
+  };
   const previewName = newName.trim();
 
   return (
@@ -445,6 +458,71 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
                 {copy.change}
               </button>
             </div>
+          ) : newMode ? (
+          <div className={styles.newClient} role="group" aria-labelledby="fl-nuovo">
+            <div className={styles.newClientHead}>
+              <h4 className={styles.newClientTitle} id="fl-nuovo">
+                {flow.newClient}
+              </h4>
+              <button type="button" className={styles.newClientCancel} onClick={cancelNew}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+                {flow.cancelNew}
+              </button>
+            </div>
+            <div className={avatarStyles.picker}>
+              <Avatar name={previewName || "+"} color={newColor} photoUrl={photo?.url} size="lg" text={previewName ? clientInitials(previewName) : "+"} />
+              <div className={avatarStyles.pickerSide}>
+                <label className={avatarStyles.photoButton} htmlFor="foto-nuovo">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" />
+                    <circle cx="12" cy="12.5" r="3.5" />
+                  </svg>
+                  <span>{flow.addPhoto}</span>
+                </label>
+                <input id="foto-nuovo" className={avatarStyles.fileInput} type="file" accept="image/*" capture="user" onChange={(e) => void choosePhoto(e.target.files?.[0])} />
+                <div className={avatarStyles.swatches} role="group" aria-label={flow.colorGroup}>
+                  {AVATAR_COLOR_NAMES.map((n, i) => (
+                    <button
+                      key={n}
+                      type="button"
+                      className={cx(avatarStyles.swatch, avatarStyles[`c${i}` as "c0"], newColor === i && avatarStyles.swatchOn)}
+                      aria-pressed={newColor === i}
+                      aria-label={n}
+                      onClick={() => setNewColor(i)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <Field ref={newNameRef} size="large" label={copy.name} maxLength={LIMITS.clientName} value={newName} onChange={(e) => setNewName(e.target.value)} />
+            <Field size="large" label={`${copy.phone} · ${copy.phoneHint}`} type="tel" inputMode="tel" maxLength={LIMITS.phone} value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
+            <Field size="large" label={`${copy.email} · ${copy.emailHint}`} type="email" inputMode="email" autoComplete="off" maxLength={LIMITS.email} value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+            {duplicate ? (
+              <div className={styles.dupWarn} role="status">
+                <p className={styles.dupText}>{flow.duplicate(duplicate.name, clientDetail(duplicate))}</p>
+                <div className={styles.dupActions}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setClientId(duplicate.id);
+                      setNewMode(false);
+                      setNewName("");
+                      setNewPhone("");
+                      setNewEmail("");
+                      setPhoto(null);
+                    }}
+                  >
+                    {flow.useExisting}
+                  </Button>
+                  <button type="button" className={dialogs.linkButton} onClick={() => setDupDismissed(normName(newName))}>
+                    {flow.keepNew}
+                  </button>
+                </div>
+              </div>
+            ) : null}
+          </div>
           ) : (
             <>
               <Field
@@ -466,8 +544,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
               <div className={styles.clientList} role="group" aria-label={flow.savedClients}>
                 <button
                   type="button"
-                  className={cx(styles.clientRow, newMode && styles.clientRowOn)}
-                  aria-pressed={newMode}
+                  className={cx(styles.clientRow, styles.clientRowNew)}
                   onClick={() => {
                     setNewMode(true);
                     setNewName((n) => n || query.trim());
@@ -513,74 +590,6 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
               {query.trim() && matches.length === 0 ? <p className={dialogs.hint}>{copy.noClients}</p> : null}
             </>
           )}
-          <div className={styles.newClient} hidden={!showAvatarPreview}>
-            <div className={avatarStyles.picker}>
-              <Avatar name={previewName || "+"} color={newColor} photoUrl={photo?.url} size="lg" text={previewName ? clientInitials(previewName) : "+"} />
-              <div className={avatarStyles.pickerSide}>
-                <label className={avatarStyles.photoButton} htmlFor="foto-nuovo">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.8l1.4-2h4.6l1.4 2h1.8A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" />
-                    <circle cx="12" cy="12.5" r="3.5" />
-                  </svg>
-                  <span>{flow.addPhoto}</span>
-                </label>
-                <input id="foto-nuovo" className={avatarStyles.fileInput} type="file" accept="image/*" capture="user" onChange={(e) => void choosePhoto(e.target.files?.[0])} />
-                <div className={avatarStyles.swatches} role="group" aria-label={flow.colorGroup}>
-                  {AVATAR_COLOR_NAMES.map((n, i) => (
-                    <button
-                      key={n}
-                      type="button"
-                      className={cx(avatarStyles.swatch, avatarStyles[`c${i}` as "c0"], newColor === i && avatarStyles.swatchOn)}
-                      aria-pressed={newColor === i}
-                      aria-label={n}
-                      onClick={() => setNewColor(i)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className={dialogs.pair}>
-              <Field size="large" label={copy.name} maxLength={LIMITS.clientName} value={newName} onChange={(e) => setNewName(e.target.value)} />
-              <Field size="large" label={`${copy.phone} · ${copy.phoneHint}`} type="tel" inputMode="tel" maxLength={LIMITS.phone} value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
-            </div>
-            <Field size="large" label={`${copy.email} · ${copy.emailHint}`} type="email" inputMode="email" autoComplete="off" maxLength={LIMITS.email} value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
-            {duplicate ? (
-              <div className={styles.dupWarn} role="status">
-                <p className={styles.dupText}>{flow.duplicate(duplicate.name, clientDetail(duplicate))}</p>
-                <div className={styles.dupActions}>
-                  <Button
-                    variant="secondary"
-                    onClick={() => {
-                      setClientId(duplicate.id);
-                      setNewMode(false);
-                      setNewName("");
-                      setNewPhone("");
-                      setNewEmail("");
-                      setPhoto(null);
-                    }}
-                  >
-                    {flow.useExisting}
-                  </Button>
-                  <button type="button" className={dialogs.linkButton} onClick={() => setDupDismissed(normName(newName))}>
-                    {flow.keepNew}
-                  </button>
-                </div>
-              </div>
-            ) : null}
-            <button
-              type="button"
-              className={dialogs.linkButton}
-              onClick={() => {
-                setNewMode(false);
-                setNewName("");
-                setNewPhone("");
-                setNewEmail("");
-                setPhoto(null);
-              }}
-            >
-              {copy.change}
-            </button>
-          </div>
           {!online ? <p className={dialogs.hint}>{walkInMode ? offlineCopy.walkInNeedsNet : date !== offlineDay.date ? offlineCopy.onlyDay(dayLabel(offlineDay.date, today, "")) : offlineCopy.text(null)}</p> : null}
         </section>
       </div>

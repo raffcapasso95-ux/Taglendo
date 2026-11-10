@@ -1,3 +1,4 @@
+import { salonLogoUrl } from "@/lib/salon/logo";
 import "server-only";
 import { cache } from "react";
 import { createAnonClient } from "@/lib/supabase/anon";
@@ -18,6 +19,8 @@ export type PublicSalon = {
   description: string | null;
   instagram: string | null;
   coverPath: string | null;
+  /** NUOVO: indirizzo del logo, o null. */
+  logoUrl: string | null;
   bookingOnline: boolean;
   cancelOnline: boolean;
   showPrices: boolean;
@@ -34,7 +37,7 @@ export type PublicSalon = {
 
 type Raw = {
   id: string; slug: string; name: string; address: string | null; area: string | null; phone: string;
-  description: string | null; instagram: string | null; cover_path: string | null;
+  description: string | null; instagram: string | null; cover_path: string | null; logo_path?: string | null;
   booking_online: boolean; cancel_online: boolean; show_prices: boolean; cancel_limit_min: number;
   min_notice_min: number; max_advance_days: number; sub_status: AccessInput["sub_status"]; trial_ends_at: string;
   services: Array<{ id: string; name: string; duration_min: number; price_cents: number }>;
@@ -57,7 +60,7 @@ export const loadPublicSalon = cache(async (slug: string): Promise<PublicSalon |
   });
   return {
     id: r.id, slug: r.slug, name: r.name, address: r.address, area: r.area, phone: r.phone, description: r.description,
-    instagram: r.instagram, coverPath: r.cover_path, bookingOnline: r.booking_online, cancelOnline: r.cancel_online,
+    instagram: r.instagram, coverPath: r.cover_path, logoUrl: salonLogoUrl(r.logo_path), bookingOnline: r.booking_online, cancelOnline: r.cancel_online,
     showPrices: r.show_prices, cancelLimitMin: r.cancel_limit_min, minNoticeMin: r.min_notice_min, maxAdvanceDays: r.max_advance_days,
     access: { sub_status: r.sub_status, trial_ends_at: r.trial_ends_at },
     services: r.services.map((s) => ({ id: s.id, name: s.name, durationMin: s.duration_min, priceCents: s.price_cents })),

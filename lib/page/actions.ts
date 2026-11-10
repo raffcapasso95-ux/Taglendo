@@ -107,3 +107,33 @@ export async function makeCover(id: string): Promise<PageResult> {
   refresh();
   return { ok: true };
 }
+
+/** NUOVO: il logo del salone (si vede in agenda e sulla pagina pubblica). Sostituisce quello di prima. */
+export async function setSalonLogo(form: FormData): Promise<PageResult> {
+  const { salonId, supabase } = await owner();
+  const file = form.get("logo");
+  if (!(file instanceof File) || !TYPES.has(file.type) || file.size === 0 || file.size > MAX_PHOTO) return { ok: false, error: errors.photo };
+  const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+  const path = `${salonId}/logo-${crypto.randomUUID()}.${ext}`;
+  const up = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+  if (up.error) return { ok: false, error: errors.generic };
+  const { data: before } = await supabase.from("salons").select("logo_path").eq("id", salonId).single();
+  const { error } = await supabase.from("salons").update({ logo_path: path }).eq("id", salonId);
+  if (error) {
+    await supabase.storage.from(BUCKET).remove([path]);
+    return { ok: false, error: errors.generic };
+  }
+  if (before?.logo_path) await supabase.storage.from(BUCKET).remove([before.logo_path]);
+  refresh();
+  return { ok: true };
+}
+
+export async function removeSalonLogo(): Promise<PageResult> {
+  const { salonId, supabase } = await owner();
+  const { data: before } = await supabase.from("salons").select("logo_path").eq("id", salonId).single();
+  const { error } = await supabase.from("salons").update({ logo_path: null }).eq("id", salonId);
+  if (error) return { ok: false, error: errors.generic };
+  if (before?.logo_path) await supabase.storage.from(BUCKET).remove([before.logo_path]);
+  refresh();
+  return { ok: true };
+}

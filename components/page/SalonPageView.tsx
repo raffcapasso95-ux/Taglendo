@@ -13,12 +13,13 @@ import { cx } from "@/components/ui/cx";
 import field from "@/components/ui/Field.module.css";
 import toggle from "@/components/ui/Toggle.module.css";
 import { paginaCopy as copy } from "@/lib/copy/pagina";
-import { addSalonPhoto, makeCover, removeSalonPhoto, saveSalonPage, setSalonSwitch, type PageResult } from "@/lib/page/actions";
+import { initials } from "@/lib/rules/agenda";
+import { addSalonPhoto, makeCover, removeSalonLogo, removeSalonPhoto, saveSalonPage, setSalonLogo, setSalonSwitch, type PageResult } from "@/lib/page/actions";
 
 type Initial = { name: string; area: string; description: string; phone: string; address: string; bookingOnline: boolean; showPrices: boolean };
 type Photo = { id: string; url: string };
 
-export function SalonPageView(props: { host: string; slug: string; initial: Initial; photos: Photo[] }) {
+export function SalonPageView(props: { host: string; slug: string; initial: Initial; photos: Photo[]; logoUrl: string | null }) {
   return (
     <ToastProvider>
       <Inner {...props} />
@@ -41,7 +42,7 @@ function SwitchRow({ tone, icon, label, sub, on, onToggle }: { tone: 0 | 1 | 2; 
   );
 }
 
-function Inner({ host, slug, initial, photos }: { host: string; slug: string; initial: Initial; photos: Photo[] }) {
+function Inner({ host, slug, initial, photos, logoUrl }: { host: string; slug: string; initial: Initial; photos: Photo[]; logoUrl: string | null }) {
   const router = useRouter();
   const toast = useToast();
   const [form, setForm] = useState(initial);
@@ -50,6 +51,7 @@ function Inner({ host, slug, initial, photos }: { host: string; slug: string; in
   const [errors, setErrors] = useState<Partial<Record<"name" | "phone" | "address" | "description" | "form", string>>>({});
   const [pending, start] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
+  const logoRef = useRef<HTMLInputElement>(null);
   const set = (k: keyof Initial) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   const dirty = (["name", "area", "description", "phone", "address"] as const).some((k) => form[k].trim() !== initial[k]);
@@ -84,6 +86,14 @@ function Inner({ host, slug, initial, photos }: { host: string; slug: string; in
     if (fileRef.current) fileRef.current.value = "";
   };
 
+  const uploadLogo = (file: File | undefined) => {
+    if (!file) return;
+    const data = new FormData();
+    data.set("logo", file);
+    run(() => setSalonLogo(data), copy.logoSaved);
+    if (logoRef.current) logoRef.current.value = "";
+  };
+
   const cover = photos[0]?.url ?? "/images/foto/hero.jpg";
 
   return (
@@ -111,6 +121,36 @@ function Inner({ host, slug, initial, photos }: { host: string; slug: string; in
               {copy.open}
             </span>
           </a>
+
+          <section className={settings.section} aria-labelledby="pg-logo">
+            <h2 className={settings.title} id="pg-logo">
+              {copy.logo}
+            </h2>
+            <div className={settings.logoRow}>
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt={`Logo di ${initial.name}`} className={settings.logoImg} width={72} height={72} />
+              ) : (
+                <span className={settings.logoEmpty} aria-hidden="true">
+                  {initials(initial.name)}
+                </span>
+              )}
+              <div className={settings.logoSide}>
+                <div className={settings.logoButtons}>
+                  <Button variant="secondary" disabled={pending} onClick={() => logoRef.current?.click()}>
+                    {logoUrl ? copy.logoChange : copy.logoAdd}
+                  </Button>
+                  {logoUrl ? (
+                    <button type="button" className={settings.logoRemove} disabled={pending} onClick={() => run(() => removeSalonLogo())}>
+                      {copy.logoRemove}
+                    </button>
+                  ) : null}
+                </div>
+                <p className={settings.phHint}>{copy.logoHint}</p>
+              </div>
+              <input ref={logoRef} type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label={copy.logoAdd} onChange={(e) => uploadLogo(e.target.files?.[0])} />
+            </div>
+          </section>
 
           <section className={settings.section} aria-labelledby="pg-foto">
             <div className={settings.phHead}>

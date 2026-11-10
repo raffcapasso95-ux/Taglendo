@@ -21,7 +21,7 @@ export async function requireUser() {
 }
 
 const SALON_COLUMNS =
-  "id, slug, name, address, area, phone, description, onboarding_step, trial_ends_at, plan, sub_status, booking_online, cancel_online, show_prices, cancel_limit_min";
+  "id, slug, name, address, area, phone, description, logo_path, onboarding_step, trial_ends_at, plan, sub_status, booking_online, cancel_online, show_prices, cancel_limit_min";
 
 async function fetchMembership(userId: string, salonId?: string) {
   const supabase = await createClient();
