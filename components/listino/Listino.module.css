@@ -136,23 +136,46 @@
   color: var(--text-secondary);
 }
 
+/* Modifiche da salvare: riquadro fluttuante centrato sul contenuto, come le schede del resto dell'app */
 .dirty {
   position: fixed;
   z-index: 15;
-  inset: auto 0 0;
+  inset: auto var(--space-3) calc(var(--space-3) + var(--tabbar-height) + env(safe-area-inset-bottom)) var(--space-3);
+  max-width: 640px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4) calc(var(--space-4) + var(--tabbar-height) + env(safe-area-inset-bottom));
-  border-top: 1px solid var(--border-subtle);
-  background: var(--canvas);
-  box-shadow: var(--shadow-sheet);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  background: var(--surface-overlay);
+  box-shadow: var(--shadow-modal);
+  animation: dirty-in var(--duration-normal) var(--ease-out);
+}
+
+@keyframes dirty-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dirty {
+    animation: none;
+  }
 }
 
 .dirtyText {
   margin: 0;
-  font-size: 14px;
-  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dirtyError {
+  color: var(--status-error);
 }
 
 .dirtyButtons {
@@ -170,8 +193,8 @@
   }
 
   .dirty {
-    inset: auto 0 0 var(--nav-rail-width);
-    padding: var(--space-3) var(--space-8) var(--space-4);
+    inset: auto var(--space-6) var(--space-5) calc(var(--nav-rail-width) + var(--space-6));
+    padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5);
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
