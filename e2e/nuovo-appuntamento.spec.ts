@@ -190,11 +190,12 @@ test.describe("Nuovo appuntamento", () => {
     const d = dialog(page);
     await d.getByRole("button", { name: "Nuovo cliente" }).click();
     const panel = d.getByRole("group", { name: "Nuovo cliente" });
-    await panel.getByLabel("Nome", { exact: true }).fill("Cesare Salvato");
+    const name = `Cesare Salvato ${Date.now().toString(36)}`;
+    await panel.getByLabel("Nome", { exact: true }).fill(name);
     await panel.getByRole("button", { name: "Salva cliente" }).click();
     await expect(page.getByText("Cliente salvato in rubrica").filter({ visible: true })).toBeVisible();
     await expect(panel).toHaveCount(0);
-    await expect(d.getByText("Cesare Salvato", { exact: true })).toBeVisible(); // scelto
-    expect(await adminSelect("clients", "select=id&name=eq.Cesare Salvato")).toHaveLength(1);
+    await expect(d.getByText(name, { exact: true })).toBeVisible(); // scelto
+    expect(await adminSelect("clients", `select=id&name=eq.${encodeURIComponent(name)}`)).toHaveLength(1);
   });
 });

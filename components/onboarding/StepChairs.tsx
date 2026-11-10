@@ -62,7 +62,8 @@ export function StepChairs({ doneUpTo, salon, ownerName, barbers }: Props) {
     >
       <form id="step-form" action={action} className={styles.form} noValidate>
         <input type="hidden" name="payload" value={JSON.stringify({ chairs: count, names: visible, emails: emails.slice(0, count - 1) })} />
-        {state.error ? <FormAlert>{state.error}</FormAlert> : null}
+        {/* gli errori di un campo stanno sotto il campo; qui solo quelli generali */}
+        {state.error && !state.field ? <FormAlert>{state.error}</FormAlert> : null}
 
         <div>
           <p className={styles.label}>{copy.count}</p>
