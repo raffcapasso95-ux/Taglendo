@@ -100,10 +100,13 @@ test.describe("Taglendo sul telefono", () => {
     await opener.click();
     const menu = page.getByRole("dialog", { name: "Menu" });
     await expect(menu).toBeVisible();
-    for (const name of ["Agenda", "Clienti", "Statistiche", "Listino e orari", "Salone", "Impostazioni", "Copia il link di prenotazione", "Esci"]) {
+    for (const name of ["Agenda", "Clienti", "Statistiche", "Listino e orari", "Salone", "Impostazioni", "Sito di Taglendo", "Copia il link di prenotazione", "Esci"]) {
       await expect(menu.getByText(name, { exact: true })).toBeVisible();
     }
     await expect(menu.getByText(/^Titolare · Barberia Menu Telefono$/)).toBeVisible();
+    await expect(menu.getByRole("link", { name: "Sito di Taglendo" })).toHaveAttribute("href", "/");
+    // i popup sono bianchi: si staccano dal fondo panna della pagina
+    expect(await menu.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(255, 255, 255)");
     await page.keyboard.press("Escape");
     await expect(menu).toBeHidden();
     await expect(opener).toBeFocused();

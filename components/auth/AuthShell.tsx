@@ -3,6 +3,9 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import styles from "./AuthShell.module.css";
 
+const HOME_LABEL = "Torna al sito"; // NUOVO
+const HOME_ARIA = "Taglendo, torna al sito"; // NUOVO
+
 type Props = {
   /** Titolo nell'intestazione del telefono. */
   title: string;
@@ -48,15 +51,23 @@ export function AuthShell({
       <span aria-hidden="true">‹</span> {back.label}
     </Link>
   ) : null;
+  // NUOVO: dalle pagine di accesso si torna sempre al sito di Taglendo
+  const homeLink = (
+    <Link href="/" className={styles.back}>
+      <span aria-hidden="true">‹</span> {HOME_LABEL}
+    </Link>
+  );
 
   return (
     <main className={styles.shell}>
       <section className={styles.panel}>
         {/* Telefono */}
         <div className={styles.hero}>
-          {backLink}
+          {backLink ?? homeLink}
           {decoration}
-          <Image src="/brand/taglendo-icon.svg" alt="Taglendo" width={44} height={44} className={styles.icon} priority />
+          <Link href="/" className={styles.homeIcon} aria-label={HOME_ARIA}>
+            <Image src="/brand/taglendo-icon.svg" alt="" width={44} height={44} className={styles.icon} priority />
+          </Link>
           <div className={styles.heroText}>
             <h1 className={styles.heroTitle}>{title}</h1>
             {lead ? <p className={styles.heroLead}>{lead}</p> : null}
@@ -72,7 +83,9 @@ export function AuthShell({
 
         {/* Desktop */}
         <div className={styles.side}>
-          <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={150} height={36} className={styles.logo} style={{ width: "var(--auth-logo-width, 150px)", height: "auto" }} priority />
+          <Link href="/" className={styles.homeIcon} aria-label={HOME_ARIA}>
+            <Image src="/brand/taglendo-logo.svg" alt="" width={150} height={36} className={styles.logo} style={{ width: "var(--auth-logo-width, 150px)", height: "auto" }} priority />
+          </Link>
           <p className={styles.headline}>{headline}</p>
           {chips ? (
             <ul className={styles.chips}>
@@ -96,7 +109,7 @@ export function AuthShell({
       <section className={styles.formArea}>
         <div className={styles.form}>
           <div className={styles.formHead}>
-            {desktopBack ? backLink : null}
+            {desktopBack ? backLink : <span className={styles.desktopOnly}>{homeLink}</span>}
             <h2 className={styles.formTitle}>{desktopTitle ?? title}</h2>
             {desktopLead ?? lead ? <p className={styles.formLead}>{desktopLead ?? lead}</p> : null}
           </div>

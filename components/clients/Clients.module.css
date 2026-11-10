@@ -849,3 +849,23 @@
     padding-top: var(--space-4);
   }
 }
+
+/* NUOVO: «Modifica» nella barra della scheda cliente */
+.editButton {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .editButton:hover {
+    background: var(--brand-peach);
+  }
+}

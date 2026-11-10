@@ -8,7 +8,7 @@ import { cx } from "@/components/ui/cx";
 import avatarStyles from "@/components/ui/Avatar.module.css";
 import fieldStyles from "@/components/ui/Field.module.css";
 import dialogs from "@/components/agenda/Dialogs.module.css";
-import { createClientRecord, setClientColor } from "@/lib/clients/actions";
+import { createClientRecord, setClientColor, updateClient } from "@/lib/clients/actions";
 import { removeClientPhoto, setClientPhoto } from "@/lib/clients/photo";
 import { resizePhoto } from "@/lib/clients/resizeImage";
 import { agendaCopy } from "@/lib/copy/agenda";
@@ -66,6 +66,7 @@ export function NewClientDialog({ onClose }: { onClose: () => void }) {
   const { photo, setPhoto, choose } = usePhoto();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [note, setNote] = useState("");
   const [color, setColor] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +76,7 @@ export function NewClientDialog({ onClose }: { onClose: () => void }) {
     start(async () => {
       setError(null);
       if (!name.trim()) return setError(agendaCopy.errors.clientName);
-      const result = await createClientRecord({ name, phone, note, avatarColor: color });
+      const result = await createClientRecord({ name, phone, email, note, avatarColor: color });
       if (!result.ok) return setError(result.error);
       if (photo) await setClientPhoto(result.id, photoForm(photo.blob)).catch(() => null);
       if (thenBook) return router.push(`/agenda?nuovo=${result.id}`);
@@ -125,6 +126,7 @@ export function NewClientDialog({ onClose }: { onClose: () => void }) {
         <p className={dialogs.hint}>Foto e colore servono a riconoscerlo al volo in agenda. La foto la vedete solo tu e il tuo staff.</p>
         <Field size="large" label="Nome" maxLength={LIMITS.clientName} value={name} onChange={(e) => setName(e.target.value)} error={error ?? undefined} />
         <Field size="large" label="Telefono · facoltativo, per WhatsApp" type="tel" inputMode="tel" maxLength={LIMITS.phone} value={phone} onChange={(e) => setPhone(e.target.value)} />
+        <Field size="large" label="Email · facoltativa, per conferma e promemoria" type="email" inputMode="email" autoComplete="off" maxLength={LIMITS.email} value={email} onChange={(e) => setEmail(e.target.value)} />
         <div className={cx(fieldStyles.field, fieldStyles.fieldLarge)}>
           <label htmlFor="nc-note" className={fieldStyles.label}>
             Preferenze e note private · facoltativo
@@ -134,6 +136,65 @@ export function NewClientDialog({ onClose }: { onClose: () => void }) {
         <button type="button" className={dialogs.linkButton} disabled={saving} onClick={() => save(true)}>
           Salva e fissa un appuntamento
         </button>
+      </div>
+    </ResponsiveDialog>
+  );
+}
+
+type EditProps = { clientId: string; name: string; phone: string | null; email: string | null; canSeeContacts: boolean; onClose: () => void };
+
+/** NUOVO: «Modifica» nella scheda del cliente: nome, telefono ed email (questi due solo a chi può vederli). */
+export function EditClientDialog({ clientId, name: initialName, phone: initialPhone, email: initialEmail, canSeeContacts, onClose }: EditProps) {
+  const router = useRouter();
+  const toast = useToast();
+  const [name, setName] = useState(initialName);
+  const [phone, setPhone] = useState(initialPhone ?? "");
+  const [email, setEmail] = useState(initialEmail ?? "");
+  const [error, setError] = useState<string | null>(null);
+  const [saving, start] = useTransition();
+
+  const save = () =>
+    start(async () => {
+      setError(null);
+      const result = await updateClient(clientId, canSeeContacts ? { name, phone, email } : { name });
+      if (!result.ok) return setError(result.error);
+      toast("Cliente aggiornato", name.trim());
+      onClose();
+      router.refresh();
+    });
+
+  return (
+    <ResponsiveDialog
+      open
+      onClose={onClose}
+      title="Modifica cliente"
+      sheetClassName={styles.sheetAuto}
+      footer={
+        <div className={dialogs.footerButtons}>
+          <Button variant="secondary" size="large" onClick={onClose}>
+            Annulla
+          </Button>
+          <Button size="large" disabled={saving || !name.trim()} onClick={save}>
+            {saving ? "Salvataggio…" : "Salva"}
+          </Button>
+        </div>
+      }
+    >
+      <div className={dialogs.form}>
+        <Field size="large" label="Nome e cognome" maxLength={LIMITS.clientName} value={name} onChange={(e) => setName(e.target.value)} />
+        {canSeeContacts ? (
+          <>
+            <Field size="large" label="Telefono · facoltativo, per WhatsApp" type="tel" inputMode="tel" maxLength={LIMITS.phone} value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <Field size="large" label="Email · facoltativa, per conferma e promemoria" type="email" inputMode="email" autoComplete="off" maxLength={LIMITS.email} value={email} onChange={(e) => setEmail(e.target.value)} />
+          </>
+        ) : (
+          <p className={dialogs.hint}>Telefono ed email li cambia chi può vedere i contatti dei clienti.</p>
+        )}
+        {error ? (
+          <p className={dialogs.hint} role="alert">
+            {error}
+          </p>
+        ) : null}
       </div>
     </ResponsiveDialog>
   );

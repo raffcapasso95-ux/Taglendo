@@ -8,6 +8,17 @@ test.describe("Accesso e password", () => {
     await expect(page).toHaveURL(/\/accedi/);
   });
 
+  test("da accesso e registrazione si torna al sito", async ({ page }) => {
+    for (const path of ["/accedi", "/registrati"]) {
+      await page.goto(path);
+      const home = page.getByRole("link", { name: /^(‹ )?Torna al sito$|^Taglendo, torna al sito$/ }).filter({ visible: true }).first();
+      await expect(home).toHaveAttribute("href", "/");
+    }
+    await page.goto("/accedi");
+    await page.getByRole("link", { name: /Torna al sito/ }).filter({ visible: true }).first().click();
+    await expect(page).toHaveURL(/\/$/);
+  });
+
   test("il titolare del salone demo entra in agenda", async ({ page, viewport }) => {
     await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
     await expect(page).toHaveURL(/\/agenda$/);

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireSalon } from "@/lib/auth/session";
-import { isPhone, LIMITS } from "@/lib/rules/forms";
+import { isEmail, isPhone, LIMITS } from "@/lib/rules/forms";
 import { createClient } from "@/lib/supabase/server";
 
 export type NoteResult = { ok: true } | { ok: false; error: string };
@@ -41,17 +41,19 @@ export async function deleteClient(clientId: string): Promise<DeleteResult> {
 export type CreateClientResult = { ok: true; id: string; name: string } | { ok: false; error: string };
 
 /** Il pulsante «+ Nuovo» della rubrica: nome, telefono e nota facoltativi, colore delle iniziali. Chi può fissare appuntamenti può anche creare clienti. */
-export async function createClientRecord(input: { name: string; phone?: string | null; note?: string | null; avatarColor: number }): Promise<CreateClientResult> {
+export async function createClientRecord(input: { name: string; phone?: string | null; email?: string | null; note?: string | null; avatarColor: number }): Promise<CreateClientResult> {
   const { salon } = await requireSalon();
   const name = input.name.trim();
   if (!name || name.length > LIMITS.clientName) return { ok: false, error: "Scrivi il nome del cliente." };
   const phone = input.phone?.trim() || null;
   if (phone && !isPhone(phone)) return { ok: false, error: "Il telefono può avere solo cifre, + e spazi." };
+  const email = input.email?.trim().toLowerCase() || null;
+  if (email && !isEmail(email)) return { ok: false, error: "L’email non sembra giusta." };
   const note = input.note?.trim() || null;
   if (note && note.length > LIMITS.clientNote) return { ok: false, error: `La nota può avere al massimo ${LIMITS.clientNote} caratteri.` };
   const avatar_color = Number.isInteger(input.avatarColor) && input.avatarColor >= 0 && input.avatarColor <= 4 ? input.avatarColor : null;
   const supabase = await createClient();
-  const { data, error } = await supabase.from("clients").insert({ salon_id: salon.id, name, phone, note, avatar_color }).select("id").single();
+  const { data, error } = await supabase.from("clients").insert({ salon_id: salon.id, name, phone, email, note, avatar_color }).select("id").single();
   if (error || !data) return { ok: false, error: "Non siamo riusciti a salvare il cliente. Riprova." };
   revalidatePath("/clienti");
   revalidatePath("/agenda");
@@ -65,6 +67,43 @@ export async function setClientColor(clientId: string, color: number): Promise<N
   const supabase = await createClient();
   const { data, error } = await supabase.from("clients").update({ avatar_color: color }).eq("id", clientId).eq("salon_id", salon.id).select("id");
   if (error || !data?.length) return { ok: false, error: "Non siamo riusciti a salvare il colore. Riprova." };
+  revalidatePath("/clienti");
+  revalidatePath(`/clienti/${clientId}`);
+  revalidatePath("/agenda");
+  return { ok: true };
+}
+
+export type UpdateClientInput = { name: string; phone?: string | null; email?: string | null };
+
+/**
+ * NUOVO: modifica nome, telefono ed email di un cliente. Serve il permesso di modificare;
+ * telefono ed email si cambiano solo se si possono vedere (titolare, o barbiere con «contatti»).
+ */
+export async function updateClient(clientId: string, input: UpdateClientInput): Promise<NoteResult> {
+  const { role, salon } = await requireSalon();
+  const supabase = await createClient();
+  let canEdit = role === "owner";
+  let canContacts = role === "owner";
+  if (role !== "owner") {
+    const { data } = await supabase.from("salons").select("barbers_edit, barbers_contacts").eq("id", salon.id).single();
+    canEdit = data?.barbers_edit ?? false;
+    canContacts = data?.barbers_contacts ?? false;
+  }
+  if (!canEdit) return { ok: false, error: "Non hai il permesso di modificare i clienti." };
+
+  const name = input.name.trim();
+  if (!name || name.length > LIMITS.clientName) return { ok: false, error: "Scrivi il nome del cliente." };
+  const patch: { name: string; phone?: string | null; email?: string | null } = { name };
+  if (canContacts) {
+    const phone = input.phone?.trim() || null;
+    if (phone && !isPhone(phone)) return { ok: false, error: "Il telefono può avere solo cifre, + e spazi." };
+    const email = input.email?.trim().toLowerCase() || null;
+    if (email && !isEmail(email)) return { ok: false, error: "L’email non sembra giusta." };
+    patch.phone = phone;
+    patch.email = email;
+  }
+  const { data, error } = await supabase.from("clients").update(patch).eq("id", clientId).eq("salon_id", salon.id).select("id");
+  if (error || !data?.length) return { ok: false, error: "Non siamo riusciti a salvare il cliente. Riprova." };
   revalidatePath("/clienti");
   revalidatePath(`/clienti/${clientId}`);
   revalidatePath("/agenda");

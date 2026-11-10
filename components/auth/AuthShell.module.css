@@ -35,6 +35,12 @@
   text-decoration: none;
 }
 
+.homeIcon {
+  display: inline-flex;
+  align-self: flex-start;
+  border-radius: var(--radius-button);
+}
+
 .icon {
   width: var(--auth-icon-size);
   height: var(--auth-icon-size);

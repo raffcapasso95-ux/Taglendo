@@ -30,6 +30,12 @@ export const LinkIcon = ({ size = 22 }: { size?: number }) => (
     <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" />
   </Icon>
 );
+/** Casa: il sito di Taglendo. */
+export const HomeIcon = ({ size = 20 }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M4 10.5 12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5H15v-6h-6v6H5.5A1.5 1.5 0 0 1 4 19z" />
+  </Icon>
+);
 /** Vetrina del negozio: la sezione «Salone». */
 export const StoreIcon = ({ size = 22 }: { size?: number }) => (
   <Icon size={size}>
