@@ -188,13 +188,14 @@ test.describe("Sposta appuntamento", () => {
 
   test("con più barbieri si può scegliere anche con chi", async ({ page }) => {
     await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
-    // un appuntamento ancora da venire del salone demo (le date dei dati d'esempio seguono il giorno in cui si prova)
+    // il prossimo appuntamento di Andrea nel salone demo (le date dei dati d'esempio seguono il giorno in cui si prova)
     const [next] = await adminSelect<{ starts_at: string; clients: { name: string } }>(
       "appointments",
-      `select=starts_at,clients(name)&salon_id=eq.5a100000-0000-4000-8000-000000000001&status=eq.confermato&starts_at=gte.${new Date(Date.now() + 3_600_000).toISOString()}&order=starts_at&limit=1`,
+      `select=starts_at,clients(name)&salon_id=eq.5a100000-0000-4000-8000-000000000001&member_id=eq.3e300000-0000-4000-8000-000000000001&status=eq.confermato&starts_at=gte.${new Date(Date.now() + 3_600_000).toISOString()}&order=starts_at&limit=1`,
     );
     await page.goto(`/agenda?g=${new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date(next!.starts_at))}`);
-    await openAppointment(page, next!.clients.name);
+    const at = new Intl.DateTimeFormat("it-IT", { timeZone: "Europe/Rome", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date(next!.starts_at));
+    await openAppointment(page, next!.clients.name, at); // lo stesso cliente può avere più appuntamenti nel giorno
     await dialog(page).getByRole("button", { name: "Sposta", exact: true }).click();
     const flow = page.getByRole("dialog", { name: "Sposta appuntamento" });
     await expect(flow.getByRole("heading", { name: "Con chi" })).toBeVisible();

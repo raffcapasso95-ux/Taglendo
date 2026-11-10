@@ -27,3 +27,15 @@ export function quickPrices(listCents: number): QuickPrice[] {
     { key: "free", label: "Omaggio", cents: 0 },
   ];
 }
+
+/** NUOVO: durata di un appuntamento diversa dal listino (es. 40 minuti invece di 30). Passi di 5, da 5 a 480. */
+export const DURATION_STEP = 5;
+export const clampDuration = (min: number) => Math.min(480, Math.max(5, Math.round(min / DURATION_STEP) * DURATION_STEP));
+
+/** Scorciatoie: il listino e +10, +15, +20 minuti. */
+export function quickDurations(base: number): Array<{ key: string; label: string; minutes: number }> {
+  return [
+    { key: "base", label: `${base} min`, minutes: base },
+    ...[10, 15, 20].map((d) => ({ key: `+${d}`, label: `+${d} min`, minutes: clampDuration(base + d) })),
+  ];
+}

@@ -30,6 +30,13 @@ export const LinkIcon = ({ size = 22 }: { size?: number }) => (
     <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" />
   </Icon>
 );
+/** Campanella: le notifiche del salone. */
+export const BellNavIcon = ({ size = 22 }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.5 2h-15z" />
+    <path d="M10 20.5a2.2 2.2 0 0 0 4 0" />
+  </Icon>
+);
 /** Casa: il sito di Taglendo. */
 export const HomeIcon = ({ size = 20 }: { size?: number }) => (
   <Icon size={size}>

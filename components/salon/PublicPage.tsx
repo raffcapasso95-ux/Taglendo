@@ -13,8 +13,6 @@ import { span } from "@/lib/rules/agenda";
 import { hoursLines, mapsHref, openSign, phoneHref } from "@/lib/rules/publicPage";
 import { fromPriceCents } from "@/lib/rules/publicPage";
 import { rangesOf, formatMinutes } from "@/lib/rules/hours";
-import flow from "@/components/agenda/Flow.module.css";
-import { cx } from "@/components/ui/cx";
 import styles from "./Shop.module.css";
 
 type Props = { salon: PublicSalon; weekday: number; nowMin: number; today: string; bookingOn: boolean };
@@ -226,40 +224,43 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn }: Props) 
                 cancelLimit={cancelLimit}
               />
             ) : (
-              <div className={`${styles.bookLayout} ${styles.bookLayoutPhone}`}>
-                <div className={styles.bookPanel}>
-                  <section className={flow.block} aria-labelledby="pb-listino">
-                    <div className={flow.blockHead}>
-                      <h3 className={flow.blockTitle} id="pb-listino">
-                        {copy.phone.list}
-                      </h3>
-                      <span className={styles.count}>{copy.phone.count(salon.services.length)}</span>
-                    </div>
-                    {salon.services.length === 0 ? <p className={styles.sectionNote}>{copy.phone.empty}</p> : null}
-                    {!showPrices && salon.services.length > 0 ? <p className={styles.sectionNote}>{copy.phone.pricesHidden}</p> : null}
-                    <ul className={styles.priceList}>
-                      {salon.services.map((s) => (
-                        <li key={s.id} className={styles.priceRow}>
-                          <span className={styles.priceText}>
-                            <span className={styles.priceName}>{s.name}</span>
-                            <span className={styles.priceMeta}>{span(s.durationMin)}</span>
-                          </span>
-                          {showPrices ? <span className={styles.priceValue}>{formatPrice(s.priceCents)}</span> : null}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                  <footer className={cx(flow.footer, styles.bookFoot)}>
-                    <div className={flow.summary}>
-                      <span className={flow.sumMain}>{copy.phone.only}</span>
-                      <span className={flow.sumSub}>{copy.phone.change}</span>
-                    </div>
-                    <a href={tel} className={styles.callButton}>
-                      <PhoneIcon />
-                      {copy.callToBook}
-                    </a>
-                  </footer>
-                </div>
+              <div className={styles.phoneBook}>
+                <section className={styles.phoneList} aria-labelledby="pb-listino">
+                  <div className={styles.phoneListHead}>
+                    <h3 className={styles.phoneListTitle} id="pb-listino">
+                      {copy.phone.list}
+                    </h3>
+                    <span className={styles.count}>{copy.phone.count(salon.services.length)}</span>
+                  </div>
+                  {salon.services.length === 0 ? <p className={styles.sectionNote}>{copy.phone.empty}</p> : null}
+                  {!showPrices && salon.services.length > 0 ? <p className={styles.sectionNote}>{copy.phone.pricesHidden}</p> : null}
+                  <ul className={styles.priceList}>
+                    {salon.services.map((s) => (
+                      <li key={s.id} className={styles.priceRow}>
+                        <span className={styles.priceText}>
+                          <span className={styles.priceName}>{s.name}</span>
+                          <span className={styles.priceMeta}>{span(s.durationMin)}</span>
+                        </span>
+                        {showPrices ? <span className={styles.priceValue}>{formatPrice(s.priceCents)}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+                {/* NUOVO: prenotazione al telefono, in un riquadro suo (prima riusava il piè del modulo e si deformava) */}
+                <aside className={styles.phoneCard} aria-label={copy.phone.bar}>
+                  <span className={styles.phoneIcon} aria-hidden="true">
+                    <PhoneIcon />
+                  </span>
+                  <p className={styles.phoneOnly}>{copy.phone.only}</p>
+                  <a href={tel} className={styles.phoneNumber}>
+                    {salon.phone}
+                  </a>
+                  <a href={tel} className={styles.phoneCall}>
+                    <PhoneIcon />
+                    {copy.callToBook}
+                  </a>
+                  <p className={styles.phoneChange}>{copy.phone.change}</p>
+                </aside>
               </div>
             )}
           </div>

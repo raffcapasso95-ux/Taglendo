@@ -93,8 +93,12 @@ export function AgendaTour({ firstName, show }: { firstName: string; show: boole
   let cardStyle: React.CSSProperties | undefined;
   if (step && rect) {
     const left = Math.min(Math.max(16, rect.left + rect.width / 2 - cardW / 2), vw - cardW - 16);
+    // sotto se c'è posto, altrimenti sopra; se l'elemento è più alto dello schermo, il riquadro resta in fondo
+    const CARD_H = 240;
     const below = rect.top + rect.height + 12;
-    cardStyle = below + 200 < vh ? { top: below, left, width: cardW } : { bottom: vh - rect.top + 12, left, width: cardW };
+    if (below + CARD_H < vh) cardStyle = { top: below, left, width: cardW };
+    else if (rect.top - 12 - CARD_H > 0) cardStyle = { bottom: vh - rect.top + 12, left, width: cardW };
+    else cardStyle = { bottom: 16, left, width: cardW };
   }
 
   return (

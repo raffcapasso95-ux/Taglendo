@@ -77,7 +77,8 @@ export function MoveAppointment({ detail, operators, closedDates, today, onClose
     if (!detail.serviceId) return;
     let cancelled = false;
     startSlots(async () => {
-      const result = await listSlots({ serviceId: detail.serviceId!, memberId: memberId === "any" ? null : memberId, date, excludeId: detail.id });
+      // la durata è quella dell'appuntamento (anche se diversa dal listino)
+      const result = await listSlots({ serviceId: detail.serviceId!, memberId: memberId === "any" ? null : memberId, date, excludeId: detail.id, durationMin: detail.endMin - detail.startMin });
       if (cancelled) return;
       setSlots(result);
       setStartMin((c) => (c !== null && result.slots.some((s) => s.startMin === c && s.free) ? c : null));

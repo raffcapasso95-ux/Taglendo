@@ -1,5 +1,6 @@
 "use client";
 
+import { cx } from "@/components/ui/cx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -84,7 +85,13 @@ function Inner({ initial }: { initial: EmailPrefs }) {
 
       {dirty || error ? (
         <div className={listino.dirty} role="region" aria-label="Salva">
-          {error ? <p className={listino.dirtyText} role="alert">{error}</p> : null}
+          {error ? (
+            <p className={cx(listino.dirtyText, listino.dirtyError)} role="alert">
+              {error}
+            </p>
+          ) : (
+            <p className={listino.dirtyText}>Modifiche non salvate</p>
+          )}
           <div className={listino.dirtyButtons}>
             <Button variant="secondary" size="large" onClick={() => { setDraft(saved); setError(null); }}>Annulla</Button>
             <Button size="large" disabled={saving || !dirty} onClick={save}>Salva</Button>

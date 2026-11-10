@@ -18,7 +18,7 @@ import { clock, operatorColor, type Operator } from "@/lib/rules/agenda";
 import { AVATAR_COLOR_NAMES, clientInitials } from "@/lib/rules/avatar";
 import { homonyms, normName, phoneTail, pickClients, sameName, visitLabel } from "@/lib/rules/clientPick";
 import { LIMITS } from "@/lib/rules/forms";
-import { eurosText, parseEuros, quickPrices } from "@/lib/rules/price";
+import { clampDuration, DURATION_STEP, eurosText, parseEuros, quickDurations, quickPrices } from "@/lib/rules/price";
 import { offlineCopy } from "@/lib/copy/offline";
 import { useOnline } from "@/lib/offline/hooks";
 import { offlineSlots } from "@/lib/offline/slots";
@@ -92,6 +92,9 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
   const [date, setDate] = useState(prefill?.date ?? selectedDate);
   const [startMin, setStartMin] = useState<number | null>(prefill?.startMin ?? null);
   const [priceOpen, setPriceOpen] = useState(false);
+  // NUOVO: durata diversa dal listino solo per questo appuntamento (null = quella del servizio)
+  const [durationMin, setDurationMin] = useState<number | null>(null);
+  const [durOpen, setDurOpen] = useState(false);
   const [priceCents, setPriceCents] = useState<number | null>(null); // null = prezzo di listino
   const [priceText, setPriceText] = useState("");
   const [priceNote, setPriceNote] = useState("");
@@ -136,14 +139,14 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
   const operatorName = memberId === "any" ? null : operators.find((o) => o.id === memberId)?.name;
 
   // Senza rete gli orari si ricavano dalla fotografia del giorno: solo quel giorno, senza chiedere al server.
-  const offlineResult: SlotsResult | null = !online && service ? (date === offlineDay.date ? { closed: offlineDay.hours.closed, durationMin: service.durationMin, slots: offlineSlots(offlineDay, service.durationMin, memberId === "any" ? null : memberId, 0) } : { closed: false, durationMin: service.durationMin, slots: [] }) : null;
+  const offlineResult: SlotsResult | null = !online && service ? (date === offlineDay.date ? { closed: offlineDay.hours.closed, durationMin: durationMin ?? service.durationMin, slots: offlineSlots(offlineDay, durationMin ?? service.durationMin, memberId === "any" ? null : memberId, 0) } : { closed: false, durationMin: durationMin ?? service.durationMin, slots: [] }) : null;
 
   // Gli orari liberi si ricaricano quando cambia servizio, barbiere o giorno.
   useEffect(() => {
     if (!online || walkInMode || !serviceId) return;
     let cancelled = false;
     startSlots(async () => {
-      const result = await listSlots({ serviceId, memberId: memberId === "any" ? null : memberId, date });
+      const result = await listSlots({ serviceId, memberId: memberId === "any" ? null : memberId, date, durationMin });
       if (cancelled) return;
       setSlots(result);
       setStartMin((current) => (current !== null && result.slots.some((s) => s.startMin === current && s.free) ? current : null));
@@ -151,7 +154,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
     return () => {
       cancelled = true;
     };
-  }, [online, walkInMode, serviceId, memberId, date]);
+  }, [online, walkInMode, serviceId, memberId, date, durationMin]);
 
   const matches = useMemo(() => pickClients(clients.map((c) => ({ ...c, lastVisit: c.lastVisit ?? null })), query, { suggested: SUGGESTED_CLIENTS, results: SEARCH_RESULTS }), [clients, query]);
   const twins = useMemo(() => homonyms(clients.map((c) => ({ ...c, lastVisit: c.lastVisit ?? null }))), [clients]);
@@ -180,7 +183,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
 
   const whenLabel = walkInMode ? flow.nowSummary(nowText) : startMin !== null ? `${shortDate(date)} · ${clock(startMin)}` : flow.pickWhen;
   const priceLabel = changed ? flow.instead(formatPrice(finalCents), formatPrice(listCents)) : formatPrice(finalCents);
-  const subLabel = service ? `${service.name} · ${service.durationMin} min · ${priceLabel} · con ${operatorName ?? flow.anyoneSummary}` : "";
+  const subLabel = service ? `${service.name} · ${durationMin ?? service.durationMin} min · ${priceLabel} · con ${operatorName ?? flow.anyoneSummary}` : "";
 
   const pickTime = (min: number) => {
     setStartMin(min);
@@ -212,7 +215,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
   const save = () =>
     startSave(async () => {
       setError(null);
-      const extra = priceCents !== null ? { priceCents, priceNote: priceNote.trim() || null } : {};
+      const extra = { ...(priceCents !== null ? { priceCents, priceNote: priceNote.trim() || null } : {}), ...(durationMin !== null ? { durationMin } : {}) };
       const who = clientId ? { clientId } : { newClient: { name: newName.trim(), phone: newPhone.trim() || null, email: newEmail.trim() || null, avatarColor: newColor } };
       if (!online && !walkInMode) {
         // Niente rete: si mette in coda e parte appena torna (la foto no: si può aggiungere dopo dalla scheda).
@@ -335,6 +338,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
                   // un prezzo fatto a mano vale per il servizio scelto: cambiando servizio si torna al listino
                   setPriceCents(null);
                   setPriceText("");
+                  setDurationMin(null);
                 }}
               >
                 <span className={styles.cardName}>{s.name}</span>
@@ -385,6 +389,46 @@ export function NewAppointment({ mode, prefill, operators, services, clients: sa
                   <Field size="large" label={flow.noteField} maxLength={60} value={priceNote} placeholder={flow.notePlaceholder} onChange={(e) => setPriceNote(e.target.value)} />
                 </div>
                 <p className={cx(dialogs.hint)}>{flow.priceHint}</p>
+              </div>
+              {/* NUOVO: la durata, come il prezzo: si cambia solo per questo appuntamento */}
+              <div className={cx(styles.price, durationMin !== null && durationMin !== service.durationMin && styles.priceChanged)}>
+                <span className={styles.priceLabel}>{flow.duration}</span>
+                <span className={styles.priceValue}>
+                  <span className={styles.priceOld} hidden={durationMin === null || durationMin === service.durationMin}>
+                    {service.durationMin} min
+                  </span>
+                  <strong>{durationMin ?? service.durationMin} min</strong>
+                </span>
+                <button type="button" className={styles.priceEdit} aria-label={flow.changeDuration} title={flow.changeDuration} aria-expanded={durOpen} aria-controls="fl-durata" onClick={() => setDurOpen(!durOpen)}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M4 20h4L19 9l-4-4L4 16z" />
+                    <path d="m13.5 6.5 4 4" />
+                  </svg>
+                </button>
+              </div>
+              <div className={styles.priceEditor} id="fl-durata" hidden={!durOpen}>
+                <div className={styles.quicks} role="group" aria-label={flow.durationQuick}>
+                  {quickDurations(service.durationMin).map((q) => {
+                    const on = (durationMin ?? service.durationMin) === q.minutes;
+                    return (
+                      <button key={q.key} type="button" className={cx(styles.quick, on && styles.quickOn)} aria-pressed={on} onClick={() => setDurationMin(q.minutes === service.durationMin ? null : q.minutes)}>
+                        {q.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className={styles.durStepper}>
+                  <button type="button" className={styles.durStep} aria-label={flow.durationLess} onClick={() => setDurationMin((d) => { const n = clampDuration((d ?? service.durationMin) - DURATION_STEP); return n === service.durationMin ? null : n; })}>
+                    −
+                  </button>
+                  <output className={styles.durValue} aria-live="polite">
+                    {durationMin ?? service.durationMin} min
+                  </output>
+                  <button type="button" className={styles.durStep} aria-label={flow.durationMore} onClick={() => setDurationMin((d) => { const n = clampDuration((d ?? service.durationMin) + DURATION_STEP); return n === service.durationMin ? null : n; })}>
+                    +
+                  </button>
+                </div>
+                <p className={cx(dialogs.hint)}>{flow.durationHint}</p>
               </div>
             </>
           ) : null}

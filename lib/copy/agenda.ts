@@ -96,6 +96,13 @@ export const agendaCopy = {
     colorGroup: "Colore delle iniziali",
     price: "Prezzo",
     changePrice: "Cambia prezzo",
+    // NUOVO: durata solo per questo appuntamento
+    duration: "Durata",
+    changeDuration: "Cambia durata",
+    durationQuick: "Durate rapide",
+    durationLess: "5 minuti in meno",
+    durationMore: "5 minuti in più",
+    durationHint: "Vale solo per questo appuntamento: il listino non cambia. Gli orari liberi si aggiornano.",
     quick: "Sconti rapidi",
     priceField: "Prezzo per questo cliente (€)",
     noteField: "Motivo · facoltativo",

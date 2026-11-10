@@ -1,6 +1,7 @@
 import { Suspense, type ReactNode } from "react";
 import { CardsSkeleton } from "@/components/states/Skeletons";
 import { AppShell } from "@/components/app/AppShell";
+import { unreadActivity } from "@/lib/activity/load";
 import { requireSalon } from "@/lib/auth/session";
 import { initials } from "@/lib/rules/agenda";
 import { env } from "@/lib/supabase/env";
@@ -11,6 +12,7 @@ import { env } from "@/lib/supabase/env";
  */
 async function Guard({ children }: { children: ReactNode }) {
   const { name, salon, role } = await requireSalon();
+  const unread = await unreadActivity();
   return (
     <AppShell
       salonName={salon.name}
@@ -18,6 +20,7 @@ async function Guard({ children }: { children: ReactNode }) {
       userName={name}
       userInitials={initials(name)}
       isOwner={role === "owner"}
+      unread={unread}
     >
       {children}
     </AppShell>
