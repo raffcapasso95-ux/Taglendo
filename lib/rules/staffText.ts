@@ -34,7 +34,7 @@ export function receives(o: { role: "owner" | "barber"; onlyMine: boolean; isMin
   return o.onlyMine ? o.isMine : true;
 }
 
-/** In quale ora di Roma parte cosa: riepilogo dalle 8, promemoria dalle 18 (con qualche ora di margine se un passaggio salta). */
+/** In quale ora di Roma parte cosa: riepilogo dalle 8 (con qualche ora di margine se un passaggio salta); i promemoria a ogni giro, ognuno col suo anticipo. */
 export function dueJobs(romeHour: number): { summaries: boolean; reminders: boolean } {
-  return { summaries: romeHour >= 8 && romeHour < 11, reminders: romeHour >= 18 && romeHour < 21 };
+  return { summaries: romeHour >= 8 && romeHour < 11, reminders: true };
 }

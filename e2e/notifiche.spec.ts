@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
-import { freshOwner, dialog, openAppointment } from "./agenda-helpers";
+import { freshOwner, dialog, newButton, openAppointment } from "./agenda-helpers";
 import { adminSelect, adminUpdate, bookingCode, countMail, signIn, uniqueEmail, visibleText, waitForMail } from "./helpers";
 
 const CRON = "Bearer local-cron-secret";
@@ -7,7 +7,7 @@ const card = (page: Page) => page.locator("#prenota-card");
 
 async function newSalon(page: Page, name: string) {
   const owner = await freshOwner(page, name);
-  await page.goto("/link");
+  await page.goto("/salone");
   const shown = (await page.getByTestId("salon-url").textContent()) ?? "";
   return { owner, slug: shown.slice(shown.lastIndexOf("/") + 1) };
 }
@@ -105,26 +105,58 @@ test.describe("Email e avvisi", () => {
     await visitor.close();
   });
 
-  test("il promemoria parte una sola volta, il giorno prima", async ({ page, browser, request }) => {
+  /** Sposta l'appuntamento fra `hoursAhead` ore e fa finta che sia stato prenotato tre giorni fa. */
+  async function moveTo(token: string, hoursAhead: number) {
+    const start = new Date(Date.now() + hoursAhead * 3600 * 1000);
+    start.setUTCSeconds(0, 0);
+    await adminUpdate("appointments", `manage_token=eq.${token}`, {
+      starts_at: start.toISOString(),
+      ends_at: new Date(start.getTime() + 30 * 60000).toISOString(),
+      created_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(),
+    });
+  }
+
+  test("il promemoria parte una sola volta, 24 ore prima se il salone non sceglie", async ({ page, browser, request }) => {
     const { slug } = await newSalon(page, "Barberia Promemoria");
     const { visitor, email, path } = await bookOnline(browser, slug);
-    const token = path.split("/").pop();
-    const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
-    tomorrow.setUTCHours(12, 0, 0, 0);
-    const end = new Date(tomorrow.getTime() + 30 * 60000);
-    await adminUpdate("appointments", `manage_token=eq.${token}`, { starts_at: tomorrow.toISOString(), ends_at: end.toISOString() });
-
+    const token = path.split("/").pop()!;
+    await moveTo(token, 30); // mancano più di 24 ore: ancora niente
     expect((await request.get("/api/cron/run?job=reminders")).status()).toBe(401);
     expect((await request.get("/api/cron/run?job=reminders", { headers: { Authorization: "Bearer sbagliato" } })).status()).toBe(401);
+    expect((await request.get("/api/cron/run?job=reminders", { headers: { Authorization: CRON } })).status()).toBe(200);
+    await new Promise((r) => setTimeout(r, 1500));
+    expect(await countMail(email, /alle \d{1,2}:\d{2} da Barberia Promemoria$/)).toBe(0);
 
+    await moveTo(token, 20);
     const first = await request.get("/api/cron/run?job=reminders", { headers: { Authorization: CRON } });
     expect(first.status()).toBe(200);
-    const mail = await waitForMail(email, /^Domani alle \d{2}:\d{2} da Barberia Promemoria$/);
-    expect(mail.html).toContain("A domani, Luca");
+    const mail = await waitForMail(email, /^(Oggi|Domani) alle \d{1,2}:\d{2} da Barberia Promemoria$/);
+    expect(mail.html).toMatch(/A (domani|più tardi), Luca/);
     expect(mail.html).toContain("Gestisci la prenotazione");
     // un secondo passaggio non manda un altro promemoria
     await request.get("/api/cron/run?job=reminders", { headers: { Authorization: CRON } });
-    expect(await countMail(email, /^Domani alle/)).toBe(1);
+    expect(await countMail(email, /alle \d{1,2}:\d{2} da Barberia Promemoria$/)).toBe(1);
+    await visitor.close();
+  });
+
+  test("il salone sceglie l'anticipo: con 2 ore il promemoria parte il giorno stesso", async ({ page, browser, request }) => {
+    const { slug } = await newSalon(page, "Barberia Due Ore");
+    await page.goto("/impostazioni/email");
+    await page.getByRole("button", { name: "2 ore", exact: true }).click();
+    await page.getByRole("button", { name: "Salva", exact: true }).click();
+    await expect(page.getByText("Email salvate").filter({ visible: true })).toBeVisible();
+    await page.goto("/salone");
+    await expect(page.getByRole("main").getByRole("link", { name: /Email automatiche ai clienti/ })).toContainText("2 ore prima");
+
+    const { visitor, email, path } = await bookOnline(browser, slug);
+    const token = path.split("/").pop()!;
+    await moveTo(token, 5);
+    await request.get("/api/cron/run?job=reminders", { headers: { Authorization: CRON } });
+    await new Promise((r) => setTimeout(r, 1500));
+    expect(await countMail(email, /da Barberia Due Ore$/)).toBe(0);
+    await moveTo(token, 1.5);
+    await request.get("/api/cron/run?job=reminders", { headers: { Authorization: CRON } });
+    await waitForMail(email, /^(Oggi|Domani) alle \d{1,2}:\d{2} da Barberia Due Ore$/);
     await visitor.close();
   });
 
@@ -135,13 +167,26 @@ test.describe("Email e avvisi", () => {
     await page.getByRole("button", { name: "Salva", exact: true }).click();
     await expect(page.getByText("Email salvate").filter({ visible: true })).toBeVisible();
     const { visitor, email, path } = await bookOnline(browser, slug);
-    const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
-    tomorrow.setUTCHours(12, 0, 0, 0);
-    await adminUpdate("appointments", `manage_token=eq.${path.split("/").pop()}`, { starts_at: tomorrow.toISOString(), ends_at: new Date(tomorrow.getTime() + 30 * 60000).toISOString() });
+    await moveTo(path.split("/").pop()!, 20);
     await request.get("/api/cron/run?job=reminders", { headers: { Authorization: CRON } });
     await new Promise((r) => setTimeout(r, 1500));
-    expect(await countMail(email, /^Domani alle/)).toBe(0);
+    expect(await countMail(email, /da Barberia Senza Promemoria$/)).toBe(0);
     await visitor.close();
+  });
+
+  test("un appuntamento fissato in agenda per un cliente con email gli manda la conferma", async ({ page }) => {
+    await freshOwner(page, "Barberia Conferma Agenda");
+    const email = uniqueEmail("agenda");
+    await page.goto("/agenda");
+    await newButton(page).click();
+    await dialog(page).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
+    await dialog(page).getByLabel("Nome").fill("Carlo Verdi");
+    await dialog(page).getByLabel(/^Email/).fill(email);
+    await dialog(page).getByRole("button", { name: /^\d{2}:\d{2}$/ }).first().click();
+    await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();
+    const mail = await waitForMail(email, /^Confermato: /);
+    expect(mail.html).toContain("Carlo");
+    expect(mail.html).toContain("Gestisci la prenotazione");
   });
 
   test("il riepilogo delle 8:00 arriva a chi lo ha acceso", async ({ page, browser, request }) => {

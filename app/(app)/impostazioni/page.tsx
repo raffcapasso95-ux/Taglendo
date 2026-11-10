@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { CardsSkeleton } from "@/components/states/Skeletons";
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { Suspense } from "react";
 import { Card } from "@/components/ui";
 import { cx } from "@/components/ui/cx";
-import { ScissorsIcon, UsersIcon } from "@/components/app/Icons";
-import { BellIcon, CardIcon, HelpIcon, MailIcon, PageIcon, RulesIcon } from "@/components/settings/SettingsIcons";
+import { StoreIcon } from "@/components/app/Icons";
+import { SettingsGroup, type SettingsRow } from "@/components/settings/SettingsGroup";
+import { BellIcon, CardIcon, HelpIcon } from "@/components/settings/SettingsIcons";
 import styles from "@/components/listino/Listino.module.css";
 import settings from "@/components/settings/Settings.module.css";
 import { signOut } from "@/lib/auth/actions";
@@ -21,44 +21,6 @@ export const metadata: Metadata = { title: "Impostazioni · Taglendo" };
 
 const copy = listinoCopy.settings;
 
-type Row = { href: string; label: string; sub: string; tone: 0 | 1 | 2 | 3; icon: ReactNode };
-
-/** Un gruppo di righe con icona colorata e una riga di spiegazione (Impostazioni del titolare). */
-function Group({ id, title, rows }: { id: string; title: string; rows: Row[] }) {
-  return (
-    <section className={settings.section} aria-labelledby={id}>
-      <h2 className={settings.title} id={id}>
-        {title}
-      </h2>
-      <div className={settings.group}>
-        {rows.map((r) => {
-          const inner = (
-            <>
-              <span className={cx(settings.icon, settings[`t${r.tone}` as "t0"])}>{r.icon}</span>
-              <span className={settings.text}>
-                <span className={settings.label}>{r.label}</span>
-                {r.sub ? <span className={settings.sub}>{r.sub}</span> : null}
-              </span>
-              <span className={settings.chev} aria-hidden="true">
-                ›
-              </span>
-            </>
-          );
-          return r.href.startsWith("mailto:") ? (
-            <a key={r.href} className={settings.row} href={r.href}>
-              {inner}
-            </a>
-          ) : (
-            <Link key={r.href} className={settings.row} href={r.href}>
-              {inner}
-            </Link>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
 async function Content() {
   const { name, role, chair_no: chair, salon } = await requireSalon();
   const owner = role === "owner";
@@ -71,16 +33,10 @@ async function Content() {
 
   if (owner) {
     // Con i pagamenti spenti (beta gratuita) non c'è nessun abbonamento da gestire.
-    const salonRows: Row[] = [
-      { href: "/listino", label: copy.rows.listino, sub: copy.rowSub.listino, tone: 0, icon: <ScissorsIcon /> },
-      { href: "/impostazioni/operatori", label: copy.rows.operators, sub: copy.operatorsSub, tone: 1, icon: <UsersIcon /> },
-      { href: "/impostazioni/regole", label: copy.rows.rules, sub: copy.rowSub.rules, tone: 2, icon: <RulesIcon /> },
-      { href: "/impostazioni/pagina", label: copy.rows.page, sub: copy.rowSub.page, tone: 3, icon: <PageIcon /> },
-      ...(billingEnabled() ? [{ href: "/impostazioni/abbonamento", label: copy.rows.subscription, sub: "", tone: 1 as const, icon: <CardIcon /> }] : []),
-    ];
-    const messageRows: Row[] = [
-      { href: "/impostazioni/email", label: copy.rows.emails, sub: copy.rowSub.emails, tone: 1, icon: <MailIcon /> },
+    const salonRows: SettingsRow[] = [{ href: "/salone", label: copy.salonRow, sub: copy.salonRowSub, tone: 3, icon: <StoreIcon size={20} /> }];
+    const accountRows: SettingsRow[] = [
       { href: "/impostazioni/avvisi", label: copy.rows.alerts, sub: copy.rowSub.alerts, tone: 0, icon: <BellIcon /> },
+      ...(billingEnabled() ? [{ href: "/impostazioni/abbonamento", label: copy.rows.subscription, sub: "", tone: 1 as const, icon: <CardIcon /> }] : []),
     ];
     return (
       <main className={cx(styles.page, settings.page)}>
@@ -100,9 +56,9 @@ async function Content() {
           </span>
         </Link>
 
-        <Group id="set-salone" title={copy.salon} rows={salonRows} />
-        <Group id="set-clienti" title={copy.messages} rows={messageRows} />
-        <Group
+        <SettingsGroup id="set-salone" title={copy.salon} rows={salonRows} />
+        <SettingsGroup id="set-account" title={copy.account} rows={accountRows} />
+        <SettingsGroup
           id="set-aiuto"
           title={copy.help.title}
           rows={[{ href: `mailto:${company.email}?subject=Taglendo%3A%20segnalazione`, label: copy.help.row, sub: copy.help.sub, tone: 2, icon: <HelpIcon /> }]}

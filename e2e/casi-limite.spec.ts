@@ -8,7 +8,7 @@ const card = (page: Page) => page.locator("#prenota-card");
 
 async function newSalon(page: Page, name: string) {
   await freshOwner(page, name);
-  await page.goto("/link");
+  await page.goto("/salone");
   const shown = (await page.getByTestId("salon-url").textContent()) ?? "";
   return shown.slice(shown.lastIndexOf("/") + 1);
 }

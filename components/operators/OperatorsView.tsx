@@ -87,7 +87,7 @@ export function OperatorsView({ salonName, people, canAdd, permissions }: Props)
 
   return (
     <main className={styles.page}>
-      <Link href="/impostazioni" className={styles.back}>
+      <Link href="/salone" className={styles.back}>
         <span aria-hidden="true">‹</span> {copy.back}
       </Link>
       <header className={styles.head}>

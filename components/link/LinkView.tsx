@@ -15,6 +15,8 @@ type Props = {
   bookingOnline: boolean;
   cancelLabel: string;
   isOwner: boolean;
+  /** Le impostazioni del salone (righe che portano alle pagine), sotto il link. */
+  children?: ReactNode;
 };
 
 const Svg = ({ children }: { children: ReactNode }) => (
@@ -31,7 +33,7 @@ export function LinkView(props: Props) {
   );
 }
 
-function Inner({ salonName, url, prices, bookingOnline, cancelLabel, isOwner }: Props) {
+function Inner({ salonName, url, prices, bookingOnline, cancelLabel, isOwner, children }: Props) {
   const toast = useToast();
   const [copied, setCopied] = useState(false);
   const shown = url.replace(/^https?:\/\//, "");
@@ -102,8 +104,8 @@ function Inner({ salonName, url, prices, bookingOnline, cancelLabel, isOwner }: 
   return (
     <main className={cx(styles.page, settings.page)}>
       <header className={settings.headBlock}>
-        <p className={styles.eyebrow}>Prenotazioni dirette</p>
-        <h1 className={styles.title}>Il tuo link</h1>
+        <p className={styles.eyebrow}>Il tuo salone</p>
+        <h1 className={styles.title}>{salonName}</h1>
         <p className={styles.intro}>
           {bookingOnline
             ? `I clienti vedono solo il tuo salone: servizi, ${prices ? "prezzi " : ""}e orari davvero liberi. Nessun marketplace, nessun nome di altri clienti.`
@@ -111,6 +113,7 @@ function Inner({ salonName, url, prices, bookingOnline, cancelLabel, isOwner }: 
         </p>
       </header>
 
+      <h2 className={settings.title}>Link di prenotazione</h2>
       <section className={settings.linkCard} aria-label="Indirizzo della pagina">
         <div className={settings.linkTop}>
           <Image className={settings.linkLogo} src="/brand/taglendo-icon.svg" alt="" width={44} height={44} />
@@ -148,6 +151,8 @@ function Inner({ salonName, url, prices, bookingOnline, cancelLabel, isOwner }: 
         </div>
       </section>
 
+      {children}
+
       <section className={settings.section} aria-labelledby="lk-regole">
         <h2 className={settings.title} id="lk-regole">
           Regole attive
@@ -165,9 +170,9 @@ function Inner({ salonName, url, prices, bookingOnline, cancelLabel, isOwner }: 
             </div>
           ))}
           {isOwner ? (
-            <Link href="/impostazioni" className={cx(settings.row, settings.rowLink)}>
+            <Link href="/impostazioni/regole" className={cx(settings.row, settings.rowLink)}>
               <span className={settings.text}>
-                <span className={settings.label}>Cambia le regole in Impostazioni</span>
+                <span className={settings.label}>Cambia le regole</span>
               </span>
               <span className={settings.chev} aria-hidden="true">
                 ›

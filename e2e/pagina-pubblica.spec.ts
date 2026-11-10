@@ -64,11 +64,16 @@ test.describe("Pagina pubblica del salone", () => {
   });
 });
 
-test.describe("Link nell'app", () => {
-  test("mostra l'indirizzo della pagina e le regole", async ({ page }) => {
+test.describe("Salone nell'app", () => {
+  test("mostra l'indirizzo della pagina, le regole e le impostazioni del salone; /link porta qui", async ({ page }) => {
     await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
     await page.goto("/link");
-    await expect(page.getByRole("heading", { level: 1, name: "Il tuo link" })).toBeVisible();
+    await expect(page).toHaveURL(/\/salone$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Barberia Saragozza" })).toBeVisible();
+    for (const label of ["Pagina del salone", "Listino e orari", "Operatori", "Regole di prenotazione", "Email automatiche ai clienti"]) {
+      await expect(page.getByRole("main").getByRole("link", { name: new RegExp(label) })).toBeVisible();
+    }
+    await expect(page.getByRole("main").getByRole("link", { name: /Email automatiche ai clienti/ })).toContainText("24 ore prima");
     await expect(page.getByTestId("salon-url")).toContainText("/barberia-saragozza");
     await expect(page.getByRole("button", { name: "Copia link" })).toBeVisible();
     await expect(visibleText(page, "Prenotazione online")).toBeVisible();
@@ -77,7 +82,7 @@ test.describe("Link nell'app", () => {
 
   test("un salone nuovo ha subito la sua pagina", async ({ page, browser }) => {
     await freshOwner(page, "Barberia Nuova Pagina");
-    await page.goto("/link");
+    await page.goto("/salone");
     await expect(page.getByTestId("salon-url")).toContainText("/barberia-nuova-pagina");
     const href = await page.getByRole("link", { name: "Apri la tua pagina" }).getAttribute("href");
     const visitor = await browser.newPage();

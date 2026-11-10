@@ -1,7 +1,7 @@
 /** Link riservati alle rotte del sito. Va tenuto uguale a salons_slug_not_reserved nel database. */
 const RESERVED_SLUGS = [
   "accedi", "registrati", "verifica", "password", "nuova-password", "invito", "primo-avvio", "pronto",
-  "agenda", "clienti", "link", "listino", "impostazioni", "profilo",
+  "agenda", "clienti", "link", "listino", "impostazioni", "profilo", "salone", "statistiche",
   "privacy", "termini", "cookie", "api", "auth", "dev", "admin", "app", "www", "taglendo",
 ] as const;
 

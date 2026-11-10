@@ -26,7 +26,7 @@ test.describe("Regole di prenotazione", () => {
     expect(rows[0]).toEqual({ min_notice_min: 1440, slot_step_min: 30, show_prices: false, cancel_limit_min: 1440 });
 
     // la pagina pubblica non mostra più i prezzi
-    await page.goto("/link");
+    await page.goto("/salone");
     const shown = (await page.getByTestId("salon-url").textContent()) ?? "";
     const slug = shown.slice(shown.lastIndexOf("/") + 1);
     const visitor = await browser.newPage();
@@ -42,7 +42,7 @@ test.describe("Regole di prenotazione", () => {
     await expect(page.getByText("Regole salvate").filter({ visible: true })).toBeVisible();
     await visitor.reload();
     await expect(visitor.getByRole("heading", { name: "Servizi e prezzi." })).toBeVisible();
-    await page.goto("/link");
+    await page.goto("/salone");
     await expect(visibleText(page, "Solo telefono").first()).toBeVisible();
     await visitor.close();
   });

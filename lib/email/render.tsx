@@ -32,11 +32,11 @@ export async function buildCancellationEmail(p: Omit<CancellationEmailProps, "si
   return { subject: cancelEmailCopy.subject, html: await render(el), text: await render(el, { plainText: true }) };
 }
 
-/** F3: promemoria. `at` è l'ora, "10:30", per l'oggetto. */
-export async function buildReminderEmail(p: Omit<ReminderEmailProps, "siteUrl"> & { at: string }): Promise<Built> {
-  const { at, ...props } = p;
+/** F3: promemoria. `at` è l'ora, "10:30", per l'oggetto; `dayLong` è "giovedì 12 novembre" (serve con day "altro"). */
+export async function buildReminderEmail(p: Omit<ReminderEmailProps, "siteUrl"> & { at: string; dayLong?: string }): Promise<Built> {
+  const { at, dayLong, ...props } = p;
   const el = <ReminderEmail {...props} siteUrl={env.siteUrl()} />;
-  return { subject: reminderEmailCopy.subject(p.salonName, at), html: await render(el), text: await render(el, { plainText: true }) };
+  return { subject: reminderEmailCopy.subject(p.salonName, at, p.day, dayLong), html: await render(el), text: await render(el, { plainText: true }) };
 }
 
 /** F6: appuntamento spostato. `afterLong` è "venerdì 30 ottobre alle 11:30". */

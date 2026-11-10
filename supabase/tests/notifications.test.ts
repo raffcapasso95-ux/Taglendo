@@ -15,6 +15,26 @@ describe("promemoria e avvisi", () => {
     });
   });
 
+  it("l'anticipo del promemoria è 24 ore se non si sceglie, e solo tra quelli previsti", async () => {
+    await inTx(async (tx) => {
+      const s = await createTestSalon(tx);
+      await tx.asAdmin();
+      const [p] = await tx.q<{ reminder_hours: number }>(`insert into email_prefs (salon_id) values ($1) on conflict (salon_id) do update set reminder = true returning reminder_hours`, [s.salonId]);
+      expect(p!.reminder_hours).toBe(24);
+      await tx.q(`update email_prefs set reminder_hours = 2 where salon_id = $1`, [s.salonId]);
+      expect(await tx.error(`update email_prefs set reminder_hours = 6 where salon_id = $1`, [s.salonId])).toBe("23514");
+    });
+  });
+
+  it("i link delle pagine del gestionale (salone, statistiche) non si possono dare a un salone", async () => {
+    await inTx(async (tx) => {
+      const s = await createTestSalon(tx);
+      await tx.asAdmin();
+      expect(await tx.error(`update salons set slug = 'salone' where id = $1`, [s.salonId])).toBe("23514");
+      expect(await tx.error(`update salons set slug = 'statistiche' where id = $1`, [s.salonId])).toBe("23514");
+    });
+  });
+
   it("il riepilogo vale una volta al giorno per operatore", async () => {
     await inTx(async (tx) => {
       const s = await createTestSalon(tx);

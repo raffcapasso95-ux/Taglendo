@@ -176,12 +176,17 @@ test.describe("Impostazioni", () => {
     await signIn(page, "andrea@barberia-saragozza.example", DEMO);
     await page.goto("/impostazioni");
     await expect(page.getByRole("heading", { level: 1, name: "Impostazioni" })).toBeVisible();
-    for (const label of ["Listino e orari", "Operatori", "Regole di prenotazione", "Email automatiche ai clienti", "Pagina del salone", "Avvisi"]) {
+    for (const label of ["Impostazioni del salone", "Avvisi"]) {
       await expect(page.getByRole("main").getByRole("link", { name: new RegExp(label) })).toBeVisible();
     }
     await expect(page.getByRole("main").getByRole("link", { name: /Abbonamento/ })).toHaveCount(0);
+    // le impostazioni del salone stanno in «Salone»; da lì, e ritorno
+    await page.getByRole("main").getByRole("link", { name: /Impostazioni del salone/ }).click();
+    await expect(page).toHaveURL(/\/salone$/);
     await page.getByRole("main").getByRole("link", { name: /Operatori/ }).click();
     await expect(page).toHaveURL(/\/impostazioni\/operatori$/);
+    await page.getByRole("link", { name: /Salone/ }).first().click();
+    await expect(page).toHaveURL(/\/salone$/);
   });
 
   test("un barbiere vede 'Solo titolare' e può uscire", async ({ page }) => {

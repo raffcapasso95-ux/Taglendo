@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Button, Toggle, ToastProvider, useToast } from "@/components/ui";
+import { Button, Segmented, Toggle, ToastProvider, useToast } from "@/components/ui";
 import listino from "@/components/listino/Listino.module.css";
 import { emailPrefsCopy as copy } from "@/lib/copy/notify";
+import { REMINDER_HOURS, reminderLabel, type ReminderHours } from "@/lib/rules/reminders";
 import { saveEmailPrefs, type EmailPrefs } from "@/lib/settings/actions";
 import styles from "./Rules.module.css";
 
@@ -39,7 +40,7 @@ function Inner({ initial }: { initial: EmailPrefs }) {
   return (
     <main className={listino.page}>
       <header className={listino.head}>
-        <Link href="/impostazioni" className={styles.back}>‹ {copy.back}</Link>
+        <Link href="/salone" className={styles.back}>‹ {copy.back}</Link>
         <p className={listino.eyebrow}>{copy.eyebrow}</p>
         <h1 className={listino.title}>{copy.title}</h1>
       </header>
@@ -55,6 +56,22 @@ function Inner({ initial }: { initial: EmailPrefs }) {
           </div>
           <Toggle label={copy.confirmation.label} description={copy.confirmation.sub} checked={draft.confirmation} onChange={(v) => setDraft((d) => ({ ...d, confirmation: v }))} />
           <Toggle label={copy.reminder.label} description={copy.reminder.sub} checked={draft.reminder} onChange={(v) => setDraft((d) => ({ ...d, reminder: v }))} />
+          {draft.reminder ? (
+            <div className={styles.rule}>
+              <span className={styles.ruleText}>
+                <span className={styles.ruleLabel}>{copy.reminderWhen.label}</span>
+                <span className={styles.ruleHint}>{copy.reminderWhen.hint(reminderLabel(draft.reminderHours))}</span>
+              </span>
+              <Segmented
+                label={copy.reminderWhen.label}
+                value={String(draft.reminderHours)}
+                onChange={(v) => setDraft((d) => ({ ...d, reminderHours: Number(v) as ReminderHours }))}
+                options={REMINDER_HOURS.map((h) => ({ value: String(h), label: copy.reminderWhen.options[h] }))}
+                className={styles.hoursChoice}
+                fullWidth
+              />
+            </div>
+          ) : null}
           <Toggle label={copy.cancellation.label} description={copy.cancellation.sub} checked={draft.cancellation} onChange={(v) => setDraft((d) => ({ ...d, cancellation: v }))} />
         </div>
         <Link href="/impostazioni/email/anteprima" className={styles.link}>

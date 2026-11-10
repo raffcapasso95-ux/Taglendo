@@ -15,6 +15,7 @@ import { formatPrice } from "@/lib/dates/format";
 import { dayNumber, monthShort, romeMinutes, weekdayShort } from "@/lib/dates/rome";
 import { clock, operatorColor, type Operator } from "@/lib/rules/agenda";
 import { AVATAR_COLOR_NAMES, clientInitials } from "@/lib/rules/avatar";
+import { homonyms, normName, phoneTail, pickClients, sameName, visitLabel } from "@/lib/rules/clientPick";
 import { LIMITS } from "@/lib/rules/forms";
 import { eurosText, parseEuros, quickPrices } from "@/lib/rules/price";
 import { offlineCopy } from "@/lib/copy/offline";
@@ -48,10 +49,8 @@ type Props = {
 };
 
 /** Quanti clienti si propongono senza che si scriva niente, e quanti con una ricerca. */
-const SUGGESTED_CLIENTS = 3;
+const SUGGESTED_CLIENTS = 5;
 const SEARCH_RESULTS = 8;
-
-const norm = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 
 /** `Ven 30 ott` */
 export const shortDate = (date: string) => `${weekdayShort(date)} ${dayNumber(date)} ${monthShort(date)}`;
@@ -79,6 +78,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
   const [newMode, setNewMode] = useState(() => !prefill?.clientId && prefill?.newName !== undefined && prefill?.newName !== null);
   const [newName, setNewName] = useState(prefill?.newName ?? "");
   const [newPhone, setNewPhone] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [newColor, setNewColor] = useState(0);
   const [photo, setPhoto] = useState<{ blob: Blob; url: string } | null>(null);
   const [serviceId, setServiceId] = useState(() => (prefill?.serviceId && services.some((s) => s.id === prefill.serviceId) ? prefill.serviceId : (services[0]?.id ?? "")));
@@ -147,12 +147,17 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
     };
   }, [online, walkInMode, serviceId, memberId, date]);
 
-  const matches = useMemo(() => {
-    const q = norm(query.trim());
-    if (!q) return clients.slice(0, SUGGESTED_CLIENTS);
-    const digits = q.replace(/\D/g, "");
-    return clients.filter((c) => norm(c.name).includes(q) || (digits.length >= 3 && (c.phone ?? "").replace(/\D/g, "").endsWith(digits))).slice(0, SEARCH_RESULTS);
-  }, [clients, query]);
+  const matches = useMemo(() => pickClients(clients.map((c) => ({ ...c, lastVisit: c.lastVisit ?? null })), query, { suggested: SUGGESTED_CLIENTS, results: SEARCH_RESULTS }), [clients, query]);
+  const twins = useMemo(() => homonyms(clients.map((c) => ({ ...c, lastVisit: c.lastVisit ?? null }))), [clients]);
+  /** Riga sotto il nome: ultime cifre del telefono (se si possono vedere) e ultima visita. */
+  const clientDetail = (c: Pick<ClientOption, "phone" | "lastVisit">) => {
+    const tail = phoneTail(c.phone);
+    return [tail ? flow.phoneTail(tail) : null, c.lastVisit ? flow.lastVisit(visitLabel(c.lastVisit, today)) : flow.neverCame].filter(Boolean).join(" · ");
+  };
+  // stesso nome di un cliente già salvato: prima di crearne un doppione si chiede «è lui?»
+  const [dupDismissed, setDupDismissed] = useState<string | null>(null);
+  const duplicateCandidate = newMode && !clientId ? sameName(clients.map((c) => ({ ...c, lastVisit: c.lastVisit ?? null })), newName) : null;
+  const duplicate = duplicateCandidate && dupDismissed !== normName(newName) ? duplicateCandidate : null;
 
   const shown = online ? slots : offlineResult;
   /** Più barbieri: c'è il blocco «Con chi», e con «Chiunque» gli orari dicono chi è libero. */
@@ -202,7 +207,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
     startSave(async () => {
       setError(null);
       const extra = priceCents !== null ? { priceCents, priceNote: priceNote.trim() || null } : {};
-      const who = clientId ? { clientId } : { newClient: { name: newName.trim(), phone: newPhone.trim() || null, avatarColor: newColor } };
+      const who = clientId ? { clientId } : { newClient: { name: newName.trim(), phone: newPhone.trim() || null, email: newEmail.trim() || null, avatarColor: newColor } };
       if (!online && !walkInMode) {
         // Niente rete: si mette in coda e parte appena torna (la foto no: si può aggiungere dopo dalla scheda).
         queueCreate({ ...who, ...extra, serviceId, memberId: memberId === "any" ? null : memberId, date, startMin: startMin ?? 0 }, { client: client?.name ?? newName.trim(), service: service?.name ?? "" });
@@ -429,66 +434,85 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
               {flow.forWhom}
             </h3>
           </div>
-          <Field
-            size="large"
-            label={flow.searchClient}
-            labelClassName={dialogs.srOnly}
-            boxClassName={dialogs.searchBox}
-            placeholder={flow.searchClient}
-            autoComplete="off"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            leading={
-              <svg className={dialogs.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="6.5" />
-                <path d="m20 20-4.2-4.2" />
-              </svg>
-            }
-          />
-          <div className={styles.people} role="group" aria-label={flow.savedClients}>
-            <button
-              type="button"
-              className={cx(styles.person, newMode && !clientId && styles.personOn)}
-              aria-pressed={newMode && !clientId}
-              onClick={() => {
-                setClientId(null);
-                setNewMode(true);
-                setNewName((n) => n || query.trim());
-              }}
-            >
-              <span className={styles.personAv}>
-                <span className={styles.newAv} aria-hidden="true">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M12 5v14M5 12h14" />
-                  </svg>
-                </span>
+          {client ? (
+            <div className={styles.clientPicked}>
+              <Avatar name={client.name} color={client.avatarColor} photoUrl={client.photoUrl} size="md" className={styles.clientAv} />
+              <span className={styles.clientText}>
+                <span className={styles.clientName}>{client.name}</span>
+                <span className={styles.clientSub}>{clientDetail(client)}</span>
               </span>
-              <span className={styles.personName}>{flow.newShort}</span>
-              <span className={styles.personSub}>{flow.newSub}</span>
-            </button>
-            {matches.map((c) => {
-              const [first, ...rest] = c.name.trim().split(/\s+/);
-              return (
+              <button type="button" className={dialogs.linkButton} onClick={() => setClientId(null)}>
+                {copy.change}
+              </button>
+            </div>
+          ) : (
+            <>
+              <Field
+                size="large"
+                label={flow.searchClient}
+                labelClassName={dialogs.srOnly}
+                boxClassName={dialogs.searchBox}
+                placeholder={flow.searchClientLong}
+                autoComplete="off"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                leading={
+                  <svg className={dialogs.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="6.5" />
+                    <path d="m20 20-4.2-4.2" />
+                  </svg>
+                }
+              />
+              <div className={styles.clientList} role="group" aria-label={flow.savedClients}>
                 <button
-                  key={c.id}
                   type="button"
-                  className={cx(styles.person, clientId === c.id && styles.personOn)}
-                  aria-pressed={clientId === c.id}
+                  className={cx(styles.clientRow, newMode && styles.clientRowOn)}
+                  aria-pressed={newMode}
                   onClick={() => {
-                    setClientId(c.id);
-                    setNewMode(false);
+                    setNewMode(true);
+                    setNewName((n) => n || query.trim());
                   }}
                 >
-                  <span className={styles.personAv}>
-                    <Avatar name={c.name} color={c.avatarColor} photoUrl={c.photoUrl} size="md" className={styles.avBig} />
+                  <span className={styles.newAv} aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M12 5v14M5 12h14" />
+                    </svg>
                   </span>
-                  <span className={styles.personName}>{first}</span>
-                  {rest.length > 0 ? <span className={styles.personSub}>{rest.join(" ")}</span> : null}
+                  <span className={styles.clientText}>
+                    <span className={styles.clientName}>{flow.newClient}</span>
+                  </span>
                 </button>
-              );
-            })}
-          </div>
-          {query.trim() && matches.length === 0 ? <p className={dialogs.hint}>{copy.noClients}</p> : null}
+                {matches.length > 0 ? (
+                  <p className={styles.clientListTitle} aria-hidden="true">
+                    {query.trim() ? flow.foundClients : flow.recentClients}
+                  </p>
+                ) : null}
+                {matches.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className={styles.clientRow}
+                    aria-pressed={false}
+                    onClick={() => {
+                      setClientId(c.id);
+                      setNewMode(false);
+                      setQuery("");
+                    }}
+                  >
+                    <Avatar name={c.name} color={c.avatarColor} photoUrl={c.photoUrl} size="md" className={styles.clientAv} />
+                    <span className={styles.clientText}>
+                      <span className={styles.clientName}>
+                        {c.name}
+                        {twins.has(normName(c.name)) ? <span className={styles.twinBadge}>{flow.sameNameBadge}</span> : null}
+                      </span>
+                      <span className={styles.clientSub}>{clientDetail(c)}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {query.trim() && matches.length === 0 ? <p className={dialogs.hint}>{copy.noClients}</p> : null}
+            </>
+          )}
           <div className={styles.newClient} hidden={!showAvatarPreview}>
             <div className={avatarStyles.picker}>
               <Avatar name={previewName || "+"} color={newColor} photoUrl={photo?.url} size="lg" text={previewName ? clientInitials(previewName) : "+"} />
@@ -519,6 +543,30 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
               <Field size="large" label={copy.name} maxLength={LIMITS.clientName} value={newName} onChange={(e) => setNewName(e.target.value)} />
               <Field size="large" label={`${copy.phone} · ${copy.phoneHint}`} type="tel" inputMode="tel" maxLength={LIMITS.phone} value={newPhone} onChange={(e) => setNewPhone(e.target.value)} />
             </div>
+            <Field size="large" label={`${copy.email} · ${copy.emailHint}`} type="email" inputMode="email" autoComplete="off" maxLength={LIMITS.email} value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
+            {duplicate ? (
+              <div className={styles.dupWarn} role="status">
+                <p className={styles.dupText}>{flow.duplicate(duplicate.name, clientDetail(duplicate))}</p>
+                <div className={styles.dupActions}>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setClientId(duplicate.id);
+                      setNewMode(false);
+                      setNewName("");
+                      setNewPhone("");
+                      setNewEmail("");
+                      setPhoto(null);
+                    }}
+                  >
+                    {flow.useExisting}
+                  </Button>
+                  <button type="button" className={dialogs.linkButton} onClick={() => setDupDismissed(normName(newName))}>
+                    {flow.keepNew}
+                  </button>
+                </div>
+              </div>
+            ) : null}
             <button
               type="button"
               className={dialogs.linkButton}
@@ -526,6 +574,7 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
                 setNewMode(false);
                 setNewName("");
                 setNewPhone("");
+                setNewEmail("");
                 setPhoto(null);
               }}
             >

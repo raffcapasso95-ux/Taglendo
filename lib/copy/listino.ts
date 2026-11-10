@@ -129,6 +129,10 @@ export const listinoCopy = {
       profile: "Profilo",
     },
     operatorsSub: "Inviti e permessi",
+    // NUOVO: le impostazioni del salone stanno nella sezione «Salone»
+    salonRow: "Impostazioni del salone",
+    salonRowSub: "Link, pagina, listino, operatori, regole ed email",
+    account: "Il tuo account",
     messages: "Messaggi",
     rowSub: {
       listino: "Servizi, prezzi e orari di ogni giorno",
@@ -137,6 +141,16 @@ export const listinoCopy = {
       emails: "Conferme e promemoria",
       alerts: "Cosa ti notifichiamo e quando",
     },
+  },
+  /** NUOVO: sezione «Salone» (link di prenotazione e tutte le impostazioni del salone). */
+  salon: {
+    eyebrow: "Il tuo salone",
+    linkTitle: "Link di prenotazione",
+    settingsTitle: "Impostazioni del salone",
+    clientsTitle: "Messaggi ai clienti",
+    remindersSub: (hours: string) => `Conferme e promemoria ${hours} prima`,
+    ownerOnly: "Solo titolare",
+    askOwner: (owner: string) => `Le impostazioni del salone le cambia ${owner || "il titolare"}.`,
   },
   errors: {
     // NUOVO

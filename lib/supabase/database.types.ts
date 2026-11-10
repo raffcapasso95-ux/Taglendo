@@ -141,14 +141,14 @@ isOneToOne: false
                   ]
                 },"email_prefs": {
                   Row: {
-                    "cancellation": boolean,"confirmation": boolean,"reminder": boolean,"salon_id": string
+                    "cancellation": boolean,"confirmation": boolean,"reminder": boolean,"reminder_hours": number,"salon_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "cancellation"?: boolean,"confirmation"?: boolean,"reminder"?: boolean,"salon_id": string
+                    "cancellation"?: boolean,"confirmation"?: boolean,"reminder"?: boolean,"reminder_hours"?: number,"salon_id": string
                   }
                   Update: {
-                    "cancellation"?: boolean,"confirmation"?: boolean,"reminder"?: boolean,"salon_id"?: string
+                    "cancellation"?: boolean,"confirmation"?: boolean,"reminder"?: boolean,"reminder_hours"?: number,"salon_id"?: string
                   }
                   Relationships: [
                     {

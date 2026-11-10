@@ -89,7 +89,7 @@ function Inner({ host, slug, initial, photos }: { host: string; slug: string; in
   return (
     <main className={cx(listino.page, settings.page, settings.pfPage)}>
       <header className={listino.head}>
-        <Link href="/impostazioni" className={rules.back}>
+        <Link href="/salone" className={rules.back}>
           ‹ {copy.back}
         </Link>
         <h1 className={listino.title}>{copy.title}</h1>

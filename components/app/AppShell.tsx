@@ -17,7 +17,7 @@ import {
   CheckMarkIcon,
   CloseIcon,
   CopyIcon,
-  LinkIcon,
+  StoreIcon,
   LogoutIcon,
   LogoutMenuIcon,
   MenuIcon,
@@ -35,7 +35,7 @@ type Item = { href: string; label: string; icon: (size?: number) => ReactNode; o
 const RAIL: Item[] = [
   { href: "/agenda", label: "Agenda", icon: (s) => <CalendarIcon size={s} /> },
   { href: "/clienti", label: "Clienti", icon: (s) => <UsersIcon size={s} /> },
-  { href: "/link", label: "Link di prenotazione", icon: (s) => <LinkIcon size={s} /> },
+  { href: "/salone", label: "Salone", icon: (s) => <StoreIcon size={s} /> },
   { href: "/listino", label: "Listino e orari", icon: (s) => <ScissorsIcon size={s} /> },
   { href: "/statistiche", label: "Statistiche", icon: (s) => <StatsIcon size={s} />, ownerOnly: true },
 ];
@@ -46,7 +46,7 @@ const MENU: Item[] = [
   { href: "/clienti", label: "Clienti", icon: (s) => <UsersIcon size={s} /> },
   { href: "/statistiche", label: "Statistiche", icon: (s) => <StatsIcon size={s} />, ownerOnly: true },
   { href: "/listino", label: "Listino e orari", icon: (s) => <ScissorsIcon size={s} /> },
-  { href: "/link", label: "Link di prenotazione", icon: (s) => <LinkIcon size={s} /> },
+  { href: "/salone", label: "Salone", icon: (s) => <StoreIcon size={s} /> },
   { href: "/impostazioni", label: "Impostazioni", icon: (s) => <SettingsRaysIcon size={s} /> },
 ];
 
@@ -56,7 +56,7 @@ const TITLES: [string, string][] = [
   ["/clienti", "Clienti"],
   ["/statistiche", "Statistiche"],
   ["/listino", "Listino e orari"],
-  ["/link", "Link"],
+  ["/salone", "Salone"],
   ["/impostazioni", "Impostazioni"],
   ["/profilo", "Profilo"],
 ];

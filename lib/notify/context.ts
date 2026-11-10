@@ -11,6 +11,7 @@ export type ApptContext = {
   date: string;
   startMin: number;
   serviceName: string;
+  priceCents: number;
   durationMin: number | null;
   memberName: string;
   multiple: boolean;
@@ -25,6 +26,7 @@ export type ApptContext = {
     address: string | null;
     cancelOnline: boolean;
     cancelLimitMin: number;
+    showPrices: boolean;
     prefs: { confirmation: boolean; reminder: boolean; cancellation: boolean };
   };
 };
@@ -34,12 +36,12 @@ export async function loadApptContext(id: string): Promise<ApptContext | null> {
   const admin = createAdminClient();
   const { data: a } = await admin
     .from("appointments")
-    .select("id, member_id, status, starts_at, service_name, service_id, manage_token, salon_id, client:clients(name, email), member:members(name)")
+    .select("id, member_id, status, starts_at, service_name, price_cents, service_id, manage_token, salon_id, client:clients(name, email), member:members(name)")
     .eq("id", id)
     .maybeSingle();
   if (!a) return null;
   const [{ data: salon }, { data: prefs }, { data: service }, { count }] = await Promise.all([
-    admin.from("salons").select("id, slug, name, phone, address, cancel_online, cancel_limit_min").eq("id", a.salon_id).maybeSingle(),
+    admin.from("salons").select("id, slug, name, phone, address, cancel_online, cancel_limit_min, show_prices").eq("id", a.salon_id).maybeSingle(),
     admin.from("email_prefs").select("confirmation, reminder, cancellation").eq("salon_id", a.salon_id).maybeSingle(),
     a.service_id ? admin.from("services").select("duration_min").eq("id", a.service_id).maybeSingle() : Promise.resolve({ data: null }),
     admin.from("members").select("id", { count: "exact", head: true }).eq("salon_id", a.salon_id).eq("active", true),
@@ -54,6 +56,7 @@ export async function loadApptContext(id: string): Promise<ApptContext | null> {
     date: romeDate(starts),
     startMin: romeMinutes(starts),
     serviceName: a.service_name,
+    priceCents: a.price_cents,
     durationMin: service?.duration_min ?? null,
     memberName: a.member?.name ?? "",
     multiple: (count ?? 0) > 1,
@@ -68,6 +71,7 @@ export async function loadApptContext(id: string): Promise<ApptContext | null> {
       address: salon.address,
       cancelOnline: salon.cancel_online,
       cancelLimitMin: salon.cancel_limit_min,
+      showPrices: salon.show_prices,
       prefs: { confirmation: prefs?.confirmation ?? true, reminder: prefs?.reminder ?? true, cancellation: prefs?.cancellation ?? true },
     },
   };
