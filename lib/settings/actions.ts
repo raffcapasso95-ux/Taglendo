@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireSalon } from "@/lib/auth/session";
 import { alertsCopy, emailPrefsCopy } from "@/lib/copy/notify";
 import { rulesCopy } from "@/lib/copy/rules";
+import { isReminderHours, type ReminderHours } from "@/lib/rules/reminders";
 import { createClient } from "@/lib/supabase/server";
 
 export type Rules = {
@@ -49,27 +50,29 @@ export async function saveRules(input: Rules): Promise<RulesResult> {
     .select("id");
   if (error || !data?.length) return { ok: false, error: rulesCopy.errors.generic };
   revalidatePath("/impostazioni/regole");
-  revalidatePath("/link");
+  revalidatePath("/salone");
   revalidatePath(`/${salon.slug}`);
   return { ok: true };
 }
 
 /* ───────────── Email ai clienti (C6) e avvisi (C11) ───────────── */
 
-export type EmailPrefs = { confirmation: boolean; reminder: boolean; cancellation: boolean };
+export type EmailPrefs = { confirmation: boolean; reminder: boolean; reminderHours: ReminderHours; cancellation: boolean };
 
 /** Quali email partono ai clienti. Le cambia il titolare; il codice di conferma non si spegne. */
 export async function saveEmailPrefs(input: EmailPrefs): Promise<RulesResult> {
   const { role, salon } = await requireSalon();
   if (role !== "owner") return { ok: false, error: emailPrefsCopy.errors.notOwner };
-  if (typeof input.confirmation !== "boolean" || typeof input.reminder !== "boolean" || typeof input.cancellation !== "boolean") return { ok: false, error: emailPrefsCopy.errors.generic };
+  if (typeof input.confirmation !== "boolean" || typeof input.reminder !== "boolean" || typeof input.cancellation !== "boolean" || !isReminderHours(input.reminderHours))
+    return { ok: false, error: emailPrefsCopy.errors.generic };
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("email_prefs")
-    .upsert({ salon_id: salon.id, confirmation: input.confirmation, reminder: input.reminder, cancellation: input.cancellation })
+    .upsert({ salon_id: salon.id, confirmation: input.confirmation, reminder: input.reminder, reminder_hours: input.reminderHours, cancellation: input.cancellation })
     .select("salon_id");
   if (error || !data?.length) return { ok: false, error: emailPrefsCopy.errors.generic };
   revalidatePath("/impostazioni/email");
+  revalidatePath("/salone");
   return { ok: true };
 }
 

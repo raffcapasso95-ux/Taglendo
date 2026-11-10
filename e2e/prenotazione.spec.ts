@@ -5,7 +5,7 @@ import { adminSelect, adminUpdate, bookingCode, uniqueEmail, visibleText, waitFo
 /** Il titolare crea il salone e restituisce il suo link. */
 async function newSalon(page: Page, name: string) {
   await freshOwner(page, name);
-  await page.goto("/link");
+  await page.goto("/salone");
   const shown = (await page.getByTestId("salon-url").textContent()) ?? "";
   return shown.slice(shown.lastIndexOf("/") + 1);
 }

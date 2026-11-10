@@ -34,8 +34,11 @@ export const cancelEmailCopy = {
 
 /** F3 · Promemoria, il giorno prima alle 18:00. */
 export const reminderEmailCopy = {
-  subject: (salon: string, at: string) => `Domani alle ${at} da ${salon}`,
-  title: (first: string) => `A domani, ${first}`,
+  // NUOVO: il promemoria parte con l'anticipo scelto dal salone, quindi può essere per oggi, domani o un altro giorno
+  subject: (salon: string, at: string, day: "oggi" | "domani" | "altro" = "domani", dayLong = "") =>
+    day === "oggi" ? `Oggi alle ${at} da ${salon}` : day === "domani" ? `Domani alle ${at} da ${salon}` : `${dayLong.charAt(0).toUpperCase()}${dayLong.slice(1)} alle ${at} da ${salon}`,
+  title: (first: string, day: "oggi" | "domani" | "altro" = "domani", weekday = "") =>
+    day === "oggi" ? `A più tardi, ${first}` : day === "domani" ? `A domani, ${first}` : `Ci vediamo ${weekday}, ${first}`,
   when: "Quando",
   service: "Servizio",
   manage: "Gestisci la prenotazione",

@@ -2,12 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { after } from "next/server";
-import { emailCancelledBySalon, emailMoved } from "@/lib/notify/clientMail";
+import { emailCancelledBySalon, emailConfirmedBySalon, emailMoved } from "@/lib/notify/clientMail";
 import { requireSalon } from "@/lib/auth/session";
 import { agendaCopy } from "@/lib/copy/agenda";
 import { isValidDate, romeDate, romeMinutes, romeWallToUtc } from "@/lib/dates/rome";
 import { buildDay, clock, type ApptStatus } from "@/lib/rules/agenda";
-import { isPhone, LIMITS } from "@/lib/rules/forms";
+import { isEmail, isPhone, LIMITS } from "@/lib/rules/forms";
 import { gridSlots, nearestAlternatives, type Candidate } from "@/lib/rules/slots";
 import { createClient } from "@/lib/supabase/server";
 import { appointmentsOn, hoursFor, operatorsOf } from "./day";
@@ -19,7 +19,7 @@ export type Conflict = { title: string; text: string; alternatives: Alternative[
 export type Failure = { ok: false; error: string; conflict?: Conflict };
 export type Created = { ok: true; id: string; clientId: string; clientName: string; date: string; startMin: number };
 
-type NewClient = { name: string; phone?: string | null; /** Colore delle iniziali (0–4). */ avatarColor?: number | null };
+type NewClient = { name: string; phone?: string | null; /** Per la conferma e il promemoria via email. */ email?: string | null; /** Colore delle iniziali (0–4). */ avatarColor?: number | null };
 export type CreateInput = {
   clientId?: string | null;
   newClient?: NewClient | null;
@@ -90,9 +90,11 @@ async function resolveClient(supabase: Supabase, salonId: string, input: Pick<Cr
   if (!name || name.length > LIMITS.clientName) return { error: errors.clientName };
   const phone = input.newClient?.phone?.trim() || null;
   if (phone && !isPhone(phone)) return { error: errors.phone };
+  const email = input.newClient?.email?.trim().toLowerCase() || null;
+  if (email && !isEmail(email)) return { error: errors.email };
   const color = input.newClient?.avatarColor;
   const avatar_color = typeof color === "number" && Number.isInteger(color) && color >= 0 && color <= 4 ? color : null;
-  const { data, error } = await supabase.from("clients").insert({ salon_id: salonId, name, phone, avatar_color }).select("id").single();
+  const { data, error } = await supabase.from("clients").insert({ salon_id: salonId, name, phone, email, avatar_color }).select("id").single();
   if (error || !data) return { error: errors.generic };
   return { id: data.id, created: true, name };
 }
@@ -166,6 +168,9 @@ export async function createAppointment(input: CreateInput): Promise<Created | F
   }
   revalidatePath("/agenda");
   const clientName = client.name ?? (await supabase.from("clients").select("name").eq("id", client.id).single()).data?.name ?? "";
+  // anche quando lo fissa il salone, il cliente con un'email riceve la conferma (con il link per gestirla)
+  const apptId = data.id;
+  after(() => emailConfirmedBySalon(apptId));
   return { ok: true, id: data.id, clientId: client.id, clientName, date: input.date, startMin: input.startMin };
 }
 

@@ -2,13 +2,19 @@
  * Email ai clienti (C6) e avvisi per il barbiere (C11). Senza marca: da design/Schermate mancanti; NUOVO = proposta.
  */
 export const emailPrefsCopy = {
-  back: "Impostazioni",
+  back: "Salone",
   eyebrow: "Comunicazioni",
   title: "Email ai clienti",
   intro: "Partono da sole, con il nome e il telefono del tuo salone.",
   code: { label: "Codice di conferma", sub: "Sempre attiva: verifica l’email del cliente" },
   confirmation: { label: "Prenotazione confermata", sub: "Subito dopo la prenotazione" },
-  reminder: { label: "Promemoria", sub: "Il giorno prima alle 18:00" },
+  reminder: { label: "Promemoria", sub: "Prima dell’appuntamento, con l’anticipo che scegli" }, // NUOVO: anticipo a scelta
+  // NUOVO
+  reminderWhen: {
+    label: "Quanto prima avvisare il cliente",
+    hint: (h: string) => `Il promemoria parte circa ${h} prima dell’appuntamento. Se il cliente prenota con meno anticipo, basta la conferma.`,
+    options: { 2: "2 ore", 4: "4 ore", 12: "12 ore", 24: "24 ore", 48: "48 ore" },
+  },
   cancellation: { label: "Appuntamento annullato", sub: "Da te o dal cliente" },
   previews: "Vedi le anteprime",
   whatsapp: "I promemoria WhatsApp restano manuali: li invii tu dall’agenda.",

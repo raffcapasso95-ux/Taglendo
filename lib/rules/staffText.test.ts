@@ -29,10 +29,9 @@ describe("avvisi al barbiere", () => {
     expect(receives({ role: "owner", onlyMine: true, isMine: true })).toBe(true);
   });
   it("quando partono i lavori programmati", () => {
-    expect(dueJobs(8)).toEqual({ summaries: true, reminders: false });
+    expect(dueJobs(8)).toEqual({ summaries: true, reminders: true });
     expect(dueJobs(18)).toEqual({ summaries: false, reminders: true });
-    expect(dueJobs(20)).toEqual({ summaries: false, reminders: true });
-    expect(dueJobs(14)).toEqual({ summaries: false, reminders: false });
-    expect(dueJobs(7)).toEqual({ summaries: false, reminders: false });
+    expect(dueJobs(14)).toEqual({ summaries: false, reminders: true });
+    expect(dueJobs(7)).toEqual({ summaries: false, reminders: true });
   });
 });

@@ -18,7 +18,8 @@ export type StripDay = {
 };
 
 export type ServiceOption = { id: string; name: string; durationMin: number; priceCents: number };
-export type ClientOption = { id: string; name: string; phone: string | null; avatarColor: number | null; photoUrl: string | null };
+/** lastVisit: giorno (Roma) dell'ultima visita conclusa, per proporre prima i clienti recenti e distinguere gli omonimi. */
+export type ClientOption = { id: string; name: string; phone: string | null; avatarColor: number | null; photoUrl: string | null; lastVisit: string | null };
 
 export type AgendaData = {
   salonName: string;
@@ -61,7 +62,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
   const { start: rangeStart } = dayRange(stripStart);
   const { start: stripEndAt } = dayRange(stripEnd);
 
-  const [flags, members, hours, closures, dayAppts, stripAppts, servicesRes, clientsRes] = await Promise.all([
+  const [flags, members, hours, closures, dayAppts, stripAppts, servicesRes, clientsRes, statsRes] = await Promise.all([
     supabase.from("salons").select("barbers_see_all, barbers_edit").eq("id", salon.id).single(),
     operatorsOf(supabase, salon.id),
     weekHours(supabase, salon.id),
@@ -76,6 +77,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
       .lt("starts_at", stripEndAt.toISOString()),
     supabase.from("services").select("id, name, duration_min, price_cents").eq("salon_id", salon.id).eq("active", true).order("sort"),
     supabase.from("clients_visible").select("id, name, phone, avatar_color, photo_path").eq("salon_id", salon.id).order("name").limit(2000),
+    supabase.from("client_stats").select("client_id, last_visit_at").eq("salon_id", salon.id).not("last_visit_at", "is", null).limit(5000),
   ]);
 
   const isOwner = membership.role === "owner";
@@ -112,6 +114,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
     };
   });
 
+  const lastVisit = new Map((statsRes.data ?? []).flatMap((r) => (r.client_id && r.last_visit_at ? [[r.client_id, romeDate(new Date(r.last_visit_at))] as const] : [])));
   const photoUrls = await signedPhotoUrls(supabase, (clientsRes.data ?? []).map((c) => c.photo_path));
   const userFirstName = firstName(membership.name);
   return {
@@ -128,7 +131,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
     canEdit,
     salonId: salon.id,
     services: (servicesRes.data ?? []).map((x) => ({ id: x.id, name: x.name, durationMin: x.duration_min, priceCents: x.price_cents })),
-    clients: (clientsRes.data ?? []).flatMap((c) => (c.id && c.name ? [{ id: c.id, name: c.name, phone: c.phone, avatarColor: c.avatar_color, photoUrl: c.photo_path ? (photoUrls.get(c.photo_path) ?? null) : null }] : [])),
+    clients: (clientsRes.data ?? []).flatMap((c) => (c.id && c.name ? [{ id: c.id, name: c.name, phone: c.phone, avatarColor: c.avatar_color, photoUrl: c.photo_path ? (photoUrls.get(c.photo_path) ?? null) : null, lastVisit: lastVisit.get(c.id) ?? null }] : [])),
     savedAt: now.toISOString(),
   };
 }

@@ -4,6 +4,7 @@
  */
 export const rulesCopy = {
   eyebrow: "Impostazioni",
+  back: "Salone",
   title: "Prenotazioni dei clienti",
   section: "Regole",
   book: {

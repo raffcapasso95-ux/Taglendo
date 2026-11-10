@@ -37,7 +37,9 @@ Il cliente non crea nessun account e nessuna password.
 
 ## Email e notifiche
 - **Codice (F1):** sempre attivo, non si può spegnere.
-- **Email che il salone può spegnere:** confermata (F2), promemoria (F3, alle 18:00 del giorno prima), annullata (F4).
+- **Email che il salone può spegnere:** confermata (F2), promemoria (F3), annullata (F4).
+- **Conferma (F2):** parte per le prenotazioni online e anche per gli appuntamenti fissati dal salone in agenda, se il cliente ha un'email.
+- **Promemoria (F3):** parte con l'anticipo scelto dal salone (2, 4, 12, 24 o 48 ore; predefinito 24). Non parte se la prenotazione è stata fatta quando mancava già meno dell'anticipo: basta la conferma.
 - **Spostata (F6) e invito (F5):** partono sempre quando servono.
 - **Promemoria WhatsApp:** restano manuali, con un link `wa.me` dall'agenda.
 - **Avvisi al barbiere (C11):**

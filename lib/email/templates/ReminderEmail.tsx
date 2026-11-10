@@ -3,7 +3,8 @@ import { reminderEmailCopy as copy } from "@/lib/copy/emails";
 import { mail } from "../theme";
 import { Layout } from "./Layout";
 
-export type ReminderEmailProps = { salonName: string; firstName: string; when: string; service: string; manageUrl: string; cancelUntil: string | null; phone: string; footer: string; siteUrl: string };
+/** day: per quando è l'appuntamento rispetto all'invio; weekday: "giovedì" (serve con "altro"). */
+export type ReminderEmailProps = { salonName: string; firstName: string; day?: "oggi" | "domani" | "altro"; weekday?: string; when: string; service: string; manageUrl: string; cancelUntil: string | null; phone: string; footer: string; siteUrl: string };
 
 const row = (label: string, value: string) => (
   <Section key={label} style={{ padding: "10px 0", borderBottom: `1px solid ${mail.line}` }}>
@@ -16,7 +17,7 @@ const row = (label: string, value: string) => (
 export function ReminderEmail(p: ReminderEmailProps) {
   return (
     <Layout salonName={p.salonName} footer={p.footer} siteUrl={p.siteUrl}>
-      <Text style={{ margin: "0 0 16px", fontSize: 24, lineHeight: 1.15, fontWeight: 700, letterSpacing: "-0.03em" }}>{copy.title(p.firstName)}</Text>
+      <Text style={{ margin: "0 0 16px", fontSize: 24, lineHeight: 1.15, fontWeight: 700, letterSpacing: "-0.03em" }}>{copy.title(p.firstName, p.day, p.weekday)}</Text>
       <Hr style={{ margin: 0, borderColor: mail.line }} />
       {row(copy.when, p.when)}
       {row(copy.service, p.service)}

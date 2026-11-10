@@ -4,7 +4,7 @@
  */
 
 export const operatorsCopy = {
-  back: "Impostazioni",
+  back: "Salone",
   title: "Operatori",
   people: "Persone",
   owner: "Titolare",

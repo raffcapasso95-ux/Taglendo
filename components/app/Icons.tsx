@@ -30,6 +30,14 @@ export const LinkIcon = ({ size = 22 }: { size?: number }) => (
     <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" />
   </Icon>
 );
+/** Vetrina del negozio: la sezione «Salone». */
+export const StoreIcon = ({ size = 22 }: { size?: number }) => (
+  <Icon size={size}>
+    <path d="M4 9.5V19a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 19V9.5" />
+    <path d="M3 9.5 4.6 4.5h14.8L21 9.5a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0z" />
+    <path d="M10 20.5v-5h4v5" />
+  </Icon>
+);
 export const ScissorsIcon = ({ size = 22 }: { size?: number }) => (
   <Icon size={size}>
     <circle cx="6" cy="6.5" r="2.8" />

@@ -76,7 +76,7 @@ function Inner({ initial }: { initial: Rules }) {
   return (
     <main className={listino.page}>
       <header className={listino.head}>
-        <Link href="/impostazioni" className={styles.back}>‹ {copy.eyebrow}</Link>
+        <Link href="/salone" className={styles.back}>‹ {copy.back}</Link>
         <h1 className={listino.title}>{copy.title}</h1>
       </header>
 

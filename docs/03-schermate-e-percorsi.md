@@ -28,11 +28,11 @@ I codici si riferiscono a `design/Schermate mancanti.dc.html`. `-D` indica la ve
 |---|---|
 | `/agenda` | App: scheda Agenda (griglia, righe, elenco; su telefono: poltrone, lista compatta, griglia) |
 | `/clienti`, `/clienti/[id]` | App: scheda Clienti; C12 per esportazione ed eliminazione |
-| `/link` | App: scheda Link |
 | `/listino`, `/listino/orari` | Ridisegno: `listino`, `listino-orari` (servizi; orari per ogni giorno, anche a più fasce) |
 | `/statistiche` | Ridisegno: `statistiche` (`?periodo=giorno\|settimana\|anno`, `&data=`); solo titolare, «Per operatore» solo con più barbieri |
 | `/listino/chiusure` | C2, C3 (+ -D) |
-| `/impostazioni` | App: Impostazioni (salone, operatori, promemoria, prenotazioni dei clienti, pagina, abbonamento, avvisi, profilo) |
+| `/salone` | Salone: link di prenotazione e impostazioni del salone (pagina, listino, operatori, regole, email ai clienti). `/link` rimanda qui |
+| `/impostazioni` | App: Impostazioni (profilo, avvisi, abbonamento, aiuto) e il collegamento al Salone |
 | `/impostazioni/regole` | C1, C1-D |
 | `/impostazioni/operatori` | C4, C4-D; vista operatore C5; limite del piano B7 |
 | `/impostazioni/email` | C6, C6-D |

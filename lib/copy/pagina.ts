@@ -1,6 +1,6 @@
 /** Testi di «Pagina del salone» (ridisegno novembre 2026, giro 8). */
 export const paginaCopy = {
-  back: "Impostazioni",
+  back: "Salone",
   title: "Pagina del salone",
   open: "Apri",
   photos: "Foto del salone",
