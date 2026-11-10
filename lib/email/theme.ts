@@ -11,5 +11,8 @@ export const mail = {
   muted: "#FBF0E9", // --surface-muted
   secondary: "#725C66", // --text-secondary
   line: "#E6D9DC", // --border-subtle
+  lineStrong: "#A88C99", // --border-strong
+  success: "#1B4F3F", // --status-success-text
+  successBg: "#EEF6F1", // --status-success-bg
   font: "Manrope, Arial, sans-serif",
 } as const;

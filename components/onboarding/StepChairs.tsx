@@ -18,8 +18,8 @@ type Props = {
   doneUpTo: number;
   salon: { name: string; address: string; phone: string };
   ownerName: string;
-  /** Nomi dei barbieri già salvati (poltrone 2 e 3). */
-  barbers: string[];
+  /** Barbieri già salvati (poltrone 2 e 3), con l'email dell'invito se c'è. */
+  barbers: Array<{ name: string; email: string }>;
 };
 
 const firstName = (full: string) => full.trim().split(/\s+/)[0] ?? "";
@@ -28,7 +28,8 @@ const initialOf = (name: string) => (Array.from(name.trim())[0] ?? "").toUpperCa
 export function StepChairs({ doneUpTo, salon, ownerName, barbers }: Props) {
   const [state, action, pending] = useActionState(saveChairs, initial);
   const [chairs, setChairs] = useState<"1" | "2" | "3">(String(Math.min(3, barbers.length + 1)) as "1" | "2" | "3");
-  const [names, setNames] = useState<[string, string]>([barbers[0] ?? "", barbers[1] ?? ""]);
+  const [names, setNames] = useState<[string, string]>([barbers[0]?.name ?? "", barbers[1]?.name ?? ""]);
+  const [emails, setEmails] = useState<[string, string]>([barbers[0]?.email ?? "", barbers[1]?.email ?? ""]);
   const count = Number(chairs);
   const visible = names.slice(0, count - 1);
 
@@ -60,7 +61,7 @@ export function StepChairs({ doneUpTo, salon, ownerName, barbers }: Props) {
       }
     >
       <form id="step-form" action={action} className={styles.form} noValidate>
-        <input type="hidden" name="payload" value={JSON.stringify({ chairs: count, names: visible })} />
+        <input type="hidden" name="payload" value={JSON.stringify({ chairs: count, names: visible, emails: emails.slice(0, count - 1) })} />
         {state.error ? <FormAlert>{state.error}</FormAlert> : null}
 
         <div>
@@ -104,6 +105,24 @@ export function StepChairs({ doneUpTo, salon, ownerName, barbers }: Props) {
                   })
                 }
                 error={state.field === "names" && !n.trim() ? state.error : undefined}
+              />
+              <Field
+                size="large"
+                type="email"
+                inputMode="email"
+                autoComplete="off"
+                label={copy.email(n)}
+                placeholder="nome@esempio.it"
+                maxLength={LIMITS.email}
+                value={emails[i]}
+                onChange={(e) =>
+                  setEmails((cur) => {
+                    const next: [string, string] = [...cur];
+                    next[i] = e.target.value;
+                    return next;
+                  })
+                }
+                error={state.field === `email${i}` ? state.error : undefined}
               />
             </div>
           ))}

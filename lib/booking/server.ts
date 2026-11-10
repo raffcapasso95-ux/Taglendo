@@ -1,3 +1,4 @@
+import { salonLogoUrl } from "@/lib/salon/logo";
 import "server-only";
 import { hasActiveAccess } from "@/lib/billing";
 import { romeDate, romeMinutes } from "@/lib/dates/rome";
@@ -13,6 +14,7 @@ export type BookingSalon = {
   cancelOnline: boolean;
   cancelLimitMin: number;
   showPrices: boolean;
+  logoUrl: string | null;
   members: Array<{ id: string; name: string }>;
 };
 
@@ -22,7 +24,7 @@ export async function loadBookingSalon(slug: string): Promise<BookingSalon | nul
   const admin = createAdminClient();
   const { data: s } = await admin
     .from("salons")
-    .select("id, slug, name, address, phone, booking_online, cancel_online, cancel_limit_min, show_prices, sub_status, trial_ends_at")
+    .select("id, slug, name, address, phone, booking_online, cancel_online, cancel_limit_min, show_prices, logo_path, sub_status, trial_ends_at")
     .eq("slug", slug.toLowerCase())
     .is("deleted_at", null)
     .maybeSingle();
@@ -37,6 +39,7 @@ export async function loadBookingSalon(slug: string): Promise<BookingSalon | nul
     cancelOnline: s.cancel_online,
     cancelLimitMin: s.cancel_limit_min,
     showPrices: s.show_prices,
+    logoUrl: salonLogoUrl(s.logo_path),
     members: members ?? [],
   };
 }

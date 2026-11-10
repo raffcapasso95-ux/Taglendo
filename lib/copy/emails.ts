@@ -8,7 +8,10 @@ export const emailCopy = {
   },
   confirmed: {
     subject: (when: string) => `Confermato: ${when}`,
-    title: (weekday: string, first: string) => `Ci vediamo ${weekday}, ${first}!`,
+    title: (weekday: string, first: string, day: "oggi" | "domani" | "altro" = "altro") => `Ci vediamo ${day === "altro" ? weekday : day}, ${first}!`,
+    badge: "Prenotazione confermata", // NUOVO
+    preview: (salon: string, when: string) => `${salon}: ${when}. Gestisci o annulla dal link.`, // NUOVO: anteprima nella casella
+    call: (phone: string) => `Chiama il salone: ${phone}`, // NUOVO
     when: "Quando",
     service: "Servizio",
     barber: "Barbiere",

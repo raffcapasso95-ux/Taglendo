@@ -1,15 +1,12 @@
 "use server";
 
-import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { requireSalon } from "@/lib/auth/session";
 import { operatorsCopy } from "@/lib/copy/operators";
 import { isEmail, isPersonName, LIMITS } from "@/lib/rules/forms";
-import { buildInviteEmail } from "@/lib/email/render";
-import { sendEmail } from "@/lib/email/send";
 import { inviteExpiry } from "@/lib/rules/invite";
 import { createClient } from "@/lib/supabase/server";
-import { env } from "@/lib/supabase/env";
+import { linkFor, newToken, sendInviteEmail } from "./invite";
 
 const { errors } = operatorsCopy;
 
@@ -20,29 +17,6 @@ async function ownerSalon() {
   return m.role === "owner" ? { ...m.salon, ownerName: m.name } : null;
 }
 
-type InviteMail = { salon: { name: string; address: string | null; phone: string | null; ownerName: string }; name: string; email: string; chair: number; token: string };
-
-/** F5: l'email con il link d'invito. Se non parte, il titolare ha comunque il link da mandare a mano. */
-async function sendInviteEmail(i: InviteMail): Promise<void> {
-  try {
-    const built = await buildInviteEmail({
-      salonName: i.salon.name,
-      name: i.name.split(" ")[0] ?? i.name,
-      ownerFirst: i.salon.ownerName.split(" ")[0] ?? i.salon.ownerName,
-      ownerFull: i.salon.ownerName,
-      chair: i.chair,
-      acceptUrl: linkFor(i.token),
-      footer: [i.salon.name, i.salon.address, i.salon.phone].filter(Boolean).join(" · "),
-    });
-    const sent = await sendEmail({ to: i.email, subject: built.subject, html: built.html, text: built.text, fromName: i.salon.name });
-    if (!sent.ok) console.error("invio invito non riuscito:", sent.error);
-  } catch (e) {
-    console.error("invio invito non riuscito:", e);
-  }
-}
-
-const newToken = () => randomBytes(24).toString("base64url");
-const linkFor = (token: string) => `${env.siteUrl()}/invito/${token}`;
 const expiry = () => inviteExpiry();
 
 /**

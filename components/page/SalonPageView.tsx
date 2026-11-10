@@ -7,7 +7,7 @@ import listino from "@/components/listino/Listino.module.css";
 import rules from "@/components/settings/Rules.module.css";
 import settings from "@/components/settings/Settings.module.css";
 import { CloseIcon, GlobeIcon, OpenIcon, PlusIcon, StarIcon, TagIcon, ClockIcon } from "@/components/settings/SettingsIcons";
-import { Field, ToastProvider, useToast } from "@/components/ui";
+import { Field, ToastProvider, useToast, AddressField } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { cx } from "@/components/ui/cx";
 import field from "@/components/ui/Field.module.css";
@@ -224,7 +224,7 @@ function Inner({ host, slug, initial, photos, logoUrl }: { host: string; slug: s
                 </p>
               </div>
               <Field size="large" label={copy.phone} name="phone" type="tel" inputMode="tel" value={form.phone} onChange={(e) => set("phone")(e.target.value)} maxLength={20} error={errors.phone} />
-              <Field size="large" label={copy.address} name="address" value={form.address} onChange={(e) => set("address")(e.target.value)} maxLength={120} error={errors.address} />
+              <AddressField label={copy.address} name="address" value={form.address} onChange={set("address")} maxLength={120} error={errors.address} />
               {errors.form ? (
                 <p className={field.error} role="alert">
                   {errors.form}

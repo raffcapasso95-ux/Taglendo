@@ -1,13 +1,14 @@
 "use server";
 
 import { createHmac, randomInt } from "node:crypto";
+import { reminderDayWord } from "@/lib/rules/reminders";
 import { buildCodeEmail, buildConfirmationEmail } from "@/lib/email/render";
 import { sendEmail } from "@/lib/email/send";
 import { notifyStaff } from "@/lib/notify/staff";
 import { after } from "next/server";
 import { bookingCopy } from "@/lib/copy/booking";
 import { formatPrice } from "@/lib/dates/format";
-import { isValidDate, romeDate, romeWallToUtc, weekdayName } from "@/lib/dates/rome";
+import { addDays, isValidDate, romeDate, romeWallToUtc, weekdayName } from "@/lib/dates/rome";
 import { span } from "@/lib/rules/agenda";
 import { cancelLimitText, whenLong, whenShort } from "@/lib/rules/emailText";
 import { isEmail, isPersonName, isPhone, LIMITS } from "@/lib/rules/forms";
@@ -190,6 +191,8 @@ export async function confirmCode(input: { slug: string; email: string; code: st
     salonName: salon.name,
     firstName,
     weekday: weekdayName(date).toLowerCase(),
+    day: reminderDayWord(date, romeDate(new Date()), addDays(romeDate(new Date()), 1)),
+    logoUrl: salon.logoUrl,
     when: whenShort(date, wanted.startMin),
     subjectWhen: whenLong(date, wanted.startMin),
     service: serviceLine,

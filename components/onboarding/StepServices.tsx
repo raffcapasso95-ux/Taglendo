@@ -49,11 +49,13 @@ type Props = {
   doneUpTo: number;
   salon: { name: string; address: string; phone: string };
   initial: ServiceDraft[];
+  showPrices: boolean;
 };
 
-export function StepServices({ doneUpTo, salon, initial: init }: Props) {
+export function StepServices({ doneUpTo, salon, initial: init, showPrices: initialPrices }: Props) {
   const [state, action, pending] = useActionState(saveServices, initial);
   const [list, setList] = useState<ServiceDraft[]>(init);
+  const [showPrices, setShowPrices] = useState(initialPrices);
   const [editing, setEditing] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | undefined>();
   const added = useRef(0);
@@ -66,7 +68,7 @@ export function StepServices({ doneUpTo, salon, initial: init }: Props) {
     const duration = parseDuration(s.duration);
     const cents = parsePriceCents(s.price);
     return s.name.trim() && duration != null && cents != null
-      ? [{ label: s.name.trim(), sub: `${duration} min`, value: formatPrice(cents) }]
+      ? [{ label: s.name.trim(), sub: `${duration} min`, value: showPrices ? formatPrice(cents) : "" }]
       : [];
   });
 
@@ -134,6 +136,7 @@ export function StepServices({ doneUpTo, salon, initial: init }: Props) {
         }}
       >
         <input type="hidden" name="payload" value={payload} />
+        <input type="hidden" name="showPrices" value={showPrices ? "1" : "0"} />
         {(localError ?? state.error) ? <FormAlert>{localError ?? state.error}</FormAlert> : null}
 
         <Card flush>
@@ -180,6 +183,9 @@ export function StepServices({ doneUpTo, salon, initial: init }: Props) {
         <button type="button" className={styles.addButton} onClick={add}>
           {copy.add}
         </button>
+        <Card flush className={styles.breakCard}>
+          <Toggle label={copy.pricesLabel} description={showPrices ? copy.pricesOn : copy.pricesOff} checked={showPrices} onChange={setShowPrices} />
+        </Card>
       </form>
     </Frame>
   );

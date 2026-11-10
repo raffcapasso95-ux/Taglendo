@@ -9,6 +9,7 @@ import { useDialog } from "@/components/ui/useDialog";
 import { agendaCopy } from "@/lib/copy/agenda";
 import { createAppointment, listSlots, walkIn, type Alternative, type Conflict, type Created, type SlotsResult } from "@/lib/agenda/actions";
 import type { ClientOption, ServiceOption } from "@/lib/agenda/load";
+import { createClientRecord } from "@/lib/clients/actions";
 import { setClientPhoto } from "@/lib/clients/photo";
 import { resizePhoto } from "@/lib/clients/resizeImage";
 import { formatPrice } from "@/lib/dates/format";
@@ -67,12 +68,17 @@ export function dayLabel(date: string, today: string, tomorrow: string): string 
  * e con «Chiunque» ogni orario mostra chi è libero.
  * Su telefono occupa tutto lo schermo (il tasto indietro la chiude); su desktop è un pannello a destra.
  */
-export function NewAppointment({ mode, prefill, operators, services, clients, closedDates, today, selectedDate, onClose, onCreated, onQueued }: Props) {
+export function NewAppointment({ mode, prefill, operators, services, clients: savedClients, closedDates, today, selectedDate, onClose, onCreated, onQueued }: Props) {
   const online = useOnline();
   const toast = useToast();
   const desktop = useIsDesktop();
   const { offlineDay, queueCreate } = useAgenda();
   const walkInMode = mode === "walkin";
+  // i clienti salvati qui con «Salva cliente» si aggiungono subito alla rubrica di questa schermata
+  const [added, setAdded] = useState<ClientOption[]>([]);
+  const clients = useMemo(() => [...added, ...savedClients.filter((c) => !added.some((a) => a.id === c.id))], [added, savedClients]);
+  const [savingClient, startSaveClient] = useTransition();
+  const [newError, setNewError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [clientId, setClientId] = useState<string | null>(() => (prefill?.clientId && clients.some((c) => c.id === prefill.clientId) ? prefill.clientId : null));
   const [newMode, setNewMode] = useState(() => !prefill?.clientId && prefill?.newName !== undefined && prefill?.newName !== null);
@@ -241,6 +247,31 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
     if (newMode && !openedNew.current) newNameRef.current?.focus();
     openedNew.current = newMode;
   }, [newMode]);
+  /** «Salva cliente»: lo mette in rubrica subito (con foto e colore) e lo sceglie per questo appuntamento. */
+  const saveNewClient = () =>
+    startSaveClient(async () => {
+      setNewError(null);
+      const name = newName.trim();
+      if (!name) return setNewError(agendaCopy.errors.clientName);
+      const result = await createClientRecord({ name, phone: newPhone, email: newEmail, avatarColor: newColor });
+      if (!result.ok) return setNewError(result.error);
+      let photoUrl: string | null = null;
+      if (photo) {
+        const form = new FormData();
+        form.set("photo", new File([photo.blob], "foto.jpg", { type: "image/jpeg" }));
+        const up = await setClientPhoto(result.id, form).catch(() => null);
+        if (up && up.ok) photoUrl = photo.url;
+      }
+      setAdded((cur) => [{ id: result.id, name: result.name, phone: newPhone.trim() || null, avatarColor: newColor, photoUrl, lastVisit: null }, ...cur]);
+      setClientId(result.id);
+      setNewMode(false);
+      setNewName("");
+      setNewPhone("");
+      setNewEmail("");
+      if (!photoUrl) setPhoto(null);
+      toast(flow.clientSaved, result.name);
+    });
+
   const cancelNew = () => {
     setNewMode(false);
     setNewName("");
@@ -520,6 +551,19 @@ export function NewAppointment({ mode, prefill, operators, services, clients, cl
                     {flow.keepNew}
                   </button>
                 </div>
+              </div>
+            ) : null}
+            {newError ? (
+              <p className={styles.newClientError} role="alert">
+                {newError}
+              </p>
+            ) : null}
+            {online ? (
+              <div className={styles.newClientActions}>
+                <Button size="large" disabled={savingClient || !newName.trim()} onClick={saveNewClient}>
+                  {savingClient ? flow.savingClient : flow.saveClient}
+                </Button>
+                <p className={dialogs.hint}>{flow.saveClientHint}</p>
               </div>
             ) : null}
           </div>

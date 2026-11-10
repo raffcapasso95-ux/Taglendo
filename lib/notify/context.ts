@@ -1,5 +1,6 @@
 import "server-only";
 import { romeDate, romeMinutes } from "@/lib/dates/rome";
+import { salonLogoUrl } from "@/lib/salon/logo";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { env } from "@/lib/supabase/env";
 
@@ -27,6 +28,7 @@ export type ApptContext = {
     cancelOnline: boolean;
     cancelLimitMin: number;
     showPrices: boolean;
+    logoUrl: string | null;
     prefs: { confirmation: boolean; reminder: boolean; cancellation: boolean };
   };
 };
@@ -41,7 +43,7 @@ export async function loadApptContext(id: string): Promise<ApptContext | null> {
     .maybeSingle();
   if (!a) return null;
   const [{ data: salon }, { data: prefs }, { data: service }, { count }] = await Promise.all([
-    admin.from("salons").select("id, slug, name, phone, address, cancel_online, cancel_limit_min, show_prices").eq("id", a.salon_id).maybeSingle(),
+    admin.from("salons").select("id, slug, name, phone, address, cancel_online, cancel_limit_min, show_prices, logo_path").eq("id", a.salon_id).maybeSingle(),
     admin.from("email_prefs").select("confirmation, reminder, cancellation").eq("salon_id", a.salon_id).maybeSingle(),
     a.service_id ? admin.from("services").select("duration_min").eq("id", a.service_id).maybeSingle() : Promise.resolve({ data: null }),
     admin.from("members").select("id", { count: "exact", head: true }).eq("salon_id", a.salon_id).eq("active", true),
@@ -72,6 +74,7 @@ export async function loadApptContext(id: string): Promise<ApptContext | null> {
       cancelOnline: salon.cancel_online,
       cancelLimitMin: salon.cancel_limit_min,
       showPrices: salon.show_prices,
+      logoUrl: salonLogoUrl(salon.logo_path),
       prefs: { confirmation: prefs?.confirmation ?? true, reminder: prefs?.reminder ?? true, cancellation: prefs?.cancellation ?? true },
     },
   };

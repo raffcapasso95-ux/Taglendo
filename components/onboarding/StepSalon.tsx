@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Button, Field } from "@/components/ui";
+import { Button, Field, AddressField } from "@/components/ui";
 import { FormAlert } from "@/components/auth/FormAlert";
 import { onboardingCopy } from "@/lib/copy/onboarding";
 import { saveSalon, type StepState } from "@/lib/onboarding/actions";
@@ -66,15 +66,7 @@ export function StepSalon({ doneUpTo, initial: init }: Props) {
           error={err("name")}
           autoFocus
         />
-        <Field
-          size="large"
-          name="address"
-          label={copy.address}
-          autoComplete="street-address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          error={err("address")}
-        />
+        <AddressField name="address" label={copy.address} value={address} onChange={setAddress} error={err("address")} />
         <Field
           size="large"
           name="phone"

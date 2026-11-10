@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { StepChairs } from "@/components/onboarding/StepChairs";
-import { StepHours, type HoursInitial } from "@/components/onboarding/StepHours";
+import { StepHours } from "@/components/onboarding/StepHours";
 import { PRESET_SERVICES, StepServices, type ServiceDraft } from "@/components/onboarding/StepServices";
 import { StepSalon } from "@/components/onboarding/StepSalon";
 import { requireSalon } from "@/lib/auth/session";
 import { loadWeek } from "@/lib/hours/week";
-import { dayFromRanges, formatMinutes } from "@/lib/rules/hours";
+import type { Range, WeekDay } from "@/lib/rules/hours";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Primo avvio · Taglendo" };
@@ -45,19 +45,12 @@ async function Content({ params }: { params: Promise<{ step: string }> }) {
   }
 
   if (step === 2) {
-    const week = (await loadWeek(supabase, salon.id)).map(dayFromRanges);
-    const openDays = week.map((d, weekday) => ({ d, weekday })).filter(({ d }) => !d.closed);
-    const ref = openDays[0]?.d;
-    const firstBreak = ref?.breaks[0];
-    const initial: HoursInitial = {
-      days: openDays.map(({ weekday }) => weekday),
-      open: formatMinutes(ref?.openMin ?? 540),
-      close: formatMinutes(ref?.closeMin ?? 1140),
-      breakOn: ref ? firstBreak != null : true,
-      breakStart: formatMinutes(firstBreak?.[0] ?? 780),
-      breakEnd: formatMinutes(firstBreak?.[1] ?? 870),
-    };
-    return <StepHours doneUpTo={doneUpTo} salon={preview} initial={initial} />;
+    // gli orari giorno per giorno; un salone appena creato parte da martedì–sabato, 9–13 e 14:30–19
+    const saved = await loadWeek(supabase, salon.id);
+    const week: WeekDay[] = saved.some((d) => !d.closed && d.ranges.length > 0)
+      ? saved
+      : Array.from({ length: 7 }, (_, w) => (w >= 2 && w <= 6 ? { closed: false, ranges: [[540, 780], [870, 1140]] as Range[] } : { closed: true, ranges: [] }));
+    return <StepHours doneUpTo={doneUpTo} salon={preview} initial={week} />;
   }
 
   if (step === 3) {
@@ -69,16 +62,16 @@ async function Content({ params }: { params: Promise<{ step: string }> }) {
       price: String(s.price_cents / 100).replace(".", ","),
       enabled: true,
     }));
-    return <StepServices doneUpTo={doneUpTo} salon={preview} initial={saved.length > 0 ? saved : PRESET_SERVICES} />;
+    return <StepServices doneUpTo={doneUpTo} salon={preview} initial={saved.length > 0 ? saved : PRESET_SERVICES} showPrices={salon.show_prices} />;
   }
 
   const { data } = await supabase
     .from("members")
-    .select("name, chair_no")
+    .select("name, chair_no, invite_email")
     .eq("salon_id", salon.id)
     .eq("role", "barber")
     .order("chair_no");
-  return <StepChairs doneUpTo={doneUpTo} salon={preview} ownerName={ownerName} barbers={(data ?? []).map((m) => m.name)} />;
+  return <StepChairs doneUpTo={doneUpTo} salon={preview} ownerName={ownerName} barbers={(data ?? []).map((m) => ({ name: m.name, email: m.invite_email ?? "" }))} />;
 }
 
 export default function Page(props: PageProps<"/primo-avvio/[step]">) {

@@ -3,8 +3,12 @@
 import { redirect } from "next/navigation";
 import { requireSalon } from "@/lib/auth/session";
 import { onboardingCopy } from "@/lib/copy/onboarding";
-import { isPhone, LIMITS } from "@/lib/rules/forms";
-import { parseTime, toWeek, validateHours, type HoursError } from "@/lib/rules/hours";
+import { isEmail, isPhone, LIMITS } from "@/lib/rules/forms";
+import { inviteExpiry } from "@/lib/rules/invite";
+import { newToken, sendInviteEmail } from "@/lib/operators/invite";
+import { validateRanges, type HoursError, type Range, type WeekDay } from "@/lib/rules/hours";
+import { canSaveWeek } from "@/lib/rules/listino";
+import { listinoCopy } from "@/lib/copy/listino";
 import { isValidSlug, slugify } from "@/lib/rules/slug";
 import { saveWeek } from "@/lib/hours/week";
 import { createClient } from "@/lib/supabase/server";
@@ -91,35 +95,21 @@ export async function saveSalon(_prev: StepState, data: FormData): Promise<StepS
 
 /* ───────────── Passo 2 · orari ───────────── */
 
-type HoursPayload = { days: number[]; open: string; close: string; breakOn: boolean; breakStart: string; breakEnd: string };
-
+/** Gli orari giorno per giorno (come in Listino › Orari): ogni giorno aperto ha fasce valide, almeno un giorno aperto. */
 export async function saveHours(_prev: StepState, data: FormData): Promise<StepState> {
   const { salon } = await owner();
-  const p = payload<HoursPayload>(data);
-  if (!p) return { error: errors.generic };
-
-  const days = (p.days ?? []).filter((d) => Number.isInteger(d) && d >= 0 && d <= 6);
-  const openMin = parseTime(p.open);
-  const closeMin = parseTime(p.close);
-  if (openMin == null) return { field: "open", error: errors.time };
-  if (closeMin == null) return { field: "close", error: errors.time };
-  let breakMin: { start: number; end: number } | null = null;
-  if (p.breakOn) {
-    const start = parseTime(p.breakStart);
-    const end = parseTime(p.breakEnd);
-    if (start == null) return { field: "breakStart", error: errors.time };
-    if (end == null) return { field: "breakEnd", error: errors.time };
-    breakMin = { start, end };
+  const week = payload<WeekDay[]>(data);
+  if (!Array.isArray(week) || week.length !== 7) return { error: errors.generic };
+  const clean: WeekDay[] = week.map((d) => ({ closed: Boolean(d?.closed), ranges: (d?.ranges ?? []).map(([a, b]): Range => [Math.trunc(Number(a)), Math.trunc(Number(b))]) }));
+  for (const d of clean) {
+    if (d.ranges.length > 0 && validateRanges(d.ranges)) return { error: listinoCopy.errors.hours };
+    if (!d.closed && d.ranges.length === 0) return { error: listinoCopy.errors.hours };
   }
-
-  const invalid = validateHours({ days, openMin, closeMin, breakMin });
-  if (invalid) {
-    const field = invalid === "no_days" ? "days" : invalid === "open_after_close" ? "open" : "breakStart";
-    return { field, error: HOURS_ERRORS[invalid] };
-  }
+  if (!clean.some((d) => !d.closed)) return { field: "days", error: HOURS_ERRORS.no_days };
+  if (!canSaveWeek(clean)) return { error: listinoCopy.errors.hours };
 
   const supabase = await createClient();
-  if (!(await saveWeek(supabase, salon.id, toWeek({ days, openMin, closeMin, breakMin })))) return { error: errors.generic };
+  if (!(await saveWeek(supabase, salon.id, clean))) return { error: errors.generic };
   if (await advanceTo(salon.id, salon.onboarding_step, 3)) return { error: errors.generic };
   redirect("/primo-avvio/3");
 }
@@ -159,16 +149,23 @@ export async function saveServices(_prev: StepState, data: FormData): Promise<St
     })),
   );
   if (error) return { error: errors.generic };
+  const { error: pricesError } = await supabase.from("salons").update({ show_prices: text(data, "showPrices") !== "0" }).eq("id", salon.id);
+  if (pricesError) return { error: errors.generic };
   if (await advanceTo(salon.id, salon.onboarding_step, 4)) return { error: errors.generic };
   redirect("/primo-avvio/4");
 }
 
 /* ───────────── Passo 4 · poltrone ───────────── */
 
-type ChairsPayload = { chairs: number; names: string[] };
+type ChairsPayload = { chairs: number; names: string[]; emails?: string[] };
 
+/**
+ * Le poltrone: un nome per ogni barbiere e, se c'è, la sua email. Con l'email parte subito l'invito (F5)
+ * per registrarsi o accedere e vedere la propria agenda; senza, l'invito si manda dopo da Operatori.
+ */
 export async function saveChairs(_prev: StepState, data: FormData): Promise<StepState> {
-  const { salon } = await owner();
+  const membership = await owner();
+  const { salon } = membership;
   const p = payload<ChairsPayload>(data);
   if (!p || ![1, 2, 3].includes(p.chairs)) return { error: errors.generic };
 
@@ -176,25 +173,34 @@ export async function saveChairs(_prev: StepState, data: FormData): Promise<Step
   if (names.length < p.chairs - 1 || names.some((n) => !n || n.length > LIMITS.memberName)) {
     return { field: "names", error: errors.barberName };
   }
+  const emails = names.map((_, i) => String(p.emails?.[i] ?? "").trim().toLowerCase());
+  const badEmail = emails.findIndex((e) => e && !isEmail(e));
+  if (badEmail >= 0) return { field: `email${badEmail}`, error: errors.barberEmail };
+  if (emails.some((e, i) => e && emails.indexOf(e) !== i)) return { field: `email${emails.lastIndexOf(emails.find((e, i) => e && emails.indexOf(e) !== i)!)}`, error: errors.barberEmailTwice };
 
   const supabase = await createClient();
-  // Barbieri senza account e senza invito: si riscrivono. Gli inviti si mandano dopo.
-  const { error: delError } = await supabase
-    .from("members")
-    .delete()
-    .eq("salon_id", salon.id)
-    .eq("role", "barber")
-    .is("user_id", null);
+  // Le poltrone senza account si riscrivono; gli inviti con la stessa email restano validi (niente seconda email).
+  const { data: before } = await supabase.from("members").select("chair_no, invite_email, invite_token, invite_expires_at").eq("salon_id", salon.id).eq("role", "barber").is("user_id", null);
+  const { error: delError } = await supabase.from("members").delete().eq("salon_id", salon.id).eq("role", "barber").is("user_id", null);
   if (delError) return { error: errors.generic };
 
+  const toSend: Array<{ name: string; email: string; chair: number; token: string }> = [];
   if (names.length > 0) {
-    const { error } = await supabase
-      .from("members")
-      .insert(names.map((name, i) => ({ salon_id: salon.id, name, role: "barber" as const, chair_no: i + 2 })));
+    const rows = names.map((name, i) => {
+      const chair = i + 2;
+      const email = emails[i];
+      if (!email) return { salon_id: salon.id, name, role: "barber" as const, chair_no: chair };
+      const same = (before ?? []).find((b) => b.chair_no === chair && b.invite_email === email && b.invite_token);
+      const token = same?.invite_token ?? newToken();
+      if (!same) toSend.push({ name, email, chair, token });
+      return { salon_id: salon.id, name, role: "barber" as const, chair_no: chair, invite_email: email, invite_token: token, invite_expires_at: same?.invite_expires_at ?? inviteExpiry() };
+    });
+    const { error } = await supabase.from("members").insert(rows);
     if (error) return { error: errors.generic };
   }
 
   const { error } = await supabase.from("salons").update({ onboarding_step: 5 }).eq("id", salon.id);
   if (error) return { error: errors.generic };
+  for (const i of toSend) await sendInviteEmail({ salon: { ...salon, ownerName: membership.name }, ...i });
   redirect("/pronto");
 }

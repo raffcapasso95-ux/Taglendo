@@ -39,6 +39,9 @@ export const onboardingCopy = {
     to: "Alle",
     dayLetters: ["D", "L", "M", "M", "G", "V", "S"], // indice = giorno (0 = domenica)
     dayNames: ["Domenica", "Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato"],
+    // NUOVO: orari giorno per giorno, come in Listino › Orari
+    lead: "Tocca un giorno per cambiare le fasce (es. mattina e pomeriggio) o copiarle su altri giorni. L’interruttore apre o chiude il giorno.",
+    later: "Potrai cambiarli quando vuoi in Listino › Orari.",
   },
   services: {
     title: "Cosa offri",
@@ -49,6 +52,10 @@ export const onboardingCopy = {
     duration: "Durata",
     price: "Prezzo",
     save: "Salva servizio",
+    // NUOVO: come in Pagina del salone
+    pricesLabel: "Prezzi visibili sulla tua pagina",
+    pricesOn: "I clienti vedono i prezzi prima di prenotare.",
+    pricesOff: "I prezzi non si vedono né sulla pagina né nelle email.",
   },
   chairs: {
     title: "Chi lavora in salone",
@@ -57,7 +64,8 @@ export const onboardingCopy = {
     you: "Tu",
     chair: (n: number) => `Poltrona ${n}`,
     placeholder: "Nome del barbiere",
-    plan: "Gli inviti ai barbieri li mandi dopo.",
+    plan: "Con l’email il barbiere riceve subito l’invito per registrarsi o accedere e vedere la sua agenda. Senza, lo inviti dopo da Salone › Operatori.", // NUOVO
+    email: (name: string) => (name.trim() ? `Email di ${name.trim().split(/\s+/)[0]} · facoltativa` : "Email del barbiere · facoltativa"), // NUOVO
   },
   done: {
     eyebrow: "Tutto pronto",
@@ -88,6 +96,8 @@ export const onboardingCopy = {
     serviceDuration: "La durata va da 5 a 240 minuti.",
     servicePrice: "Scrivi il prezzo in euro.",
     barberName: "Scrivi il nome del barbiere.",
+    barberEmail: "L’email del barbiere non sembra giusta.", // NUOVO
+    barberEmailTwice: "Due barbieri non possono avere la stessa email.", // NUOVO
     generic: "Qualcosa non ha funzionato. Riprova.",
   },
 } as const;
