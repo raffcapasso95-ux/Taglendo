@@ -4,6 +4,7 @@ import {
   buildDay,
   busyPercent,
   freeIntervals,
+  GRID_PX_MIN,
   GRID_PX_PER_MIN,
   gridRange,
   fillScale,
@@ -303,31 +304,32 @@ describe("fillScale: con pochi appuntamenti la griglia riempie lo spazio", () =>
     const busy: Array<[number, number]> = [[885, 915]]; // un solo appuntamento, 14:45–15:15
     const sc = fitGridScale(busy, 720, 1140, 600, [[780, 870]]);
     expect(sc.height).toBeCloseTo(600, 0);
-    // l'appuntamento resta proporzionato (al massimo il doppio della scala comoda)
-    expect(sc.y(915) - sc.y(885)).toBeLessThanOrEqual(30 * 1.6 * 2 + 0.5);
+    // l'appuntamento resta proporzionato (al massimo una volta e mezza la scala comoda)
+    expect(sc.y(915) - sc.y(885)).toBeLessThanOrEqual(30 * GRID_PX_PER_MIN * 1.5 + 0.5);
     // ordine delle ore rispettato
     expect(sc.y(780)).toBeLessThan(sc.y(870));
     expect(sc.y(870)).toBeLessThan(sc.y(885));
   });
 
-  it("se lo spazio è enorme non gonfia la griglia oltre il doppio", () => {
-    const sc = gridScale([[600, 630]], 540, 660, 1.6);
-    const filled = fillScale(sc, 5000, 1.6);
-    expect(filled.height).toBeLessThanOrEqual(120 * 1.6 * 2 + 1);
+  it("se lo spazio è enorme non gonfia la griglia oltre una volta e mezza", () => {
+    const sc = gridScale([[600, 630]], 540, 660, GRID_PX_PER_MIN);
+    const filled = fillScale(sc, 5000, GRID_PX_PER_MIN);
+    expect(filled.height).toBeLessThanOrEqual(120 * GRID_PX_PER_MIN * 1.5 + 1);
   });
 });
 
 describe("fitGridScale: la giornata sta nello spazio", () => {
   const busy: Array<[number, number]> = [[540, 570], [600, 630], [660, 690], [720, 750], [870, 900], [930, 960], [990, 1020], [1050, 1080]];
   it("senza misura usa la scala più comoda", () => {
-    expect(fitGridScale(busy, 540, 1140, null).height).toBeCloseTo(gridScale(busy, 540, 1140, 1.6).height);
+    expect(fitGridScale(busy, 540, 1140, null).height).toBeCloseTo(gridScale(busy, 540, 1140, GRID_PX_PER_MIN).height);
   });
-  it("se lo spazio è poco sceglie una scala più stretta, ma mai sotto il minimo", () => {
-    const comfy = gridScale(busy, 540, 1140, 1.6).height;
+  it("se lo spazio è poco sceglie una scala più stretta; se non basta nemmeno quella si scorre, con la scala comoda", () => {
+    const comfy = gridScale(busy, 540, 1140, GRID_PX_PER_MIN).height;
     const fit = fitGridScale(busy, 540, 1140, comfy - 20);
     expect(fit.height).toBeLessThanOrEqual(comfy - 20);
     const tiny = fitGridScale(busy, 540, 1140, 10);
-    expect(tiny.height).toBeCloseTo(gridScale(busy, 540, 1140, 1.2).height);
+    expect(fit.height).toBeGreaterThanOrEqual(gridScale(busy, 540, 1140, GRID_PX_MIN).height - 0.5);
+    expect(tiny.height).toBeCloseTo(comfy);
   });
 });
 

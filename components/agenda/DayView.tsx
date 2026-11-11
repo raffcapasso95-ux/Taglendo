@@ -199,7 +199,8 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
 
         <div className={styles.cols} style={{ gridTemplateColumns: `var(--grid-time-col) repeat(${day.columns.length}, minmax(0, 1fr))` }}>
           <div className={styles.timeCol} style={{ height }}>
-            {hourMarks.filter((m) => m.label).map((m) => (
+            {/* l'etichetta dell'ora vicina a quella attuale si toglie: finirebbe sotto il segnaposto rosso */}
+            {hourMarks.filter((m) => m.label && (nowTop === null || Math.abs(m.top - nowTop) >= 18)).map((m) => (
               <span key={m.min} className={styles.hourLabel} style={{ top: m.top }}>
                 {clock(m.min)}
               </span>
@@ -260,21 +261,27 @@ function DeskGrid({ day, showPast, setShowPast, showCancelled, setShowCancelled 
                   const current = isToday && a.status === "confermato" && a.startMin <= nowMin && nowMin < a.endMin;
                   const top = y(Math.max(a.startMin, g0));
                   const h = y(a.endMin) - top;
+                  const tall = h >= 46; // due righe: nome, poi orario e servizio
                   return (
                     <button
                       key={a.id}
                       type="button"
-                      className={blockClass(a, current)}
+                      className={cx(blockClass(a, current), tall && styles.blockTall)}
                       style={{ top, height: h }}
                       title={`${clock(a.startMin)}–${clock(a.endMin)} · ${a.clientName} · ${a.serviceName}`}
                       onClick={() => openAppointment(a.id)}
                     >
+                      {/* come in un calendario: il nome in alto, sotto orario e servizio; i blocchi bassi restano su una riga */}
                       <span className={styles.blockLine}>
-                        <span className={styles.blockTime}>{clock(a.startMin)}</span>
+                        <span className={tall ? "visually-hidden" : styles.blockTime}>{clock(a.startMin)} </span>
                         <span className={cx(styles.blockName, a.status === "annullato" && styles.struck)}>{a.clientName}</span>
                         <StateTag status={a.status} />
                       </span>
-                      {h >= 44 ? <span className={styles.blockSvc}>{a.serviceName}</span> : null}
+                      {tall ? (
+                        <span className={styles.blockSvc}>
+                          {clock(a.startMin)}–{clock(a.endMin)} · {a.serviceName}
+                        </span>
+                      ) : null}
                     </button>
                   );
                 })}

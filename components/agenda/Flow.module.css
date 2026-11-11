@@ -1102,3 +1102,8 @@
     transition: none;
   }
 }
+
+/* la matita sul bordo destro di una finestra: l'area di tocco non sporge (farebbe scorrere il contenuto di lato) */
+.priceEnd .priceEdit::after {
+  right: 0;
+}

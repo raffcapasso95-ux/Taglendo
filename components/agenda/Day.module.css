@@ -909,3 +909,20 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* NUOVO: blocchi alti, come in un calendario: il testo parte dall'alto, nome più grande */
+@media (min-width: 1024px) {
+  .blockTall {
+    justify-content: flex-start;
+    padding-top: 6px;
+    gap: 2px;
+  }
+
+  .blockTall .blockName {
+    font-size: 14px;
+  }
+
+  .blockTall .blockSvc {
+    font-variant-numeric: tabular-nums;
+  }
+}
