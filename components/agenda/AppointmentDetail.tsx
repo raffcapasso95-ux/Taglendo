@@ -253,7 +253,7 @@ export function AppointmentDetail({ id, today, canEdit, salonName, multipleOpera
               {detail.source === "online" ? ` · ${copy.online}` : ""}
             </p>
             {priceEditable ? (
-              <div className={cx(flow.price, styles.subPrice, detail.priceCents !== detail.listPriceCents && flow.priceChanged)}>
+              <div className={cx(flow.price, flow.priceEnd, styles.subPrice, detail.priceCents !== detail.listPriceCents && flow.priceChanged)}>
                 <span className={flow.priceLabel}>{agendaCopy.flow.price}</span>
                 <span className={flow.priceValue}>
                   <span className={flow.priceOld} hidden={detail.priceCents === detail.listPriceCents}>

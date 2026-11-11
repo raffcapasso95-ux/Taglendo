@@ -48,7 +48,7 @@ const isActive = (s: ApptStatus) => s === "confermato" || s === "completato";
 /** Spazio minimo che vale la pena mostrare come "libero", in minuti. */
 const MIN_GAP = 15;
 /** Pixel per minuto nella griglia desktop (96 px l'ora). */
-export const GRID_PX_PER_MIN = 1.6;
+export const GRID_PX_PER_MIN = 2.4;
 
 /** Un tratto senza appuntamenti lungo almeno così (minuti) viene compresso nella griglia desktop. */
 const QUIET_MIN = 60;
@@ -123,9 +123,12 @@ export function gridScale(
 }
 
 /** Altezze (px per minuto) provate, dalla più comoda alla più stretta, perché la giornata stia nello spazio. */
-const GRID_PX_STEPS = [1.6, 1.5, 1.4, 1.3, 1.2] as const;
+// NUOVO: blocchi alti come in un calendario (30 minuti = 60–72 px): c'è posto per nome, orario e servizio.
+// Se la giornata non sta nello schermo si scorre (oggi si parte dall'ora attuale).
+const GRID_PX_STEPS = [GRID_PX_PER_MIN, 2.2, 2.0] as const;
+export const GRID_PX_MIN = GRID_PX_STEPS[GRID_PX_STEPS.length - 1]!;
 
-/** La scala più comoda che sta in `available` px; se nemmeno la più stretta basta, quella (si scorre). */
+/** La scala più comoda che sta in `available` px; se nemmeno la più stretta basta si scorre comunque: tanto vale la più comoda. */
 export function fitGridScale(
   busy: ReadonlyArray<readonly [number, number]>,
   start: number,
@@ -139,16 +142,16 @@ export function fitGridScale(
     const sc = make(px);
     if (sc.height <= available) return fillScale(sc, available, px);
   }
-  return make(GRID_PX_STEPS[GRID_PX_STEPS.length - 1]!);
+  return make(GRID_PX_STEPS[0]);
 }
 
 /** Quanto può crescere al massimo la griglia per riempire lo spazio: oltre, gli appuntamenti diventerebbero enormi. */
-const MAX_FILL = 2;
+const MAX_FILL = 1.5;
 
 /**
  * NUOVO: con pochi appuntamenti la griglia compressa resta bassa e sotto avanza spazio vuoto.
  * Prima i tratti compressi (liberi e pause) tornano verso la loro altezza naturale, in proporzione alla durata;
- * se avanza ancora spazio, tutta la griglia si allunga, fino al doppio.
+ * se avanza ancora spazio, tutta la griglia si allunga, fino a una volta e mezza.
  */
 export function fillScale(sc: GridScale, available: number, px: number): GridScale {
   const extra = available - sc.height;
