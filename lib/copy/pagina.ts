@@ -32,6 +32,10 @@ export const paginaCopy = {
   onlineSub: "Se la spegni, i clienti vedono solo il pulsante per chiamarti",
   prices: "Mostra i prezzi",
   pricesSub: "Accanto a ogni servizio, sulla pagina",
+  // NUOVO: ricerca dei saloni
+  listed: "Compari nella ricerca di Taglendo",
+  listedSub: "I clienti trovano il salone cercando la città. Se la spegni, si arriva solo dal tuo link",
+  listedNoPlace: "Non troviamo la città nell’indirizzo: scrivila dopo la via (es. «Via Roma 12, Bologna») per comparire nella ricerca.",
   services: "Servizi e orari",
   servicesSub: "Si cambiano in Listino e orari",
   errors: {

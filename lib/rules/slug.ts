@@ -2,6 +2,7 @@
 const RESERVED_SLUGS = [
   "accedi", "registrati", "verifica", "password", "nuova-password", "invito", "primo-avvio", "pronto",
   "agenda", "clienti", "link", "listino", "impostazioni", "profilo", "salone", "statistiche", "notifiche",
+  "cerca", "barbieri", "per-i-saloni",
   "privacy", "termini", "cookie", "api", "auth", "dev", "admin", "app", "www", "taglendo",
 ] as const;
 

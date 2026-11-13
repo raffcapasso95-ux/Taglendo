@@ -6,8 +6,8 @@ La chiave resta sul server (`/api/indirizzi`): il browser non la vede mai. Senza
 ## Creare la chiave (una volta)
 1. Su https://console.cloud.google.com crea un progetto (es. «Taglendo») e attiva la fatturazione.
    Le prime ~10.000 ricerche al mese di Autocomplete sono gratuite.
-2. In «API e servizi › Libreria» attiva **Places API (New)**.
-3. In «API e servizi › Credenziali» crea una **chiave API** e in «Limitazioni API» lasciale solo **Places API (New)**.
+2. In «API e servizi › Libreria» attiva **Places API (New)** e **Geocoding API** (posizione precisa dei saloni per la ricerca).
+3. In «API e servizi › Credenziali» crea una **chiave API** e in «Limitazioni API» lasciale solo **Places API (New)** e **Geocoding API**.
    Non serve la limitazione per sito: la chiave la usa solo il server.
 
 ## Metterla su Vercel

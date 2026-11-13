@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireSalon } from "@/lib/auth/session";
 import { paginaCopy } from "@/lib/copy/pagina";
 import { LIMITS, isPhone } from "@/lib/rules/forms";
+import { updateSalonPosition } from "@/lib/places/geocode";
 import { createClient } from "@/lib/supabase/server";
 
 const { errors } = paginaCopy;
@@ -41,15 +42,18 @@ export async function saveSalonPage(input: { name: string; area: string; descrip
     .update({ name, area: area || null, description: description || null, phone, address })
     .eq("id", salonId);
   if (error) return { ok: false, error: errors.generic };
+  // la ricerca dei saloni usa la posizione: segue l'indirizzo
+  await updateSalonPosition(supabase, salonId, address);
   refresh();
   return { ok: true };
 }
 
 /** Gli interruttori di «Prenotazione»: prenotazione online e prezzi in pagina. */
-export async function setSalonSwitch(key: "booking_online" | "show_prices", value: boolean): Promise<PageResult> {
+export async function setSalonSwitch(key: "booking_online" | "show_prices" | "listed", value: boolean): Promise<PageResult> {
   const { salonId, supabase } = await owner();
-  if (key !== "booking_online" && key !== "show_prices") return { ok: false, error: errors.generic };
-  const { error } = await supabase.from("salons").update(key === "booking_online" ? { booking_online: Boolean(value) } : { show_prices: Boolean(value) }).eq("id", salonId);
+  if (key !== "booking_online" && key !== "show_prices" && key !== "listed") return { ok: false, error: errors.generic };
+  const patch = key === "booking_online" ? { booking_online: Boolean(value) } : key === "show_prices" ? { show_prices: Boolean(value) } : { listed: Boolean(value) };
+  const { error } = await supabase.from("salons").update(patch).eq("id", salonId);
   if (error) return { ok: false, error: errors.generic };
   refresh();
   return { ok: true };
