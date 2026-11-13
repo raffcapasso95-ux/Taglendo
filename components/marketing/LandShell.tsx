@@ -64,17 +64,35 @@ export function LandShell({ audience, solid = false, children }: { audience: Aud
   return (
     <div className={styles.page} data-land="">
       <LandEffects />
-      <header className={styles.header} data-land-header="" data-solid={solid ? "true" : undefined} data-scrolled={solid ? "true" : undefined}>
+      {/* clienti: testata chiara, sempre piena; saloni: prugna, trasparente sulla foto dell'apertura */}
+      <header
+        className={styles.header}
+        data-land-header=""
+        data-tone={audience === "clienti" ? "light" : undefined}
+        data-solid={solid || audience === "clienti" ? "true" : undefined}
+        data-scrolled={solid || audience === "clienti" ? "true" : undefined}
+      >
         <div className={styles.headerRow}>
-          <Link href="/" aria-label="Taglendo, inizio pagina" className={styles.logo}>
+          <Link href={audience === "clienti" ? "/" : SALONI} aria-label={audience === "clienti" ? "Taglendo, inizio pagina" : site.businessHome} className={styles.logo}>
             <Image src="/brand/taglendo-icon.svg" alt="" width={34} height={34} className={styles.logoIcon} priority />
-            <Image src="/brand/taglendo-logo-light.svg" alt="Taglendo" width={109} height={26} className={`${styles.logoWord} ${styles.logoLight}`} priority style={{ height: 26, width: "auto" }} />
+            {audience === "clienti" ? (
+              <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={109} height={26} className={styles.logoWord} priority style={{ height: 26, width: "auto" }} />
+            ) : (
+              <Image src="/brand/taglendo-logo-light.svg" alt="Taglendo" width={109} height={26} className={`${styles.logoWord} ${styles.logoLight}`} priority style={{ height: 26, width: "auto" }} />
+            )}
+            {audience === "saloni" ? <span className={styles.logoTag}>{site.businessTag}</span> : null}
           </Link>
           <nav className={styles.nav} aria-label="Sezioni">
-            <Link href="/cerca" className={styles.navLink}>
-              {site.search}
-            </Link>
-            {audience === "saloni" ? (
+            {audience === "clienti" ? (
+              <>
+                <Link href="/cerca" className={styles.navLink}>
+                  {site.search}
+                </Link>
+                <Link href="/#citta" className={styles.navLink}>
+                  {site.cities}
+                </Link>
+              </>
+            ) : (
               <>
                 <Link href={`${SALONI}#come`} className={styles.navLink}>
                   {copy.nav.how}
@@ -85,8 +103,11 @@ export function LandShell({ audience, solid = false, children }: { audience: Aud
                 <Link href={`${SALONI}#domande`} className={styles.navLink}>
                   {copy.nav.faq}
                 </Link>
+                <Link href="/" className={styles.navLink}>
+                  {site.toClients}
+                </Link>
               </>
-            ) : null}
+            )}
           </nav>
           <div className={styles.headerActions}>
             <Suspense fallback={<GuestActions audience={audience} />}>

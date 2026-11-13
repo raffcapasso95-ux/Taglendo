@@ -4,7 +4,7 @@ import { formatPrice } from "@/lib/dates/format";
 import { citySlug, distanceLabel } from "@/lib/places/comuni";
 import type { CityCount, SalonHit, SearchResult } from "@/lib/search/load";
 import { RADIUS_KM } from "@/lib/search/rules";
-import { slotLabel } from "@/lib/search/rules";
+import { slotChips } from "@/lib/search/rules";
 import { Results } from "./Results";
 import { SearchBox } from "./SearchBox";
 import type { SalonView } from "./types";
@@ -22,8 +22,8 @@ export const toView = (h: SalonHit, now: Date): SalonView => ({
   logoUrl: h.logoUrl,
   distance: distanceLabel(h.distanceKm),
   price: h.priceFromCents !== null ? copy.card.from(formatPrice(h.priceFromCents)) : null,
-  services: h.services,
-  slot: h.nextSlot ? copy.card.next(slotLabel(h.nextSlot, now)) : null,
+  services: h.services.map((x) => ({ name: x.name, duration: `${x.durationMin} min`, price: x.priceCents !== null ? formatPrice(x.priceCents) : null })),
+  ...(({ day, chips }) => ({ slotDay: day, slots: chips }))(slotChips(h.nextSlots, now)),
   bookingOnline: h.bookingOnline,
 });
 
@@ -52,8 +52,10 @@ export function SearchPage({ result, cities, typed }: { result: SearchResult; ci
 
   return (
     <div className={styles.page}>
+      <div className={styles.searchRow}>
+        <SearchBox initial={ok && !ok.near ? place : typed} compact />
+      </div>
       <h1 className={styles.title}>{title}</h1>
-      <SearchBox initial={ok && !ok.near ? place : typed} />
 
       {result.kind === "unknown" ? (
         <p className={styles.notice} role="status">
@@ -67,10 +69,8 @@ export function SearchPage({ result, cities, typed }: { result: SearchResult; ci
             <p className={styles.notice} role="status">
               {copy.results.wider(RADIUS_KM, place || "te")}
             </p>
-          ) : (
-            <p className={styles.sub}>{copy.results.count(ok.hits.length, ok.radiusKm)}</p>
-          )}
-          <Results salons={ok.hits.map((h) => toView(h, now))} center={ok.center} />
+          ) : null}
+          <Results salons={ok.hits.map((h) => toView(h, now))} center={ok.center} summary={`${copy.results.count(ok.hits.length, ok.radiusKm)} · ${copy.results.sorted}`} />
         </>
       ) : null}
 
@@ -85,7 +85,7 @@ export function SearchPage({ result, cities, typed }: { result: SearchResult; ci
       ) : null}
 
       {!ok || ok.hits.length === 0 ? (
-        <section aria-labelledby="citta-t" className={styles.results}>
+        <section aria-labelledby="citta-t" className={styles.citiesBlock}>
           {cities.length > 0 ? (
             <>
               <h2 id="citta-t" className={styles.emptyTitle}>
@@ -104,8 +104,10 @@ export function SearchPage({ result, cities, typed }: { result: SearchResult; ci
 export function SearchSkeleton() {
   return (
     <div className={styles.page} aria-busy="true">
+      <div className={styles.searchRow}>
+        <SearchBox compact />
+      </div>
       <h1 className={styles.title}>{copy.results.headingEmpty}</h1>
-      <SearchBox />
       <div className={styles.skeleton} aria-hidden="true" />
       <div className={styles.skeleton} aria-hidden="true" />
     </div>

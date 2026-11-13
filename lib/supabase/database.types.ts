@@ -445,6 +445,11 @@ isOneToOne: false
 "purge_deleted_salons":
 { Args: Record<PropertyKey, never>; Returns: number
                            },
+"recent_salons":
+{ Args: { "p_limit"?: number }; Returns: {
+              "area": string,"city": string,"cover_path": string,"logo_path": string,"name": string,"price_from_cents": number,"services": (string)[],"slug": string
+            }[]
+                           },
 "register_salon":
 { Args: Record<PropertyKey, never>; Returns: string
                            },
@@ -461,7 +466,7 @@ isOneToOne: false
                            },
 "search_salons":
 { Args: { "p_lat": number,"p_limit"?: number,"p_lng": number,"p_radius_km"?: number }; Returns: {
-              "address": string,"area": string,"booking_online": boolean,"city": string,"cover_path": string,"distance_km": number,"lat": number,"lng": number,"logo_path": string,"name": string,"next_slot": string,"price_from_cents": number,"services": (string)[],"slug": string
+              "address": string,"area": string,"booking_online": boolean,"city": string,"cover_path": string,"distance_km": number,"lat": number,"lng": number,"logo_path": string,"name": string,"next_slots": (string)[],"price_from_cents": number,"services": Json,"slug": string
             }[]
                            },
 "set_week_hours":

@@ -32,3 +32,26 @@ export function slotLabel(startsAt: string, now: Date): string {
   const w = weekdayShort(day);
   return `${w.charAt(0).toUpperCase()}${w.slice(1)} ${dayNumber(day)} ${monthShort(day)}, ${time}`;
 }
+
+/** Il giorno di un orario, come si dice: «Oggi», «Domani», «Ven 13 nov». */
+export function dayLabel(startsAt: string, now: Date): string {
+  const day = romeDate(new Date(startsAt));
+  const today = romeDate(now);
+  if (day === today) return "Oggi";
+  if (day === addDays(today, 1)) return "Domani";
+  const w = weekdayShort(day);
+  return `${w.charAt(0).toUpperCase()}${w.slice(1)} ${dayNumber(day)} ${monthShort(day)}`;
+}
+
+/** I prossimi orari come pulsanti: il giorno del primo in testa, e il giorno sul pulsante solo quando cambia. */
+export function slotChips(slots: readonly string[], now: Date): { day: string | null; chips: Array<{ time: string; day: string | null }> } {
+  if (slots.length === 0) return { day: null, chips: [] };
+  const first = dayLabel(slots[0]!, now);
+  return {
+    day: first,
+    chips: slots.map((s) => {
+      const d = dayLabel(s, now);
+      return { time: clock(romeMinutes(new Date(s))), day: d === first ? null : d };
+    }),
+  };
+}
