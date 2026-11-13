@@ -162,7 +162,7 @@
 .page {
   max-width: var(--land-max);
   margin: 0 auto;
-  padding: calc(68px + env(safe-area-inset-top, 0px) + var(--space-6)) var(--space-5) var(--space-12);
+  padding: calc(68px + env(safe-area-inset-top, 0px) + var(--space-5)) var(--space-5) calc(var(--space-16) + var(--space-8));
   gap: var(--space-5);
   flex-direction: column;
   display: flex;
@@ -175,9 +175,24 @@
   font-weight: 600;
 }
 
+.searchRow {
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.boxCompact {
+  max-width: none;
+}
+
+.citiesBlock {
+  gap: var(--space-3);
+  flex-direction: column;
+  display: flex;
+}
+
 .title {
   margin: 0;
-  font-size: var(--land-h2);
+  font-size: clamp(28px, 4vw, 40px);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.03em;
@@ -267,48 +282,51 @@
 
 /* ── Elenco e mappa ─────────────────────────────────────────── */
 .results {
+  gap: var(--space-5);
+  flex-direction: column;
+  display: flex;
+}
+
+.listCol {
+  min-width: 0;
   gap: var(--space-4);
   flex-direction: column;
   display: flex;
 }
 
-.viewSwitch {
-  padding: var(--space-1);
-  border-radius: var(--radius-pill);
-  background: var(--surface-muted);
-  align-self: flex-start;
-  gap: var(--space-1);
+.toolbar {
+  gap: var(--space-3);
+  justify-content: space-between;
+  align-items: center;
   display: flex;
 }
 
-.viewButton {
+.mapToggle {
   min-height: var(--tap-min);
-  padding: 0 var(--space-5);
-  border: 0;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-pill);
-  background: transparent;
+  background: var(--surface);
   color: var(--text-primary);
   font: inherit;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
-}
-
-.viewButtonOn {
-  background: var(--brand-plum);
-  color: var(--brand-cream);
+  gap: var(--space-2);
+  align-items: center;
+  display: none;
 }
 
 .list {
   margin: 0;
   padding: 0;
-  gap: var(--space-3);
+  gap: var(--space-4);
   flex-direction: column;
   list-style: none;
   display: flex;
 }
 
-.results[data-view="map"] .list {
+.results[data-view="map"] .listCol {
   display: none;
 }
 
@@ -316,21 +334,17 @@
   display: none;
 }
 
+/* la scheda di un salone */
 .card {
-  border: 1px solid transparent;
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-panel);
   background: var(--surface);
   box-shadow: var(--shadow-panel-soft);
   color: var(--text-primary);
-  text-decoration: none;
   overflow: hidden;
   flex-direction: column;
   display: flex;
-  transition: border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
-}
-
-.card:active {
-  transform: scale(0.99);
+  transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
 
 .cardOn {
@@ -339,8 +353,9 @@
 
 .cardPhoto {
   position: relative;
-  aspect-ratio: 16 / 9;
-  background: var(--surface-muted);
+  aspect-ratio: 2 / 1;
+  background: var(--brand-peach);
+  overflow: hidden;
   flex: 0 0 auto;
   display: block;
 }
@@ -351,122 +366,212 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform var(--duration-slow) var(--ease-out);
 }
 
 .cardNoPhoto {
   position: absolute;
   inset: 0;
-  color: var(--text-secondary);
-  font-size: 40px;
-  font-weight: 700;
+  background: linear-gradient(135deg, var(--brand-peach), var(--surface-muted));
   justify-content: center;
   align-items: center;
   display: flex;
 }
 
-.cardNum,
-.pin {
-  width: 28px;
-  height: 28px;
-  border: 2px solid var(--brand-cream);
+.cardLogo {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  object-fit: contain;
+  box-shadow: var(--shadow-card);
+}
+
+.cardInitial {
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   background: var(--brand-plum);
   color: var(--brand-cream);
-  font-size: 13px;
+  font-size: 30px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
   justify-content: center;
   align-items: center;
   display: flex;
 }
 
-.cardNum {
+.cardPriceTag {
   position: absolute;
-  top: var(--space-2);
-  left: var(--space-2);
+  left: var(--space-3);
+  bottom: var(--space-3);
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
 }
 
 .cardBody {
   min-width: 0;
   padding: var(--space-4);
-  gap: var(--space-1);
+  gap: var(--space-3);
   flex: 1 1 auto;
   flex-direction: column;
   display: flex;
 }
 
-.cardTop {
-  gap: var(--space-3);
-  justify-content: space-between;
-  align-items: baseline;
+.cardHead {
+  gap: var(--space-1);
+  flex-direction: column;
   display: flex;
 }
 
 .cardName {
-  min-width: 0;
-  font-size: 18px;
+  margin: 0;
+  font-size: 19px;
   font-weight: 700;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 
-.cardDistance {
+.page .cardLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cardWhere {
+  margin: 0;
   color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
+  font-size: 14px;
+  gap: var(--space-1);
+  align-items: flex-start;
+  display: flex;
+}
+
+.cardWhere svg {
+  margin-top: 2px;
   flex: 0 0 auto;
 }
 
-.cardWhere,
-.cardServices {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.cardPrice {
+.cardWhere strong {
   color: var(--text-primary);
   font-weight: 700;
   white-space: nowrap;
 }
 
-.cardFoot {
-  margin-top: var(--space-2);
-  gap: var(--space-3);
-  justify-content: space-between;
+.cardServices {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--border-subtle);
+  list-style: none;
+}
+
+.cardService {
+  min-height: 40px;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 14px;
+  gap: var(--space-2);
+  align-items: baseline;
+  display: flex;
+}
+
+.cardServiceName {
+  min-width: 0;
+  font-weight: 600;
+  flex: 1 1 auto;
+}
+
+.cardServiceMeta {
+  color: var(--text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.cardServicePrice {
+  min-width: 52px;
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.cardSlots {
+  gap: var(--space-2) var(--space-3);
+  flex-wrap: wrap;
   align-items: center;
   display: flex;
 }
 
-.cardSlot {
-  min-width: 0;
-  color: var(--status-success);
+.cardSlotsDay {
   font-size: 14px;
   font-weight: 700;
 }
 
-.cardSlotOff {
-  color: var(--text-secondary);
+.slotList {
+  margin: 0;
+  padding: 0;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  list-style: none;
+  display: flex;
+}
+
+.page .slot {
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--status-success);
+  border-radius: var(--radius-pill);
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  gap: 6px;
+  align-items: center;
+  display: inline-flex;
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.slotDay {
+  font-size: 12px;
   font-weight: 600;
 }
 
-.cardCta {
-  min-height: 40px;
-  padding: 0 var(--space-4);
+.cardNoSlot {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cardFoot {
+  margin-top: auto;
+  justify-content: flex-end;
+  display: flex;
+}
+
+.page .cardCta {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-5);
   border-radius: var(--radius-pill);
   background: var(--brand-plum);
   color: var(--brand-cream);
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  white-space: nowrap;
-  flex: 0 0 auto;
+  text-decoration: none;
   align-items: center;
   display: inline-flex;
 }
 
+/* la mappa */
 .mapPane {
-  height: 70svh;
-  min-height: 360px;
+  height: calc(100svh - 140px);
+  min-height: 420px;
   border-radius: var(--radius-panel);
   box-shadow: var(--shadow-panel-soft);
   overflow: hidden;
@@ -480,38 +585,133 @@
   background: var(--map-bg);
 }
 
+.tiles {
+  filter: grayscale(0.55) sepia(0.18) saturate(0.9) brightness(1.04) contrast(0.92);
+}
+
 .pin {
-  width: 34px;
-  height: 34px;
-  font-family: var(--font-family);
-  font-size: 14px;
-  box-shadow: var(--shadow-float);
-  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
-}
-
-.pinOn {
-  background: var(--brand-apricot);
-  color: var(--brand-plum);
-  transform: scale(1.18);
-}
-
-.popup {
-  min-width: 160px;
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border: 2px solid var(--surface);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
   color: var(--text-primary);
   font-family: var(--font-family);
   font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  box-shadow: var(--shadow-float);
+  transform: translate(-50%, calc(-100% - 8px));
+  align-items: center;
+  display: inline-flex;
+  position: relative;
+  transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+.pin::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 2px;
+}
+
+.pinOn {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.popupWrap {
+  font-family: var(--font-family);
+}
+
+/* Leaflet colora d'azzurro i link della mappa: nel riquadro del salone il testo resta del sito */
+.popupWrap a.popup,
+.popupWrap a.popup strong {
+  color: var(--text-primary);
+}
+
+.popup {
+  min-width: 220px;
+  color: var(--text-primary);
+  font-size: 13px;
   text-decoration: none;
+  gap: var(--space-3);
+  align-items: center;
+  display: flex;
+}
+
+.popupImg {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-card);
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.popupNoPhoto {
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  font-size: 26px;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.popupText {
+  min-width: 0;
   gap: 2px;
   flex-direction: column;
   display: flex;
 }
 
-.popup strong {
+.popupText strong {
   font-size: 15px;
 }
 
-.popup span {
+.popupText span {
   color: var(--text-secondary);
+}
+
+.popupText .popupCta {
+  margin-top: var(--space-1);
+  color: var(--text-primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* sul telefono: il pulsante Mappa/Elenco galleggia in basso, al centro */
+.floatSwitch {
+  position: fixed;
+  z-index: 35;
+  left: 50%;
+  bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+  min-height: var(--control-height);
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: var(--shadow-float);
+  cursor: pointer;
+  transform: translateX(-50%);
+  gap: var(--space-2);
+  align-items: center;
+  display: inline-flex;
+}
+
+.floatSwitch:active {
+  transform: translateX(-50%) scale(0.97);
 }
 
 @media (min-width: 700px) {
@@ -520,102 +720,94 @@
   }
 
   .cardPhoto {
-    width: 200px;
+    width: 240px;
     aspect-ratio: auto;
-    min-height: 150px;
+    min-height: 220px;
   }
 }
 
 @media (min-width: 1024px) {
-  .viewSwitch {
+  .floatSwitch {
     display: none;
   }
 
+  .mapToggle {
+    display: inline-flex;
+  }
+
   .results {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
     align-items: start;
-    gap: var(--space-5);
+    gap: var(--space-6);
     display: grid;
   }
 
-  .results[data-view] .list {
+  .resultsNoMap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .results[data-view] .listCol {
     display: flex;
   }
 
   .results[data-view] .mapPane {
     position: sticky;
-    top: calc(68px + var(--space-5));
-    height: calc(100svh - 68px - var(--space-10));
+    top: calc(68px + var(--space-4));
+    height: calc(100svh - 68px - var(--space-8));
     display: block;
+  }
+
+  .results.resultsNoMap[data-view] .mapPane {
+    display: none;
+  }
+
+  .resultsNoMap .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: grid;
+  }
+
+  .resultsNoMap .card {
+    flex-direction: column;
+  }
+
+  .resultsNoMap .cardPhoto {
+    width: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (max-width: 1023px) {
+  .results[data-view="map"] .mapPane {
+    height: calc(100svh - 68px - 120px);
+  }
+}
+
+@media (hover: hover) {
+  .card:hover {
+    border-color: var(--brand-plum);
+    box-shadow: var(--shadow-card);
+  }
+
+  .card:hover .cardImg {
+    transform: scale(1.03);
+  }
+
+  .page .slot:hover {
+    background: var(--status-success);
+    color: var(--brand-cream);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .card,
+  .cardImg,
   .pin,
-  .submit,
-  .city {
+  .page .slot {
     transition: none;
   }
 }
 
-/* ── Home per i clienti ─────────────────────────────────────── */
-.homeHero {
-  z-index: 1; /* i suggerimenti delle città possono scendere sulla sezione dopo */
-  min-height: min(100svh, 760px);
-  overflow: visible;
-}
-
-
-.homeSearch {
-  width: 100%;
-  position: relative;
-  z-index: 2; /* i suggerimenti stanno sopra le sezioni che seguono */
-}
-
-.homeBlock {
-  gap: var(--space-4);
-  flex-direction: column;
-  display: flex;
-}
-
-.homeSteps {
-  margin: var(--space-2) 0 0;
-  padding: 0;
-  gap: var(--space-4);
-  grid-template-columns: minmax(0, 1fr);
-  list-style: none;
-  display: grid;
-}
-
-.homeStep {
-  padding: var(--space-5);
-  border-radius: var(--radius-panel);
-  background: var(--surface);
-  box-shadow: var(--shadow-panel-soft);
-  gap: var(--space-2);
-  flex-direction: column;
-  display: flex;
-}
-
-.homeStepNum {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--brand-plum);
-  color: var(--brand-cream);
-  font-size: 15px;
-  font-weight: 700;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-@media (min-width: 820px) {
-  .homeSteps {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
 
 .skeleton {
   height: 150px;
@@ -628,8 +820,18 @@
     background: var(--surface-muted);
   }
 
-  .card:hover,
   .city:hover {
     border-color: var(--brand-plum);
+  }
+}
+
+@media (min-width: 820px) {
+  .boxCompact {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .boxCompact .form {
+    max-width: 620px;
   }
 }

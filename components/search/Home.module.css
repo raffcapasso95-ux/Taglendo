@@ -1,0 +1,629 @@
+/* NUOVO: home per i clienti. Chiara e luminosa (la pagina per i saloni resta prugna). Solo token. */
+
+.wrap {
+  max-width: var(--land-max);
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+
+.section {
+  padding: var(--space-16) 0;
+}
+
+.sectionMuted {
+  background: var(--surface);
+}
+
+.center {
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrowLight {
+  color: var(--on-plum-dim);
+}
+
+.h1 {
+  margin: 0;
+  font-size: clamp(40px, 6vw, 76px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+.h1Accent {
+  position: relative;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.scribble {
+  position: absolute;
+  left: 2%;
+  right: 4%;
+  bottom: -0.16em;
+  width: 94%;
+  height: 0.22em;
+  overflow: visible;
+}
+
+.scribble path {
+  fill: none;
+  stroke: var(--brand-apricot);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.h2 {
+  margin: 0;
+  font-size: clamp(28px, 3.6vw, 44px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin: var(--space-2) 0 0;
+  color: var(--text-secondary);
+  font-size: 17px;
+}
+
+.text {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ── Apertura: titolo e ricerca a sinistra, foto a destra ─────── */
+.hero {
+  position: relative;
+  padding: calc(68px + env(safe-area-inset-top, 0px) + var(--space-12)) 0 var(--space-16);
+  background:
+    radial-gradient(60% 70% at 85% 20%, var(--brand-peach), transparent 70%),
+    radial-gradient(50% 60% at 0% 100%, var(--surface-muted), transparent 70%),
+    var(--canvas);
+}
+
+.heroInner {
+  gap: var(--space-12);
+  align-items: center;
+  display: grid;
+}
+
+.heroText {
+  min-width: 0;
+  gap: var(--space-5);
+  flex-direction: column;
+  display: flex;
+}
+
+.kicker {
+  margin: 0;
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+  font-size: 14px;
+  font-weight: 700;
+  align-self: flex-start;
+}
+
+.heroLead {
+  max-width: 34em;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.heroSearch {
+  position: relative;
+  z-index: 5; /* i suggerimenti delle città scendono sopra le sezioni dopo */
+}
+
+.heroSearch form {
+  box-shadow: var(--shadow-card);
+}
+
+.popular {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  align-items: center;
+  display: flex;
+}
+
+.popularLink {
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  text-decoration: none;
+  align-items: center;
+  display: inline-flex;
+}
+
+.heroArt {
+  position: relative;
+  min-height: 300px;
+}
+
+.photoMain,
+.photoSide {
+  position: absolute;
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-shot);
+  overflow: hidden;
+}
+
+.photoMain {
+  top: 0;
+  right: 0;
+  width: 66%;
+  height: 100%;
+}
+
+.photoSide {
+  left: 0;
+  bottom: 12%;
+  width: 46%;
+  aspect-ratio: 3 / 2;
+  border: 6px solid var(--surface);
+}
+
+.photoMain img,
+.photoSide img {
+  object-fit: cover;
+  filter: grayscale(0.2);
+}
+
+.float {
+  position: absolute;
+  max-width: 70%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  font-size: 14px;
+}
+
+.floatBooked {
+  top: 8%;
+  left: 4%;
+  gap: var(--space-3);
+  align-items: center;
+  display: flex;
+}
+
+.floatBooked strong {
+  display: block;
+  font-size: 15px;
+}
+
+.floatBooked span span {
+  color: var(--text-secondary);
+}
+
+.floatIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--status-success-bg);
+  color: var(--status-success);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.floatFree {
+  right: 6%;
+  bottom: 4%;
+  border: 1px solid var(--status-success);
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  font-weight: 700;
+}
+
+/* ── Nuovi su Taglendo: una fila che scorre ───────────────────── */
+.head {
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+  justify-content: space-between;
+  align-items: flex-end;
+  display: flex;
+}
+
+.more {
+  min-height: var(--tap-min);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-underline-offset: 3px;
+  gap: var(--space-1);
+  align-items: center;
+  display: inline-flex;
+}
+
+.rail {
+  margin: 0 calc(-1 * var(--space-5));
+  padding: var(--space-1) var(--space-5) var(--space-4);
+  gap: var(--space-4);
+  list-style: none;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--space-5);
+  scrollbar-width: thin;
+  display: flex;
+}
+
+.railItem {
+  width: min(280px, 78vw);
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+}
+
+.salon {
+  height: 100%;
+  color: var(--text-primary);
+  text-decoration: none;
+  gap: var(--space-1);
+  flex-direction: column;
+  display: flex;
+}
+
+.salonPhoto {
+  position: relative;
+  margin-bottom: var(--space-2);
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-panel);
+  background: var(--brand-peach);
+  overflow: hidden;
+  display: block;
+}
+
+.salonPhoto > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.salonNoPhoto {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--brand-peach), var(--surface-muted));
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.salonLogo {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  object-fit: contain;
+}
+
+.salonInitial {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  font-size: 26px;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.salonName {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.salonMeta,
+.salonServices {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/* ── Perché prenotare con Taglendo ───────────────────────────── */
+.why {
+  margin: var(--space-8) 0 0;
+  padding: 0;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
+  display: grid;
+}
+
+.whyItem {
+  padding: var(--space-5);
+  border-radius: var(--radius-panel);
+  background: var(--canvas);
+}
+
+.whyIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+/* ── Come funziona: i passi e il telefono ─────────────────────── */
+.steps {
+  gap: var(--space-12);
+  align-items: center;
+  display: grid;
+}
+
+.stepList {
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  gap: var(--space-5);
+  list-style: none;
+  flex-direction: column;
+  display: flex;
+}
+
+.step {
+  gap: var(--space-4);
+  align-items: flex-start;
+  display: flex;
+}
+
+.stepNum {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  font-size: 16px;
+  font-weight: 700;
+  flex: 0 0 auto;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.stepsShot {
+  max-width: 300px;
+  margin: 0 auto;
+  border: 8px solid var(--brand-plum);
+  border-radius: 36px;
+  box-shadow: var(--shadow-shot);
+  overflow: hidden;
+}
+
+.stepsShot img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ── Cerca per città ──────────────────────────────────────────── */
+.cityGrid {
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  gap: var(--space-2);
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
+  display: grid;
+}
+
+.city {
+  min-height: 56px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--canvas);
+  color: var(--text-primary);
+  text-decoration: none;
+  gap: var(--space-3);
+  align-items: center;
+  display: flex;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.city svg {
+  margin-left: auto;
+  flex: 0 0 auto;
+}
+
+.cityName {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.cityOn .cityName {
+  font-weight: 700;
+}
+
+.cityCount {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ── Hai un salone? Fascia prugna, l'unico punto scuro della pagina ── */
+.business {
+  padding: var(--space-8) var(--space-5);
+  border-radius: var(--radius-panel);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  overflow: hidden;
+  gap: var(--space-8);
+  align-items: center;
+  display: grid;
+}
+
+.businessTitle {
+  color: var(--brand-cream);
+}
+
+.businessLead {
+  margin: var(--space-3) 0 0;
+  color: var(--on-plum-dim);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.checks {
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  gap: var(--space-2);
+  list-style: none;
+  flex-direction: column;
+  display: flex;
+}
+
+.checks li {
+  font-size: 15px;
+  font-weight: 600;
+  gap: var(--space-2);
+  align-items: center;
+  display: flex;
+}
+
+.checks svg {
+  color: var(--brand-apricot);
+}
+
+.businessCta {
+  margin-top: var(--space-6);
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  display: flex;
+}
+
+.btnLight,
+.btnGhost {
+  min-height: var(--control-height);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  gap: var(--space-2);
+  align-items: center;
+  display: inline-flex;
+}
+
+.btnLight {
+  background: var(--brand-cream);
+  color: var(--brand-plum);
+}
+
+.btnGhost {
+  border: 1px solid var(--on-plum-dim);
+  color: var(--brand-cream);
+}
+
+.businessShot {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+}
+
+.businessShot img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (min-width: 700px) {
+  .why {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cityGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: calc(var(--space-16) + var(--space-8)) 0;
+  }
+
+  .heroInner {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  }
+
+  .heroArt {
+    min-height: 460px;
+  }
+
+  .why {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .steps {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+  }
+
+  .cityGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .business {
+    padding: var(--space-12);
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .businessShot {
+    margin-right: calc(-1 * var(--space-16) - var(--space-12));
+  }
+}
+
+@media (hover: hover) {
+  .salon:hover .salonPhoto > img {
+    transform: scale(1.04);
+  }
+
+  .city:hover,
+  .popularLink:hover {
+    border-color: var(--brand-plum);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .salonPhoto > img,
+  .city {
+    transition: none;
+  }
+}

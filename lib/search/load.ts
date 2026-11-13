@@ -18,18 +18,23 @@ export type SalonHit = {
   logoUrl: string | null;
   bookingOnline: boolean;
   priceFromCents: number | null;
-  services: string[];
+  services: Array<{ name: string; durationMin: number; priceCents: number | null }>;
   distanceKm: number;
-  nextSlot: string | null;
+  nextSlots: string[];
 };
+
+/** Un salone arrivato da poco, per la home. */
+export type RecentSalon = { slug: string; name: string; where: string; coverUrl: string | null; logoUrl: string | null; priceFromCents: number | null; services: string[] };
 
 export type SearchResult =
   | { kind: "none" }
   | { kind: "unknown"; text: string }
   | { kind: "ok"; place: string | null; near: boolean; center: { lat: number; lng: number }; radiusKm: number; widened: boolean; hits: SalonHit[] };
 
+const photoUrl = (path: string | null) => (path ? `${env.url()}/storage/v1/object/public/salon-photos/${path}` : null);
+
 async function around(lat: number, lng: number, radius: number): Promise<SalonHit[]> {
-  const { data } = await createAnonClient().rpc("search_salons", { p_lat: lat, p_lng: lng, p_radius_km: radius });
+  const { data } = await createAnonClient().rpc("find_salons", { p_lat: lat, p_lng: lng, p_radius_km: radius });
   return (data ?? []).map((r) => ({
     slug: r.slug,
     name: r.name,
@@ -38,13 +43,13 @@ async function around(lat: number, lng: number, radius: number): Promise<SalonHi
     city: r.city,
     lat: r.lat,
     lng: r.lng,
-    coverUrl: r.cover_path ? `${env.url()}/storage/v1/object/public/salon-photos/${r.cover_path}` : null,
+    coverUrl: photoUrl(r.cover_path),
     logoUrl: salonLogoUrl(r.logo_path),
     bookingOnline: r.booking_online,
     priceFromCents: r.price_from_cents,
-    services: r.services ?? [],
+    services: ((r.services ?? []) as Array<{ name: string; duration_min: number; price_cents: number | null }>).map((x) => ({ name: x.name, durationMin: x.duration_min, priceCents: x.price_cents })),
     distanceKm: r.distance_km,
-    nextSlot: r.next_slot,
+    nextSlots: r.next_slots ?? [],
   }));
 }
 
@@ -83,4 +88,18 @@ export type CityCount = { city: string; salons: number };
 export async function listedCities(): Promise<CityCount[]> {
   const { data } = await createAnonClient().rpc("salon_cities");
   return (data ?? []).filter((c): c is { city: string; salons: number; lat: number; lng: number } => Boolean(c.city)).map((c) => ({ city: c.city, salons: c.salons }));
+}
+
+/** Gli ultimi saloni arrivati su Taglendo (prima chi ha una foto). */
+export async function recentSalons(limit = 8): Promise<RecentSalon[]> {
+  const { data } = await createAnonClient().rpc("recent_salons", { p_limit: limit });
+  return (data ?? []).map((r) => ({
+    slug: r.slug,
+    name: r.name,
+    where: r.area || r.city || "",
+    coverUrl: photoUrl(r.cover_path),
+    logoUrl: salonLogoUrl(r.logo_path),
+    priceFromCents: r.price_from_cents,
+    services: r.services ?? [],
+  }));
 }

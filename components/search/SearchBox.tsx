@@ -13,7 +13,7 @@ type Suggestion = { name: string; prov: string };
  * NUOVO: il campo «Dove» della ricerca dei saloni. Scrivendo propone le città (dall'elenco dei comuni);
  * «Vicino a me» usa la posizione del telefono. Senza JavaScript resta un modulo normale che porta a /cerca.
  */
-export function SearchBox({ initial = "", tone = "light" }: { initial?: string; tone?: "light" | "dark" }) {
+export function SearchBox({ initial = "", tone = "light", compact = false }: { initial?: string; tone?: "light" | "dark"; compact?: boolean }) {
   const router = useRouter();
   const listId = useId();
   const [value, setValue] = useState(initial);
@@ -68,7 +68,7 @@ export function SearchBox({ initial = "", tone = "light" }: { initial?: string; 
   const shown = open && items.length > 0 && value.trim().length >= 2;
 
   return (
-    <div className={cx(styles.box, tone === "dark" && styles.boxDark)}>
+    <div className={cx(styles.box, tone === "dark" && styles.boxDark, compact && styles.boxCompact)}>
       <form
         className={styles.form}
         action="/cerca"

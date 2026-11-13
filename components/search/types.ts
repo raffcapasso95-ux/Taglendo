@@ -1,4 +1,4 @@
-/** Un salone pronto da mostrare nell'elenco: i testi (distanza, prezzo, primo orario) sono già scritti dal server. */
+/** Un salone pronto da mostrare nell'elenco: i testi (distanza, prezzi, orari) sono già scritti dal server. */
 export type SalonView = {
   slug: string;
   name: string;
@@ -9,7 +9,8 @@ export type SalonView = {
   logoUrl: string | null;
   distance: string; // «a 600 m»
   price: string | null; // «da 12 €»
-  services: string[];
-  slot: string | null; // «Primo orario: oggi alle 15:30»
+  services: Array<{ name: string; duration: string; price: string | null }>;
+  slotDay: string | null; // «Oggi», «Domani», «Ven 13 nov»: il giorno del primo orario
+  slots: Array<{ time: string; day: string | null }>; // day solo se diverso dal primo
   bookingOnline: boolean;
 };

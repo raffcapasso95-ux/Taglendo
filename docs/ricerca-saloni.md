@@ -14,7 +14,7 @@ I clienti cercano una barberia per città o con «Vicino a me», vedono l'elenco
 ## Chi compare
 Un salone compare se: non è eliminato, ha finito il primo avvio, ha una posizione, ha almeno un servizio attivo,
 la prova o l'abbonamento sono validi e il titolare non ha spento «Compari nella ricerca di Taglendo»
-(Impostazioni › Pagina del salone). Regola in `private.is_listed`, ricerca in `public.search_salons`.
+(Impostazioni › Pagina del salone). Regola in `private.is_listed`, ricerca in `public.find_salons`.
 L'elenco mostra solo dati che la pagina del salone mostra già (il prezzo «da» solo se i prezzi sono visibili,
 il primo orario solo con la prenotazione online).
 

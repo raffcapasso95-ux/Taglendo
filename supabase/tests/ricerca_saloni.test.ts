@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { SALON, createTestSalon, inTx, type Tx } from "./db";
 
 const BOLOGNA = [44.4949, 11.3426] as const;
-type Row = { slug: string; distance_km: number; price_from_cents: number | null; services: string[]; next_slot: string | null; city: string };
+type Row = { slug: string; distance_km: number; price_from_cents: number | null; services: Array<{ name: string; duration_min: number; price_cents: number | null }>; next_slots: string[] | null; city: string };
 
 const search = (tx: Tx, lat: number, lng: number, radius = 30) =>
-  tx.q<Row>(`select slug, distance_km, price_from_cents, services, next_slot, city from search_salons($1, $2, $3)`, [lat, lng, radius]);
+  tx.q<Row>(`select slug, distance_km, price_from_cents, services, next_slots, city from find_salons($1, $2, $3)`, [lat, lng, radius]);
 
 /** Un salone di prova pronto per la ricerca, a Modena. */
 async function listedSalon(tx: Tx) {
@@ -20,15 +20,23 @@ describe("ricerca dei saloni", () => {
     await inTx(async (tx) => {
       await listedSalon(tx);
       await tx.as(null); // visitatore
-      const near = await search(tx, ...BOLOGNA, 60);
+      // solo i due saloni di questa prova (le prove end-to-end possono averne lasciati altri nel database locale)
+      const near = (await search(tx, ...BOLOGNA, 60)).filter((r) => ["barberia-saragozza", "salone-di-prova"].includes(r.slug));
       expect(near.map((r) => r.slug)).toEqual(["barberia-saragozza", "salone-di-prova"]);
       expect(near[0]!.distance_km).toBeLessThan(2);
       expect(near[1]!.distance_km).toBeGreaterThan(30);
       expect(near[0]!.price_from_cents).toBeGreaterThan(0);
       expect(near[0]!.services.length).toBeGreaterThan(0);
-      expect(near[0]!.next_slot).not.toBeNull();
+      expect(near[0]!.services.length).toBeLessThanOrEqual(3);
+      expect(near[0]!.services[0]).toMatchObject({ name: expect.any(String), duration_min: expect.any(Number), price_cents: expect.any(Number) });
+      // i prossimi orari: al massimo 4, in ordine, tutti diversi
+      const slots = near[0]!.next_slots!;
+      expect(slots.length).toBeGreaterThan(0);
+      expect(slots.length).toBeLessThanOrEqual(4);
+      expect([...slots].sort()).toEqual(slots);
+      expect(new Set(slots).size).toBe(slots.length);
       // raggio stretto: solo Bologna
-      expect((await search(tx, ...BOLOGNA, 10)).map((r) => r.slug)).toEqual(["barberia-saragozza"]);
+      expect((await search(tx, ...BOLOGNA, 10)).map((r) => r.slug)).not.toContain("salone-di-prova");
       // lontano da tutto: niente
       expect(await search(tx, 40.8333, 14.25, 30)).toHaveLength(0);
     });
@@ -68,7 +76,8 @@ describe("ricerca dei saloni", () => {
       await tx.q(`update salons set show_prices = false, booking_online = false where id = $1`, [s.salonId]);
       await tx.as(null);
       const [r] = await search(tx, 44.6471, 10.9252, 5);
-      expect(r).toMatchObject({ price_from_cents: null, next_slot: null });
+      expect(r).toMatchObject({ price_from_cents: null, next_slots: null });
+      expect(r!.services.every((x) => x.price_cents === null)).toBe(true); // nemmeno nei servizi
     });
   });
 
@@ -76,10 +85,14 @@ describe("ricerca dei saloni", () => {
     await inTx(async (tx) => {
       await listedSalon(tx);
       await tx.as(null);
-      expect(await tx.error(`select * from search_salons(120, 11, 30)`, [])).toBe("22023");
-      expect(await tx.error(`select * from search_salons(44, 11, 5000)`, [])).toBe("22023");
+      expect(await tx.error(`select * from find_salons(120, 11, 30)`, [])).toBe("22023");
+      expect(await tx.error(`select * from find_salons(44, 11, 5000)`, [])).toBe("22023");
       const cities = await tx.q<{ city: string; salons: number }>(`select city, salons from salon_cities()`);
-      expect(cities.map((c) => c.city).sort()).toEqual(["Bologna", "Modena"]);
+      expect(cities.map((c) => c.city)).toEqual(expect.arrayContaining(["Bologna", "Modena"]));
+      // gli ultimi arrivati: prima chi ha una foto
+      const recent = (await tx.q<{ slug: string }>(`select slug from recent_salons(24)`)).map((r) => r.slug);
+      expect(recent).toContain("salone-di-prova");
+      expect(recent.indexOf("barberia-saragozza")).toBeLessThan(recent.indexOf("salone-di-prova"));
     });
   });
 
