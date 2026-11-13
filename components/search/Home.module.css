@@ -1,368 +1,5 @@
-/* NUOVO: home per i clienti. Chiara e luminosa (la pagina per i saloni resta prugna). Solo token. */
-
-.wrap {
-  max-width: var(--land-max);
-  margin: 0 auto;
-  padding: 0 var(--space-5);
-}
-
-.section {
-  padding: var(--space-16) 0;
-}
-
-.sectionMuted {
-  background: var(--surface);
-}
-
-.center {
-  text-align: center;
-}
-
-.eyebrow {
-  margin: 0 0 var(--space-2);
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.eyebrowLight {
-  color: var(--on-plum-dim);
-}
-
-.h1 {
-  margin: 0;
-  font-size: clamp(40px, 6vw, 76px);
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.045em;
-}
-
-.h1Accent {
-  position: relative;
-  white-space: nowrap;
-  display: inline-block;
-}
-
-.scribble {
-  position: absolute;
-  left: 2%;
-  right: 4%;
-  bottom: -0.16em;
-  width: 94%;
-  height: 0.22em;
-  overflow: visible;
-}
-
-.scribble path {
-  fill: none;
-  stroke: var(--brand-apricot);
-  stroke-width: 5;
-  stroke-linecap: round;
-}
-
-.h2 {
-  margin: 0;
-  font-size: clamp(28px, 3.6vw, 44px);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
-}
-
-.h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.lead {
-  margin: var(--space-2) 0 0;
-  color: var(--text-secondary);
-  font-size: 17px;
-}
-
-.text {
-  margin: var(--space-1) 0 0;
-  color: var(--text-secondary);
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-/* ── Apertura: titolo e ricerca a sinistra, foto a destra ─────── */
-.hero {
-  position: relative;
-  padding: calc(68px + env(safe-area-inset-top, 0px) + var(--space-12)) 0 var(--space-16);
-  background:
-    radial-gradient(60% 70% at 85% 20%, var(--brand-peach), transparent 70%),
-    radial-gradient(50% 60% at 0% 100%, var(--surface-muted), transparent 70%),
-    var(--canvas);
-}
-
-.heroInner {
-  gap: var(--space-8) var(--space-12);
-  grid-template-areas: "text" "search" "art";
-  align-items: center;
-  display: grid;
-}
-
-.heroText {
-  grid-area: text;
-  min-width: 0;
-  gap: var(--space-5);
-  flex-direction: column;
-  display: flex;
-}
-
-.kicker {
-  margin: 0;
-  padding: 6px var(--space-3);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  box-shadow: var(--shadow-panel-soft);
-  font-size: 14px;
-  font-weight: 700;
-  align-self: flex-start;
-}
-
-.heroLead {
-  max-width: 34em;
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 18px;
-  line-height: 1.5;
-}
-
-.heroSearch {
-  grid-area: search;
-  position: relative;
-  z-index: 5; /* i riquadri di Servizio, Dove e Quando scendono sopra le sezioni dopo */
-  gap: var(--space-4);
-  flex-direction: column;
-  display: flex;
-}
-
-
-
-.popular {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 600;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  align-items: center;
-  display: flex;
-}
-
-.popularLink {
-  transition: transform var(--duration-press) var(--ease-out), border-color var(--duration-fast) ease;
-  min-height: 36px;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--text-primary);
-  text-decoration: none;
-  align-items: center;
-  display: inline-flex;
-}
-
-.heroArt {
-  grid-area: art;
-  position: relative;
-  min-height: 300px;
-}
-
-.photoMain {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 72%;
-  height: 100%;
-  border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-shot);
-  overflow: hidden;
-}
-
-.photoMain img {
-  object-fit: cover;
-  filter: grayscale(0.2);
-}
-
-.float {
-  position: absolute;
-  max-width: 70%;
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  font-size: 14px;
-}
-
-.floatBooked {
-  top: 8%;
-  left: 4%;
-  gap: var(--space-3);
-  align-items: center;
-  display: flex;
-}
-
-.floatBooked strong {
-  display: block;
-  font-size: 15px;
-}
-
-.floatBooked span span {
-  color: var(--text-secondary);
-}
-
-.floatIcon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--status-success-bg);
-  color: var(--status-success);
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-
-/* ── Entrata dell'apertura: un elemento dopo l'altro, breve (una volta sola per visita) ── */
-.enter,
-.enterArt {
-  animation: enter 420ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 60ms);
-}
-
-.enterArt {
-  animation-name: enter-art;
-  animation-duration: 600ms;
-  animation-delay: 120ms;
-}
-
-@keyframes enter {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-}
-
-@keyframes enter-art {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.98);
-  }
-}
-
-/* ── Cosa ti serve? I servizi come riquadri ───────────────────── */
-.categories {
-  margin: var(--space-6) 0 0;
-  padding: 0;
-  gap: var(--space-3);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  list-style: none;
-  display: grid;
-}
-
-.category {
-  height: 100%;
-  padding: var(--space-4);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-panel);
-  background: var(--surface);
-  color: var(--text-primary);
-  text-decoration: none;
-  gap: var(--space-1);
-  flex-direction: column;
-  display: flex;
-  transition: transform var(--duration-press) var(--ease-out), border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
-}
-
-.category:active {
-  transform: scale(0.97);
-}
-
-.categoryIcon {
-  width: 44px;
-  height: 44px;
-  margin-bottom: var(--space-2);
-  border-radius: var(--radius-card);
-  background: var(--brand-peach);
-  color: var(--brand-plum);
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.categoryName {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.categoryNote {
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-/* ── Nuovi su Taglendo: una fila che scorre ───────────────────── */
-.railWrap {
-  position: relative;
-}
-
-.railBtn {
-  position: absolute;
-  z-index: 2;
-  top: calc((min(280px, 78vw) * 0.75) / 2);
-  width: var(--tap-min);
-  height: var(--tap-min);
-  border: 1px solid var(--border-subtle);
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-card);
-  cursor: pointer;
-  transform: translateY(-50%);
-  justify-content: center;
-  align-items: center;
-  display: none;
-  transition: transform var(--duration-press) var(--ease-out);
-}
-
-.railBtn:active {
-  transform: translateY(-50%) scale(0.94);
-}
-
-.railPrev {
-  left: calc(-1 * var(--space-5));
-}
-
-.railNext {
-  right: calc(-1 * var(--space-5));
-}
-
-.head {
-  margin-bottom: var(--space-6);
-  gap: var(--space-4);
-  justify-content: space-between;
-  align-items: flex-end;
-  display: flex;
-}
-
-.more {
-  min-height: var(--tap-min);
-  color: var(--text-primary);
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-  text-underline-offset: 3px;
-  gap: var(--space-1);
-  align-items: center;
-  display: inline-flex;
-}
+/* NUOVO: home per i clienti. Corta, come quelle dei portali di prenotazione: ricerca, saloni, una fascia, le città.
+   Chiara e luminosa (la pagina per i saloni resta prugna). Solo token. */
 
 .rail {
   margin: 0 calc(-1 * var(--space-5));
@@ -450,134 +87,41 @@
   font-size: 14px;
 }
 
-/* ── Perché prenotare con Taglendo ───────────────────────────── */
-.why {
-  margin: var(--space-8) 0 0;
-  padding: 0;
-  gap: var(--space-4);
-  grid-template-columns: minmax(0, 1fr);
-  list-style: none;
-  display: grid;
+.railWrap {
+  position: relative;
 }
 
-.whyItem {
-  padding: var(--space-5);
-  border-radius: var(--radius-panel);
-  background: var(--canvas);
-}
-
-.whyIcon {
-  width: 48px;
-  height: 48px;
-  margin-bottom: var(--space-3);
-  border-radius: var(--radius-card);
-  background: var(--brand-peach);
-  color: var(--brand-plum);
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-/* ── Come funziona: i passi e il telefono ─────────────────────── */
-.steps {
-  gap: var(--space-12);
-  align-items: center;
-  display: grid;
-}
-
-.stepList {
-  margin: var(--space-6) 0 0;
-  padding: 0;
-  gap: var(--space-5);
-  list-style: none;
-  flex-direction: column;
-  display: flex;
-}
-
-.step {
-  gap: var(--space-4);
-  align-items: flex-start;
-  display: flex;
-}
-
-.stepNum {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--brand-plum);
-  color: var(--brand-cream);
-  font-size: 16px;
-  font-weight: 700;
-  flex: 0 0 auto;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.stepsShot {
-  max-width: 300px;
-  margin: 0 auto;
-  border: 8px solid var(--brand-plum);
-  border-radius: 36px;
-  box-shadow: var(--shadow-shot);
-  overflow: hidden;
-}
-
-.stepsShot img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* ── Cerca per città ──────────────────────────────────────────── */
-.cityGrid {
-  margin: var(--space-6) 0 0;
-  padding: 0;
-  gap: var(--space-2);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  list-style: none;
-  display: grid;
-}
-
-.city {
-  min-height: 56px;
-  padding: 0 var(--space-4);
+.railBtn {
+  position: absolute;
+  z-index: 2;
+  top: calc((min(280px, 78vw) * 0.75) / 2);
+  width: var(--tap-min);
+  height: var(--tap-min);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-card);
-  background: var(--canvas);
+  border-radius: 50%;
+  background: var(--surface);
   color: var(--text-primary);
-  text-decoration: none;
-  gap: var(--space-3);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transform: translateY(-50%);
+  justify-content: center;
   align-items: center;
-  display: flex;
-  transition: transform var(--duration-press) var(--ease-out), border-color var(--duration-fast) ease;
+  display: none;
+  transition: transform var(--duration-press) var(--ease-out);
 }
 
-.city svg {
-  margin-left: auto;
-  flex: 0 0 auto;
+.railBtn:active {
+  transform: translateY(-50%) scale(0.94);
 }
 
-.cityName {
-  font-size: 15px;
-  font-weight: 600;
+.railPrev {
+  left: calc(-1 * var(--space-5));
 }
 
-.cityOn .cityName {
-  font-weight: 700;
+.railNext {
+  right: calc(-1 * var(--space-5));
 }
 
-.cityCount {
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-pill);
-  background: var(--status-success-bg);
-  color: var(--status-success-text);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-/* ── Hai un salone? Fascia prugna, l'unico punto scuro della pagina ── */
 .business {
   padding: var(--space-8) var(--space-5);
   border-radius: var(--radius-panel);
@@ -598,27 +142,6 @@
   color: var(--on-plum-dim);
   font-size: 17px;
   line-height: 1.5;
-}
-
-.checks {
-  margin: var(--space-5) 0 0;
-  padding: 0;
-  gap: var(--space-2);
-  list-style: none;
-  flex-direction: column;
-  display: flex;
-}
-
-.checks li {
-  font-size: 15px;
-  font-weight: 600;
-  gap: var(--space-2);
-  align-items: center;
-  display: flex;
-}
-
-.checks svg {
-  color: var(--brand-apricot);
 }
 
 .businessCta {
@@ -663,49 +186,292 @@
   display: block;
 }
 
-@media (min-width: 700px) {
-  .why {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.cityCount {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
 
-  .cityGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+.head {
+  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+  justify-content: space-between;
+  align-items: flex-end;
+  display: flex;
+}
+
+.more {
+  min-height: var(--tap-min);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-underline-offset: 3px;
+  gap: var(--space-1);
+  align-items: center;
+  display: inline-flex;
+}
+
+.eyebrow {
+  margin: 0 0 var(--space-2);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrowLight {
+  color: var(--on-plum-dim);
+}
+
+.h1Accent {
+  position: relative;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.scribble {
+  position: absolute;
+  left: 2%;
+  right: 4%;
+  bottom: -0.16em;
+  width: 94%;
+  height: 0.22em;
+  overflow: visible;
+}
+
+.scribble path {
+  fill: none;
+  stroke: var(--brand-apricot);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.h2 {
+  margin: 0;
+  font-size: clamp(28px, 3.6vw, 44px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin: var(--space-2) 0 0;
+  color: var(--text-secondary);
+  font-size: 17px;
+}
+
+.wrap {
+  max-width: var(--land-max);
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+
+.section {
+  padding: var(--space-12) 0;
+}
+
+.sectionTight {
+  padding: 0 0 var(--space-12);
+}
+
+.h1 {
+  max-width: 13em;
+  margin: 0 auto;
+  font-size: clamp(40px, 6.4vw, 84px);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+/* ── Apertura centrata ────────────────────────────────────────── */
+.hero {
+  position: relative;
+  padding: calc(68px + env(safe-area-inset-top, 0px) + var(--space-12)) 0 var(--space-12);
+  background:
+    radial-gradient(45% 60% at 15% 10%, var(--brand-peach), transparent 70%),
+    radial-gradient(40% 55% at 90% 30%, var(--surface-muted), transparent 70%),
+    var(--canvas);
+  text-align: center;
+}
+
+.heroInner {
+  gap: var(--space-5);
+  flex-direction: column;
+  align-items: center;
+  display: flex;
+}
+
+.heroLead {
+  max-width: 34em;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.heroSearch {
+  position: relative;
+  z-index: 5; /* i riquadri di Servizio, Dove e Quando scendono sopra le sezioni dopo */
+  width: 100%;
+  max-width: 920px;
+  margin-top: var(--space-3);
+  text-align: left;
+}
+
+.heroSearch > div {
+  max-width: none;
+}
+
+/* i servizi come scorciatoie, sotto la barra */
+.quick {
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  display: flex;
+}
+
+.quickLink {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4) 0 var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  gap: var(--space-2);
+  align-items: center;
+  display: inline-flex;
+  transition: transform var(--duration-press) var(--ease-out), border-color var(--duration-fast) ease;
+}
+
+.quickLink:active {
+  transform: scale(0.97);
+}
+
+.quickIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.quickIcon svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* tre promesse in una riga */
+.trustLine {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  list-style: none;
+  gap: var(--space-2) var(--space-5);
+  flex-wrap: wrap;
+  justify-content: center;
+  display: flex;
+}
+
+.trustLine li {
+  gap: 6px;
+  align-items: center;
+  display: inline-flex;
+}
+
+.trustLine svg {
+  color: var(--status-success);
+}
+
+/* ── Le città: link fitti su più colonne ──────────────────────── */
+.cityLinks {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-4) 0 0;
+  border-top: 1px solid var(--border-subtle);
+  columns: 2;
+  column-gap: var(--space-6);
+  list-style: none;
+}
+
+.cityLink {
+  min-height: var(--tap-min);
+  color: var(--text-primary);
+  font-size: 15px;
+  text-decoration: none;
+  break-inside: avoid;
+  gap: var(--space-2);
+  align-items: center;
+  display: flex;
+}
+
+/* ── Entrata dell'apertura: un elemento dopo l'altro, breve ───── */
+.enter {
+  animation: enter 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.salon:active .salonPhoto,
+.btnLight:active,
+.btnGhost:active {
+  transform: scale(0.97);
+}
+
+.salonPhoto,
+.btnLight,
+.btnGhost {
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+@media (min-width: 700px) {
+  .cityLinks {
+    columns: 4;
   }
 }
 
 @media (min-width: 1024px) {
   .section {
-    padding: calc(var(--space-16) + var(--space-8)) 0;
+    padding: var(--space-16) 0;
   }
 
-  .heroInner {
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-    grid-template-areas: "text art" "search search";
+  .hero {
+    padding-bottom: var(--space-16);
   }
 
-  .heroArt {
-    min-height: 400px;
-    align-self: stretch;
-  }
-
-  .heroSearch {
-    margin-top: calc(-1 * var(--space-4));
-  }
-
-  .heroSearch > div:first-child {
-    max-width: none;
-  }
-
-  .why {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .steps {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
-  }
-
-  .cityGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .railBtn {
+    display: flex;
   }
 
   .business {
@@ -718,64 +484,18 @@
   }
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (pointer: fine) {
   .salon:hover .salonPhoto > img {
     transform: scale(1.04);
   }
 
-  .city:hover,
-  .popularLink:hover {
+  .quickLink:hover {
     border-color: var(--brand-plum);
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .salonPhoto > img,
-  .city {
-    transition: none;
-  }
-}
-
-.popularLink:active,
-.btnLight:active,
-.btnGhost:active {
-  transform: scale(0.97);
-}
-
-.btnLight,
-.btnGhost {
-  transition: transform var(--duration-press) var(--ease-out);
-}
-
-.city:active,
-.salon:active .salonPhoto {
-  transform: scale(0.98);
-}
-
-.salonPhoto {
-  transition: transform var(--duration-press) var(--ease-out);
-}
-
-@media (min-width: 700px) {
-  .categories {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 1024px) {
-  .categories {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-  }
-
-  .railBtn {
-    display: flex;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .category:hover {
-    border-color: var(--brand-plum);
-    box-shadow: var(--shadow-panel-soft);
+  .cityLink:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
   .railBtn:hover {
@@ -784,383 +504,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .enter,
-  .enterArt {
+  .enter {
     animation: fade 200ms ease both;
   }
 
-  .category,
-  .popularLink,
+  .quickLink,
+  .salonPhoto,
+  .salonPhoto > img,
   .btnLight,
   .btnGhost,
-  .salonPhoto,
   .railBtn {
     transition: none;
-  }
-}
-
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
-}
-
-/* ── Apertura: la scheda d'anteprima sopra la foto ─────────────── */
-.preview {
-  position: absolute;
-  left: 0;
-  bottom: 8%;
-  width: min(340px, 86%);
-  padding: var(--space-3);
-  border-radius: var(--radius-panel);
-  background: var(--surface);
-  box-shadow: var(--shadow-card);
-  gap: var(--space-3);
-  display: flex;
-}
-
-.previewPhoto {
-  position: relative;
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  flex: 0 0 auto;
-}
-
-.previewPhoto img {
-  object-fit: cover;
-}
-
-.previewBody {
-  min-width: 0;
-  gap: 2px;
-  flex-direction: column;
-  display: flex;
-}
-
-.previewTitle {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.previewMeta {
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-.previewSlots {
-  margin-top: var(--space-2);
-  gap: 6px;
-  flex-wrap: wrap;
-  align-items: center;
-  display: flex;
-}
-
-.previewDay {
-  margin-right: 2px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.previewSlot {
-  padding: 3px var(--space-2);
-  border: 1px solid var(--status-success);
-  border-radius: var(--radius-pill);
-  background: var(--status-success-bg);
-  color: var(--status-success-text);
-  font-size: 12px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.previewSlotOn {
-  background: var(--status-success);
-  color: var(--brand-cream);
-}
-
-/* ── Quattro motivi in una riga, sotto l'apertura ──────────────── */
-.trust {
-  border-block: 1px solid var(--border-subtle);
-  background: var(--surface);
-}
-
-.trustList {
-  margin: 0 auto;
-  padding-block: var(--space-5);
-  gap: var(--space-4);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  list-style: none;
-  display: grid;
-}
-
-.trustItem {
-  gap: var(--space-3);
-  align-items: center;
-  display: flex;
-}
-
-.trustIcon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--brand-peach);
-  color: var(--brand-plum);
-  flex: 0 0 auto;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.trustIcon svg {
-  width: 20px;
-  height: 20px;
-}
-
-.trustTitle {
-  font-size: 15px;
-  font-weight: 700;
-  display: block;
-}
-
-.trustText {
-  color: var(--text-secondary);
-  font-size: 13px;
-  display: block;
-}
-
-/* ── Servizi: la freccia arriva al passaggio ───────────────────── */
-.category {
-  position: relative;
-}
-
-.categoryArrow {
-  position: absolute;
-  top: var(--space-4);
-  right: var(--space-4);
-  color: var(--text-secondary);
-  opacity: 0;
-  transform: translateX(-4px);
-  transition: opacity var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
-}
-
-/* ── Come funziona su fondo pesca, numeri grandi ───────────────── */
-.sectionPeach {
-  background: var(--brand-peach);
-}
-
-.sectionPeach .text,
-.sectionPeach .eyebrow {
-  color: var(--text-primary);
-}
-
-.sectionPeach .stepNum {
-  width: auto;
-  height: auto;
-  min-width: 56px;
-  border-radius: 0;
-  background: none;
-  color: var(--brand-plum);
-  font-size: 40px;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  font-variant-numeric: tabular-nums;
-  justify-content: flex-start;
-}
-
-.sectionPeach .step {
-  padding-bottom: var(--space-5);
-  border-bottom: 1px solid var(--plum-line);
-}
-
-.sectionPeach .step:last-child {
-  border-bottom: 0;
-}
-
-/* ── Fascia fotografica ────────────────────────────────────────── */
-.band {
-  position: relative;
-  min-height: 480px;
-  padding: var(--space-16) 0;
-  background: var(--brand-plum);
-  color: var(--brand-cream);
-  isolation: isolate;
-  overflow: hidden;
-  align-items: center;
-  display: flex;
-}
-
-.bandImg {
-  z-index: -2;
-  object-fit: cover;
-  object-position: 50% 30%;
-  filter: grayscale(1) contrast(1.05);
-}
-
-.band::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: var(--land-scrim);
-}
-
-.bandInner {
-  width: 100%;
-  gap: var(--space-4);
-  flex-direction: column;
-  align-items: flex-start;
-  display: flex;
-}
-
-.bandTitle {
-  max-width: 14em;
-  margin: 0;
-  color: var(--brand-cream);
-  font-size: clamp(34px, 5vw, 64px);
-  font-weight: 700;
-  line-height: 1.04;
-  letter-spacing: -0.04em;
-}
-
-.bandText {
-  max-width: 32em;
-  margin: 0 0 var(--space-2);
-  color: var(--on-plum-dim);
-  font-size: 18px;
-  line-height: 1.5;
-}
-
-/* ── Domande frequenti ─────────────────────────────────────────── */
-.faqWrap {
-  gap: var(--space-8);
-  display: grid;
-}
-
-.faqHead {
-  gap: var(--space-3);
-  flex-direction: column;
-  align-items: flex-start;
-  display: flex;
-}
-
-.faq {
-  border-top: 1px solid var(--border-subtle);
-}
-
-.faqItem {
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.faqQ {
-  min-height: 64px;
-  padding: var(--space-4) 0;
-  font-size: 17px;
-  font-weight: 700;
-  list-style: none;
-  cursor: pointer;
-  gap: var(--space-4);
-  justify-content: space-between;
-  align-items: center;
-  display: flex;
-}
-
-.faqQ::-webkit-details-marker {
-  display: none;
-}
-
-.faqPlus {
-  position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--surface-muted);
-  flex: 0 0 auto;
-  transition: transform var(--duration-normal) var(--ease-out);
-}
-
-.faqPlus::before,
-.faqPlus::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 12px;
-  height: 2px;
-  border-radius: 1px;
-  background: var(--brand-plum);
-  transform: translate(-50%, -50%);
-}
-
-.faqPlus::after {
-  transform: translate(-50%, -50%) rotate(90deg);
-}
-
-.faqItem[open] .faqPlus {
-  transform: rotate(45deg);
-}
-
-.faqA {
-  max-width: 40em;
-  margin: 0;
-  padding: 0 var(--space-12) var(--space-5) 0;
-  color: var(--text-secondary);
-  font-size: 16px;
-  line-height: 1.55;
-}
-
-@media (min-width: 1024px) {
-  .trustList {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .faqWrap {
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    align-items: start;
-  }
-
-  .faqHead {
-    position: sticky;
-    top: calc(68px + var(--space-8));
-  }
-
-  .band {
-    min-height: 560px;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .category:hover .categoryArrow {
-    opacity: 1;
-    transform: none;
-  }
-
-  .faqQ:hover .faqPlus {
-    background: var(--brand-peach);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .categoryArrow,
-  .faqPlus {
-    transition: none;
-  }
-}
-
-/* sul telefono le città stanno su due colonne: senza freccia, il conteggio sotto il nome */
-@media (max-width: 699px) {
-  .city {
-    min-height: 52px;
-    padding: var(--space-2) var(--space-3);
-    flex-wrap: wrap;
-    gap: 2px var(--space-2);
-  }
-
-  .city svg {
-    display: none;
-  }
-
-  .cityName {
-    font-size: 14px;
   }
 }
