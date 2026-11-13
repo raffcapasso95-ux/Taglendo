@@ -1,151 +1,323 @@
 /* NUOVO: ricerca dei saloni (campo «Dove», elenco, mappa). Solo token. */
 
-/* ── Campo di ricerca ───────────────────────────────────────── */
+/* ── Barra di ricerca: Servizio · Dove · Quando ───────────────── */
 .box {
   width: 100%;
-  max-width: 560px;
-  gap: var(--space-3);
+  max-width: 920px;
+  gap: var(--space-2);
   flex-direction: column;
-  align-items: flex-start;
   display: flex;
+
+  --pop-ease: var(--ease-out);
 }
 
-.form {
+/* sul telefono: una scheda con tre righe e «Cerca» a tutta larghezza */
+.bar {
+  position: relative;
   width: 100%;
-  padding: var(--space-1);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-pill);
+  padding: var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
   background: var(--surface-overlay);
-  gap: var(--space-1);
-  align-items: center;
+  box-shadow: var(--shadow-card);
+  flex-direction: column;
   display: flex;
 }
 
-.boxDark .form {
+.boxDark .bar {
   border-color: transparent;
   box-shadow: var(--shadow-float);
 }
 
-.field {
+.segment {
   position: relative;
-  min-width: 0;
-  flex: 1 1 auto;
+  min-height: 60px;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-card);
+  gap: var(--space-3);
   align-items: center;
+  display: flex;
+  transition: background-color var(--duration-fast) ease;
+}
+
+.segment + .segment::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--space-3);
+  right: var(--space-3);
+  height: 1px;
+  background: var(--border-subtle);
+}
+
+.segmentOn {
+  background: var(--surface-muted);
+}
+
+.segmentOn::before,
+.segmentOn + .segment::before {
+  opacity: 0;
+}
+
+.segmentIcon {
+  color: var(--text-secondary);
+  flex: 0 0 auto;
   display: flex;
 }
 
-.fieldIcon {
-  position: absolute;
-  left: var(--space-3);
-  color: var(--text-secondary);
-  pointer-events: none;
+.segmentBody {
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  display: flex;
 }
 
-.input {
+.segmentLabel {
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.segmentInput,
+.segmentValue {
   width: 100%;
-  min-height: var(--control-height);
-  padding: 0 var(--space-3) 0 calc(var(--space-3) + 28px);
+  min-height: 28px;
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text-primary);
   font: inherit;
   font-size: 16px;
   font-weight: 600;
+  text-align: left;
 }
 
-.input::placeholder {
+.segmentInput::placeholder,
+.segmentPlaceholder {
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-.input:focus-visible {
-  outline: var(--focus-ring) solid var(--brand-plum);
-  outline-offset: 0;
+.segmentValue {
+  cursor: pointer;
+}
+
+/* il segno del fuoco è sul campo intero (sotto), non sul testo */
+.segment .segmentInput:focus-visible,
+.segment .segmentValue:focus-visible {
+  outline: none;
+}
+
+.segment:focus-within {
+  box-shadow: inset 0 0 0 2px var(--brand-plum);
 }
 
 .submit {
   min-height: var(--control-height);
+  margin-top: var(--space-2);
   padding: 0 var(--space-5);
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--brand-plum);
   color: var(--brand-cream);
   font: inherit;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
   cursor: pointer;
   flex: 0 0 auto;
-  transition: transform var(--duration-fast) var(--ease-out);
+  gap: var(--space-2);
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  transition: transform var(--duration-press) var(--ease-out), background-color var(--duration-fast) ease;
 }
 
 .submit:active {
   transform: scale(0.97);
 }
 
-.suggestions {
+/* i riquadri che si aprono dal campo: entrano scalando da sopra, escono più in fretta */
+.pop {
   position: absolute;
-  z-index: 30;
+  z-index: 40;
   top: calc(100% + var(--space-2));
   left: 0;
-  right: 0;
+  width: min(360px, calc(100vw - 2 * var(--space-5)));
   margin: 0;
-  padding: var(--space-1);
+  padding: var(--space-2);
   border-radius: var(--radius-card);
   background: var(--surface-overlay);
   box-shadow: var(--shadow-modal);
   color: var(--text-primary);
   list-style: none;
+  transform-origin: top left;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-4px) scale(0.97);
+  transition: opacity 120ms ease, transform 120ms var(--pop-ease), visibility 0s linear 120ms;
 }
 
-.suggestions[hidden] {
-  display: none;
+.pop[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition: opacity 180ms ease, transform 200ms var(--pop-ease), visibility 0s;
 }
 
-.suggestion {
+.option {
   min-height: var(--tap-min);
-  padding: 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-button);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  justify-content: space-between;
-  align-items: center;
   gap: var(--space-3);
+  align-items: center;
   display: flex;
 }
 
-.suggestionOn {
+.option > svg {
+  color: var(--text-secondary);
+  flex: 0 0 auto;
+}
+
+.optionOn {
   background: var(--surface-muted);
 }
 
+.optionNear {
+  margin-bottom: var(--space-1);
+}
+
+.optionIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-button);
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  flex: 0 0 auto;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.optionText {
+  flex-direction: column;
+  display: flex;
+}
+
+.optionSub {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+}
+
 .suggestionProv {
+  margin-left: auto;
   color: var(--text-secondary);
   font-size: 13px;
   font-weight: 600;
 }
 
-.near {
-  min-height: var(--tap-min);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-  gap: var(--space-2);
-  align-items: center;
-  display: inline-flex;
+/* il riquadro dei giorni */
+.popDate {
+  width: min(380px, calc(100vw - 2 * var(--space-5)));
+  padding: var(--space-3);
+  gap: var(--space-3);
+  flex-direction: column;
+  display: flex;
 }
 
-.near:disabled {
-  cursor: progress;
-  text-decoration: none;
+.dayQuick {
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  display: flex;
+}
+
+.dayChip {
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+.dayChipOn,
+.dayOn {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.dayGrid {
+  gap: var(--space-1);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  display: grid;
+}
+
+.day {
+  min-height: 52px;
+  padding: var(--space-1) 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+  gap: 2px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+.dayChip:active,
+.day:active {
+  transform: scale(0.95);
+}
+
+.dayWeek {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.dayNum {
+  font-size: 16px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dayOther {
+  min-height: var(--tap-min);
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  gap: var(--space-3);
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+}
+
+.dayOther input {
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 16px;
 }
 
 .geoError {
@@ -156,6 +328,85 @@
   color: var(--status-error);
   font-size: 14px;
   font-weight: 600;
+}
+
+/* su computer: una sola barra a pillola, tre campi divisi da filetti verticali */
+@media (min-width: 820px) {
+  .bar {
+    padding: var(--space-1);
+    border-radius: var(--radius-pill);
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .segment {
+    min-height: 60px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-pill);
+    flex: 1 1 0;
+  }
+
+  .segService {
+    flex-grow: 1.1;
+  }
+
+  .segDate {
+    flex-grow: 0.8;
+    min-width: 180px;
+  }
+
+  .segmentValue {
+    white-space: nowrap;
+  }
+
+  .segment + .segment::before {
+    inset: 14px auto 14px 0;
+    width: 1px;
+    height: auto;
+  }
+
+  .submit {
+    margin: 0 0 0 var(--space-1);
+    padding: 0 var(--space-6);
+  }
+
+  .segDate .pop {
+    left: auto;
+    right: 0;
+    transform-origin: top right;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .segment:not(.segmentOn):hover {
+    background: var(--surface-muted);
+  }
+
+  .option:hover {
+    background: var(--surface-muted);
+  }
+
+  .submit:hover {
+    background: var(--action-primary-hover);
+  }
+
+  .dayChip:not(.dayChipOn):hover,
+  .day:not(.dayOn):hover {
+    border-color: var(--brand-plum);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop,
+  .pop[data-open="true"] {
+    transform: none;
+  }
+
+  .submit,
+  .day,
+  .dayChip {
+    transition: none;
+  }
 }
 
 /* ── Pagina dei risultati ───────────────────────────────────── */
@@ -816,22 +1067,8 @@
 }
 
 @media (hover: hover) {
-  .suggestion:hover {
-    background: var(--surface-muted);
-  }
-
   .city:hover {
     border-color: var(--brand-plum);
   }
 }
 
-@media (min-width: 820px) {
-  .boxCompact {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  .boxCompact .form {
-    max-width: 620px;
-  }
-}

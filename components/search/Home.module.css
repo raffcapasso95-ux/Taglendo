@@ -101,12 +101,14 @@
 }
 
 .heroInner {
-  gap: var(--space-12);
+  gap: var(--space-8) var(--space-12);
+  grid-template-areas: "text" "search" "art";
   align-items: center;
   display: grid;
 }
 
 .heroText {
+  grid-area: text;
   min-width: 0;
   gap: var(--space-5);
   flex-direction: column;
@@ -133,13 +135,15 @@
 }
 
 .heroSearch {
+  grid-area: search;
   position: relative;
-  z-index: 5; /* i suggerimenti delle città scendono sopra le sezioni dopo */
+  z-index: 5; /* i riquadri di Servizio, Dove e Quando scendono sopra le sezioni dopo */
+  gap: var(--space-4);
+  flex-direction: column;
+  display: flex;
 }
 
-.heroSearch form {
-  box-shadow: var(--shadow-card);
-}
+
 
 .popular {
   margin: 0;
@@ -153,6 +157,7 @@
 }
 
 .popularLink {
+  transition: transform var(--duration-press) var(--ease-out), border-color var(--duration-fast) ease;
   min-height: 36px;
   padding: 0 var(--space-3);
   border: 1px solid var(--border-subtle);
@@ -165,6 +170,7 @@
 }
 
 .heroArt {
+  grid-area: art;
   position: relative;
   min-height: 300px;
 }
@@ -245,7 +251,120 @@
   font-weight: 700;
 }
 
+/* ── Entrata dell'apertura: un elemento dopo l'altro, breve (una volta sola per visita) ── */
+.enter,
+.enterArt {
+  animation: enter 420ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+.enterArt {
+  animation-name: enter-art;
+  animation-duration: 600ms;
+  animation-delay: 120ms;
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@keyframes enter-art {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+/* ── Cosa ti serve? I servizi come riquadri ───────────────────── */
+.categories {
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  display: grid;
+}
+
+.category {
+  height: 100%;
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  color: var(--text-primary);
+  text-decoration: none;
+  gap: var(--space-1);
+  flex-direction: column;
+  display: flex;
+  transition: transform var(--duration-press) var(--ease-out), border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+}
+
+.category:active {
+  transform: scale(0.97);
+}
+
+.categoryIcon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.categoryName {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.categoryNote {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
 /* ── Nuovi su Taglendo: una fila che scorre ───────────────────── */
+.railWrap {
+  position: relative;
+}
+
+.railBtn {
+  position: absolute;
+  z-index: 2;
+  top: calc((min(280px, 78vw) * 0.75) / 2);
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-card);
+  cursor: pointer;
+  transform: translateY(-50%);
+  justify-content: center;
+  align-items: center;
+  display: none;
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+.railBtn:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.railPrev {
+  left: calc(-1 * var(--space-5));
+}
+
+.railNext {
+  right: calc(-1 * var(--space-5));
+}
+
 .head {
   margin-bottom: var(--space-6);
   gap: var(--space-4);
@@ -452,7 +571,7 @@
   gap: var(--space-3);
   align-items: center;
   display: flex;
-  transition: border-color var(--duration-fast) var(--ease-out);
+  transition: transform var(--duration-press) var(--ease-out), border-color var(--duration-fast) ease;
 }
 
 .city svg {
@@ -582,10 +701,20 @@
 
   .heroInner {
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-areas: "text art" "search search";
   }
 
   .heroArt {
-    min-height: 460px;
+    min-height: 400px;
+    align-self: stretch;
+  }
+
+  .heroSearch {
+    margin-top: calc(-1 * var(--space-4));
+  }
+
+  .heroSearch > div:first-child {
+    max-width: none;
   }
 
   .why {
@@ -625,5 +754,74 @@
   .salonPhoto > img,
   .city {
     transition: none;
+  }
+}
+
+.popularLink:active,
+.btnLight:active,
+.btnGhost:active {
+  transform: scale(0.97);
+}
+
+.btnLight,
+.btnGhost {
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+.city:active,
+.salon:active .salonPhoto {
+  transform: scale(0.98);
+}
+
+.salonPhoto {
+  transition: transform var(--duration-press) var(--ease-out);
+}
+
+@media (min-width: 700px) {
+  .categories {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .categories {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .railBtn {
+    display: flex;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .category:hover {
+    border-color: var(--brand-plum);
+    box-shadow: var(--shadow-panel-soft);
+  }
+
+  .railBtn:hover {
+    border-color: var(--brand-plum);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter,
+  .enterArt {
+    animation: fade 200ms ease both;
+  }
+
+  .category,
+  .popularLink,
+  .btnLight,
+  .btnGhost,
+  .salonPhoto,
+  .railBtn {
+    transition: none;
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
   }
 }

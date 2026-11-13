@@ -8,7 +8,8 @@ import styles from "@/components/search/Home.module.css";
 import { searchCopy } from "@/lib/copy/search";
 import { formatPrice } from "@/lib/dates/format";
 import { citySlug } from "@/lib/places/comuni";
-import { listedCities, recentSalons } from "@/lib/search/load";
+import { Rail } from "@/components/search/Rail";
+import { listedCities, popularServices, recentSalons } from "@/lib/search/load";
 
 const copy = searchCopy.home;
 
@@ -47,6 +48,32 @@ const WHY_ICONS = [
     <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1" />
   </Icon>,
 ];
+const CATEGORY_ICONS = [
+  <Icon key="taglio">
+    <circle cx="6" cy="6" r="3" />
+    <circle cx="6" cy="18" r="3" />
+    <path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12" />
+  </Icon>,
+  <Icon key="barba">
+    <path d="M5 8c0 7 3.5 12 7 12s7-5 7-12" />
+    <path d="M9 13.5c1 .7 2 1 3 1s2-.3 3-1M8 8h8" />
+  </Icon>,
+  <Icon key="completo">
+    <path d="M12 3.5 14.5 9l6 .5-4.5 4 1.4 6L12 16.4 6.6 19.5 8 13.5l-4.5-4 6-.5z" />
+  </Icon>,
+  <Icon key="rasatura">
+    <path d="M4 15 15 4l5 5L9 20H4z" />
+    <path d="M12 7l5 5" />
+  </Icon>,
+  <Icon key="bambino">
+    <circle cx="12" cy="9" r="4.5" />
+    <path d="M10.5 9h.01M13.5 9h.01M10.5 11.2c.9.6 2.1.6 3 0M5 21c1-3.5 3.8-5.5 7-5.5s6 2 7 5.5" />
+  </Icon>,
+  <Icon key="sfumatura">
+    <path d="M4 18h16M4 14h12M4 10h8M4 6h4" />
+  </Icon>,
+];
+
 const Arrow = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M5 12h14M13 6l6 6-6 6" />
@@ -76,7 +103,7 @@ async function Recent() {
             {copy.recentAll} <Arrow />
           </Link>
         </div>
-        <ul className={styles.rail}>
+        <Rail>
           {salons.map((s) => (
             <li key={s.slug} className={styles.railItem}>
               <Link href={`/${s.slug}`} className={styles.salon}>
@@ -103,10 +130,16 @@ async function Recent() {
               </Link>
             </li>
           ))}
-        </ul>
+        </Rail>
       </div>
     </section>
   );
+}
+
+/** La barra di ricerca con i servizi più diffusi tra i saloni in elenco. */
+async function HeroSearch() {
+  const services = await popularServices();
+  return <SearchBox services={services} />;
 }
 
 /** Le città: le grandi sempre, più quelle dove ci sono già saloni; il numero dove ce ne sono. */
@@ -141,8 +174,10 @@ export default function Page() {
       <section className={styles.hero} aria-labelledby="home-t">
         <div className={cx(styles.wrap, styles.heroInner)}>
           <div className={styles.heroText}>
-            <p className={styles.kicker}>{copy.kicker}</p>
-            <h1 className={styles.h1} id="home-t">
+            <p className={cx(styles.kicker, styles.enter)} style={{ "--i": 0 } as React.CSSProperties}>
+              {copy.kicker}
+            </p>
+            <h1 className={cx(styles.h1, styles.enter)} id="home-t" style={{ "--i": 1 } as React.CSSProperties}>
               {copy.title}{" "}
               <span className={styles.h1Accent}>
                 {copy.titleAccent}
@@ -151,20 +186,11 @@ export default function Page() {
                 </svg>
               </span>
             </h1>
-            <p className={styles.heroLead}>{copy.lead}</p>
-            <div className={styles.heroSearch}>
-              <SearchBox />
-            </div>
-            <p className={styles.popular}>
-              <span>{copy.popular}</span>
-              {POPULAR.map((c) => (
-                <Link key={c} href={`/barbieri/${citySlug(c)}`} className={styles.popularLink}>
-                  {c}
-                </Link>
-              ))}
+            <p className={cx(styles.heroLead, styles.enter)} style={{ "--i": 2 } as React.CSSProperties}>
+              {copy.lead}
             </p>
           </div>
-          <div className={styles.heroArt} aria-hidden="true">
+          <div className={cx(styles.heroArt, styles.enterArt)} aria-hidden="true">
             <div className={styles.photoMain}>
               <Image src="/images/foto/cambia-macchinetta.jpg" alt="" fill priority sizes="(min-width: 1024px) 360px, 66vw" />
             </div>
@@ -182,6 +208,40 @@ export default function Page() {
             </div>
             <div className={cx(styles.float, styles.floatFree)}>{copy.floatFree}</div>
           </div>
+          {/* la ricerca a tutta larghezza: Servizio · Dove · Quando */}
+          <div className={cx(styles.heroSearch, styles.enter)} style={{ "--i": 3 } as React.CSSProperties}>
+            <Suspense fallback={<SearchBox />}>
+              <HeroSearch />
+            </Suspense>
+            <p className={styles.popular}>
+              <span>{copy.popular}</span>
+              {POPULAR.map((c) => (
+                <Link key={c} href={`/barbieri/${citySlug(c)}`} className={styles.popularLink}>
+                  {c}
+                </Link>
+              ))}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.section} aria-labelledby="servizi-t">
+        <div className={styles.wrap}>
+          <h2 className={styles.h2} id="servizi-t">
+            {copy.categoriesTitle}
+          </h2>
+          <p className={styles.lead}>{copy.categoriesLead}</p>
+          <ul className={styles.categories}>
+            {copy.categories.map((c, i) => (
+              <li key={c.name}>
+                <Link href={`/cerca?servizio=${encodeURIComponent(c.query)}`} className={styles.category}>
+                  <span className={styles.categoryIcon}>{CATEGORY_ICONS[i]}</span>
+                  <span className={styles.categoryName}>{c.name}</span>
+                  <span className={styles.categoryNote}>{c.note}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
