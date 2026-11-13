@@ -427,6 +427,10 @@ isOneToOne: false
 { Args: { "p_lat": number,"p_limit"?: number,"p_lng": number,"p_radius_km"?: number }; Returns: {
               "address": string,"area": string,"booking_online": boolean,"city": string,"cover_path": string,"distance_km": number,"lat": number,"lng": number,"logo_path": string,"name": string,"next_slots": (string)[],"price_from_cents": number,"services": Json,"slug": string
             }[]
+                           } |
+{ Args: { "p_date": string,"p_lat": number,"p_limit": number,"p_lng": number,"p_radius_km": number,"p_service": string }; Returns: {
+              "address": string,"area": string,"booking_online": boolean,"city": string,"cover_path": string,"distance_km": number,"lat": number,"lng": number,"logo_path": string,"name": string,"next_slots": (string)[],"price_from_cents": number,"services": Json,"slug": string
+            }[]
                            },
 "free_slots":
 { Args: { "p_days": number,"p_duration"?: number,"p_exclude"?: string,"p_from": string,"p_member": string,"p_public"?: boolean,"p_salon": string,"p_service": string,"p_step"?: number }; Returns: {
@@ -469,9 +473,9 @@ isOneToOne: false
               "city": string,"lat": number,"lng": number,"salons": number
             }[]
                            },
-"search_salons":
-{ Args: { "p_lat": number,"p_limit"?: number,"p_lng": number,"p_radius_km"?: number }; Returns: {
-              "address": string,"area": string,"booking_online": boolean,"city": string,"cover_path": string,"distance_km": number,"lat": number,"lng": number,"logo_path": string,"name": string,"next_slot": string,"price_from_cents": number,"services": (string)[],"slug": string
+"service_names":
+{ Args: { "p_limit"?: number }; Returns: {
+              "name": string,"salons": number
             }[]
                            },
 "set_week_hours":

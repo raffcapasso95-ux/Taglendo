@@ -4,7 +4,8 @@ import { formatPrice } from "@/lib/dates/format";
 import { citySlug, distanceLabel } from "@/lib/places/comuni";
 import type { CityCount, SalonHit, SearchResult } from "@/lib/search/load";
 import { RADIUS_KM } from "@/lib/search/rules";
-import { slotChips } from "@/lib/search/rules";
+import { resultsTitle, slotChips, type SearchFilters } from "@/lib/search/rules";
+import { romeDate } from "@/lib/dates/rome";
 import { Results } from "./Results";
 import { SearchBox } from "./SearchBox";
 import type { SalonView } from "./types";
@@ -44,18 +45,26 @@ export function CityLinks({ cities }: { cities: CityCount[] }) {
 }
 
 /** NUOVO: la pagina dei risultati, usata da /cerca e dalle pagine per città. */
-export function SearchPage({ result, cities, typed }: { result: SearchResult; cities: CityCount[]; typed: string }) {
+export function SearchPage({ result, cities, services, typed, filters }: { result: SearchResult; cities: CityCount[]; services: string[]; typed: string; filters: SearchFilters }) {
   const now = new Date();
+  const today = romeDate(now);
   const ok = result.kind === "ok" ? result : null;
   const place = ok?.place ?? "";
-  const title = !ok ? copy.results.headingEmpty : ok.near ? copy.results.headingNear(ok.place) : copy.results.heading(place);
+  const title = !ok ? copy.results.headingEmpty : resultsTitle({ place: ok.place, near: ok.near, service: filters.service, date: filters.date, today });
+  const filtered = Boolean(filters.service || filters.date);
 
   return (
     <div className={styles.page}>
       <div className={styles.searchRow}>
-        <SearchBox initial={ok && !ok.near ? place : typed} compact />
+        <SearchBox initial={ok && !ok.near ? place : typed} service={filters.service ?? ""} date={filters.date} services={services} compact />
       </div>
       <h1 className={styles.title}>{title}</h1>
+
+      {result.kind === "none" && filtered ? (
+        <p className={styles.notice} role="status">
+          {copy.results.needPlace}
+        </p>
+      ) : null}
 
       {result.kind === "unknown" ? (
         <p className={styles.notice} role="status">
@@ -76,8 +85,8 @@ export function SearchPage({ result, cities, typed }: { result: SearchResult; ci
 
       {ok && ok.hits.length === 0 ? (
         <div className={styles.empty}>
-          <p className={styles.emptyTitle}>{copy.results.none(place || "te")}</p>
-          <p className={styles.emptyText}>{copy.results.noneHint}</p>
+          <p className={styles.emptyTitle}>{filtered ? copy.results.noneFiltered(place || "te") : copy.results.none(place || "te")}</p>
+          <p className={styles.emptyText}>{filtered ? copy.results.noneFilteredHint : copy.results.noneHint}</p>
           <Link href="/per-i-saloni" className={styles.link}>
             {copy.results.owner}
           </Link>
@@ -105,7 +114,7 @@ export function SearchSkeleton() {
   return (
     <div className={styles.page} aria-busy="true">
       <div className={styles.searchRow}>
-        <SearchBox compact />
+        <SearchBox services={[]} compact />
       </div>
       <h1 className={styles.title}>{copy.results.headingEmpty}</h1>
       <div className={styles.skeleton} aria-hidden="true" />

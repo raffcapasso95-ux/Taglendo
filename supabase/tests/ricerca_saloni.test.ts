@@ -109,3 +109,45 @@ describe("ricerca dei saloni", () => {
     });
   });
 });
+
+describe("ricerca per servizio e data", () => {
+  type R = { slug: string; services: Array<{ name: string }>; next_slots: string[] | null; price_from_cents: number | null };
+  const find = (tx: Tx, service: string | null, date: string | null) =>
+    tx.q<R>(`select slug, services, next_slots, price_from_cents from find_salons(44.4949, 11.3426, 30, 40, $1, $2::date)`, [service, date]);
+
+  it("il servizio filtra i saloni e mette in testa i servizi cercati, con il prezzo «da» di quelli", async () => {
+    await inTx(async (tx) => {
+      await tx.as(null);
+      const [demo] = (await find(tx, "BARBA", null)).filter((r) => r.slug === "barberia-saragozza");
+      expect(demo!.services[0]!.name.toLowerCase()).toContain("barba");
+      expect((await find(tx, "permanente", null)).map((r) => r.slug)).not.toContain("barberia-saragozza");
+      const all = (await find(tx, null, null)).find((r) => r.slug === "barberia-saragozza")!;
+      expect(demo!.price_from_cents).toBeGreaterThanOrEqual(all.price_from_cents!);
+    });
+  });
+
+  it("con un giorno: solo chi ha posto quel giorno, e gli orari sono di quel giorno", async () => {
+    await inTx(async (tx) => {
+      await tx.as(null);
+      // il salone demo è chiuso la domenica: cerco la prossima domenica e il prossimo martedì
+      const [{ sun, tue }] = await tx.q<{ sun: string; tue: string }>(
+        `select (current_date + ((7 - extract(dow from current_date)::int) % 7 + 7))::text as sun,
+                (current_date + ((9 - extract(dow from current_date)::int) % 7 + 7))::text as tue`,
+      ) as [{ sun: string; tue: string }];
+      expect((await find(tx, null, sun)).map((r) => r.slug)).not.toContain("barberia-saragozza");
+      const [open] = (await find(tx, null, tue)).filter((r) => r.slug === "barberia-saragozza");
+      expect(open!.next_slots!.length).toBeGreaterThan(0);
+      const days = await tx.q<{ d: string }>(`select distinct (unnest($1::timestamptz[]) at time zone 'Europe/Rome')::date::text as d`, [open!.next_slots]);
+      expect(days.map((d) => d.d)).toEqual([tue]);
+      expect(await tx.error(`select * from find_salons(44.4, 11.3, 30, 40, null, current_date + 400)`, [])).toBe("22023");
+    });
+  });
+
+  it("i servizi più diffusi per i suggerimenti", async () => {
+    await inTx(async (tx) => {
+      await tx.as(null);
+      const names = await tx.q<{ name: string }>(`select name from service_names(12)`);
+      expect(names.length).toBeGreaterThan(0);
+    });
+  });
+});

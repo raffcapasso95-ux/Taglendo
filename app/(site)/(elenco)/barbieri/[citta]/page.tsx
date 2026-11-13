@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { SearchPage, SearchSkeleton } from "@/components/search/SearchPage";
 import { searchCopy } from "@/lib/copy/search";
 import { citySlug, comuneBySlug } from "@/lib/places/comuni";
-import { listedCities, searchCity } from "@/lib/search/load";
+import { listedCities, popularServices, searchCity } from "@/lib/search/load";
 
 type Props = { params: Promise<{ citta: string }> };
 
@@ -28,13 +29,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 /** NUOVO · I barbieri di una città: `/barbieri/bologna`. Lo stesso elenco di /cerca, con un indirizzo fisso. */
 async function Content({ params }: Props) {
   const { citta } = await params;
+  await connection(); // orari liberi e «oggi» si leggono a ogni visita
   const comune = comuneBySlug(citta);
   if (!comune) notFound();
   const canonical = citySlug(comune.name);
   if (citta !== canonical) permanentRedirect(`/barbieri/${canonical}`);
-  const [result, cities] = await Promise.all([searchCity(citta), listedCities()]);
+  const [result, cities, services] = await Promise.all([searchCity(citta), listedCities(), popularServices()]);
   if (!result) notFound();
-  return <SearchPage result={result} cities={cities} typed={comune.name} />;
+  return <SearchPage result={result} cities={cities} services={services} typed={comune.name} filters={result.filters} />;
 }
 
 export default function Page({ params }: Props) {

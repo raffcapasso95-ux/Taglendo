@@ -1,5 +1,5 @@
 /** Regole della ricerca dei saloni che non toccano il database: cosa si cerca e come si scrive il primo orario. */
-import { addDays, romeDate, romeMinutes, weekdayShort, dayNumber, monthShort } from "@/lib/dates/rome";
+import { addDays, isValidDate, romeDate, romeMinutes, weekdayShort, dayNumber, monthShort } from "@/lib/dates/rome";
 
 export const RADIUS_KM = 30;
 /** Se entro 30 km non c'è niente si allarga, per non lasciare la pagina vuota. */
@@ -17,6 +17,33 @@ export function parseSearch(params: { dove?: string | string[]; lat?: string | s
   }
   const text = one(params.dove).trim().slice(0, 80);
   return text ? { kind: "text", text } : { kind: "none" };
+}
+
+/** Servizio e giorno cercati (facoltativi): `?servizio=barba&data=2026-11-14`. */
+export type SearchFilters = { service: string | null; date: string | null };
+export const NO_FILTERS: SearchFilters = { service: null, date: null };
+/** Fin dove si può scegliere il giorno (come l'anticipo massimo dei saloni). */
+export const MAX_DAYS_AHEAD = 60;
+
+export function parseFilters(params: { servizio?: string | string[]; data?: string | string[] }, today: string): SearchFilters {
+  const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v) ?? "";
+  const service = one(params.servizio).replace(/\s+/g, " ").trim().slice(0, 40) || null;
+  const d = one(params.data).trim();
+  const date = isValidDate(d) && d >= today && d <= addDays(today, MAX_DAYS_AHEAD) ? d : null;
+  return { service, date };
+}
+
+/** I parametri dell'indirizzo per una ricerca (si tolgono quelli vuoti). */
+export function searchHref(p: { dove?: string | null; lat?: number; lng?: number; servizio?: string | null; data?: string | null }): string {
+  const q = new URLSearchParams();
+  if (p.servizio) q.set("servizio", p.servizio);
+  if (p.lat !== undefined && p.lng !== undefined) {
+    q.set("lat", p.lat.toFixed(4));
+    q.set("lng", p.lng.toFixed(4));
+  } else if (p.dove) q.set("dove", p.dove);
+  if (p.data) q.set("data", p.data);
+  const s = q.toString();
+  return s ? `/cerca?${s}` : "/cerca";
 }
 
 const clock = (min: number) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
@@ -54,4 +81,22 @@ export function slotChips(slots: readonly string[], now: Date): { day: string | 
       return { time: clock(romeMinutes(new Date(s))), day: d === first ? null : d };
     }),
   };
+}
+
+/** «oggi», «domani», «sabato 14 novembre»: il giorno cercato, dentro una frase. */
+export function dayPhrase(date: string, today: string): string {
+  if (date === today) return "oggi";
+  if (date === addDays(today, 1)) return "domani";
+  const WEEK = ["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"];
+  const MONTHS = ["gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno", "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"];
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
+  return `${WEEK[new Date(Date.UTC(y, m - 1, d)).getUTCDay()]} ${d} ${MONTHS[m - 1]}`;
+}
+
+/** Il titolo dei risultati: «Barbieri a Bologna», «Barba a Bologna», «… · sabato 14 novembre». */
+export function resultsTitle(p: { place: string | null; near: boolean; service: string | null; date: string | null; today: string }): string {
+  const what = p.service ? p.service.charAt(0).toUpperCase() + p.service.slice(1) : "Barbieri";
+  const where = p.near ? (p.place ? `vicino a te · ${p.place}` : "vicino a te") : p.place ? `a ${p.place}` : "";
+  const when = p.date ? ` · ${dayPhrase(p.date, p.today)}` : "";
+  return `${what} ${where}`.trim() + when;
 }

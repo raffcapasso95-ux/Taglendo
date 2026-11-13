@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseSearch, slotChips, slotLabel } from "./rules";
+import { dayPhrase, parseFilters, parseSearch, resultsTitle, searchHref, slotChips, slotLabel } from "./rules";
 
 describe("ricerca dei saloni: cosa si cerca", () => {
   it("«Vicino a me» vince sul testo; coordinate strane non valgono", () => {
@@ -30,5 +30,26 @@ describe("i prossimi orari come pulsanti", () => {
       ],
     });
     expect(slotChips([], now)).toEqual({ day: null, chips: [] });
+  });
+});
+
+describe("servizio e giorno", () => {
+  const today = "2026-11-11";
+  it("si leggono dall'indirizzo; un giorno passato o troppo lontano non vale", () => {
+    expect(parseFilters({ servizio: "  taglio   e barba ", data: "2026-11-14" }, today)).toEqual({ service: "taglio e barba", date: "2026-11-14" });
+    expect(parseFilters({ data: "2026-11-10" }, today)).toEqual({ service: null, date: null });
+    expect(parseFilters({ data: "2027-06-01" }, today).date).toBeNull();
+    expect(parseFilters({ data: "ciao" }, today).date).toBeNull();
+  });
+  it("l'indirizzo di una ricerca, senza parametri vuoti", () => {
+    expect(searchHref({ dove: "Bologna", servizio: "Barba", data: "2026-11-14" })).toBe("/cerca?servizio=Barba&dove=Bologna&data=2026-11-14");
+    expect(searchHref({ lat: 44.49491, lng: 11.3426, dove: "x" })).toBe("/cerca?lat=44.4949&lng=11.3426");
+    expect(searchHref({ dove: "Bologna", servizio: "" })).toBe("/cerca?dove=Bologna");
+  });
+  it("il titolo dice cosa, dove e quando", () => {
+    expect(resultsTitle({ place: "Bologna", near: false, service: null, date: null, today })).toBe("Barbieri a Bologna");
+    expect(resultsTitle({ place: "Bologna", near: false, service: "barba", date: "2026-11-12", today })).toBe("Barba a Bologna · domani");
+    expect(resultsTitle({ place: "Bologna", near: true, service: null, date: "2026-11-14", today })).toBe("Barbieri vicino a te · Bologna · sabato 14 novembre");
+    expect(dayPhrase(today, today)).toBe("oggi");
   });
 });
