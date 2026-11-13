@@ -11,6 +11,7 @@ import { canSaveWeek } from "@/lib/rules/listino";
 import { listinoCopy } from "@/lib/copy/listino";
 import { isValidSlug, slugify } from "@/lib/rules/slug";
 import { saveWeek } from "@/lib/hours/week";
+import { updateSalonPosition } from "@/lib/places/geocode";
 import { createClient } from "@/lib/supabase/server";
 
 const { errors } = onboardingCopy;
@@ -89,6 +90,7 @@ export async function saveSalon(_prev: StepState, data: FormData): Promise<StepS
 
   const { error } = await supabase.from("salons").update({ name, address, phone, slug }).eq("id", salon.id);
   if (error) return error.code === "23505" ? { field: "slug", error: errors.slugTaken } : { error: errors.generic };
+  await updateSalonPosition(supabase, salon.id, address); // per la ricerca dei saloni
   if (await advanceTo(salon.id, salon.onboarding_step, 2)) return { error: errors.generic };
   redirect("/primo-avvio/2");
 }

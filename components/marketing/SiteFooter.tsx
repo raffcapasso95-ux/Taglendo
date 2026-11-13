@@ -22,9 +22,9 @@ export function SiteFooter() {
           </div>
           <div className={styles.footerCol}>
             <span className={styles.footerTitle}>{f.product}</span>
-            <Link href="/#come" className={styles.footerLink}>{copy.nav.how}</Link>
-            <Link href="/#prezzi" className={styles.footerLink}>{copy.nav.prices}</Link>
-            <Link href="/#domande" className={styles.footerLink}>{f.faq}</Link>
+            <Link href="/per-i-saloni#come" className={styles.footerLink}>{copy.nav.how}</Link>
+            <Link href="/per-i-saloni#prezzi" className={styles.footerLink}>{copy.nav.prices}</Link>
+            <Link href="/per-i-saloni#domande" className={styles.footerLink}>{f.faq}</Link>
             <Link href="/accedi" className={styles.footerLink}>{copy.nav.signIn}</Link>
           </div>
           <div className={styles.footerCol}>

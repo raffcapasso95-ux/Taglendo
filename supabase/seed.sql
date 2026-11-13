@@ -64,12 +64,12 @@ from auth.users u
 where u.id in ('a0000000-0000-4000-8000-000000000001', 'a0000000-0000-4000-8000-000000000002');
 
 -- ── Salone ───────────────────────────────────────────────────
-insert into public.salons (id, slug, name, address, area, phone, description, trial_ends_at, created_at, onboarding_step)
+insert into public.salons (id, slug, name, address, area, phone, description, trial_ends_at, created_at, onboarding_step, lat, lng, city)
 values (
   '5a100000-0000-4000-8000-000000000001', 'barberia-saragozza', 'Barberia Saragozza',
   'Via Saragozza 48, Bologna', 'Porta Saragozza · Bologna', '051 644 2190',
   'Taglio, barba e rasatura con tre barbieri in Via Saragozza.',
-  now() + interval '15 days', now(), 5
+  now() + interval '15 days', now(), 5, 44.4912, 11.3329, 'Bologna'
 );
 
 insert into public.email_prefs (salon_id) values ('5a100000-0000-4000-8000-000000000001');

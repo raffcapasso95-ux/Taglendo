@@ -19,7 +19,8 @@ export function LandEffects() {
     const hero = page.querySelector<HTMLElement>("[data-land-hero]");
     const onScroll = () => {
       // la testata è trasparente sulla foto dell'apertura e prugna appena si scorre: così si legge anche sulle sezioni chiare
-      header?.setAttribute("data-scrolled", window.scrollY > 24 ? "true" : "false");
+      // le pagine senza apertura scura (data-solid) hanno la testata sempre piena
+      header?.setAttribute("data-scrolled", header.dataset.solid === "true" || window.scrollY > 24 ? "true" : "false");
       const end = page.querySelector("#inizia")?.getBoundingClientRect().top ?? 1e9;
       const past = hero ? window.scrollY > hero.offsetHeight - 80 && end > window.innerHeight - 40 : false;
       bar?.setAttribute("data-hidden", past ? "false" : "true");

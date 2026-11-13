@@ -17,7 +17,7 @@ import { marketingCopy } from "@/lib/copy/marketing";
 export const metadata: Metadata = {
   title: marketingCopy.meta.title,
   description: marketingCopy.meta.description,
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/per-i-saloni" },
   openGraph: { title: marketingCopy.meta.title, description: marketingCopy.meta.description, type: "website", locale: "it_IT", siteName: "Taglendo", images: [{ url: "/og.png", width: 1200, height: 630, alt: "Taglendo, la tua agenda online sempre in tasca" }] },
   twitter: { card: "summary_large_image", title: marketingCopy.meta.title, description: marketingCopy.meta.description, images: ["/og.png"] },
 };

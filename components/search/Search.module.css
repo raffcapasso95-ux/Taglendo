@@ -1,0 +1,631 @@
+/* NUOVO: ricerca dei saloni (campo «Dove», elenco, mappa). Solo token. */
+
+/* ── Campo di ricerca ───────────────────────────────────────── */
+.box {
+  width: 100%;
+  max-width: 560px;
+  gap: var(--space-3);
+  flex-direction: column;
+  align-items: flex-start;
+  display: flex;
+}
+
+.form {
+  width: 100%;
+  padding: var(--space-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-overlay);
+  gap: var(--space-1);
+  align-items: center;
+  display: flex;
+}
+
+.boxDark .form {
+  border-color: transparent;
+  box-shadow: var(--shadow-float);
+}
+
+.field {
+  position: relative;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  display: flex;
+}
+
+.fieldIcon {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.input {
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3) 0 calc(var(--space-3) + 28px);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.input:focus-visible {
+  outline: var(--focus-ring) solid var(--brand-plum);
+  outline-offset: 0;
+}
+
+.submit {
+  min-height: var(--control-height);
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.submit:active {
+  transform: scale(0.97);
+}
+
+.suggestions {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: var(--space-1);
+  border-radius: var(--radius-card);
+  background: var(--surface-overlay);
+  box-shadow: var(--shadow-modal);
+  color: var(--text-primary);
+  list-style: none;
+}
+
+.suggestions[hidden] {
+  display: none;
+}
+
+.suggestion {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  display: flex;
+}
+
+.suggestionOn,
+.suggestion:hover {
+  background: var(--surface-muted);
+}
+
+.suggestionProv {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.near {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  gap: var(--space-2);
+  align-items: center;
+  display: inline-flex;
+}
+
+.near:disabled {
+  cursor: progress;
+  text-decoration: none;
+}
+
+.geoError {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-button);
+  background: var(--surface-overlay);
+  color: var(--status-error);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── Pagina dei risultati ───────────────────────────────────── */
+.page {
+  max-width: var(--land-max);
+  margin: 0 auto;
+  padding: calc(68px + env(safe-area-inset-top, 0px) + var(--space-6)) var(--space-5) var(--space-12);
+  gap: var(--space-5);
+  flex-direction: column;
+  display: flex;
+}
+
+.crumb {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--land-h2);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.sub {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.empty {
+  padding: var(--space-8) var(--space-5);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-panel);
+  gap: var(--space-3);
+  flex-direction: column;
+  align-items: flex-start;
+  display: flex;
+}
+
+.emptyTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.emptyText {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+}
+
+.link {
+  min-height: var(--tap-min);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-underline-offset: 3px;
+  align-items: center;
+  display: inline-flex;
+}
+
+/* le città: pillole che portano alla pagina della città */
+.cities {
+  margin: 0;
+  padding: 0;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  list-style: none;
+  display: flex;
+}
+
+.city {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  gap: var(--space-2);
+  align-items: center;
+  display: inline-flex;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.city:hover {
+  border-color: var(--brand-plum);
+}
+
+.cityCount {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ── Elenco e mappa ─────────────────────────────────────────── */
+.results {
+  gap: var(--space-4);
+  flex-direction: column;
+  display: flex;
+}
+
+.viewSwitch {
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+  align-self: flex-start;
+  gap: var(--space-1);
+  display: flex;
+}
+
+.viewButton {
+  min-height: var(--tap-min);
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.viewButtonOn {
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  gap: var(--space-3);
+  flex-direction: column;
+  list-style: none;
+  display: flex;
+}
+
+.results[data-view="map"] .list {
+  display: none;
+}
+
+.results[data-view="list"] .mapPane {
+  display: none;
+}
+
+.card {
+  border: 1px solid transparent;
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+  color: var(--text-primary);
+  text-decoration: none;
+  overflow: hidden;
+  flex-direction: column;
+  display: flex;
+  transition: border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+}
+
+.card:active {
+  transform: scale(0.99);
+}
+
+.cardOn,
+.card:hover {
+  border-color: var(--brand-plum);
+}
+
+.cardPhoto {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--surface-muted);
+  flex: 0 0 auto;
+  display: block;
+}
+
+.cardImg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardNoPhoto {
+  position: absolute;
+  inset: 0;
+  color: var(--text-secondary);
+  font-size: 40px;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.cardNum,
+.pin {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--brand-cream);
+  border-radius: 50%;
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.cardNum {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+}
+
+.cardBody {
+  min-width: 0;
+  padding: var(--space-4);
+  gap: var(--space-1);
+  flex: 1 1 auto;
+  flex-direction: column;
+  display: flex;
+}
+
+.cardTop {
+  gap: var(--space-3);
+  justify-content: space-between;
+  align-items: baseline;
+  display: flex;
+}
+
+.cardName {
+  min-width: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.cardDistance {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.cardWhere,
+.cardServices {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.cardPrice {
+  color: var(--text-primary);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cardFoot {
+  margin-top: var(--space-2);
+  gap: var(--space-3);
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+}
+
+.cardSlot {
+  min-width: 0;
+  color: var(--status-success);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cardSlotOff {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.cardCta {
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  align-items: center;
+  display: inline-flex;
+}
+
+.mapPane {
+  height: 70svh;
+  min-height: 360px;
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel-soft);
+  overflow: hidden;
+  isolation: isolate; /* i livelli di Leaflet restano sotto la testata */
+}
+
+.map,
+.mapLoading {
+  width: 100%;
+  height: 100%;
+  background: var(--map-bg);
+}
+
+.pin {
+  width: 34px;
+  height: 34px;
+  font-family: var(--font-family);
+  font-size: 14px;
+  box-shadow: var(--shadow-float);
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+}
+
+.pinOn {
+  background: var(--brand-apricot);
+  color: var(--brand-plum);
+  transform: scale(1.18);
+}
+
+.popup {
+  min-width: 160px;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: 13px;
+  text-decoration: none;
+  gap: 2px;
+  flex-direction: column;
+  display: flex;
+}
+
+.popup strong {
+  font-size: 15px;
+}
+
+.popup span {
+  color: var(--text-secondary);
+}
+
+@media (min-width: 700px) {
+  .card {
+    flex-direction: row;
+  }
+
+  .cardPhoto {
+    width: 200px;
+    aspect-ratio: auto;
+    min-height: 150px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .viewSwitch {
+    display: none;
+  }
+
+  .results {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    align-items: start;
+    gap: var(--space-5);
+    display: grid;
+  }
+
+  .results[data-view] .list {
+    display: flex;
+  }
+
+  .results[data-view] .mapPane {
+    position: sticky;
+    top: calc(68px + var(--space-5));
+    height: calc(100svh - 68px - var(--space-10));
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .pin,
+  .submit,
+  .city {
+    transition: none;
+  }
+}
+
+/* ── Home per i clienti ─────────────────────────────────────── */
+.homeHero {
+  z-index: 1; /* i suggerimenti delle città possono scendere sulla sezione dopo */
+  min-height: min(100svh, 760px);
+  overflow: visible;
+}
+
+.homeHero :global(img) {
+  clip-path: inset(0);
+}
+
+.homeSearch {
+  width: 100%;
+  position: relative;
+  z-index: 2; /* i suggerimenti stanno sopra le sezioni che seguono */
+}
+
+.homeBlock {
+  gap: var(--space-4);
+  flex-direction: column;
+  display: flex;
+}
+
+.homeSteps {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  gap: var(--space-4);
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
+  display: grid;
+}
+
+.homeStep {
+  padding: var(--space-5);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+  gap: var(--space-2);
+  flex-direction: column;
+  display: flex;
+}
+
+.homeStepNum {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  font-size: 15px;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+@media (min-width: 820px) {
+  .homeSteps {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.skeleton {
+  height: 150px;
+  border-radius: var(--radius-panel);
+  background: var(--surface-muted);
+}
