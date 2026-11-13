@@ -47,11 +47,13 @@ export const searchCopy = {
     title: "Prenota il barbiere",
     titleAccent: "vicino a te.",
     lead: "Cerca per città, guarda listino e orari liberi, prenota in un minuto. Senza telefonate e senza registrarti.",
-    trust: [
-      { title: "Prenoti in un minuto", text: "Servizio, orario, nome: fatto" },
-      { title: "Senza registrarti", text: "Niente account né password" },
-      { title: "Conferma via email", text: "Con il link per gestirla" },
-      { title: "Gratis per te", text: "Paghi in salone, come sempre" },
+    whyKicker: "Perché Taglendo",
+    whyTitle: "Perché prenotare con Taglendo",
+    why: [
+      { title: "A qualsiasi ora", text: "Anche di notte o la domenica: vedi gli orari liberi veri e prenoti in un minuto." },
+      { title: "Senza registrarti", text: "Nome, email e un codice di conferma. Niente account, niente password." },
+      { title: "Conferma e promemoria", text: "La conferma arriva per email, con il link per gestire la prenotazione." },
+      { title: "Gratis per te", text: "Prenotare non costa niente: il servizio lo paghi in salone, come sempre." },
     ] as const,
     categoriesTitle: "Cosa ti serve?",
     categories: [

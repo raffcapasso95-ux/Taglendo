@@ -29,6 +29,25 @@ const Icon = ({ children }: { children: React.ReactNode }) => (
     {children}
   </svg>
 );
+const WHY_ICONS = [
+  <Icon key="ora">
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 7.5V12l3 2" />
+  </Icon>,
+  <Icon key="account">
+    <path d="M12 3.5 4.5 6.5v5c0 4.4 3.1 8 7.5 9 4.4-1 7.5-4.6 7.5-9v-5L12 3.5z" />
+    <path d="m8.8 12 2.2 2.2 4.2-4.4" />
+  </Icon>,
+  <Icon key="email">
+    <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" />
+    <path d="m4.5 7 7.5 6 7.5-6" />
+  </Icon>,
+  <Icon key="gratis">
+    <path d="M20 12.5 12.5 20a2 2 0 0 1-2.8 0L4 14.3a2 2 0 0 1 0-2.8L11.5 4H20z" />
+    <circle cx="16" cy="8" r="1.4" />
+  </Icon>,
+];
+
 const CATEGORY_ICONS = [
   <Icon key="taglio">
     <circle cx="6" cy="6" r="3" />
@@ -58,11 +77,6 @@ const CATEGORY_ICONS = [
 const Arrow = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M5 12h14M13 6l6 6-6 6" />
-  </svg>
-);
-const Check = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <path d="m5 12 5 5 9-10" />
   </svg>
 );
 
@@ -155,6 +169,8 @@ export default function Page() {
     <>
       {/* 1 · Apertura: titolo, ricerca, servizi a portata di tocco */}
       <section className={styles.hero} aria-labelledby="home-t" id="cerca">
+        {/* la foto di sfondo è solo atmosfera: in bianco e nero e quasi trasparente, sotto un velo panna */}
+        <Image src="/images/foto/hero.jpg" alt="" fill priority sizes="100vw" className={styles.heroBg} />
         <div className={cx(styles.wrap, styles.heroInner)}>
           <h1 className={cx(styles.h1, styles.enter)} id="home-t" style={{ "--i": 0 } as React.CSSProperties}>
             {copy.title}{" "}
@@ -181,14 +197,6 @@ export default function Page() {
               </Link>
             ))}
           </nav>
-          <ul className={cx(styles.trustLine, styles.enter)} style={{ "--i": 4 } as React.CSSProperties}>
-            {copy.trust.map((t) => (
-              <li key={t.title}>
-                <Check />
-                {t.title}
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
@@ -197,7 +205,30 @@ export default function Page() {
         <Recent />
       </Suspense>
 
-      {/* 3 · Hai un salone? Una fascia sola */}
+      {/* 3 · Perché prenotare con Taglendo: quattro motivi */}
+      <section className={styles.sectionTight} aria-labelledby="perche-t">
+        <div className={styles.wrap}>
+          <div className={styles.why}>
+            <div className={styles.whyHead}>
+              <p className={styles.eyebrow}>{copy.whyKicker}</p>
+              <h2 className={styles.h2} id="perche-t">
+                {copy.whyTitle}
+              </h2>
+            </div>
+            <ul className={styles.whyList}>
+              {copy.why.map((w, i) => (
+                <li key={w.title} className={styles.whyItem}>
+                  <span className={styles.whyIcon}>{WHY_ICONS[i]}</span>
+                  <h3 className={styles.whyTitle}>{w.title}</h3>
+                  <p className={styles.whyText}>{w.text}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* 4 · Hai un salone? Una fascia sola */}
       <section className={styles.sectionTight} aria-labelledby="salone-t">
         <div className={styles.wrap}>
           <div className={styles.business}>
@@ -223,7 +254,7 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 4 · Le città: un elenco fitto di link, come in fondo ai portali */}
+      {/* 5 · Le città: un elenco fitto di link, come in fondo ai portali */}
       <section className={styles.sectionTight} aria-labelledby="citta-t" id="citta">
         <div className={styles.wrap}>
           <h2 className={styles.h3} id="citta-t">

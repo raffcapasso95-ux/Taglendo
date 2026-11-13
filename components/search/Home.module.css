@@ -299,6 +299,8 @@
 /* ── Apertura centrata ────────────────────────────────────────── */
 .hero {
   position: relative;
+  isolation: isolate;
+  overflow: hidden;
   padding: calc(68px + env(safe-area-inset-top, 0px) + var(--space-12)) 0 var(--space-12);
   background:
     radial-gradient(45% 60% at 15% 10%, var(--brand-peach), transparent 70%),
@@ -333,6 +335,26 @@
 
 .heroSearch > div {
   max-width: none;
+}
+
+/* la foto di sfondo: solo atmosfera. In bianco e nero, quasi trasparente, sotto un velo panna che sfuma in basso */
+.heroBg {
+  z-index: -2;
+  object-fit: cover;
+  object-position: 50% 35%;
+  filter: grayscale(1) contrast(0.9);
+  opacity: 0.16;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(45% 60% at 15% 10%, var(--brand-peach), transparent 70%),
+    linear-gradient(to bottom, transparent 55%, var(--canvas));
+  opacity: 0.85;
 }
 
 /* i servizi come scorciatoie, sotto la barra */
@@ -379,28 +401,61 @@
   height: 18px;
 }
 
-/* tre promesse in una riga */
-.trustLine {
-  margin: var(--space-2) 0 0;
-  padding: 0;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 600;
-  list-style: none;
-  gap: var(--space-2) var(--space-5);
-  flex-wrap: wrap;
-  justify-content: center;
+/* ── Perché prenotare con Taglendo ────────────────────────────── */
+.why {
+  padding: var(--space-8) var(--space-5);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-panel-soft);
+  gap: var(--space-8);
+  display: grid;
+}
+
+.whyHead {
+  gap: var(--space-2);
+  flex-direction: column;
   display: flex;
 }
 
-.trustLine li {
-  gap: 6px;
-  align-items: center;
-  display: inline-flex;
+.whyList {
+  margin: 0;
+  padding: 0;
+  gap: var(--space-6) var(--space-5);
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
+  display: grid;
 }
 
-.trustLine svg {
-  color: var(--status-success);
+.whyItem {
+  gap: var(--space-2);
+  flex-direction: column;
+  display: flex;
+}
+
+.whyIcon {
+  width: 48px;
+  height: 48px;
+  margin-bottom: var(--space-1);
+  border-radius: var(--radius-card);
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.whyTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.whyText {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 /* ── Le città: link fitti su più colonne ──────────────────────── */
@@ -459,6 +514,10 @@
   .cityLinks {
     columns: 4;
   }
+
+  .whyList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 1024px) {
@@ -468,6 +527,14 @@
 
   .hero {
     padding-bottom: var(--space-16);
+  }
+
+  .why {
+    padding: var(--space-12);
+  }
+
+  .whyList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .railBtn {
