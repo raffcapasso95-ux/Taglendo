@@ -115,8 +115,7 @@
   display: flex;
 }
 
-.suggestionOn,
-.suggestion:hover {
+.suggestionOn {
   background: var(--surface-muted);
 }
 
@@ -258,9 +257,7 @@
   transition: border-color var(--duration-fast) var(--ease-out);
 }
 
-.city:hover {
-  border-color: var(--brand-plum);
-}
+
 
 .cityCount {
   color: var(--text-secondary);
@@ -336,8 +333,7 @@
   transform: scale(0.99);
 }
 
-.cardOn,
-.card:hover {
+.cardOn {
   border-color: var(--brand-plum);
 }
 
@@ -570,9 +566,6 @@
   overflow: visible;
 }
 
-.homeHero :global(img) {
-  clip-path: inset(0);
-}
 
 .homeSearch {
   width: 100%;
@@ -628,4 +621,15 @@
   height: 150px;
   border-radius: var(--radius-panel);
   background: var(--surface-muted);
+}
+
+@media (hover: hover) {
+  .suggestion:hover {
+    background: var(--surface-muted);
+  }
+
+  .card:hover,
+  .city:hover {
+    border-color: var(--brand-plum);
+  }
 }

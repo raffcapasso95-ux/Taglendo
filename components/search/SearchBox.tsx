@@ -27,10 +27,7 @@ export function SearchBox({ initial = "", tone = "light" }: { initial?: string; 
   useEffect(() => {
     if (!typed.current) return;
     const q = value.trim();
-    if (q.length < 2) {
-      setItems([]);
-      return;
-    }
+    if (q.length < 2) return;
     const ctrl = new AbortController();
     const timer = window.setTimeout(() => {
       fetch(`/api/luoghi?q=${encodeURIComponent(q)}`, { signal: ctrl.signal })
@@ -68,7 +65,7 @@ export function SearchBox({ initial = "", tone = "light" }: { initial?: string; 
     );
   };
 
-  const shown = open && items.length > 0;
+  const shown = open && items.length > 0 && value.trim().length >= 2;
 
   return (
     <div className={cx(styles.box, tone === "dark" && styles.boxDark)}>

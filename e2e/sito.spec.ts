@@ -3,7 +3,7 @@ import { signIn } from "./helpers";
 
 test.describe("Sito commerciale", () => {
   test("la pagina iniziale mostra il prodotto e porta a registrazione e accesso", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     await expect(page).toHaveTitle(/Taglendo — Prenotazioni online e agenda per barbieri/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("La tua agenda online, sempre in tasca.");
     const hero = page.locator("#top");
@@ -19,7 +19,7 @@ test.describe("Sito commerciale", () => {
   });
 
   test("nella beta i prezzi dicono «Gratis durante la beta»", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const prezzi = page.locator("#prezzi");
     await expect(prezzi.getByRole("heading", { name: "Gratis durante la beta." })).toBeVisible();
     await expect(prezzi.getByText("Quando partiranno gli abbonamenti ti avvisiamo con largo anticipo")).toBeVisible();
@@ -32,7 +32,7 @@ test.describe("Sito commerciale", () => {
   });
 
   test("«Prima e dopo» si muove con le frecce e con il trascinamento", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const handle = page.getByRole("slider", { name: /Sposta il confronto/ });
     await handle.scrollIntoViewIfNeeded();
     await expect(handle).toHaveAttribute("aria-valuenow", "50");
@@ -53,7 +53,7 @@ test.describe("Sito commerciale", () => {
   });
 
   test("le domande si aprono e rispondono secondo la beta", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const q = page.getByText("Ci sono commissioni sulle prenotazioni?");
     await q.scrollIntoViewIfNeeded();
     await expect(page.getByText(/Durante la beta Taglendo è gratis/)).toBeHidden();
@@ -64,7 +64,7 @@ test.describe("Sito commerciale", () => {
   });
 
   test("la chiusura porta alla registrazione e all'accesso", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const end = page.locator("#inizia");
     await end.scrollIntoViewIfNeeded();
     await expect(end.getByRole("heading", { name: "Meno telefonate, più tagli." })).toBeVisible();
@@ -75,7 +75,7 @@ test.describe("Sito commerciale", () => {
   });
 
   test("online o al telefono: l'interruttore cambia testo e anteprima", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const online = page.getByRole("tab", { name: "Prenotazione online" });
     await online.scrollIntoViewIfNeeded();
     await expect(online).toHaveAttribute("aria-selected", "true");
@@ -86,10 +86,10 @@ test.describe("Sito commerciale", () => {
   });
 
   test("chi ha già una sessione trova il suo tondo con il menu dell'account", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     await expect(page.getByRole("banner").getByRole("link", { name: "Prova gratis" })).toBeVisible();
     await signIn(page, "andrea@barberia-saragozza.example", "taglendo-demo");
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const banner = page.getByRole("banner");
     await expect(banner.getByRole("link", { name: "Accedi", exact: true })).toHaveCount(0);
     await expect(banner.getByRole("link", { name: "Prova gratis" })).toHaveCount(0);
@@ -116,7 +116,7 @@ test.describe("Sito commerciale", () => {
   });
 
   test("il banner cookie del sito si può rifiutare e riaprire dal piè di pagina", async ({ page, context }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const banner = page.getByRole("dialog", { name: "Cookie" });
     await expect(banner.getByText("Usiamo cookie tecnici per far funzionare il sito.")).toBeVisible();
     await banner.getByRole("button", { name: "Rifiuta" }).click();
@@ -126,7 +126,7 @@ test.describe("Sito commerciale", () => {
   });
 
   test("il piè di pagina porta alle pagine legali e mostra i dati ancora da completare", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const footer = page.getByRole("contentinfo");
     await expect(footer.getByRole("link", { name: "Informativa privacy" })).toHaveAttribute("href", "/privacy");
     await expect(footer.getByRole("link", { name: "Termini di servizio" })).toHaveAttribute("href", "/termini");
@@ -161,20 +161,22 @@ test.describe("Sito commerciale", () => {
     expect(xml).toMatch(/<loc>[^<]*\/<\/loc>/);
     expect(xml).toContain("/privacy</loc>");
     expect(xml).toContain("/barberia-saragozza</loc>");
+    expect(xml).toContain("/per-i-saloni</loc>");
+    expect(xml).toContain("/barbieri/bologna</loc>");
     expect(xml).not.toContain("/agenda");
     const robots = await (await request.get("/robots.txt")).text();
     expect(robots).toContain("Disallow: /agenda");
     expect(robots).toMatch(/Sitemap: .*\/sitemap\.xml/);
     expect((await request.get("/og.png")).status()).toBe(200);
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     await expect(page.locator('meta[property="og:image"]')).toHaveAttribute("content", /\/og\.png$/);
     await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
     await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", /agenda online per barberie/);
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /^https?:\/\/[^/]+\/?$/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /^https?:\/\/[^/]+\/per-i-saloni$/);
   });
 
   test("sul telefono la barra in basso ricorda di provare", async ({ page }, info) => {
-    await page.goto("/");
+    await page.goto("/per-i-saloni");
     const bar = page.getByText("Gratis durante la beta").filter({ visible: true });
     if (info.project.name === "telefono") await expect(page.getByText("App per barbieri")).toBeVisible();
     else await expect(page.getByText("App per barbieri")).toBeHidden();
@@ -182,13 +184,13 @@ test.describe("Sito commerciale", () => {
   });
 
   test("la testata resta in vista mentre si scorre e diventa prugna (si legge anche sulle sezioni chiare)", async ({ page }) => {
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/per-i-saloni", { waitUntil: "networkidle" });
     const header = page.getByRole("banner");
     const bg = () => header.evaluate((h) => getComputedStyle(h).backgroundColor);
     expect(await bg()).toBe("rgba(0, 0, 0, 0)"); // sull'apertura è trasparente, sopra la foto
     await page.locator("#prezzi").scrollIntoViewIfNeeded();
     await expect(header).toHaveAttribute("data-scrolled", "true");
-    expect(await bg()).not.toBe("rgba(0, 0, 0, 0)");
+    await expect.poll(bg).not.toBe("rgba(0, 0, 0, 0)"); // dopo la transizione del colore
     const top = await header.evaluate((h) => Math.round(h.getBoundingClientRect().top));
     expect(top).toBe(0);
     await expect(header.getByRole("link", { name: "Prova gratis" })).toBeVisible();

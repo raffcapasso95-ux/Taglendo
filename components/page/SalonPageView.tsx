@@ -16,7 +16,7 @@ import { paginaCopy as copy } from "@/lib/copy/pagina";
 import { initials } from "@/lib/rules/agenda";
 import { addSalonPhoto, makeCover, removeSalonLogo, removeSalonPhoto, saveSalonPage, setSalonLogo, setSalonSwitch, type PageResult } from "@/lib/page/actions";
 
-type Initial = { name: string; area: string; description: string; phone: string; address: string; bookingOnline: boolean; showPrices: boolean };
+type Initial = { name: string; area: string; description: string; phone: string; address: string; bookingOnline: boolean; showPrices: boolean; listed: boolean; located: boolean };
 type Photo = { id: string; url: string };
 
 export function SalonPageView(props: { host: string; slug: string; initial: Initial; photos: Photo[]; logoUrl: string | null }) {
@@ -48,6 +48,7 @@ function Inner({ host, slug, initial, photos, logoUrl }: { host: string; slug: s
   const [form, setForm] = useState(initial);
   const [online, setOnline] = useState(initial.bookingOnline);
   const [prices, setPrices] = useState(initial.showPrices);
+  const [listed, setListed] = useState(initial.listed);
   const [errors, setErrors] = useState<Partial<Record<"name" | "phone" | "address" | "description" | "form", string>>>({});
   const [pending, start] = useTransition();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -65,13 +66,14 @@ function Inner({ host, slug, initial, photos, logoUrl }: { host: string; slug: s
       router.refresh();
     });
 
-  const flip = (key: "booking_online" | "show_prices") => {
-    const next = key === "booking_online" ? !online : !prices;
-    (key === "booking_online" ? setOnline : setPrices)(next);
+  const flip = (key: "booking_online" | "show_prices" | "listed") => {
+    const [value, set] = key === "booking_online" ? [online, setOnline] : key === "show_prices" ? [prices, setPrices] : [listed, setListed];
+    const next = !value;
+    set(next);
     start(async () => {
       const r = await setSalonSwitch(key, next);
       if (!r.ok) {
-        (key === "booking_online" ? setOnline : setPrices)(!next);
+        set(!next);
         return setErrors({ form: r.error });
       }
       router.refresh();
@@ -243,6 +245,7 @@ function Inner({ host, slug, initial, photos, logoUrl }: { host: string; slug: s
             <div className={settings.group}>
               <SwitchRow tone={2} icon={<GlobeIcon />} label={copy.online} sub={copy.onlineSub} on={online} onToggle={() => flip("booking_online")} />
               <SwitchRow tone={1} icon={<TagIcon />} label={copy.prices} sub={copy.pricesSub} on={prices} onToggle={() => flip("show_prices")} />
+              <SwitchRow tone={2} icon={<GlobeIcon />} label={copy.listed} sub={listed && !initial.located ? copy.listedNoPlace : copy.listedSub} on={listed} onToggle={() => flip("listed")} />
               <Link className={settings.row} href="/listino">
                 <span className={cx(settings.icon, settings.t0)}>
                   <ClockIcon />

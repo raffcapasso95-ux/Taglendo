@@ -5,7 +5,9 @@ I codici si riferiscono a `design/Schermate mancanti.dc.html`. `-D` indica la ve
 ## Sito commerciale: `taglendo.it`
 | Rotta | Design |
 |---|---|
-| `/` | Ridisegno: `home` (apertura con telefono animato, nastro, «Pronto in 3 passi», Prima e dopo, Cosa cambia, online/telefono, Listino Taglendo, domande, chiusura, piè di pagina nuovo). Le altre pagine del sito (privacy, termini, cookie) hanno ancora testata e piè di pagina precedenti |
+| `/` | NUOVO: home per i clienti con la ricerca dei saloni (vedi `docs/ricerca-saloni.md`) |
+| `/cerca`, `/barbieri/[città]` | NUOVO: elenco dei saloni con mappa |
+| `/per-i-saloni` | Ridisegno: `home` (apertura con telefono animato, nastro, «Pronto in 3 passi», Prima e dopo, Cosa cambia, online/telefono, Listino Taglendo, domande, chiusura, piè di pagina nuovo). Le altre pagine del sito (privacy, termini, cookie) hanno ancora testata e piè di pagina precedenti |
 | `/privacy` | G1 |
 | `/termini` | G4 |
 | `/cookie` | G5 |

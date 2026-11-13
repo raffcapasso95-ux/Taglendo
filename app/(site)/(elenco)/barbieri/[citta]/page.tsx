@@ -35,7 +35,12 @@ async function Content({ params }: Props) {
   return <SearchPage result={result} cities={cities} typed={comune.name} />;
 }
 
-export default function Page({ params }: Props) {
+export default async function Page({ params }: Props) {
+  // la città si controlla prima di mostrare la pagina: così una città inesistente risponde 404 (non 200 con il testo «non trovata»)
+  const { citta } = await params;
+  const comune = comuneBySlug(citta);
+  if (!comune) notFound();
+  if (citta !== citySlug(comune.name)) permanentRedirect(`/barbieri/${citySlug(comune.name)}`);
   return (
     <Suspense fallback={<SearchSkeleton />}>
       <Content params={params} />
