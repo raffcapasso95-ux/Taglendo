@@ -125,14 +125,15 @@ test.describe("Sito commerciale", () => {
     await expect(page.getByRole("dialog", { name: "Cookie" })).toBeVisible();
   });
 
-  test("il piè di pagina porta alle pagine legali e mostra i dati ancora da completare", async ({ page }) => {
+  test("il piè di pagina porta alle pagine legali e in fondo dice solo «© 2026 Taglendo»", async ({ page }) => {
     await page.goto("/per-i-saloni");
     const footer = page.getByRole("contentinfo");
     await expect(footer.getByRole("link", { name: "Informativa privacy" })).toHaveAttribute("href", "/privacy");
     await expect(footer.getByRole("link", { name: "Termini di servizio" })).toHaveAttribute("href", "/termini");
     await expect(footer.getByRole("link", { name: "Cookie", exact: true })).toHaveAttribute("href", "/cookie");
     await expect(footer.getByRole("link", { name: "aiuto@taglendo.it" })).toHaveAttribute("href", "mailto:aiuto@taglendo.it");
-    await expect(footer.getByText(/^\[.+\]$/)).toHaveCount(3); // ragione sociale, P.IVA, sede
+    await expect(footer.getByText("© 2026 Taglendo", { exact: true })).toBeVisible();
+    await expect(footer.getByText(/^\[.+\]$/)).toHaveCount(0); // niente dati segnaposto per ora
   });
 
   test("le pagine legali hanno indice, avviso di bozza e testi", async ({ page }) => {

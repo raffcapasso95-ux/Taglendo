@@ -8,7 +8,7 @@ import { getAccount } from "@/components/marketing/AuthLinks";
 import { landCopy as copy } from "@/lib/copy/land";
 import { searchCopy } from "@/lib/copy/search";
 import { marketingCopy } from "@/lib/copy/marketing";
-import { company, isPlaceholder } from "@/lib/site";
+import { company } from "@/lib/site";
 import styles from "@/components/marketing/Land.module.css";
 
 const site = searchCopy.site;
@@ -19,9 +19,6 @@ const Arrow = ({ size = 18 }: { size?: number }) => (
   </svg>
 );
 
-function Field({ value }: { value: string }) {
-  return isPlaceholder(value) ? <span className={styles.fPlaceholder}>{value}</span> : <>{value}</>;
-}
 
 /** Chi è già dentro vede il tondo con le sue iniziali (menu con agenda, impostazioni, Esci), come in un'app. */
 async function AuthActions({ audience }: { audience: Audience }) {
@@ -205,9 +202,8 @@ export function LandShell({ audience, solid = false, children }: { audience: Aud
           <p className={styles.fWord} aria-hidden="true" />
           <div className={styles.fBottom}>
             <span>
-              © 2026 Taglendo <Field value={company.legalName} /> · P.IVA <Field value={company.vat} /> · Sede legale <Field value={company.address} />
+              © 2026 Taglendo
             </span>
-            <span>{f.photos}</span>
           </div>
         </div>
       </footer>
