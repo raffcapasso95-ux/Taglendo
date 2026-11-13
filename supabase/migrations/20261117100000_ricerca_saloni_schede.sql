@@ -1,10 +1,9 @@
 -- Taglendo · Ricerca dei saloni, schede più ricche (come i grandi portali di prenotazione):
 -- per ogni salone i primi servizi con durata e prezzo, e i prossimi orari liberi da toccare.
 -- In più i saloni arrivati da poco, per la home.
+-- Nome nuovo (find_salons): il sito già online usa ancora search_salons, che resta finché il nuovo codice non è pubblicato.
 
-drop function public.search_salons(double precision, double precision, integer, integer);
-
-create function public.search_salons(p_lat double precision, p_lng double precision, p_radius_km integer default 30, p_limit integer default 40)
+create function public.find_salons(p_lat double precision, p_lng double precision, p_radius_km integer default 30, p_limit integer default 40)
 returns table (
   slug text, name text, address text, area text, city text, lat double precision, lng double precision,
   cover_path text, logo_path text, booking_online boolean,
@@ -59,8 +58,8 @@ begin
   order by p.dist, p.name;
 end
 $$;
-revoke all on function public.search_salons(double precision, double precision, integer, integer) from public;
-grant execute on function public.search_salons(double precision, double precision, integer, integer) to anon, authenticated;
+revoke all on function public.find_salons(double precision, double precision, integer, integer) from public;
+grant execute on function public.find_salons(double precision, double precision, integer, integer) to anon, authenticated;
 
 -- Gli ultimi saloni arrivati su Taglendo (in elenco), per la home: niente distanza né orari.
 create function public.recent_salons(p_limit integer default 8)

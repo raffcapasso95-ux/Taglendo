@@ -34,7 +34,7 @@ export type SearchResult =
 const photoUrl = (path: string | null) => (path ? `${env.url()}/storage/v1/object/public/salon-photos/${path}` : null);
 
 async function around(lat: number, lng: number, radius: number): Promise<SalonHit[]> {
-  const { data } = await createAnonClient().rpc("search_salons", { p_lat: lat, p_lng: lng, p_radius_km: radius });
+  const { data } = await createAnonClient().rpc("find_salons", { p_lat: lat, p_lng: lng, p_radius_km: radius });
   return (data ?? []).map((r) => ({
     slug: r.slug,
     name: r.name,
