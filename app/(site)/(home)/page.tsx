@@ -167,11 +167,12 @@ async function Cities() {
   );
 }
 
-/** NUOVO · Home per i clienti: chiara, con la ricerca in primo piano (come i portali di prenotazione). */
+/** NUOVO · Home per i clienti: la ricerca in primo piano, poi una pagina che accompagna (come i portali di prenotazione). */
 export default function Page() {
   return (
     <>
-      <section className={styles.hero} aria-labelledby="home-t">
+      {/* 1 · Apertura: titolo e ricerca; a destra com'è una prenotazione */}
+      <section className={styles.hero} aria-labelledby="home-t" id="cerca">
         <div className={cx(styles.wrap, styles.heroInner)}>
           <div className={styles.heroText}>
             <p className={cx(styles.kicker, styles.enter)} style={{ "--i": 0 } as React.CSSProperties}>
@@ -190,12 +191,30 @@ export default function Page() {
               {copy.lead}
             </p>
           </div>
+
           <div className={cx(styles.heroArt, styles.enterArt)} aria-hidden="true">
             <div className={styles.photoMain}>
-              <Image src="/images/foto/cambia-macchinetta.jpg" alt="" fill priority sizes="(min-width: 1024px) 360px, 66vw" />
+              <Image src="/images/foto/cambia-macchinetta.jpg" alt="" fill priority sizes="(min-width: 1024px) 380px, 70vw" />
             </div>
-            <div className={styles.photoSide}>
-              <Image src="/images/foto/cambia-taglio.jpg" alt="" fill sizes="(min-width: 1024px) 240px, 46vw" />
+            {/* una scheda come quelle dell'elenco: servizio, prezzo, orari di oggi */}
+            <div className={styles.preview}>
+              <div className={styles.previewPhoto}>
+                <Image src="/images/foto/cambia-taglio.jpg" alt="" fill sizes="96px" />
+              </div>
+              <div className={styles.previewBody}>
+                <span className={styles.previewTitle}>{copy.previewTitle}</span>
+                <span className={styles.previewMeta}>
+                  {copy.previewMeta} · {copy.previewWhere}
+                </span>
+                <span className={styles.previewSlots}>
+                  <span className={styles.previewDay}>{copy.previewDay}</span>
+                  {copy.previewSlots.map((t, i) => (
+                    <span key={t} className={cx(styles.previewSlot, i === 1 && styles.previewSlotOn)}>
+                      {t}
+                    </span>
+                  ))}
+                </span>
+              </div>
             </div>
             <div className={cx(styles.float, styles.floatBooked)}>
               <span className={styles.floatIcon}>
@@ -206,9 +225,8 @@ export default function Page() {
                 <span>{copy.floatBookedText}</span>
               </span>
             </div>
-            <div className={cx(styles.float, styles.floatFree)}>{copy.floatFree}</div>
           </div>
-          {/* la ricerca a tutta larghezza: Servizio · Dove · Quando */}
+
           <div className={cx(styles.heroSearch, styles.enter)} style={{ "--i": 3 } as React.CSSProperties}>
             <Suspense fallback={<SearchBox />}>
               <HeroSearch />
@@ -225,12 +243,33 @@ export default function Page() {
         </div>
       </section>
 
+      {/* 2 · Quattro motivi, in una riga: si leggono senza fermarsi */}
+      <section className={styles.trust} aria-label={copy.whyTitle}>
+        <ul className={cx(styles.wrap, styles.trustList)}>
+          {copy.trust.map((t, i) => (
+            <li key={t.title} className={styles.trustItem}>
+              <span className={styles.trustIcon}>{WHY_ICONS[i]}</span>
+              <span>
+                <strong className={styles.trustTitle}>{t.title}</strong>
+                <span className={styles.trustText}>{t.text}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* 3 · Cosa ti serve? I servizi come riquadri */}
       <section className={styles.section} aria-labelledby="servizi-t">
         <div className={styles.wrap}>
-          <h2 className={styles.h2} id="servizi-t">
-            {copy.categoriesTitle}
-          </h2>
-          <p className={styles.lead}>{copy.categoriesLead}</p>
+          <div className={styles.head}>
+            <div>
+              <p className={styles.eyebrow}>{copy.categoriesKicker}</p>
+              <h2 className={styles.h2} id="servizi-t">
+                {copy.categoriesTitle}
+              </h2>
+              <p className={styles.lead}>{copy.categoriesLead}</p>
+            </div>
+          </div>
           <ul className={styles.categories}>
             {copy.categories.map((c, i) => (
               <li key={c.name}>
@@ -238,6 +277,9 @@ export default function Page() {
                   <span className={styles.categoryIcon}>{CATEGORY_ICONS[i]}</span>
                   <span className={styles.categoryName}>{c.name}</span>
                   <span className={styles.categoryNote}>{c.note}</span>
+                  <span className={styles.categoryArrow} aria-hidden="true">
+                    <Arrow />
+                  </span>
                 </Link>
               </li>
             ))}
@@ -245,28 +287,13 @@ export default function Page() {
         </div>
       </section>
 
+      {/* 4 · Nuovi su Taglendo */}
       <Suspense fallback={null}>
         <Recent />
       </Suspense>
 
-      <section className={cx(styles.section, styles.sectionMuted)} aria-labelledby="perche-t">
-        <div className={styles.wrap}>
-          <h2 className={cx(styles.h2, styles.center)} id="perche-t">
-            {copy.whyTitle}
-          </h2>
-          <ul className={styles.why}>
-            {copy.why.map((w, i) => (
-              <li key={w.title} className={styles.whyItem}>
-                <span className={styles.whyIcon}>{WHY_ICONS[i]}</span>
-                <h3 className={styles.h3}>{w.title}</h3>
-                <p className={styles.text}>{w.text}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section className={styles.section} aria-labelledby="passi-t">
+      {/* 5 · Come funziona: fondo pesca, tre passi grandi e il telefono */}
+      <section className={cx(styles.section, styles.sectionPeach)} aria-labelledby="passi-t">
         <div className={cx(styles.wrap, styles.steps)}>
           <div className={styles.stepsText}>
             <p className={styles.eyebrow}>{copy.stepsKicker}</p>
@@ -277,7 +304,7 @@ export default function Page() {
               {copy.steps.map((s, i) => (
                 <li key={s.title} className={styles.step}>
                   <span className={styles.stepNum} aria-hidden="true">
-                    {i + 1}
+                    {String(i + 1).padStart(2, "0")}
                   </span>
                   <span>
                     <h3 className={styles.h3}>{s.title}</h3>
@@ -293,10 +320,52 @@ export default function Page() {
         </div>
       </section>
 
+      {/* 6 · Una fascia fotografica: il perché, in una frase */}
+      <section className={styles.band} aria-labelledby="fascia-t">
+        <Image src="/images/foto/hero.jpg" alt="" fill sizes="100vw" className={styles.bandImg} />
+        <div className={cx(styles.wrap, styles.bandInner)}>
+          <h2 className={styles.bandTitle} id="fascia-t">
+            {copy.bandTitle}
+          </h2>
+          <p className={styles.bandText}>{copy.bandText}</p>
+          <a href="#cerca" className={styles.btnLight}>
+            {copy.bandCta} <Arrow />
+          </a>
+        </div>
+      </section>
+
+      {/* 7 · Domande frequenti dei clienti */}
+      <section className={styles.section} aria-labelledby="faq-t">
+        <div className={cx(styles.wrap, styles.faqWrap)}>
+          <div className={styles.faqHead}>
+            <p className={styles.eyebrow}>{copy.faqKicker}</p>
+            <h2 className={styles.h2} id="faq-t">
+              {copy.faqTitle}
+            </h2>
+            <Link href="/per-i-saloni" className={styles.more}>
+              {copy.faqOwnerLink} <Arrow />
+            </Link>
+          </div>
+          <div className={styles.faq}>
+            {copy.faq.map((f) => (
+              <details key={f.q} className={styles.faqItem}>
+                <summary className={styles.faqQ}>
+                  {f.q}
+                  <span className={styles.faqPlus} aria-hidden="true" />
+                </summary>
+                <p className={styles.faqA}>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8 · Cerca per città */}
       <section className={cx(styles.section, styles.sectionMuted)} aria-labelledby="citta-t" id="citta">
         <div className={styles.wrap}>
+          <p className={styles.eyebrow}>{copy.citiesTitle}</p>
           <h2 className={styles.h2} id="citta-t">
-            {copy.citiesTitle}
+            {copy.citiesHeading}
           </h2>
           <p className={styles.lead}>{copy.citiesLead}</p>
           <Suspense fallback={null}>
@@ -305,6 +374,7 @@ export default function Page() {
         </div>
       </section>
 
+      {/* 9 · Hai un salone? */}
       <section className={styles.section} aria-labelledby="salone-t">
         <div className={styles.wrap}>
           <div className={styles.business}>

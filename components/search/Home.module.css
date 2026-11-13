@@ -175,31 +175,18 @@
   min-height: 300px;
 }
 
-.photoMain,
-.photoSide {
+.photoMain {
   position: absolute;
+  top: 0;
+  right: 0;
+  width: 72%;
+  height: 100%;
   border-radius: var(--radius-panel);
   box-shadow: var(--shadow-shot);
   overflow: hidden;
 }
 
-.photoMain {
-  top: 0;
-  right: 0;
-  width: 66%;
-  height: 100%;
-}
-
-.photoSide {
-  left: 0;
-  bottom: 12%;
-  width: 46%;
-  aspect-ratio: 3 / 2;
-  border: 6px solid var(--surface);
-}
-
-.photoMain img,
-.photoSide img {
+.photoMain img {
   object-fit: cover;
   filter: grayscale(0.2);
 }
@@ -242,14 +229,6 @@
   display: flex;
 }
 
-.floatFree {
-  right: 6%;
-  bottom: 4%;
-  border: 1px solid var(--status-success);
-  background: var(--status-success-bg);
-  color: var(--status-success-text);
-  font-weight: 700;
-}
 
 /* ── Entrata dell'apertura: un elemento dopo l'altro, breve (una volta sola per visita) ── */
 .enter,
@@ -555,7 +534,7 @@
   margin: var(--space-6) 0 0;
   padding: 0;
   gap: var(--space-2);
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   list-style: none;
   display: grid;
 }
@@ -823,5 +802,365 @@
 @keyframes fade {
   from {
     opacity: 0;
+  }
+}
+
+/* ── Apertura: la scheda d'anteprima sopra la foto ─────────────── */
+.preview {
+  position: absolute;
+  left: 0;
+  bottom: 8%;
+  width: min(340px, 86%);
+  padding: var(--space-3);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  gap: var(--space-3);
+  display: flex;
+}
+
+.previewPhoto {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.previewPhoto img {
+  object-fit: cover;
+}
+
+.previewBody {
+  min-width: 0;
+  gap: 2px;
+  flex-direction: column;
+  display: flex;
+}
+
+.previewTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.previewMeta {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.previewSlots {
+  margin-top: var(--space-2);
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  display: flex;
+}
+
+.previewDay {
+  margin-right: 2px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.previewSlot {
+  padding: 3px var(--space-2);
+  border: 1px solid var(--status-success);
+  border-radius: var(--radius-pill);
+  background: var(--status-success-bg);
+  color: var(--status-success-text);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.previewSlotOn {
+  background: var(--status-success);
+  color: var(--brand-cream);
+}
+
+/* ── Quattro motivi in una riga, sotto l'apertura ──────────────── */
+.trust {
+  border-block: 1px solid var(--border-subtle);
+  background: var(--surface);
+}
+
+.trustList {
+  margin: 0 auto;
+  padding-block: var(--space-5);
+  gap: var(--space-4);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  display: grid;
+}
+
+.trustItem {
+  gap: var(--space-3);
+  align-items: center;
+  display: flex;
+}
+
+.trustIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  flex: 0 0 auto;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+.trustIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.trustTitle {
+  font-size: 15px;
+  font-weight: 700;
+  display: block;
+}
+
+.trustText {
+  color: var(--text-secondary);
+  font-size: 13px;
+  display: block;
+}
+
+/* ── Servizi: la freccia arriva al passaggio ───────────────────── */
+.category {
+  position: relative;
+}
+
+.categoryArrow {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  color: var(--text-secondary);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out);
+}
+
+/* ── Come funziona su fondo pesca, numeri grandi ───────────────── */
+.sectionPeach {
+  background: var(--brand-peach);
+}
+
+.sectionPeach .text,
+.sectionPeach .eyebrow {
+  color: var(--text-primary);
+}
+
+.sectionPeach .stepNum {
+  width: auto;
+  height: auto;
+  min-width: 56px;
+  border-radius: 0;
+  background: none;
+  color: var(--brand-plum);
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  justify-content: flex-start;
+}
+
+.sectionPeach .step {
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid var(--plum-line);
+}
+
+.sectionPeach .step:last-child {
+  border-bottom: 0;
+}
+
+/* ── Fascia fotografica ────────────────────────────────────────── */
+.band {
+  position: relative;
+  min-height: 480px;
+  padding: var(--space-16) 0;
+  background: var(--brand-plum);
+  color: var(--brand-cream);
+  isolation: isolate;
+  overflow: hidden;
+  align-items: center;
+  display: flex;
+}
+
+.bandImg {
+  z-index: -2;
+  object-fit: cover;
+  object-position: 50% 30%;
+  filter: grayscale(1) contrast(1.05);
+}
+
+.band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--land-scrim);
+}
+
+.bandInner {
+  width: 100%;
+  gap: var(--space-4);
+  flex-direction: column;
+  align-items: flex-start;
+  display: flex;
+}
+
+.bandTitle {
+  max-width: 14em;
+  margin: 0;
+  color: var(--brand-cream);
+  font-size: clamp(34px, 5vw, 64px);
+  font-weight: 700;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+
+.bandText {
+  max-width: 32em;
+  margin: 0 0 var(--space-2);
+  color: var(--on-plum-dim);
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* ── Domande frequenti ─────────────────────────────────────────── */
+.faqWrap {
+  gap: var(--space-8);
+  display: grid;
+}
+
+.faqHead {
+  gap: var(--space-3);
+  flex-direction: column;
+  align-items: flex-start;
+  display: flex;
+}
+
+.faq {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.faqQ {
+  min-height: 64px;
+  padding: var(--space-4) 0;
+  font-size: 17px;
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+  gap: var(--space-4);
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+}
+
+.faqQ::-webkit-details-marker {
+  display: none;
+}
+
+.faqPlus {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  flex: 0 0 auto;
+  transition: transform var(--duration-normal) var(--ease-out);
+}
+
+.faqPlus::before,
+.faqPlus::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--brand-plum);
+  transform: translate(-50%, -50%);
+}
+
+.faqPlus::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+.faqItem[open] .faqPlus {
+  transform: rotate(45deg);
+}
+
+.faqA {
+  max-width: 40em;
+  margin: 0;
+  padding: 0 var(--space-12) var(--space-5) 0;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+@media (min-width: 1024px) {
+  .trustList {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .faqWrap {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+
+  .faqHead {
+    position: sticky;
+    top: calc(68px + var(--space-8));
+  }
+
+  .band {
+    min-height: 560px;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .category:hover .categoryArrow {
+    opacity: 1;
+    transform: none;
+  }
+
+  .faqQ:hover .faqPlus {
+    background: var(--brand-peach);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .categoryArrow,
+  .faqPlus {
+    transition: none;
+  }
+}
+
+/* sul telefono le città stanno su due colonne: senza freccia, il conteggio sotto il nome */
+@media (max-width: 699px) {
+  .city {
+    min-height: 52px;
+    padding: var(--space-2) var(--space-3);
+    flex-wrap: wrap;
+    gap: 2px var(--space-2);
+  }
+
+  .city svg {
+    display: none;
+  }
+
+  .cityName {
+    font-size: 14px;
   }
 }
