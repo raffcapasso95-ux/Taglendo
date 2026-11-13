@@ -11,7 +11,9 @@ type Props = { params: Promise<{ citta: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { citta } = await params;
   const comune = comuneBySlug(citta);
-  if (!comune) return {};
+  // i metadati si calcolano prima della pagina: qui una città inesistente risponde 404 e un indirizzo scritto male fa 308
+  if (!comune) notFound();
+  if (citta !== citySlug(comune.name)) permanentRedirect(`/barbieri/${citySlug(comune.name)}`);
   const result = await searchCity(citta);
   const local = result?.widened ? 0 : (result?.hits.length ?? 0);
   return {
@@ -35,12 +37,7 @@ async function Content({ params }: Props) {
   return <SearchPage result={result} cities={cities} typed={comune.name} />;
 }
 
-export default async function Page({ params }: Props) {
-  // la città si controlla prima di mostrare la pagina: così una città inesistente risponde 404 (non 200 con il testo «non trovata»)
-  const { citta } = await params;
-  const comune = comuneBySlug(citta);
-  if (!comune) notFound();
-  if (citta !== citySlug(comune.name)) permanentRedirect(`/barbieri/${citySlug(comune.name)}`);
+export default function Page({ params }: Props) {
   return (
     <Suspense fallback={<SearchSkeleton />}>
       <Content params={params} />

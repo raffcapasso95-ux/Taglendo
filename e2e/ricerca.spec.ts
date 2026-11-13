@@ -52,13 +52,16 @@ test.describe("Ricerca dei saloni", () => {
     await ctx.close();
   });
 
-  test("pagina per città: titolo per Google, indirizzo unico, città inesistente 404", async ({ page, request }) => {
+  test("pagina per città: titolo per Google, indirizzo unico, città inesistente «non trovata»", async ({ page, request }) => {
     await page.goto("/barbieri/bologna");
     await expect(page).toHaveTitle("Barbieri a Bologna · Prenota online · Taglendo");
     await expect(page.locator('[data-salon="barberia-saragozza"]')).toBeVisible();
     await page.goto("/barbieri/BOLOGNA");
     await expect(page).toHaveURL(/\/barbieri\/bologna$/);
-    expect((await request.get("/barbieri/non-esiste")).status()).toBe(404);
+    // città inesistente: la pagina «non trovata», fuori dai motori di ricerca (in produzione la risposta è a flusso, come per i saloni)
+    await page.goto("/barbieri/non-esiste");
+    await expect(page.getByRole("link", { name: "Torna alla pagina iniziale" })).toBeVisible();
+    await expect(page.locator('meta[name="robots"][content*="noindex"]').first()).toBeAttached();
     const map = await request.get("/sitemap.xml");
     const xml = await map.text();
     expect(xml).toContain("/barbieri/bologna");
