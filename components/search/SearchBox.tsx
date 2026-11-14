@@ -82,6 +82,7 @@ export function SearchBox({
   tone = "light",
   compact = false,
   submitLabel,
+  labels,
 }: {
   initial?: string;
   service?: string;
@@ -91,9 +92,12 @@ export function SearchBox({
   compact?: boolean;
   /** Il testo del pulsante (nei risultati: «Aggiorna»). */
   submitLabel?: string;
+  /** Le tre etichette dei campi (in apertura sono domande: «Cosa ti serve?», «Dove?», «Quando?»). */
+  labels?: { service: string; where: string; when: string; placeholder?: string };
 }) {
   const router = useRouter();
   const id = useId();
+  const lbl = labels ?? { service: copy.serviceLabel, where: copy.whereLabel, when: copy.whenLabel };
   const root = useRef<HTMLFormElement>(null);
   const placeInput = useRef<HTMLInputElement>(null);
   const [panel, setPanel] = useState<Panel>(null);
@@ -216,7 +220,7 @@ export function SearchBox({
       >
         <Segment
           icon={<ScissorsIcon />}
-          label={copy.serviceLabel}
+          label={lbl.service}
           open={panel === "service"}
           className={styles.segService}
           panel={
@@ -248,7 +252,7 @@ export function SearchBox({
             type="text"
             autoComplete="off"
             enterKeyHint="next"
-            aria-label={copy.serviceLabel}
+            aria-label={lbl.service}
             placeholder={copy.servicePlaceholder}
             role="combobox"
             aria-expanded={panel === "service"}
@@ -277,7 +281,7 @@ export function SearchBox({
 
         <Segment
           icon={<PinIcon />}
-          label={copy.whereLabel}
+          label={lbl.where}
           open={panel === "place"}
           className={styles.segPlace}
           panel={
@@ -326,9 +330,9 @@ export function SearchBox({
             autoComplete="off"
             autoCapitalize="words"
             spellCheck={false}
-            aria-label={copy.label}
+            aria-label={lbl.where}
             aria-invalid={missing || undefined}
-            placeholder={copy.placeholder}
+            placeholder={labels?.placeholder ?? copy.placeholder}
             role="combobox"
             aria-expanded={panel === "place"}
             aria-controls={`${id}-place`}
@@ -351,7 +355,7 @@ export function SearchBox({
 
         <Segment
           icon={<CalendarIcon />}
-          label={copy.whenLabel}
+          label={lbl.when}
           open={panel === "date"}
           className={styles.segDate}
           panel={
@@ -418,7 +422,7 @@ export function SearchBox({
             </div>
           }
         >
-          <button type="button" className={cx(styles.segmentValue, !date && styles.segmentPlaceholder)} aria-label={`${copy.whenLabel}: ${dateText}`} aria-expanded={panel === "date"} aria-controls={`${id}-date`} onClick={() => setPanel(panel === "date" ? null : "date")}>
+          <button type="button" className={cx(styles.segmentValue, !date && styles.segmentPlaceholder)} aria-label={`${lbl.when.replace(/\?$/, "")}: ${dateText}`} aria-expanded={panel === "date"} aria-controls={`${id}-date`} onClick={() => setPanel(panel === "date" ? null : "date")}>
             {dateText}
           </button>
           {date ? <input type="hidden" name="data" value={date} /> : null}

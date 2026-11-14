@@ -315,3 +315,14 @@
   --zone-line: rgba(242, 140, 111, .5);
   --duration-pop: 200ms;
 }
+
+/* Ridisegno del sito — home clienti (Main.dc.html) */
+:root {
+  --hero-veil: linear-gradient(180deg, rgba(46, 27, 37, .55) 0%, rgba(46, 27, 37, .25) 35%, rgba(46, 27, 37, .88) 100%);
+  --tile-fade: linear-gradient(to top, rgba(46, 27, 37, .85), rgba(46, 27, 37, 0) 55%);
+  --shadow-phone: 0 0 0 1px rgba(255, 247, 240, .18), 0 30px 60px rgba(0, 0, 0, .35);
+  --shadow-notice: 0 12px 32px rgba(62, 37, 50, .35);
+  --on-plum-body: #D9C7CE;
+  --radius-xl: 32px;
+  --home-h1: clamp(40px, 5.3vw, 76px);
+}

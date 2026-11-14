@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
+import { NearMeButton } from "@/components/search/NearMeButton";
 import { SearchBox } from "@/components/search/SearchBox";
 import { cx } from "@/components/ui/cx";
 import styles from "@/components/search/Home.module.css";
 import { searchCopy } from "@/lib/copy/search";
-import { formatPrice } from "@/lib/dates/format";
 import { citySlug } from "@/lib/places/comuni";
-import { Rail } from "@/components/search/Rail";
-import { listedCities, popularServices, recentSalons } from "@/lib/search/load";
+import { clockLabel } from "@/lib/search/rules";
+import { romeMinutes } from "@/lib/dates/rome";
+import { cityStats, popularServices, recentSalons, type CityStat } from "@/lib/search/load";
 
 const copy = searchCopy.home;
 
@@ -21,69 +22,32 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: searchCopy.meta.homeTitle, description: searchCopy.meta.homeDescription, images: ["/og.png"] },
 };
 
-/** Le città più grandi: sempre in elenco (per chi cerca e per Google), anche prima che ci siano saloni. */
-const BIG_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze", "Bari", "Catania", "Venezia", "Verona"] as const;
+/** Le città più grandi: sempre in elenco («Presto anche a»), anche prima che ci siano saloni. */
+const BIG_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze", "Bari", "Catania", "Venezia", "Verona", "Padova", "Salerno"] as const;
+/** I riquadri delle città, nell'ordine dei colori del design. */
+const CITY_TONES = ["Plum", "Peach", "White", "Cream"] as const;
 
-const Icon = ({ children }: { children: React.ReactNode }) => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+const Svg = ({ size = 18, children }: { size?: number; children: React.ReactNode }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     {children}
   </svg>
 );
-const WHY_ICONS = [
-  <Icon key="ora">
-    <circle cx="12" cy="12" r="8.5" />
-    <path d="M12 7.5V12l3 2" />
-  </Icon>,
-  <Icon key="account">
-    <path d="M12 3.5 4.5 6.5v5c0 4.4 3.1 8 7.5 9 4.4-1 7.5-4.6 7.5-9v-5L12 3.5z" />
-    <path d="m8.8 12 2.2 2.2 4.2-4.4" />
-  </Icon>,
-  <Icon key="email">
-    <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" />
-    <path d="m4.5 7 7.5 6 7.5-6" />
-  </Icon>,
-  <Icon key="gratis">
-    <path d="M20 12.5 12.5 20a2 2 0 0 1-2.8 0L4 14.3a2 2 0 0 1 0-2.8L11.5 4H20z" />
-    <circle cx="16" cy="8" r="1.4" />
-  </Icon>,
-];
-
-const CATEGORY_ICONS = [
-  <Icon key="taglio">
-    <circle cx="6" cy="6" r="3" />
-    <circle cx="6" cy="18" r="3" />
-    <path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12" />
-  </Icon>,
-  <Icon key="barba">
-    <path d="M5 8c0 7 3.5 12 7 12s7-5 7-12" />
-    <path d="M9 13.5c1 .7 2 1 3 1s2-.3 3-1M8 8h8" />
-  </Icon>,
-  <Icon key="completo">
-    <path d="M12 3.5 14.5 9l6 .5-4.5 4 1.4 6L12 16.4 6.6 19.5 8 13.5l-4.5-4 6-.5z" />
-  </Icon>,
-  <Icon key="rasatura">
-    <path d="M4 15 15 4l5 5L9 20H4z" />
-    <path d="M12 7l5 5" />
-  </Icon>,
-  <Icon key="bambino">
-    <circle cx="12" cy="9" r="4.5" />
-    <path d="M10.5 9h.01M13.5 9h.01M10.5 11.2c.9.6 2.1.6 3 0M5 21c1-3.5 3.8-5.5 7-5.5s6 2 7 5.5" />
-  </Icon>,
-  <Icon key="sfumatura">
-    <path d="M4 18h16M4 14h12M4 10h8M4 6h4" />
-  </Icon>,
-];
-
-const Arrow = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+const Arrow = ({ size }: { size?: number }) => (
+  <Svg size={size}>
     <path d="M5 12h14M13 6l6 6-6 6" />
-  </svg>
+  </Svg>
+);
+const Check = () => (
+  <Svg size={18}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </Svg>
 );
 
-/** Gli ultimi saloni arrivati: schede con foto in una fila che scorre (come «Consigliati» dei grandi portali). */
+/** I saloni arrivati da poco: quattro schede, in ordine di arrivo (niente «consigliati»). */
 async function Recent() {
-  const salons = await recentSalons(8);
+  const salons = await recentSalons(4);
   if (salons.length === 0) return null;
+  const mapCity = salons[0]?.city;
   return (
     <section className={styles.section} aria-labelledby="nuovi-t">
       <div className={styles.wrap}>
@@ -92,15 +56,15 @@ async function Recent() {
             <h2 className={styles.h2} id="nuovi-t">
               {copy.recentTitle}
             </h2>
-            <p className={styles.lead}>{copy.recentLead}</p>
+            <p className={styles.sub}>{copy.recentLead}</p>
           </div>
-          <Link href="/cerca" className={styles.more}>
-            {copy.recentAll} <Arrow />
+          <Link href={mapCity ? `/cerca?dove=${encodeURIComponent(mapCity)}` : "/cerca"} className={styles.more}>
+            {copy.recentAll}
           </Link>
         </div>
-        <Rail>
+        <ul className={styles.rail}>
           {salons.map((s) => (
-            <li key={s.slug} className={styles.railItem}>
+            <li key={s.slug}>
               <Link href={`/${s.slug}`} className={styles.salon}>
                 <span className={styles.salonPhoto}>
                   {s.coverUrl ? (
@@ -112,20 +76,27 @@ async function Recent() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={s.logoUrl} alt="" className={styles.salonLogo} />
                       ) : (
-                        <span className={styles.salonInitial}>{s.name.charAt(0)}</span>
+                        <span className={styles.salonInitial}>{Array.from(s.name)[0]}</span>
                       )}
                     </span>
                   )}
+                  {s.barbers >= 2 ? <span className={styles.badge}>{copy.barbers(s.barbers)}</span> : null}
+                  {s.firstToday ? (
+                    <span className={styles.free}>
+                      <span className={styles.freeDot} aria-hidden="true" />
+                      {copy.freeToday(clockLabel(romeMinutes(new Date(s.firstToday))))}
+                    </span>
+                  ) : null}
                 </span>
-                <span className={styles.salonName}>{s.name}</span>
-                <span className={styles.salonMeta}>
-                  {[s.where, s.priceFromCents !== null ? searchCopy.card.from(formatPrice(s.priceFromCents)) : null].filter(Boolean).join(" · ")}
+                <span className={styles.salonText}>
+                  <b className={styles.salonName}>{s.name}</b>
+                  {s.where ? <span className={styles.salonWhere}>{s.where}</span> : null}
+                  {s.services.length > 0 ? <span className={styles.salonServices}>{s.services.join(" · ")}</span> : null}
                 </span>
-                {s.services.length > 0 ? <span className={styles.salonServices}>{s.services.join(" · ")}</span> : null}
               </Link>
             </li>
           ))}
-        </Rail>
+        </ul>
       </div>
     </section>
   );
@@ -134,135 +105,218 @@ async function Recent() {
 /** La barra di ricerca con i servizi più diffusi tra i saloni in elenco. */
 async function HeroSearch() {
   const services = await popularServices();
-  return <SearchBox services={services} />;
+  return <SearchBox services={services} tone="dark" labels={{ service: copy.box.service, where: copy.box.where, when: copy.box.when, placeholder: copy.box.placeholder }} />;
 }
 
-/** Le città: le grandi sempre, più quelle dove ci sono già saloni (con il numero). */
+const cityNote = (c: CityStat) => (c.freeToday > 0 ? copy.cityToday(c.freeToday) : c.freeTomorrow > 0 ? copy.cityTomorrow : null);
+
+/** Le città con barberie (quattro riquadri) e, sotto, quelle dove Taglendo arriva presto. */
 async function Cities() {
-  const listed = await listedCities();
-  const counts = new Map(listed.map((c) => [c.city, c.salons]));
-  const names = [...new Set([...listed.map((c) => c.city), ...BIG_CITIES])];
-  names.sort((a, b) => (counts.get(b) ?? 0) - (counts.get(a) ?? 0));
+  const stats = await cityStats(12);
+  const shown = stats.slice(0, 4);
+  const have = new Set(stats.map((c) => c.city.toLowerCase()));
+  const soon = BIG_CITIES.filter((c) => !have.has(c.toLowerCase()));
   return (
-    <ul className={styles.cityLinks}>
-      {names.map((city) => {
-        const n = counts.get(city) ?? 0;
-        return (
+    <>
+      {shown.length > 0 ? (
+        <ul className={styles.cityCards}>
+          {shown.map((c, i) => {
+            const note = cityNote(c);
+            return (
+              <li key={c.city}>
+                <Link href={`/barbieri/${citySlug(c.city)}`} className={cx(styles.cityCard, styles[`city${CITY_TONES[i % 4]!}` as "cityPlum"])}>
+                  <span className={styles.cityTop}>
+                    <b className={styles.cityName}>{c.city}</b>
+                    <span className={styles.cityArrow}>
+                      <Arrow size={20} />
+                    </span>
+                  </span>
+                  <span>
+                    <b className={styles.cityCount}>{copy.cityCount(c.salons)}</b>
+                    {note ? <span className={styles.cityNote}>{note}</span> : null}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+      <div className={styles.soonHead}>
+        <p className={styles.soonLabel}>{copy.soon}</p>
+        <Link href="/per-i-saloni" className={styles.soonLink}>
+          {copy.missing}
+        </Link>
+      </div>
+      <ul className={styles.soon}>
+        {soon.map((city) => (
           <li key={city}>
-            <Link href={`/barbieri/${citySlug(city)}`} className={styles.cityLink}>
-              {copy.cityLink(city)}
-              {n > 0 ? <span className={styles.cityCount}>{copy.citySalons(n)}</span> : null}
+            <Link href={`/barbieri/${citySlug(city)}`} className={styles.soonCity} aria-label={copy.cityLink(city)}>
+              {city}
             </Link>
           </li>
-        );
-      })}
-    </ul>
+        ))}
+      </ul>
+    </>
   );
 }
 
 /**
- * NUOVO · Home per i clienti, corta come quelle dei portali di prenotazione:
- * la ricerca in apertura, poi i saloni, una fascia per chi ha un salone e le città.
+ * Home per i clienti (ridisegno di novembre 2026): la ricerca su foto, i servizi, i saloni arrivati da poco,
+ * tre passi, le città e un blocco per chi ha una barberia. Niente prezzi aggregati, niente «consigliati».
  */
 export default function Page() {
   return (
     <>
-      {/* 1 · Apertura: titolo, ricerca, servizi a portata di tocco */}
-      <section className={styles.hero} aria-labelledby="home-t" id="cerca">
-        {/* la foto di sfondo è solo atmosfera: in bianco e nero e quasi trasparente, sotto un velo panna */}
-        <Image src="/images/foto/hero.jpg" alt="" fill priority sizes="100vw" className={styles.heroBg} />
+      {/* 1 · Apertura: foto a tutta larghezza con velo, titolo, ricerca, tre rassicurazioni */}
+      <section className={styles.hero} aria-labelledby="home-t" id="cerca" data-land-hero="">
+        <Image src="/images/foto/poltrona.jpg" alt="" fill priority sizes="100vw" className={styles.heroBg} />
+        <div className={styles.heroVeil} aria-hidden="true" />
         <div className={cx(styles.wrap, styles.heroInner)}>
           <h1 className={cx(styles.h1, styles.enter)} id="home-t" style={{ "--i": 0 } as React.CSSProperties}>
-            {copy.title}{" "}
-            <span className={styles.h1Accent}>
-              {copy.titleAccent}
-              <svg className={styles.scribble} viewBox="0 0 200 18" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M3 12 C 40 4, 90 3, 130 7 S 185 13, 197 6" />
-              </svg>
-            </span>
+            {copy.title}
           </h1>
           <p className={cx(styles.heroLead, styles.enter)} style={{ "--i": 1 } as React.CSSProperties}>
             {copy.lead}
           </p>
           <div className={cx(styles.heroSearch, styles.enter)} style={{ "--i": 2 } as React.CSSProperties}>
-            <Suspense fallback={<SearchBox />}>
+            <Suspense fallback={<SearchBox tone="dark" labels={{ service: copy.box.service, where: copy.box.where, when: copy.box.when, placeholder: copy.box.placeholder }} />}>
               <HeroSearch />
             </Suspense>
           </div>
-          <nav className={cx(styles.quick, styles.enter)} style={{ "--i": 3 } as React.CSSProperties} aria-label={copy.categoriesTitle}>
-            {copy.categories.map((c, i) => (
-              <Link key={c.name} href={`/cerca?servizio=${encodeURIComponent(c.query)}`} className={styles.quickLink}>
-                <span className={styles.quickIcon}>{CATEGORY_ICONS[i]}</span>
-                {c.name}
-              </Link>
+          <ul className={cx(styles.checks, styles.enter)} style={{ "--i": 3 } as React.CSSProperties}>
+            {copy.checks.map((c) => (
+              <li key={c}>
+                <Check />
+                {c}
+              </li>
             ))}
-          </nav>
+          </ul>
         </div>
       </section>
 
-      {/* 2 · I saloni: il contenuto della home */}
+      {/* 2 · Cosa ti facciamo oggi? Quattro servizi, senza prezzi */}
+      <section className={styles.section} aria-labelledby="servizi-t">
+        <div className={styles.wrap}>
+          <div className={styles.head}>
+            <h2 className={styles.h2} id="servizi-t">
+              {copy.servicesTitle}
+            </h2>
+            <Link href="/cerca" className={styles.more}>
+              {copy.servicesAll}
+            </Link>
+          </div>
+          <ul className={styles.cats}>
+            {copy.services.map((c) => (
+              <li key={c.name}>
+                <Link href={`/cerca?servizio=${encodeURIComponent(c.query)}`} className={styles.cat}>
+                  <Image src={c.photo} alt="" fill sizes="(min-width: 1100px) 25vw, 50vw" style={{ objectPosition: c.pos }} />
+                  <span className={styles.catLabel}>
+                    <span className={styles.catName}>
+                      {c.name}
+                      <span className={styles.catNote}>{c.note}</span>
+                    </span>
+                    <span className={styles.catArrow}>
+                      <Arrow size={18} />
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* 3 · Appena arrivate: in ordine di arrivo */}
       <Suspense fallback={null}>
         <Recent />
       </Suspense>
 
-      {/* 3 · Perché prenotare con Taglendo: quattro motivi */}
-      <section className={styles.sectionTight} aria-labelledby="perche-t">
-        <div className={styles.wrap}>
-          <div className={styles.why}>
-            <div className={styles.whyHead}>
-              <p className={styles.eyebrow}>{copy.whyKicker}</p>
-              <h2 className={styles.h2} id="perche-t">
-                {copy.whyTitle}
-              </h2>
-            </div>
-            <ul className={styles.whyList}>
-              {copy.why.map((w, i) => (
-                <li key={w.title} className={styles.whyItem}>
-                  <span className={styles.whyIcon}>{WHY_ICONS[i]}</span>
-                  <h3 className={styles.whyTitle}>{w.title}</h3>
-                  <p className={styles.whyText}>{w.text}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+      {/* 4 · Prenotare è più semplice: foto e tre passi */}
+      <section className={styles.easy} aria-labelledby="facile-t">
+        <div className={styles.easyPhoto}>
+          <Image src="/images/foto/barba.jpg" alt={copy.easyPhoto} fill sizes="(min-width: 961px) 50vw, 100vw" />
+        </div>
+        <div className={styles.easyText}>
+          <h2 className={cx(styles.h2, styles.easyTitle)} id="facile-t">
+            {copy.easyTitle}
+          </h2>
+          <ol className={styles.steps}>
+            {copy.easy.map((s, i) => (
+              <li key={s.title} className={styles.step}>
+                <span className={styles.stepNum}>{String(i + 1).padStart(2, "0")}</span>
+                <span>
+                  <b className={styles.stepTitle}>{s.title}</b>
+                  <span className={styles.stepText}>{s.text}</span>
+                </span>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      {/* 4 · Hai un salone? Una fascia sola */}
-      <section className={styles.sectionTight} aria-labelledby="salone-t">
+      {/* 5 · Barbieri per città */}
+      <section className={styles.section} aria-labelledby="citta-t" id="citta">
+        <div className={styles.wrap}>
+          <div className={styles.head}>
+            <div>
+              <h2 className={styles.h2} id="citta-t">
+                {copy.citiesTitle}
+              </h2>
+              <p className={styles.sub}>{copy.citiesLead}</p>
+            </div>
+            <NearMeButton className={styles.nearMe} />
+          </div>
+          <Suspense fallback={null}>
+            <Cities />
+          </Suspense>
+        </div>
+      </section>
+
+      {/* 6 · Per chi ha una barberia: un blocco grande, con l'agenda vera in un telefono tagliato */}
+      <section className={styles.salonSection} aria-labelledby="salone-t">
         <div className={styles.wrap}>
           <div className={styles.business}>
             <div className={styles.businessText}>
-              <p className={cx(styles.eyebrow, styles.eyebrowLight)}>{copy.salonKicker}</p>
+              <p className={styles.businessKicker}>
+                <Image src="/brand/taglendo-icon.svg" alt="" width={28} height={28} />
+                {copy.salonKicker}
+              </p>
               <h2 className={cx(styles.h2, styles.businessTitle)} id="salone-t">
                 {copy.salonTitle}
               </h2>
               <p className={styles.businessLead}>{copy.salonText}</p>
+              <ul className={styles.businessChecks}>
+                {copy.salonChecks.map((c) => (
+                  <li key={c}>
+                    <Check />
+                    {c}
+                  </li>
+                ))}
+              </ul>
               <div className={styles.businessCta}>
-                <Link href="/per-i-saloni" className={styles.btnLight}>
-                  {copy.salonCta} <Arrow />
-                </Link>
-                <Link href="/registrati" className={styles.btnGhost}>
+                <Link href="/registrati" className={styles.btnLight}>
                   {copy.salonTry}
+                </Link>
+                <Link href="/per-i-saloni#come" className={styles.btnGhost}>
+                  {copy.salonHow}
                 </Link>
               </div>
             </div>
-            <div className={styles.businessShot}>
-              <Image src="/images/shot-agenda-desktop.png" alt={copy.salonAlt} width={2560} height={1640} sizes="(min-width: 1024px) 560px, 90vw" />
+            <div className={styles.businessArt} aria-hidden="true">
+              <div className={styles.phone}>
+                <div className={styles.phoneScreen}>
+                  <Image src="/images/shot-agenda-p.jpg" alt="" width={900} height={1900} sizes="230px" />
+                  <div className={styles.notice}>
+                    <Image src="/brand/taglendo-icon.svg" alt="" width={28} height={28} />
+                    <span>
+                      <b>{copy.salonNotice}</b>
+                      <span>{copy.salonNoticeWho}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* 5 · Le città: un elenco fitto di link, come in fondo ai portali */}
-      <section className={styles.sectionTight} aria-labelledby="citta-t" id="citta">
-        <div className={styles.wrap}>
-          <h2 className={styles.h3} id="citta-t">
-            {copy.citiesTitle}
-          </h2>
-          <Suspense fallback={null}>
-            <Cities />
-          </Suspense>
         </div>
       </section>
     </>

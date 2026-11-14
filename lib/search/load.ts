@@ -31,7 +31,19 @@ export type SalonHit = {
 };
 
 /** Un salone arrivato da poco, per la home. */
-export type RecentSalon = { slug: string; name: string; where: string; coverUrl: string | null; logoUrl: string | null; priceFromCents: number | null; services: string[] };
+export type RecentSalon = {
+  slug: string;
+  name: string;
+  /** L'indirizzo (o la zona). */
+  where: string;
+  city: string | null;
+  coverUrl: string | null;
+  logoUrl: string | null;
+  services: string[];
+  /** Il primo orario libero di oggi, se c'è. */
+  firstToday: string | null;
+  barbers: number;
+};
 
 export type SearchResult =
   | { kind: "none" }
@@ -125,16 +137,26 @@ export async function listedCities(): Promise<CityCount[]> {
   return (data ?? []).filter((c): c is { city: string; salons: number; lat: number; lng: number } => Boolean(c.city)).map((c) => ({ city: c.city, salons: c.salons }));
 }
 
-/** Gli ultimi saloni arrivati su Taglendo (prima chi ha una foto). */
+/** Gli ultimi saloni arrivati su Taglendo, in ordine di arrivo (niente ordinamenti «di qualità»). */
 export async function recentSalons(limit = 8): Promise<RecentSalon[]> {
   const { data } = await createAnonClient().rpc("recent_salons", { p_limit: limit });
   return (data ?? []).map((r) => ({
     slug: r.slug,
     name: r.name,
-    where: r.area || r.city || "",
+    where: r.address || r.area || r.city || "",
+    city: r.city,
     coverUrl: photoUrl(r.cover_path),
     logoUrl: salonLogoUrl(r.logo_path),
-    priceFromCents: r.price_from_cents,
     services: r.services ?? [],
+    firstToday: r.first_today,
+    barbers: r.barbers,
   }));
+}
+
+export type CityStat = { city: string; salons: number; freeToday: number; freeTomorrow: number };
+
+/** Le città con saloni in elenco: quante barberie e quante hanno posto oggi o domani (nessun nome, nessun prezzo). */
+export async function cityStats(limit = 12): Promise<CityStat[]> {
+  const { data } = await createAnonClient().rpc("city_stats", { p_limit: limit });
+  return (data ?? []).map((r) => ({ city: r.city, salons: r.salons, freeToday: r.free_today, freeTomorrow: r.free_tomorrow }));
 }

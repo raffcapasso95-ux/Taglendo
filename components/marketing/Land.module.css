@@ -1452,9 +1452,10 @@
 }
 
 .fLogo {
+  min-height: var(--tap-min);
   gap: 12px;
   align-items: center;
-  display: flex;
+  display: inline-flex;
 }
 
 .fLogo img:first-child {
@@ -1849,6 +1850,42 @@
     background: var(--action-primary-hover);
     color: var(--brand-cream);
   }
+}
+
+/* Home dei clienti: la testata è trasparente sulla foto (testo panna) e diventa chiara appena si scorre */
+.header[data-tone="auto"] .logoDark {
+  display: none;
+}
+
+.header[data-tone="auto"] .logoLight {
+  display: block;
+}
+
+.header[data-tone="auto"][data-scrolled="true"] {
+  background: var(--site-bar-bg);
+  color: var(--text-primary);
+  box-shadow: 0 1px 0 var(--border-subtle);
+  backdrop-filter: blur(12px);
+}
+
+.header[data-tone="auto"][data-scrolled="true"] .logoDark {
+  display: block;
+}
+
+.header[data-tone="auto"][data-scrolled="true"] .logoLight {
+  display: none;
+}
+
+.page .header[data-tone="auto"] .btnSmall {
+  border: 1px solid var(--on-plum-outline);
+  background: transparent;
+  color: var(--brand-cream);
+}
+
+.page .header[data-tone="auto"][data-scrolled="true"] .btnSmall {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--brand-cream);
 }
 
 /* «per i saloni» accanto al logo: si capisce subito di essere nella parte per i barbieri */

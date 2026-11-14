@@ -1,488 +1,122 @@
-/* NUOVO: home per i clienti. Corta, come quelle dei portali di prenotazione: ricerca, saloni, una fascia, le città.
-   Chiara e luminosa (la pagina per i saloni resta prugna). Solo token. */
+/* Home per i clienti — design/ridisegno-sito-2026-11/prototipi/Main.dc.html. Solo token. */
 
-.rail {
-  margin: 0 calc(-1 * var(--space-5));
-  padding: var(--space-1) var(--space-5) var(--space-4);
-  gap: var(--space-4);
-  list-style: none;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--space-5);
-  scrollbar-width: thin;
-  display: flex;
-}
-
-.railItem {
-  width: min(280px, 78vw);
-  flex: 0 0 auto;
-  scroll-snap-align: start;
-}
-
-.salon {
-  height: 100%;
-  color: var(--text-primary);
-  text-decoration: none;
-  gap: var(--space-1);
-  flex-direction: column;
-  display: flex;
-}
-
-.salonPhoto {
-  position: relative;
-  margin-bottom: var(--space-2);
-  aspect-ratio: 4 / 3;
-  border-radius: var(--radius-panel);
-  background: var(--brand-peach);
-  overflow: hidden;
-  display: block;
-}
-
-.salonPhoto > img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--duration-slow) var(--ease-out);
-}
-
-.salonNoPhoto {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--brand-peach), var(--surface-muted));
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.salonLogo {
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius-card);
-  background: var(--surface);
-  object-fit: contain;
-}
-
-.salonInitial {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--brand-plum);
-  color: var(--brand-cream);
-  font-size: 26px;
-  font-weight: 700;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.salonName {
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.salonMeta,
-.salonServices {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.railWrap {
-  position: relative;
-}
-
-.railBtn {
-  position: absolute;
-  z-index: 2;
-  top: calc((min(280px, 78vw) * 0.75) / 2);
-  width: var(--tap-min);
-  height: var(--tap-min);
-  border: 1px solid var(--border-subtle);
-  border-radius: 50%;
-  background: var(--surface);
-  color: var(--text-primary);
-  box-shadow: var(--shadow-card);
-  cursor: pointer;
-  transform: translateY(-50%);
-  justify-content: center;
-  align-items: center;
-  display: none;
-  transition: transform var(--duration-press) var(--ease-out);
-}
-
-.railBtn:active {
-  transform: translateY(-50%) scale(0.94);
-}
-
-.railPrev {
-  left: calc(-1 * var(--space-5));
-}
-
-.railNext {
-  right: calc(-1 * var(--space-5));
-}
-
-.business {
-  padding: var(--space-8) var(--space-5);
-  border-radius: var(--radius-panel);
-  background: var(--brand-plum);
-  color: var(--brand-cream);
-  overflow: hidden;
-  gap: var(--space-8);
-  align-items: center;
-  display: grid;
-}
-
-.businessTitle {
-  color: var(--brand-cream);
-}
-
-.businessLead {
-  margin: var(--space-3) 0 0;
-  color: var(--on-plum-dim);
-  font-size: 17px;
-  line-height: 1.5;
-}
-
-.businessCta {
-  margin-top: var(--space-6);
-  gap: var(--space-3);
-  flex-wrap: wrap;
-  display: flex;
-}
-
-.btnLight,
-.btnGhost {
-  min-height: var(--control-height);
-  padding: 0 var(--space-5);
-  border-radius: var(--radius-pill);
-  font-size: 15px;
-  font-weight: 700;
-  text-decoration: none;
-  gap: var(--space-2);
-  align-items: center;
-  display: inline-flex;
-}
-
-.btnLight {
-  background: var(--brand-cream);
-  color: var(--brand-plum);
-}
-
-.btnGhost {
-  border: 1px solid var(--on-plum-dim);
-  color: var(--brand-cream);
-}
-
-.businessShot {
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-float);
-  overflow: hidden;
-}
-
-.businessShot img {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-.cityCount {
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-pill);
-  background: var(--status-success-bg);
-  color: var(--status-success-text);
-  font-size: 12px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.head {
-  margin-bottom: var(--space-6);
-  gap: var(--space-4);
-  justify-content: space-between;
-  align-items: flex-end;
-  display: flex;
-}
-
-.more {
-  min-height: var(--tap-min);
-  color: var(--text-primary);
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-  text-underline-offset: 3px;
-  gap: var(--space-1);
-  align-items: center;
-  display: inline-flex;
-}
-
-.eyebrow {
-  margin: 0 0 var(--space-2);
-  color: var(--text-secondary);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.eyebrowLight {
-  color: var(--on-plum-dim);
-}
-
-.h1Accent {
-  position: relative;
-  white-space: nowrap;
-  display: inline-block;
-}
-
-.scribble {
-  position: absolute;
-  left: 2%;
-  right: 4%;
-  bottom: -0.16em;
-  width: 94%;
-  height: 0.22em;
-  overflow: visible;
-}
-
-.scribble path {
-  fill: none;
-  stroke: var(--brand-apricot);
-  stroke-width: 5;
-  stroke-linecap: round;
+.wrap {
+  max-width: var(--site-wrap);
+  margin: 0 auto;
+  padding: 0 var(--site-gutter);
 }
 
 .h2 {
   margin: 0;
-  font-size: clamp(28px, 3.6vw, 44px);
+  font-size: var(--site-h2);
+  line-height: 1.1;
   font-weight: 700;
-  line-height: 1.08;
   letter-spacing: -0.035em;
 }
 
-.h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.lead {
+.sub {
   margin: var(--space-2) 0 0;
   color: var(--text-secondary);
-  font-size: 17px;
 }
 
-.wrap {
-  max-width: var(--land-max);
-  margin: 0 auto;
-  padding: 0 var(--space-5);
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-bottom: 28px;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-underline-offset: 3px;
 }
 
 .section {
-  padding: var(--space-12) 0;
+  padding: 72px 0 88px;
 }
 
-.sectionTight {
-  padding: 0 0 var(--space-12);
-}
+/* ── Apertura ──────────────────────────────────────────────────────────── */
 
-.h1 {
-  max-width: 13em;
-  margin: 0 auto;
-  font-size: clamp(40px, 6.4vw, 84px);
-  font-weight: 700;
-  line-height: 1.02;
-  letter-spacing: -0.045em;
-}
-
-/* ── Apertura centrata ────────────────────────────────────────── */
 .hero {
   position: relative;
+  min-height: min(100svh, 760px);
+  padding: calc(96px + env(safe-area-inset-top, 0px)) 0 var(--space-16);
+  display: flex;
+  align-items: flex-end;
+  background: var(--brand-plum);
+  color: var(--text-inverse);
   isolation: isolate;
   overflow: hidden;
-  padding: calc(68px + env(safe-area-inset-top, 0px) + var(--space-12)) 0 var(--space-12);
-  background:
-    radial-gradient(45% 60% at 15% 10%, var(--brand-peach), transparent 70%),
-    radial-gradient(40% 55% at 90% 30%, var(--surface-muted), transparent 70%),
-    var(--canvas);
-  text-align: center;
+}
+
+.heroBg {
+  object-fit: cover;
+  object-position: 50% 32%;
+  z-index: -2;
+}
+
+.heroVeil {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--hero-veil);
 }
 
 .heroInner {
-  gap: var(--space-5);
-  flex-direction: column;
-  align-items: center;
+  width: 100%;
   display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.h1 {
+  margin: 0;
+  max-width: 10em;
+  font-size: var(--home-h1);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.05em;
 }
 
 .heroLead {
-  max-width: 34em;
   margin: 0;
-  color: var(--text-secondary);
-  font-size: 18px;
-  line-height: 1.5;
+  max-width: 30em;
+  font-size: 19px;
+  color: var(--brand-peach);
 }
 
 .heroSearch {
   position: relative;
-  z-index: 5; /* i riquadri di Servizio, Dove e Quando scendono sopra le sezioni dopo */
-  width: 100%;
-  max-width: 920px;
-  margin-top: var(--space-3);
-  text-align: left;
+  z-index: 3; /* i menu della ricerca si aprono sopra le tre rassicurazioni */
+  max-width: 900px;
 }
 
-.heroSearch > div {
-  max-width: none;
-}
-
-/* la foto di sfondo: solo atmosfera. In bianco e nero, quasi trasparente, sotto un velo panna che sfuma in basso */
-.heroBg {
-  z-index: -2;
-  object-fit: cover;
-  object-position: 50% 35%;
-  filter: grayscale(1) contrast(0.9);
-  opacity: 0.16;
-}
-
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background:
-    radial-gradient(45% 60% at 15% 10%, var(--brand-peach), transparent 70%),
-    linear-gradient(to bottom, transparent 55%, var(--canvas));
-  opacity: 0.85;
-}
-
-/* i servizi come scorciatoie, sotto la barra */
-.quick {
-  gap: var(--space-2);
+.checks {
+  display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  display: flex;
-}
-
-.quickLink {
-  min-height: var(--tap-min);
-  padding: 0 var(--space-4) 0 var(--space-2);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  color: var(--text-primary);
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
-  gap: var(--space-2);
-  align-items: center;
-  display: inline-flex;
-  transition: transform var(--duration-press) var(--ease-out), border-color var(--duration-fast) ease;
-}
-
-.quickLink:active {
-  transform: scale(0.97);
-}
-
-.quickIcon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--brand-peach);
-  color: var(--brand-plum);
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.quickIcon svg {
-  width: 18px;
-  height: 18px;
-}
-
-/* ── Perché prenotare con Taglendo ────────────────────────────── */
-.why {
-  padding: var(--space-8) var(--space-5);
-  border-radius: var(--radius-panel);
-  background: var(--surface);
-  box-shadow: var(--shadow-panel-soft);
-  gap: var(--space-8);
-  display: grid;
-}
-
-.whyHead {
-  gap: var(--space-2);
-  flex-direction: column;
-  display: flex;
-}
-
-.whyList {
+  gap: 10px 28px;
   margin: 0;
   padding: 0;
-  gap: var(--space-6) var(--space-5);
-  grid-template-columns: minmax(0, 1fr);
   list-style: none;
-  display: grid;
-}
-
-.whyItem {
-  gap: var(--space-2);
-  flex-direction: column;
-  display: flex;
-}
-
-.whyIcon {
-  width: 48px;
-  height: 48px;
-  margin-bottom: var(--space-1);
-  border-radius: var(--radius-card);
-  background: var(--brand-peach);
-  color: var(--brand-plum);
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
-
-.whyTitle {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-}
-
-.whyText {
-  margin: 0;
-  color: var(--text-secondary);
   font-size: 15px;
-  line-height: 1.5;
+  color: var(--brand-peach);
 }
 
-/* ── Le città: link fitti su più colonne ──────────────────────── */
-.cityLinks {
-  margin: var(--space-4) 0 0;
-  padding: var(--space-4) 0 0;
-  border-top: 1px solid var(--border-subtle);
-  columns: 2;
-  column-gap: var(--space-6);
-  list-style: none;
-}
-
-.cityLink {
-  min-height: var(--tap-min);
-  color: var(--text-primary);
-  font-size: 15px;
-  text-decoration: none;
-  break-inside: avoid;
-  gap: var(--space-2);
-  align-items: center;
+.checks li {
   display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-/* ── Entrata dell'apertura: un elemento dopo l'altro, breve ───── */
 .enter {
-  animation: enter 420ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 60ms);
+  animation: enter 480ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
 }
 
 @keyframes enter {
@@ -492,95 +126,771 @@
   }
 }
 
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
+/* ── Cosa ti facciamo oggi? ────────────────────────────────────────────── */
+
+.cats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.salon:active .salonPhoto,
+.cat {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--space-5);
+  overflow: hidden;
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+  text-decoration: none;
+}
+
+.cat img {
+  object-fit: cover;
+  transition: transform 600ms var(--ease-out);
+}
+
+.cat::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--tile-fade);
+}
+
+.catLabel {
+  position: absolute;
+  z-index: 1;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.catName {
+  min-width: 0;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+.catNote {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--brand-peach);
+}
+
+.catArrow {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--brand-cream);
+  color: var(--brand-plum);
+  transition: transform 200ms var(--ease-out);
+}
+
+/* ── Appena arrivate ───────────────────────────────────────────────────── */
+
+.rail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.salon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.salonPhoto {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--brand-plum);
+}
+
+.salonPhoto > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 600ms var(--ease-out);
+}
+
+.salonNoPhoto {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-peach);
+}
+
+.salonLogo {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-squircle);
+  object-fit: cover;
+}
+
+.salonInitial {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--brand-plum);
+}
+
+.badge {
+  position: absolute;
+  left: var(--space-3);
+  top: var(--space-3);
+  padding: 4px 10px;
+  border-radius: var(--radius-small-button);
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.free {
+  position: absolute;
+  left: var(--space-3);
+  bottom: var(--space-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius-icon-button);
+  background: var(--brand-cream);
+  color: var(--status-success);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.freeDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.salonText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.salonName {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.salonWhere {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.salonServices {
+  margin-top: var(--space-1);
+  font-size: 14px;
+}
+
+/* ── Prenotare è più semplice ──────────────────────────────────────────── */
+
+.easy {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 460px;
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+}
+
+.easyPhoto {
+  position: relative;
+  min-height: 360px;
+}
+
+.easyPhoto img {
+  object-fit: cover;
+}
+
+.easyText {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 36px;
+  padding: 72px 64px;
+}
+
+.easyTitle {
+  font-size: 44px;
+}
+
+.steps {
+  display: grid;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.stepNum {
+  color: var(--brand-apricot);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.stepTitle {
+  display: block;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.stepText {
+  color: var(--on-plum-body);
+}
+
+/* ── Barbieri per città ────────────────────────────────────────────────── */
+
+.nearMe {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--segmented-item-height);
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cityCards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cityCards > li {
+  display: flex;
+}
+
+.cityCard {
+  position: relative;
+  flex: 1;
+  min-height: 200px;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6);
+  border-radius: var(--space-6);
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: transform 200ms var(--ease-out);
+}
+
+.cityPlum {
+  background: var(--brand-plum);
+  border-color: var(--brand-plum);
+  color: var(--text-inverse);
+}
+
+.cityPeach {
+  background: var(--brand-peach);
+  border-color: var(--brand-peach);
+  color: var(--brand-plum);
+}
+
+.cityWhite {
+  background: var(--surface);
+  border-color: var(--border-subtle);
+  color: var(--brand-plum);
+}
+
+.cityCream {
+  background: var(--surface-muted);
+  border-color: var(--surface-muted);
+  color: var(--brand-plum);
+}
+
+.cityTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.cityName {
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.cityArrow {
+  transition: transform 200ms var(--ease-out);
+}
+
+.cityCount {
+  display: block;
+  font-weight: 600;
+}
+
+.cityNote {
+  display: block;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.soonHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 36px 0 var(--space-3);
+}
+
+.soonLabel {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.soonLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.soon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.soonCity {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--border-strong);
+  color: var(--text-secondary);
+  font-size: 15px;
+  text-decoration: none;
+}
+
+/* ── Per chi ha una barberia ───────────────────────────────────────────── */
+
+.salonSection {
+  padding: 0 0 104px;
+}
+
+.business {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 58%);
+  border-radius: var(--radius-xl);
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+  overflow: hidden;
+}
+
+.business::before {
+  content: "";
+  position: absolute;
+  right: -120px;
+  top: -120px;
+  width: 520px;
+  height: 520px;
+  border-radius: var(--radius-squircle);
+  background: var(--brand-apricot);
+  opacity: 0.14;
+  transform: rotate(12deg);
+}
+
+.businessText {
+  position: relative;
+  min-width: 0;
+  padding: 64px 0 64px 64px;
+}
+
+.businessKicker {
+  margin: 0 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--brand-peach);
+}
+
+.businessKicker img {
+  border-radius: var(--radius-icon-button);
+}
+
+.businessTitle {
+  font-size: 48px;
+  line-height: 1.04;
+}
+
+.businessLead {
+  margin: var(--space-4) 0 0;
+  max-width: 28em;
+  font-size: 18px;
+  color: var(--on-plum-body);
+}
+
+.businessChecks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px var(--space-6);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+}
+
+.businessChecks li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.businessChecks svg {
+  color: var(--status-success-border);
+}
+
+.businessCta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
+}
+
+.btnLight,
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-height-large);
+  padding: 0 28px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) ease;
+}
+
+.btnLight {
+  background: var(--brand-cream);
+  color: var(--brand-plum);
+}
+
+.btnGhost {
+  border: 1px solid var(--on-plum-outline);
+  color: var(--text-inverse);
+}
+
 .btnLight:active,
 .btnGhost:active {
   transform: scale(0.97);
 }
 
-.salonPhoto,
-.btnLight,
-.btnGhost {
-  transition: transform var(--duration-press) var(--ease-out);
+.businessArt {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 42%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 64px;
+  overflow: hidden;
 }
 
-@media (min-width: 700px) {
-  .cityLinks {
-    columns: 4;
-  }
-
-  .whyList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.phone {
+  width: 230px;
+  padding: var(--space-2);
+  border-radius: 34px;
+  background: var(--salon-bg-deep);
+  box-shadow: var(--shadow-phone);
+  transform: rotate(-4deg);
+  transform-origin: top center;
 }
 
-@media (min-width: 1024px) {
-  .section {
-    padding: var(--space-16) 0;
-  }
+.phoneScreen {
+  position: relative;
+  border-radius: var(--radius-sheet);
+  overflow: hidden;
+  background: var(--brand-cream);
+}
 
-  .hero {
-    padding-bottom: var(--space-16);
-  }
+.phoneScreen > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 
-  .why {
-    padding: var(--space-12);
-  }
+.notice {
+  position: absolute;
+  left: var(--space-2);
+  right: var(--space-2);
+  top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px var(--space-3);
+  border-radius: var(--space-4);
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-notice);
+}
 
-  .whyList {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+.notice img {
+  flex-shrink: 0;
+  border-radius: 8px;
+}
 
-  .railBtn {
-    display: flex;
-  }
+.notice span {
+  min-width: 0;
+}
 
-  .business {
-    padding: var(--space-12);
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  }
+.notice b {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+}
 
-  .businessShot {
-    margin-right: calc(-1 * var(--space-16) - var(--space-12));
-  }
+.notice span span {
+  font-size: 12px;
+  color: var(--text-secondary);
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .cat:hover img,
   .salon:hover .salonPhoto > img {
     transform: scale(1.04);
   }
 
-  .quickLink:hover {
-    border-color: var(--brand-plum);
+  .cat:hover .catArrow,
+  .cityCard:hover .cityArrow {
+    transform: translateX(3px);
   }
 
-  .cityLink:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  .cityCard:hover {
+    transform: translateY(-3px);
   }
 
-  .railBtn:hover {
-    border-color: var(--brand-plum);
+  .nearMe:hover {
+    background: var(--surface-muted);
+  }
+
+  .btnLight:hover {
+    background: var(--surface);
+  }
+
+  .btnGhost:hover {
+    background: var(--on-plum-hover);
+  }
+
+  .soonCity:hover {
+    background: var(--surface);
+  }
+}
+
+@media (max-width: 1100px) {
+  .cats,
+  .rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── Telefono ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  .wrap {
+    padding: 0 var(--site-gutter-phone);
+  }
+
+  .hero {
+    min-height: 0;
+    padding-top: calc(96px + env(safe-area-inset-top, 0px));
+    padding-bottom: var(--space-12);
+  }
+
+  .h1 {
+    font-size: 40px;
+  }
+
+  .h2 {
+    font-size: var(--site-h2-phone);
+  }
+
+  .section {
+    padding: 56px 0 56px;
+  }
+
+  .cats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .catLabel {
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: var(--space-3);
+  }
+
+  .catName {
+    font-size: 17px;
+  }
+
+  .catNote {
+    font-size: 12px;
+  }
+
+  .catArrow {
+    width: 34px;
+    height: 34px;
+  }
+
+  /* i saloni arrivati da poco scorrono di lato */
+  .rail {
+    display: flex;
+    overflow-x: auto;
+    gap: 14px;
+    margin: 0 calc(-1 * var(--site-gutter-phone));
+    padding: 0 var(--site-gutter-phone) var(--space-2);
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--site-gutter-phone);
+    scrollbar-width: none;
+  }
+
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rail > li {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+  }
+
+  .easy {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .easyPhoto {
+    height: 220px;
+    min-height: 0;
+  }
+
+  .easyText {
+    padding: 40px 20px;
+    gap: var(--space-6);
+  }
+
+  .easyTitle {
+    font-size: 30px;
+  }
+
+  .cityCards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cityCard {
+    min-height: 150px;
+    padding: var(--space-4);
+  }
+
+  .cityName {
+    font-size: 24px;
+  }
+
+  .salonSection {
+    padding-bottom: 56px;
+  }
+
+  .business {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .businessText {
+    padding: 32px 22px 0;
+  }
+
+  .businessTitle {
+    font-size: 32px;
+  }
+
+  .businessArt {
+    position: relative;
+    width: auto;
+    height: 260px;
+    padding-top: 28px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .enter {
-    animation: fade 200ms ease both;
+    animation: none;
   }
 
-  .quickLink,
-  .salonPhoto,
+  .cat img,
   .salonPhoto > img,
+  .catArrow,
+  .cityArrow,
+  .cityCard,
   .btnLight,
-  .btnGhost,
-  .railBtn {
+  .btnGhost {
     transition: none;
+  }
+
+  .btnLight:active,
+  .btnGhost:active {
+    transform: none;
   }
 }

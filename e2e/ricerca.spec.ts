@@ -15,9 +15,9 @@ test.describe("Ricerca dei saloni", () => {
 
   test("dalla home: scrivo la città, scelgo il suggerimento, vedo il salone e lo apro", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Prenota il barbiere vicino a te.");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("Il tuo barbiere, quando vuoi tu.");
     await expect(page.getByRole("banner").getByRole("link", { name: "Hai un salone?" })).toHaveAttribute("href", "/per-i-saloni");
-    const box = page.getByRole("combobox", { name: "Dove" });
+    const box = page.getByRole("combobox", { name: "Dove?" });
     await box.fill("bolo");
     await page.getByRole("option", { name: /^Bologna\s*BO$/ }).click();
     await expect(page).toHaveURL(/\/cerca\?dove=Bologna$/);
@@ -30,12 +30,12 @@ test.describe("Ricerca dei saloni", () => {
     await expect(card.getByRole("link", { name: /^Prenota da Barberia Saragozza: / }).first()).toHaveAttribute("href", "/barberia-saragozza");
     // le città con saloni in fondo alla home
     await page.goto("/");
-    await expect(page.getByRole("link", { name: /^Barbieri a Bologna \d+ saloni?$/ })).toHaveAttribute("href", "/barbieri/bologna");
+    await expect(page.getByRole("link", { name: /^Bologna\s*\d+ barberi[ae]/ })).toHaveAttribute("href", "/barbieri/bologna");
     // le grandi città ci sono sempre, anche senza saloni
     await expect(page.getByRole("link", { name: "Barbieri a Roma" })).toHaveAttribute("href", "/barbieri/roma");
     // i saloni arrivati da poco, con la foto
-    await expect(page.getByRole("heading", { name: "Nuovi su Taglendo" })).toBeVisible();
-    await expect(page.getByRole("link", { name: /^Barberia Saragozza/ }).first()).toHaveAttribute("href", "/barberia-saragozza");
+    await expect(page.getByRole("heading", { name: "Appena arrivate su Taglendo" })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Barberia Saragozza/ }).first()).toHaveAttribute("href", "/barberia-saragozza");
     await page.goto("/cerca?dove=Bologna");
     await page.locator('[data-salon="barberia-saragozza"]').getByRole("link", { name: "Barberia Saragozza", exact: true }).click();
     await expect(page).toHaveURL(/\/barberia-saragozza$/, { timeout: 30_000 }); // in sviluppo la pagina si compila al primo giro
@@ -43,9 +43,9 @@ test.describe("Ricerca dei saloni", () => {
 
   test("servizio, città e giorno: la barra cerca con tutti e tre, e basta anche la città", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("combobox", { name: "Servizio" }).click();
+    await page.getByRole("combobox", { name: "Cosa ti serve?" }).click();
     await page.getByRole("option", { name: "Barba", exact: true }).click();
-    await page.getByRole("combobox", { name: "Dove" }).fill("bolo");
+    await page.getByRole("combobox", { name: "Dove?" }).fill("bolo");
     await expect(page.getByRole("option", { name: /^Bologna\s*BO$/ })).toBeVisible();
     await page.keyboard.press("Escape");
     await page.getByRole("button", { name: /^Quando:/ }).click();
@@ -66,11 +66,12 @@ test.describe("Ricerca dei saloni", () => {
     await expect(first.getByRole("list", { name: "Servizi" }).getByRole("listitem").first()).toContainText(/Barba/);
     // senza città: la barra lo chiede
     await page.goto("/");
-    await page.getByRole("combobox", { name: "Servizio" }).fill("Taglio");
+    await page.getByRole("combobox", { name: "Cosa ti serve?" }).fill("Taglio");
     await page.getByRole("button", { name: "Cerca", exact: true }).click();
     await expect(page.getByText("Scrivi dove cerchi, o usa «Vicino a me».")).toBeVisible();
     // dai riquadri «Cosa ti serve?» il servizio arriva già scelto
-    await page.getByRole("link", { name: "Barba", exact: true }).first().click();
+    await page.goto("/");
+    await page.getByRole("main").getByRole("link", { name: /^Barba/ }).first().click();
     await expect(page).toHaveURL(/\/cerca\?servizio=Barba$/);
     await expect(page.getByRole("combobox", { name: "Servizio" })).toHaveValue("Barba");
     await expect(page.getByText(/Scrivi una città o usa «Vicino a me»/)).toBeVisible();
@@ -197,19 +198,21 @@ test.describe("Barbieri vicino a te: filtri, ordine, mappa (ridisegno del sito)"
   });
 
   test("nessun risultato: riquadro tratteggiato e «Azzera i filtri»", async ({ page }) => {
-    await page.goto("/cerca?dove=Bologna&km=2&nuovi=1&fascia=mattina&servizi=rasatura,bambini&aperto=1");
+    // a Venezia non c'è nessuna barberia: con qualsiasi filtro la risposta è «nessuna barberia con questi filtri»
+    await page.goto("/cerca?dove=Venezia&km=2&nuovi=1&fascia=mattina&servizi=rasatura,bambini&aperto=1");
     await expect(page.getByText("Nessuna barberia con questi filtri")).toBeVisible();
     await expect(page.locator("[data-salon]")).toHaveCount(0);
     await page.getByRole("link", { name: "Azzera i filtri" }).click();
-    await expect(page).toHaveURL(/\/cerca\?dove=Bologna$/);
-    await expect(demo(page)).toBeVisible();
+    await expect(page).toHaveURL(/\/cerca\?dove=Venezia$/);
+    await expect(page.getByText("Nessuna barberia con questi filtri")).toHaveCount(0);
   });
 
   test("filtri veri: Liberi oggi / Aperto ora / Nuovi non mostrano chi non li ha", async ({ page }) => {
     await adminUpdate("salons", "slug=eq.barberia-saragozza", { created_at: new Date(Date.now() - 90 * 86400000).toISOString() });
     try {
       await page.goto("/cerca?dove=Bologna&nuovi=1");
-      await expect(page.getByText("Nessuna barberia con questi filtri")).toBeVisible();
+      await expect(page.getByRole("heading", { level: 1, name: "Barbieri a Bologna" })).toBeVisible();
+      await expect(demo(page)).toHaveCount(0); // arrivato da 90 giorni: non è «nuovo»
       await page.goto("/cerca?dove=Bologna");
       await expect(demo(page).getByText("Nuovo", { exact: true })).toHaveCount(0);
     } finally {
@@ -231,9 +234,10 @@ test.describe("Barbieri vicino a te: filtri, ordine, mappa (ridisegno del sito)"
   test("mappa: etichetta con il primo orario, scheda in basso, «Cerca in questa zona» dopo aver spostato la mappa", async ({ page, isMobile }) => {
     await page.goto("/cerca?dove=Bologna");
     if (isMobile) await page.getByRole("button", { name: "Mappa", exact: true }).click();
-    const pin = page.locator(".leaflet-marker-icon").filter({ hasText: /\d:\d\d/ }).first();
+    // altre prove lasciano saloni nello stesso punto: si sceglie l'etichetta del salone demo (il clic va dritto al segnaposto)
+    const pin = page.locator('.leaflet-marker-icon[title^="Barberia Saragozza,"]');
     await expect(pin).toBeVisible();
-    await pin.click();
+    await pin.dispatchEvent("click");
     const card = page.getByRole("group", { name: "Barberia Saragozza" });
     await expect(card).toBeVisible();
     await expect(card.getByRole("link", { name: "Vedi la pagina" })).toHaveAttribute("href", "/barberia-saragozza");
