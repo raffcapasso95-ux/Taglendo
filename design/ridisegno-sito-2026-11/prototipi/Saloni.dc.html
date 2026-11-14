@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Taglendo per i saloni</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:Manrope;src:url("/_blob/0934ad8566f18feaf7ed742aecd241bb") format("truetype");font-weight:200 800}
+body{margin:0;background:#FFF7F0}
+a{color:#3E2532}a:hover{color:#523342}
+.tg *{box-sizing:border-box}
+.tg{font-family:Manrope,Arial,sans-serif;color:#3E2532;background:#FFF7F0;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:clip}
+.wrap{max-width:1248px;margin:0 auto;padding:0 32px}
+.muted{color:#725C66}
+.num{font-variant-numeric:tabular-nums}
+.h2{margin:0;font-size:40px;line-height:1.1;font-weight:700;letter-spacing:-.035em}
+.lbl{font-size:13px;font-weight:600;letter-spacing:.04em;color:#725C66}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:12px;background:#3E2532;color:#FFF7F0;font:inherit;font-weight:600;font-size:16px;text-decoration:none;white-space:nowrap;border:0;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms ease}
+.btn:hover{background:#523342;color:#FFF7F0}
+.btn:active,.press:active{transform:scale(.97)}
+.btn-l{background:#FFF7F0;color:#3E2532}.btn-l:hover{background:#FFFFFF;color:#3E2532}
+.btn-o{background:transparent;color:inherit;border:1px solid currentColor}
+.slot{display:inline-flex;align-items:center;justify-content:center;min-height:40px;min-width:62px;padding:0 10px;border-radius:8px;border:1px solid #7FB29B;background:#EEF6F1;color:#21624E;font:inherit;font-weight:600;font-size:14px;font-variant-numeric:tabular-nums;text-decoration:none;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms ease,color 160ms ease}
+.slot:active{transform:scale(.96)}
+.slot.on{background:#3E2532;border-color:#3E2532;color:#FFF7F0}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid #E6D9DC;background:#FFFFFF;font:inherit;font-size:14px;font-weight:600;color:#3E2532;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,transform 160ms cubic-bezier(.23,1,.32,1)}
+.chip:active{transform:scale(.96)}
+.chip.on{background:#3E2532;border-color:#3E2532;color:#FFF7F0}
+.sq{border-radius:22%}
+.bw{filter:grayscale(1)}
+.rise{animation:rise 480ms cubic-bezier(.23,1,.32,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.fade{animation:fade 300ms ease both}
+@keyframes fade{from{opacity:0}}
+.toast-in{animation:toast 420ms cubic-bezier(.23,1,.32,1) both}
+@keyframes toast{from{opacity:0;transform:translateY(-14px) scale(.97)}}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+details .plus{transition:transform 220ms cubic-bezier(.23,1,.32,1)}
+details[open] .plus{transform:rotate(45deg)}
+:focus-visible{outline:3px solid #3E2532;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.rise,.fade,.toast-in{animation:none}*{transition-duration:1ms!important}}
+.tg{-webkit-tap-highlight-color:transparent}
+.tg input,.tg select,.tg textarea{font-size:16px}
+@media (max-width:960px){
+ .chip,.slot{min-height:48px}
+ .slot{font-size:15px}
+ .btn{min-height:48px}
+}
+
+.mbar{display:none}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;align-items:center}
+.day{position:relative;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1.15fr 1fr 1fr 1fr;border-radius:28px;overflow:hidden;background:linear-gradient(90deg,#2E1B25 0%,#3E2532 24%,#FBF0E9 24%,#FBF0E9 74%,#F8D6C6 100%)}
+.day .stop{position:relative;padding:64px 28px 32px;min-width:0;opacity:0;transform:translateY(8px);transition:opacity 420ms cubic-bezier(.23,1,.32,1) var(--d),transform 420ms cubic-bezier(.23,1,.32,1) var(--d)}
+.day .stop.on{opacity:1;transform:none}
+.day .tick{position:absolute;left:28px;top:34px;width:12px;height:12px;border-radius:50%}
+.day .rail{position:absolute;left:0;right:0;top:39px;height:2px;background:linear-gradient(90deg,rgba(255,247,240,.35) 0 24%,#A88C99 24% 100%);transform:scaleX(0);transform-origin:left;transition:transform 900ms cubic-bezier(.77,0,.175,1)}
+.day .rail.on{transform:scaleX(1)}
+@media (prefers-reduced-motion:reduce){.day .stop{opacity:1;transform:none}.day .rail{transform:none}}
+.three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.pgrid{display:grid;grid-template-columns:340px minmax(0,1fr);gap:48px;margin-top:48px;align-items:start}
+.pfeat{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.pbtn{width:100%;display:flex;gap:14px;align-items:flex-start;text-align:left;padding:16px;border-radius:18px;border:0;background:transparent;color:#FFF7F0;font:inherit;cursor:pointer;transition:background-color 200ms ease}
+.pbtn:hover{background:rgba(255,247,240,.05)}
+.pbtn.on{background:rgba(255,247,240,.1)}
+.pbtn b{display:block;font-size:17px;font-weight:700}
+.pbtn .pd{display:block;font-size:15px;color:#D9C7CE;margin-top:2px}
+.pn{width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,247,240,.35);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;transition:background-color 200ms ease,color 200ms ease,border-color 200ms ease}
+.pbtn.on .pn{background:#F28C6F;border-color:#F28C6F;color:#2E1B25}
+.browser{border-radius:18px;overflow:hidden;background:#FFFFFF;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+.bbar{height:38px;display:flex;align-items:center;gap:6px;padding:0 14px;background:#FBF0E9;border-bottom:1px solid #E6D9DC}
+.bbar span{width:10px;height:10px;border-radius:50%;background:#E6D9DC}
+.bbar em{margin-left:14px;padding:3px 12px;border-radius:999px;background:#FFFFFF;font-size:12px;font-style:normal;color:#725C66}
+.pv{position:relative;height:520px;overflow:hidden;pointer-events:none}
+.scaler{width:1440px;transform:scale(.54);transform-origin:top left}
+.mover{position:relative;transition:transform 640ms cubic-bezier(.77,0,.175,1)}
+.hl{position:absolute;border-radius:24px;box-shadow:0 0 0 4px #F28C6F,0 0 0 4000px rgba(46,27,37,.28);transition:left 640ms cubic-bezier(.77,0,.175,1),top 640ms cubic-bezier(.77,0,.175,1),width 640ms cubic-bezier(.77,0,.175,1),height 640ms cubic-bezier(.77,0,.175,1)}
+@media (prefers-reduced-motion:reduce){.mover,.hl{transition:none}}
+.rgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:64px;align-items:center}
+.setp{background:#FFFFFF;border:1px solid #E6D9DC;border-radius:28px;padding:24px 28px;box-shadow:0 24px 60px rgba(62,37,50,.08)}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:16px 0;border-top:1px solid #F1E6E8}
+.srow.col{flex-direction:column;align-items:stretch;gap:12px}
+.stx{min-width:0}
+.stx b{display:block;font-weight:700}
+.stx span{display:block;font-size:14px;color:#725C66;margin-top:2px}
+.sw{position:relative;width:52px;height:32px;border-radius:999px;border:0;background:#E6D9DC;cursor:pointer;flex-shrink:0;transition:background-color 200ms ease}
+.sw i{position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#FFFFFF;box-shadow:0 1px 3px rgba(62,37,50,.3);transition:transform 220ms cubic-bezier(.23,1,.32,1)}
+.sw.on{background:#21624E}
+.sw.on i{transform:translateX(20px)}
+.segs{display:flex;padding:4px;border-radius:14px;background:#FBF0E9}
+.segs button{flex:1;min-height:40px;border:0;border-radius:10px;background:transparent;font:inherit;font-size:14px;font-weight:600;color:#3E2532;cursor:pointer;transition:background-color 160ms ease,color 160ms ease}
+.segs button.on{background:#3E2532;color:#FFF7F0}
+.pagehead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px}
+.four{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.cost{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px}
+.faqg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:48px}
+@media (max-width:960px){
+ .wrap{padding:0 16px}
+ .hero,.three,.cost,.faqg{grid-template-columns:minmax(0,1fr);gap:32px}
+ .four{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .day{grid-template-columns:minmax(0,1fr);background:linear-gradient(180deg,#3E2532 0%,#3E2532 26%,#FBF0E9 26%,#FBF0E9 80%,#F8D6C6 100%)}
+ .day .stop{padding:24px 24px 24px 56px}
+ .day .tick{left:24px;top:34px}
+ .day .rail{left:29px;right:auto;top:0;bottom:0;width:2px;height:auto;background:linear-gradient(180deg,rgba(255,247,240,.35) 0 26%,#A88C99 26% 100%);transform:scaleY(0);transform-origin:top}
+ .day .rail.on{transform:scaleY(1)}
+ .heroart{padding-right:0!important}
+ .pgrid,.rgrid{grid-template-columns:minmax(0,1fr);gap:24px}
+ .pv{height:520px}
+ .scaler{width:390px;transform:scale(.82)}
+ .mover{transform:none!important}
+ .hl{display:none}
+ .pfeat{flex-direction:column;overflow:visible}
+ .pfeat li{flex:none}
+ .pbtn{cursor:default}
+ .pn{background:#F28C6F;border-color:#F28C6F;color:#2E1B25}
+ .pbtn.on{background:transparent}
+ .browser{max-width:340px;margin:0 auto}
+ .setp{padding:16px 18px}
+ .heroart > div:first-child{display:none}
+ .navd{display:none!important}
+ .mbar{display:flex}
+ .h1{font-size:46px!important}
+ .h2{font-size:30px}
+ .cost{padding:28px!important}
+ .cost .bignum{font-size:120px!important}
+ .heroart{max-height:440px;overflow:hidden;align-items:flex-start}
+ .heroart > div:last-child > div{width:260px!important}
+ .h1{font-size:40px!important}
+ .stepbox{height:360px!important;padding-top:32px!important}
+ .tg section[style*="padding: 104px 0"]{padding-top:64px!important;padding-bottom:64px!important}
+ .tg section[style*="0 0 104px"]{padding-bottom:64px!important}
+ .tg section[style*="88px 0 24px"]{padding-top:64px!important}
+ .tg div[style*="height: 560px"]{height:420px!important}
+ .tg div[style*="padding: 56px;"]{padding:28px 22px!important}
+ .pbtn{padding:12px}
+ footer{padding-bottom:96px!important}
+}
+
+</style>
+</helmet>
+<div class="tg">
+
+<div style="position: relative; color: #FFF7F0; background: #2E1B25; overflow: hidden">
+<img src="/_blob/ddf12a07ff5981aa739df84295e9083b" alt="Un barbiere al lavoro su una sfumatura" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%">
+<div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(46,27,37,0.95) 0%, rgba(46,27,37,0.82) 48%, rgba(46,27,37,0.4) 100%)"></div>
+<header style="position: relative; border-bottom: 1px solid rgba(255,247,240,0.14)">
+  <div class="wrap" style="height: 76px; display: flex; align-items: center; gap: 24px">
+    <a href="Saloni.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none" aria-label="Taglendo per i saloni"><img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 32px; height: 32px"><img src="/_blob/ec0de53bbd71baabea1b1d8f2c1ead3d" alt="" style="width: 124px; height: auto"></a>
+    <nav class="navd" aria-label="Sezioni" style="display: flex; gap: 24px; font-size: 15px; font-weight: 600; margin-left: auto"><a href="#come" style="color: #FFF7F0; text-decoration: none">Come funziona</a><a href="#pagina" style="color: #FFF7F0; text-decoration: none">La tua pagina</a><a href="Funzioni.dc.html" style="color: #FFF7F0; text-decoration: none">Funzioni</a><a href="#costo" style="color: #FFF7F0; text-decoration: none">Quanto costa</a><a href="#domande" style="color: #FFF7F0; text-decoration: none">Domande</a></nav>
+    <a href="#" class="navd" style="color: #FFF7F0; font-size: 15px; font-weight: 600; text-decoration: none; padding: 0 8px">Accedi</a>
+    <a href="#" class="btn btn-l" style="min-height: 44px; border-radius: 999px">Prova gratis</a>
+  </div>
+</header>
+<section style="position: relative; padding: 72px 0 104px">
+  <div class="wrap hero">
+    <div style="min-width: 0; display: flex; flex-direction: column; gap: 24px">
+      <p class="rise" style="margin: 0; font-size: 15px; font-weight: 600; color: #F8D6C6">Per barbieri, da 1 a 3 poltrone</p>
+      <h1 class="h1 rise" style="animation-delay: 60ms; margin: 0; font-size: 62px; line-height: 1.04; font-weight: 700; letter-spacing: -0.045em">La tua agenda online,<br><span style="color: #F28C6F">sempre in tasca.</span></h1>
+      <p class="rise" style="animation-delay: 120ms; margin: 0; font-size: 19px; color: #F8D6C6; max-width: 29em">I clienti prenotano dalla pagina della tua barberia, a qualsiasi ora. Tu vedi ogni appuntamento sul telefono e sul computer.</p>
+      <div class="rise" style="animation-delay: 180ms; display: flex; flex-wrap: wrap; gap: 12px"><a href="#" class="btn btn-l" style="min-height: 56px; padding: 0 28px; border-radius: 999px">Prova gratis</a><a href="#come" class="btn btn-o" style="min-height: 56px; border-radius: 999px; border-color: rgba(255,247,240,0.45)">Guarda come funziona</a></div>
+      <p style="margin: 0; font-size: 14px; color: #D9C7CE">Gratis durante la beta · Senza carta di credito · Zero commissioni</p>
+    </div>
+    <div class="heroart" style="position: relative; display: flex; justify-content: center; min-width: 0; padding-right: 60px"><div style="position: relative; width: 230px; flex-shrink: 0; border-radius: 32px; background: #2E1B25; padding: 6px; box-shadow: 0 30px 60px rgba(46,27,37,0.3); position: absolute; right: 0; bottom: -40px; transform: rotate(5deg); z-index: 0"><div style="position: relative; border-radius: 25px; overflow: hidden; background: #FFF7F0"><img src="/_blob/778e9cb5390c1068c138dd214e9210b9" alt="La pagina del salone sul telefono" style="display: block; width: 100%; height: auto"></div></div><div style="position: relative; z-index: 1"><div style="position: relative; width: 300px; flex-shrink: 0; border-radius: 42px; background: #2E1B25; padding: 9px; box-shadow: 0 30px 60px rgba(46,27,37,0.3); "><div style="position: relative; border-radius: 33px; overflow: hidden; background: #FFF7F0"><img src="/_blob/91caa56f2a525cb30c8b3a9be1465246" alt="L’agenda di oggi su Taglendo" style="display: block; width: 100%; height: auto"><sc-if value="{{ notif }}" hint-placeholder-val="{{ true }}"><div class="toast-in" role="status" style="position: absolute; left: 8px; right: 8px; top: 10px; z-index: 3; display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 16px; background: #FFFFFF; color: #3E2532; box-shadow: 0 12px 32px rgba(62,37,50,0.35)"><img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 30px; height: 30px; flex-shrink: 0"><span style="min-width: 0"><b style="display: block; font-size: 13px; font-weight: 700">Nuova prenotazione online</b><span style="font-size: 12px; color: #725C66">Gianni Ferraro · 09:30 con Andrea</span></span></div></sc-if></div></div></div></div>
+  </div>
+</section>
+</div>
+
+<section style="padding: 88px 0 24px">
+  <div class="wrap">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px 32px; margin-bottom: 28px">
+      <h2 class="h2" style="margin: 0; max-width: 16em">Una giornata qualunque, con Taglendo.</h2>
+      <p class="muted" style="margin: 0; font-size: 16px; max-width: 26em">Niente di nuovo da imparare: è la tua giornata di sempre, con meno telefono in mano.</p>
+    </div>
+    <ol class="day" ref="{{ dayRef }}">
+      <span class="rail {{ dayCls }}" aria-hidden="true"></span>
+      <li class="stop {{ dayCls }}" style="--d: 0ms; color: #FFF7F0">
+      <span class="tick" style="background: #F28C6F; box-shadow: 0 0 0 4px #3E2532"></span>
+      <span style="display: flex; align-items: center; gap: 8px"><b class="num" style="font-size: 26px; font-weight: 700; letter-spacing: -0.02em">23:40</b><span style="opacity: .8; display: inline-flex"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z"/></svg></span></span>
+      <b style="display: block; font-size: 17px; font-weight: 700; margin-top: 10px">Marco prenota per sabato.</b>
+      <span style="display: block; font-size: 15px; color: #D9C7CE; margin-top: 4px">Tu dormi, la barberia è chiusa. La tua pagina no.</span>
+    </li><li class="stop {{ dayCls }}" style="--d: 120ms; color: #3E2532">
+      <span class="tick" style="background: #3E2532; box-shadow: 0 0 0 4px #FBF0E9"></span>
+      <span style="display: flex; align-items: center; gap: 8px"><b class="num" style="font-size: 26px; font-weight: 700; letter-spacing: -0.02em">08:45</b><span style="opacity: .8; display: inline-flex"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/></svg></span></span>
+      <b style="display: block; font-size: 17px; font-weight: 700; margin-top: 10px">Apri l’agenda dal telefono.</b>
+      <span style="display: block; font-size: 15px; color: #725C66; margin-top: 4px">Gli appuntamenti di oggi sono già lì, con nome e servizio.</span>
+    </li><li class="stop {{ dayCls }}" style="--d: 240ms; color: #3E2532">
+      <span class="tick" style="background: #3E2532; box-shadow: 0 0 0 4px #FBF0E9"></span>
+      <span style="display: flex; align-items: center; gap: 8px"><b class="num" style="font-size: 26px; font-weight: 700; letter-spacing: -0.02em">15:20</b><span style="opacity: .8; display: inline-flex"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span></span>
+      <b style="display: block; font-size: 17px; font-weight: 700; margin-top: 10px">Andrea guarda la sua giornata.</b>
+      <span style="display: block; font-size: 15px; color: #725C66; margin-top: 4px">Ogni barbiere ha il suo accesso e vede le sue prenotazioni.</span>
+    </li><li class="stop {{ dayCls }}" style="--d: 360ms; color: #3E2532">
+      <span class="tick" style="background: #3E2532; box-shadow: 0 0 0 4px #FBF0E9"></span>
+      <span style="display: flex; align-items: center; gap: 8px"><b class="num" style="font-size: 26px; font-weight: 700; letter-spacing: -0.02em">18:00</b><span style="opacity: .8; display: inline-flex"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></svg></span></span>
+      <b style="display: block; font-size: 17px; font-weight: 700; margin-top: 10px">Partono i promemoria di domani.</b>
+      <span style="display: block; font-size: 15px; color: #725C66; margin-top: 4px">Un’email ai clienti prima dell’appuntamento: meno poltrone vuote.</span>
+    </li>
+    </ol>
+  </div>
+</section>
+
+<section id="come" style="padding: 104px 0">
+  <div class="wrap">
+    <div style="max-width: 680px; margin-bottom: 48px"><h2 class="h2">Pronto in tre passi.</h2><p class="muted" style="margin: 10px 0 0; font-size: 17px">Sono le schermate vere di Taglendo, così come le vedrai sul tuo telefono.</p></div>
+    <div class="three"><article class="rise" style="animation-delay: 0ms; display: flex; flex-direction: column; gap: 24px; min-width: 0">
+  <div class="stepbox" style="background: #F8D6C6; border-radius: 28px; padding: 44px 0 0; display: flex; justify-content: center; align-items: flex-start; overflow: hidden; height: 440px"><div style="position: relative; width: 236px; flex-shrink: 0; border-radius: 33px; background: #2E1B25; padding: 7px; box-shadow: 0 30px 60px rgba(46,27,37,0.3); "><div style="position: relative; border-radius: 25px; overflow: hidden; background: #FFF7F0"><img src="/_blob/4e77fd09cd405b407157e2426fb16db0" alt="Primo avvio: scelta dei servizi" style="display: block; width: 100%; height: auto"></div></div></div>
+  <div><span class="num" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #3E2532; color: #FFF7F0; font-size: 14px; font-weight: 600">01</span><h3 style="margin: 14px 0 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em">Crei il salone</h3><p class="muted" style="margin: 6px 0 0; font-size: 16px">Nome, indirizzo, orari e listino. Ti prepariamo i servizi più comuni: togli quelli che non fai e correggi prezzi e durate.</p></div>
+</article><article class="rise" style="animation-delay: 80ms; display: flex; flex-direction: column; gap: 24px; min-width: 0">
+  <div class="stepbox" style="background: #3E2532; border-radius: 28px; padding: 44px 0 0; display: flex; justify-content: center; align-items: flex-start; overflow: hidden; height: 440px"><div style="position: relative; width: 236px; flex-shrink: 0; border-radius: 33px; background: #2E1B25; padding: 7px; box-shadow: 0 30px 60px rgba(46,27,37,0.3); box-shadow: 0 0 0 1px rgba(255,247,240,0.22), 0 30px 60px rgba(0,0,0,0.35);"><div style="position: relative; border-radius: 25px; overflow: hidden; background: #FFF7F0"><img src="/_blob/030c9e740a82ccdc3a0a0015107454ef" alt="Prenotazione: scelta di giorno e ora" style="display: block; width: 100%; height: auto"></div></div></div>
+  <div><span class="num" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #3E2532; color: #FFF7F0; font-size: 14px; font-weight: 600">02</span><h3 style="margin: 14px 0 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em">I clienti prenotano</h3><p class="muted" style="margin: 6px 0 0; font-size: 16px">Dalla pagina della tua barberia scelgono servizio, barbiere e uno degli orari liberi. Confermano con un codice via email.</p></div>
+</article><article class="rise" style="animation-delay: 160ms; display: flex; flex-direction: column; gap: 24px; min-width: 0">
+  <div class="stepbox" style="background: #EEF6F1; border-radius: 28px; padding: 44px 0 0; display: flex; justify-content: center; align-items: flex-start; overflow: hidden; height: 440px"><div style="position: relative; width: 236px; flex-shrink: 0; border-radius: 33px; background: #2E1B25; padding: 7px; box-shadow: 0 30px 60px rgba(46,27,37,0.3); "><div style="position: relative; border-radius: 25px; overflow: hidden; background: #FFF7F0"><img src="/_blob/91caa56f2a525cb30c8b3a9be1465246" alt="Agenda di oggi" style="display: block; width: 100%; height: auto"></div></div></div>
+  <div><span class="num" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #3E2532; color: #FFF7F0; font-size: 14px; font-weight: 600">03</span><h3 style="margin: 14px 0 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em">Tu apri l’agenda</h3><p class="muted" style="margin: 6px 0 0; font-size: 16px">Ogni appuntamento è già nella colonna del barbiere giusto, con i posti liberi in verde.</p></div>
+</article></div>
+  </div>
+</section>
+
+<section id="pagina" style="padding: 104px 0; background: #3E2532; color: #FFF7F0; overflow: hidden">
+  <div class="wrap">
+    <div class="pagehead"><div><h2 class="h2">La pagina della tua barberia.</h2><p style="margin: 14px 0 0; font-size: 18px; color: #D9C7CE; max-width: 34em">Ogni barberia su Taglendo ha la sua pagina, pronta appena finisci il primo avvio. Guarda cosa trova il tuo cliente.</p></div>
+      <a href="Salone.dc.html" class="btn btn-l" style="border-radius: 999px">Apri la pagina d’esempio</a></div>
+    <div class="pgrid">
+      <ol class="pfeat" role="tablist" aria-label="Le parti della pagina">
+        <sc-for list="{{ pf }}" as="f" hint-placeholder-count="5"><li><button type="button" role="tab" aria-selected="{{ f.on }}" class="pbtn {{ f.cls }}" onClick="{{ f.pick }}"><span class="pn num">{{ f.n }}</span><span style="min-width: 0"><b>{{ f.t }}</b><span class="pd">{{ f.d }}</span></span></button></li></sc-for>
+      </ol>
+      <div style="min-width: 0">
+        <div class="browser">
+          <div class="bbar"><span></span><span></span><span></span><em>taglendo.it/barberia-porta-nuova</em></div>
+          <div class="pv">
+            <div class="scaler"><div class="mover" style="transform: translateY(-{{ pOff }}px)">
+              <dc-import name="Salone" hint-size="1440px,2800px"></dc-import>
+              <span class="hl" style="left: {{ hx }}px; top: {{ hy }}px; width: {{ hw }}px; height: {{ hh }}px"></span>
+            </div></div>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 16px"><p style="margin: 0; font-size: 14px; color: #D9C7CE">Funziona anche senza foto: in alto ci sono il tuo logo e i tuoi orari.</p><a href="Funzioni.dc.html" style="display: inline-flex; align-items: center; gap: 6px; color: #FFF7F0; font-weight: 600">Tutte le funzioni<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section style="padding: 104px 0">
+  <div class="wrap">
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; margin-bottom: 32px"><div><h2 class="h2">Il quaderno, e poi Taglendo.</h2><p class="muted" style="margin: 10px 0 0; font-size: 17px">Trascina la maniglia: lo stesso sabato, prima e dopo.</p></div></div>
+    <div style="position: relative; height: 560px; border-radius: 28px; overflow: hidden; border: 1px solid #E6D9DC; background: #FFFFFF; user-select: none">
+      <img src="/_blob/4ccd30eb8c8118ba59b3a362144055de" alt="Lo stesso sabato nell’agenda di Taglendo" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left">
+      <div style="position: absolute; inset: 0; clip-path: inset(0 {{ cutR }}% 0 0)"><div style="position: absolute; inset: 0; background: #FFF9E8; background-image: repeating-linear-gradient(to bottom, transparent 0 43px, #E7D9BC 43px 44px); font-family: 'Bradley Hand','Segoe Print','Comic Neue',cursive; color: #2F3A66; padding: 36px 40px 0 96px; font-size: 24px; line-height: 44px">
+  <span style="position: absolute; left: 72px; top: 0; bottom: 0; width: 2px; background: #E9A3A3"></span>
+  <p style="margin: 0; font-size: 28px; font-weight: 700">Sabato 14</p>
+  <p style="margin: 0">9:00 Luca, taglio + barba</p>
+  <p style="margin: 0"><s>9:30 Marco B.</s> <span style="color: #B43E4B">richiamare!!</span></p>
+  <p style="margin: 0">10:00 Davide (barba) 347 22…</p>
+  <p style="margin: 0">10:30 ??? forse Paolo</p>
+  <p style="margin: 0"><s>11:00 Gianni</s> → spostato lunedì?</p>
+  <p style="margin: 0">12:00 Simone</p>
+  <p style="margin: 0"><s>15:30 Ferri</s> <span style="color: #B43E4B">annullato</span></p>
+  <p style="margin: 0">16:00 bimbo Rossi + papà</p>
+  <p style="margin: 0">17:00 ________</p>
+</div></div>
+      <span style="position: absolute; left: 20px; bottom: 20px; padding: 6px 12px; border-radius: 8px; background: #2F3A66; color: #FFF9E8; font-size: 13px; font-weight: 700">Prima</span>
+      <span style="position: absolute; right: 20px; bottom: 20px; padding: 6px 12px; border-radius: 8px; background: #3E2532; color: #FFF7F0; font-size: 13px; font-weight: 700">Con Taglendo</span>
+      <span aria-hidden="true" style="position: absolute; top: 0; bottom: 0; left: {{ cut }}%; width: 3px; margin-left: -1.5px; background: #3E2532; pointer-events: none"><span style="position: absolute; top: 50%; left: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: #3E2532; color: #FFF7F0; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(62,37,50,0.35)"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 7-5 5 5 5M15 7l5 5-5 5"/></svg></span><span style="position: absolute; top: calc(50% + 36px); left: 50%; transform: translateX(-50%); padding: 4px 10px; border-radius: 8px; background: #3E2532; color: #FFF7F0; font-size: 12px; font-weight: 600; white-space: nowrap">Trascina</span></span>
+      <input type="range" min="0" max="100" value="{{ cut }}" onInput="{{ setCut }}" onChange="{{ setCut }}" aria-label="Confronta quaderno e Taglendo" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0">
+    </div>
+  </div>
+</section>
+
+<section id="costo" style="padding: 0 0 104px">
+  <div class="wrap">
+    <div class="cost" style="border-radius: 28px; background: #F8D6C6; padding: 56px">
+      <div ref="{{ costRef }}">
+        <h2 class="h2">Quanto costa?</h2>
+        <p class="num bignum" aria-label="Zero euro" style="margin: 8px 0 0; font-size: 168px; line-height: 0.95; font-weight: 700; letter-spacing: -0.06em">{{ price }}<span style="font-size: 0.4em; vertical-align: top; letter-spacing: 0; margin-left: 6px">€</span></p>
+        <p style="margin: 12px 0 0; font-size: 22px; font-weight: 600; max-width: 18em">Gratis durante la beta, con tutte le funzioni.</p>
+      </div>
+      <div style="align-self: center">
+        <ul style="list-style: none; margin: 0; padding: 0; font-size: 17px">
+          <li style="display: flex; align-items: baseline; gap: 8px; padding: 12px 0"><span>Agenda per tutte le poltrone</span><span style="flex: 1; border-bottom: 2px dotted rgba(62,37,50,0.3)"></span><b style="font-weight: 700">inclusa</b></li>
+          <li style="display: flex; align-items: baseline; gap: 8px; padding: 12px 0"><span>Pagina della barberia</span><span style="flex: 1; border-bottom: 2px dotted rgba(62,37,50,0.3)"></span><b style="font-weight: 700">inclusa</b></li>
+          <li style="display: flex; align-items: baseline; gap: 8px; padding: 12px 0"><span>Prenotazioni online</span><span style="flex: 1; border-bottom: 2px dotted rgba(62,37,50,0.3)"></span><b style="font-weight: 700">incluse</b></li>
+          <li style="display: flex; align-items: baseline; gap: 8px; padding: 12px 0"><span>Fino a 3 barbieri</span><span style="flex: 1; border-bottom: 2px dotted rgba(62,37,50,0.3)"></span><b style="font-weight: 700">inclusi</b></li>
+          <li style="display: flex; align-items: baseline; gap: 8px; padding: 12px 0"><span>Commissioni</span><span style="flex: 1; border-bottom: 2px dotted rgba(62,37,50,0.3)"></span><b class="num" style="font-weight: 700">0 €</b></li>
+          <li style="display: flex; align-items: baseline; gap: 8px; padding: 12px 0"><span>Carta di credito</span><span style="flex: 1; border-bottom: 2px dotted rgba(62,37,50,0.3)"></span><b style="font-weight: 700">non serve</b></li>
+        </ul>
+        <a href="#" class="btn" style="margin-top: 20px; border-radius: 999px">Registra la tua barberia</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="domande" style="padding: 0 0 104px">
+  <div class="wrap faqg">
+    <div><h2 class="h2">Domande frequenti</h2><p class="muted" style="margin: 12px 0 0">Altro? Scrivici a <a href="mailto:aiuto@taglendo.it" style="font-weight: 600">aiuto@taglendo.it</a>. Ti risponde una persona.</p></div>
+    <div style="border-bottom: 1px solid #E6D9DC"><details open style="border-top: 1px solid #E6D9DC; padding: 20px 0"><summary style="display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 18px; font-weight: 700">I miei clienti devono scaricare un’app?<span class="plus" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E6D9DC; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p class="muted" style="margin: 10px 0 0; max-width: 40em">No. Aprono la pagina del salone dal telefono, scelgono servizio e orario e confermano con un codice via email.</p></details><details  style="border-top: 1px solid #E6D9DC; padding: 20px 0"><summary style="display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 18px; font-weight: 700">Quanto costa davvero?<span class="plus" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E6D9DC; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p class="muted" style="margin: 10px 0 0; max-width: 40em">Niente. Durante la beta Taglendo è gratis, con tutte le funzioni e senza carta di credito.</p></details><details  style="border-top: 1px solid #E6D9DC; padding: 20px 0"><summary style="display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 18px; font-weight: 700">Posso far prenotare solo al telefono?<span class="plus" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E6D9DC; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p class="muted" style="margin: 10px 0 0; max-width: 40em">Sì. Spegni la prenotazione online: la pagina mostra listino, orari e il pulsante per chiamarti.</p></details><details  style="border-top: 1px solid #E6D9DC; padding: 20px 0"><summary style="display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 18px; font-weight: 700">E chi entra senza prenotare?<span class="plus" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E6D9DC; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p class="muted" style="margin: 10px 0 0; max-width: 40em">Lo aggiungi in pochi tocchi nel primo posto libero. L’orario sparisce anche dalla pagina.</p></details><details  style="border-top: 1px solid #E6D9DC; padding: 20px 0"><summary style="display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 18px; font-weight: 700">Lavoriamo in tre: ognuno vede la sua agenda?<span class="plus" style="width: 32px; height: 32px; border-radius: 50%; border: 1px solid #E6D9DC; display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p class="muted" style="margin: 10px 0 0; max-width: 40em">Sì. Ogni barbiere ha il suo accesso e tu decidi cosa può vedere.</p></details></div>
+  </div>
+</section>
+
+<section style="padding: 0 0 104px">
+  <div class="wrap">
+    <div style="border-radius: 28px; background: #3E2532; color: #FFF7F0; padding: 56px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px">
+      <div><h2 class="h2" style="font-size: 36px">Il prossimo cliente può prenotare stasera.</h2><p style="margin: 8px 0 0; color: #D9C7CE">Dieci minuti per creare la pagina. Se ti serve una mano, ti aiutiamo noi.</p></div>
+      <a href="#" class="btn btn-l" style="min-height: 56px; padding: 0 28px; border-radius: 999px">Prova gratis</a>
+    </div>
+  </div>
+</section>
+<footer style="background: #2E1B25; color: #FFF7F0; padding: 56px 0 32px">
+  <div class="wrap">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px">
+      <div><img src="/_blob/ec0de53bbd71baabea1b1d8f2c1ead3d" alt="Taglendo" style="width: 140px; height: auto"><p style="margin: 12px 0 0; font-size: 14px; color: #D9C7CE; max-width: 26em">Agenda e prenotazioni online per barberie, in Italia.</p></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px"><b style="font-weight: 600; color: #F8D6C6">Per i clienti</b><a href="Main.dc.html" style="color: #D9C7CE; text-decoration: none">Cerca un barbiere</a><a href="Cerca.dc.html" style="color: #D9C7CE; text-decoration: none">Barbieri vicino a te</a></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px"><b style="font-weight: 600; color: #F8D6C6">Per i saloni</b><a href="Saloni.dc.html" style="color: #D9C7CE; text-decoration: none">Taglendo per i saloni</a><a href="Saloni.dc.html" style="color: #D9C7CE; text-decoration: none">Registra il salone</a><a href="Saloni.dc.html" style="color: #D9C7CE; text-decoration: none">Accedi</a></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px"><b style="font-weight: 600; color: #F8D6C6">Taglendo</b><a href="mailto:aiuto@taglendo.it" style="color: #D9C7CE; text-decoration: none">aiuto@taglendo.it</a><span style="color: #D9C7CE">Privacy · Termini · Cookie</span></div>
+    </div>
+    <p style="margin: 40px 0 0; padding-top: 20px; border-top: 1px solid rgba(255,247,240,0.14); font-size: 13px; color: #D9C7CE">© 2026 Taglendo</p>
+  </div>
+</footer>
+<div class="mbar" style="position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: rgba(255,247,240,0.96); border-top: 1px solid #E6D9DC; align-items: center; gap: 12px"><span style="flex: 1; min-width: 0"><b style="display: block; font-weight: 700">Gratis durante la beta</b><span class="muted" style="font-size: 13px">Senza carta di credito</span></span><a href="#" class="btn" style="border-radius: 999px">Prova gratis</a></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1440, "height": 5400}}'>
+class Component extends DCLogic {
+state = { notif: true, cut: 50, price: 29, day: false, pi: 0, book: true, prices: true, notice: 1, remind: 3, sum: true };
+componentDidMount() {
+  this.pt = setInterval(() => { if (!this.pStop) this.setState(s => ({ pi: (s.pi + 1) % 5 })); }, 4200);
+  this.reduce = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (this.reduce) this.pStop = true;
+  if (!this.reduce) this.a = setInterval(() => this.setState(s => ({ notif: !s.notif })), 3200);
+  const start = () => {
+    if (this.started) return; this.started = true;
+    if (this.reduce) { this.setState({ price: 0 }); return; }
+    this.c = setInterval(() => this.setState(s => { if (s.price <= 0) { clearInterval(this.c); return null; } return { price: s.price - 1 }; }), 40);
+  };
+  if (typeof IntersectionObserver !== 'undefined' && this.costEl) {
+    this.io = new IntersectionObserver((es) => { if (es.some(e => e.isIntersecting)) { start(); this.io.disconnect(); } }, { threshold: 0.4 });
+    this.io.observe(this.costEl);
+  } else start();
+  if (this.reduce || typeof IntersectionObserver === 'undefined' || !this.dayEl) this.setState({ day: true });
+  else { this.io2 = new IntersectionObserver((es) => { if (es.some(e => e.isIntersecting)) { this.setState({ day: true }); this.io2.disconnect(); } }, { threshold: 0.3 }); this.io2.observe(this.dayEl); }
+}
+componentWillUnmount() { clearInterval(this.a); clearInterval(this.c); clearInterval(this.pt); if (this.io) this.io.disconnect(); if (this.io2) this.io2.disconnect(); }
+pageVals() {
+  const P = [
+    ['Il tuo logo, in alto', 'Nome, orari di oggi, indirizzo e i tuoi barbieri. Anche senza foto.', 0, [0, 73, 1440, 398]],
+    ['Servizi e prezzi', 'Ogni servizio ha il suo Prenota. I prezzi puoi anche nasconderli.', 420, [112, 495, 718, 430]],
+    ['Prenotazione a passi', 'Cosa, con chi, quando, i dati. Resta sempre a lato mentre si scorre.', 420, [838, 495, 490, 446]],
+    ['Foto e barbieri', 'Fino a otto foto e un “Prenota con…” per ogni barbiere.', 900, [112, 949, 718, 725]],
+    ['Da sapere, orari e mappa', 'Specialità, pagamento, chiusure e ferie sempre aggiornati.', 1640, [112, 1698, 718, 680]]];
+  const S = this.state;
+  const cur = P[S.pi];
+  return {
+    pf: P.map((p, i) => ({ n: i + 1, t: p[0], d: p[1], on: S.pi === i, cls: S.pi === i ? 'on' : '', pick: () => { this.pStop = true; this.setState({ pi: i }); } })),
+    pOff: cur[2], hx: cur[3][0], hy: cur[3][1], hw: cur[3][2], hh: cur[3][3]
+  };
+}
+ruleVals() {
+  const S = this.state, set = (o) => this.setState(o);
+  const N = ['30 min', '2 ore', 'Il giorno prima'], R = ['2 ore', '12 ore', '24 ore', '48 ore'];
+  return {
+    book: S.book, bookCls: S.book ? 'on' : '', tBook: () => set({ book: !S.book }),
+    hBook: S.book ? 'I clienti prenotano da soli dalla tua pagina, a qualsiasi ora.' : 'La pagina mostra listino e orari, ma per prenotare il cliente ti chiama.',
+    prices: S.prices, pricesCls: S.prices ? 'on' : '', tPrices: () => set({ prices: !S.prices }),
+    hPrices: S.prices ? 'Il cliente vede il prezzo di ogni servizio.' : 'Servizi e durate, senza prezzi: li concordi in salone.',
+    notices: N.map((l, i) => ({ l, on: S.notice === i, cls: S.notice === i ? 'on' : '', pick: () => set({ notice: i }) })),
+    reminds: R.map((l, i) => ({ l, on: S.remind === i, cls: S.remind === i ? 'on' : '', pick: () => set({ remind: i }) })),
+    sum: S.sum, sumCls: S.sum ? 'on' : '', tSum: () => set({ sum: !S.sum }),
+    hSum: S.sum ? 'Ogni mattina alle 8:00 ti arriva l’elenco degli appuntamenti.' : 'Nessun riepilogo: guardi tu l’agenda quando vuoi.'
+  };
+}
+renderVals() {
+  return {
+    notif: this.state.notif, cut: this.state.cut, cutR: 100 - this.state.cut, price: this.state.price,
+    setCut: (e) => this.setState({ cut: Number(e.target.value) }),
+    costRef: (el) => { this.costEl = el; },
+    dayRef: (el) => { this.dayEl = el; },
+    dayCls: this.state.day ? 'on' : '',
+    ...this.pageVals(), ...this.ruleVals()
+  };
+}
+}
+</script>
+</body>
+</html>

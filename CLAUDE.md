@@ -4,6 +4,7 @@
 Agenda e prenotazioni online per barberie da 1 a 3 poltrone, in Italia. Tre superfici condividono gli stessi dati: il sito commerciale, il gestionale del barbiere (web app/PWA) e la pagina pubblica di ogni salone (`/[slug]`). La v1 è **solo web**.
 
 ## Fonti di verità
+- **Ridisegno del sito (novembre 2026)**: `design/ridisegno-sito-2026-11/` (`IMPLEMENTAZIONE.md`, `prototipi/*.dc.html`, `riferimenti/`, `assets/`). Vale per cinque pagine del sito pubblico: home clienti (`/`), barbieri vicino a te (`/cerca`), pagina del salone (`/[slug]`), home saloni (`/per-i-saloni`) e Funzioni (`/per-i-saloni/funzioni`). Per queste pagine sostituisce `design/*.dc.html` e le home di `design/ridisegno-2026-11/`. I vincoli del suo §1 non si cambiano.
 - **Ridisegno novembre 2026**: `design/ridisegno-2026-11/` (pagine HTML statiche, `css/app.css`, `MODIFICHE.md`, `IMPLEMENTAZIONE.md`). Per le schermate elencate lì è il riferimento di design e i suoi testi sostituiscono quelli di `design/*.dc.html`; per ogni schermata vale l'ultimo giro di `MODIFICHE.md` che la nomina. Le pagine si ricostruiscono nei componenti, non si copiano; `js/prototipo.js` non va portato nell'app.
 - Design: `design/*.dc.html`. Sono prototipi HTML ad alta fedeltà: vanno ricostruiti, non copiati. Le schermate in `design/Schermate mancanti.dc.html` hanno un codice (es. `C4`, `C4-D` per desktop).
 - Design system: `design/uploads/design-system.html` e `tokens/tokens.css`.
