@@ -275,3 +275,28 @@
 @media (max-width: 1023px) {
   :root { --person-size: 46px; }
 }
+
+/* Ridisegno del sito (novembre 2026) — design/ridisegno-sito-2026-11 */
+:root {
+  --site-wrap: 1248px;                          /* larghezza della colonna, padding compreso */
+  --site-gutter: 32px;
+  --site-gutter-phone: 16px;
+  --radius-squircle: 22%;                       /* l'unica forma di marca: lo squircle del logo */
+  --on-plum-soft: #D9C7CE;                      /* testo secondario su prugna */
+  --on-plum-line: rgba(255, 247, 240, .14);
+  --on-plum-ghost: rgba(255, 247, 240, .3);
+  --on-plum-outline: rgba(255, 247, 240, .4);
+  --on-plum-hover: rgba(255, 247, 240, .08);
+  --open-on-plum: #CFE6DA;                      /* «Aperto ora» su prugna */
+  --open-on-plum-bg: rgba(127, 178, 155, .16);
+  --plum-glow: radial-gradient(120% 140% at 100% 0%, #523342 0%, rgba(82, 51, 66, 0) 55%);
+  --shadow-logo: 0 0 0 5px rgba(255, 247, 240, .12), 0 18px 40px rgba(20, 10, 16, .35);
+  --shadow-book: 0 20px 50px rgba(62, 37, 50, .10);
+  --photo-veil: rgba(46, 27, 37, .55);
+  --sticky-top: 96px;                           /* sotto la barra in alto da 72 px */
+  --site-h1-salon: 60px;
+  --site-h1-salon-phone: 36px;
+  --site-h2: 40px;
+  --site-h2-section: 30px;
+  --site-h2-phone: 26px;
+}

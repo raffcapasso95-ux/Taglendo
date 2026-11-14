@@ -39,16 +39,16 @@ test.describe("Sito pubblico", () => {
 test.describe("Sito pubblico sul telefono", () => {
   test.skip(({ viewport }) => (viewport?.width ?? 0) >= 900, "solo telefono");
 
-  test("pagina del salone: un solo «Prenota» in alto, pulsanti dell'hero uguali, barbieri in lista", async ({ page }) => {
+  test("pagina del salone: un solo «Prenota» (la barra in basso), pulsanti in alto uguali, barbieri in lista", async ({ page }) => {
     await page.goto("/barberia-saragozza", { waitUntil: "networkidle" });
     // in alto non c'è il doppione del pulsante della barra in basso
     await expect(page.locator("header").getByRole("link", { name: "Prenota", exact: true })).toBeHidden();
     await expect(page.getByRole("link", { name: "Prenota", exact: true }).filter({ visible: true }).first()).toBeVisible(); // quello della barra
     // i due pulsanti dell'hero sono larghi uguale
-    const [a, b] = [await page.getByRole("link", { name: "Prenota online" }).first().boundingBox(), await page.getByRole("link", { name: "Vedi servizi e prezzi" }).boundingBox()];
+    const [a, b] = [await page.getByRole("link", { name: "Prenota online" }).first().boundingBox(), await page.getByRole("link", { name: /051 644 2190/ }).first().boundingBox()];
     expect(Math.abs(a!.width - b!.width)).toBeLessThanOrEqual(1);
     // i barbieri non sono tre schermate: ritratti piccoli
-    const portraits = await page.locator("#barbieri [class*=portrait]").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().width));
+    const portraits = await page.locator("#barbieri [class*=avatar]").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().width));
     expect(portraits.length).toBeGreaterThan(0);
     expect(Math.max(...portraits)).toBeLessThanOrEqual(100);
   });

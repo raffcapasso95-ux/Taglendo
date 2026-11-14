@@ -1,21 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BookPick } from "./BookPick";
 import { BottomBar } from "./BottomBar";
 import { CookieConsent } from "./CookieConsent";
 import { Gallery } from "./Gallery";
-import { PickBarber } from "./PickBarber";
+import { ShareButton } from "./ShareButton";
 import { ShopBooking } from "./ShopBooking";
-import { shopCopy as copy } from "@/lib/copy/shop";
+import { cx } from "@/components/ui/cx";
+import { shopCopy } from "@/lib/copy/shop";
 import { formatPrice } from "@/lib/dates/format";
+import { citySlug } from "@/lib/places/comuni";
 import type { PublicSalon } from "@/lib/public/load";
 import { span } from "@/lib/rules/agenda";
-import { hoursLines, mapsHref, openSign, phoneHref } from "@/lib/rules/publicPage";
-import { fromPriceCents } from "@/lib/rules/publicPage";
-import { rangesOf, formatMinutes } from "@/lib/rules/hours";
-import styles from "./Shop.module.css";
+import { formatMinutes, rangesOf } from "@/lib/rules/hours";
+import { barbersLine, closedDaysLine, hoursLines, knowRows, mapsHref, phoneHref, statusPill, todayLine, zoneOf } from "@/lib/rules/publicPage";
+import styles from "./Page.module.css";
 
-type Props = { salon: PublicSalon; weekday: number; nowMin: number; today: string; bookingOn: boolean };
+type Props = {
+  salon: PublicSalon;
+  weekday: number;
+  nowMin: number;
+  today: string;
+  bookingOn: boolean;
+  /** Anteprima rimpicciolita (home saloni): niente barre fisse, niente cookie, link interni inerti. */
+  preview?: boolean;
+};
+
+const copy = shopCopy.page;
+const TONES = [styles.tone0, styles.tone1, styles.tone2];
 
 const Svg = ({ size = 18, children }: { size?: number; children: ReactNode }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -24,7 +37,7 @@ const Svg = ({ size = 18, children }: { size?: number; children: ReactNode }) =>
 );
 const PhoneIcon = ({ size }: { size?: number }) => (
   <Svg size={size}>
-    <path d="M5 4h3l1.5 4-2 1.3a11 11 0 0 0 7.2 7.2l1.3-2 4 1.5v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z" />
+    <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" />
   </Svg>
 );
 const PinIcon = ({ size }: { size?: number }) => (
@@ -33,43 +46,50 @@ const PinIcon = ({ size }: { size?: number }) => (
     <circle cx="12" cy="9.5" r="2.5" />
   </Svg>
 );
+const ClockIcon = () => (
+  <Svg>
+    <circle cx="12" cy="12" r="8.5" />
+    <path d="M12 7.5V12l3 2" />
+  </Svg>
+);
 
-const initials = (name: string) =>
+export const initials = (name: string) =>
   name
     .trim()
     .split(/\s+/)
+    .filter((w) => /\p{L}/u.test(w))
     .slice(0, 2)
     .map((w) => Array.from(w)[0]?.toUpperCase() ?? "")
     .join("");
 
-/** La pagina del salone (ridisegno novembre 2026): una poltrona, prezzi nascosti e «solo telefono» sono varianti della stessa pagina. */
-export function PublicPage({ salon, weekday, nowMin, today, bookingOn }: Props) {
+const first = (name: string) => Array.from(name.trim())[0]?.toUpperCase() ?? "";
+
+/** La pagina del salone (ridisegno del sito, novembre 2026). Funziona anche senza foto e senza logo. */
+export function PublicPage({ salon, weekday, nowMin, today, bookingOn, preview = false }: Props) {
   const tel = phoneHref(salon.phone);
-  const sign = openSign(salon.week, weekday, nowMin);
-  const signText = sign.line ? `${sign.title} · ${sign.line}` : sign.title;
-  const barSign = sign.line ? `${sign.title} ${sign.line}` : sign.title;
-  const from = fromPriceCents(salon.services);
-  const showPrices = salon.showPrices;
+  const pill = statusPill(salon.week, weekday, nowMin);
   const maps = mapsHref(salon.address, salon.area);
-  const city = salon.area?.split("·").pop()?.trim();
-  const team = salon.members.length;
-  const solo = team <= 1;
+  const city = salon.city ?? salon.area?.split("·").pop()?.trim() ?? null;
+  const zone = zoneOf(salon.area, city);
+  const team = salon.members;
+  const solo = team.length <= 1;
+  const barbers = barbersLine(team.map((m) => m.name));
   const cancelLimit = salon.cancelOnline ? (salon.cancelLimitMin >= 1440 ? "24 ore" : "2 ore") : null;
-  const todayHours = salon.week[weekday]!;
-  const todayRanges = rangesOf(todayHours);
   const photos = salon.photos.map((url, i) => ({ url, alt: `${salon.name}: foto ${i + 1}` }));
-  const cta = bookingOn ? { href: "#prenota", header: copy.book, hero: copy.bookOnline } : { href: tel, header: copy.call, hero: copy.callToBook };
+  const know = knowRows({ ...salon.know, cancelOnline: salon.cancelOnline, cancelLimitMin: salon.cancelLimitMin });
+  const book = bookingOn ? "#prenota" : tel;
+  const logoAlt = copy.logoAlt(salon.name);
 
   return (
     <div className={styles.page} id="top">
-      <header className={styles.header}>
-        <div className={`${styles.wrap} ${styles.headerRow}`}>
+      <header className={styles.top}>
+        <div className={cx(styles.wrap, styles.topRow)}>
           <a href="#top" className={styles.brand}>
             {salon.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={salon.logoUrl} alt="" width={40} height={40} className={styles.brandLogo} />
+              <img src={salon.logoUrl} alt="" width={40} height={40} className={styles.logoSm} />
             ) : (
-              <span className={styles.brandMark} aria-hidden="true">
+              <span className={styles.initialsSm} aria-hidden="true">
                 {initials(salon.name)}
               </span>
             )}
@@ -78,333 +98,287 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn }: Props) 
               {salon.area ? <span className={styles.brandArea}>{salon.area}</span> : null}
             </span>
           </a>
-          <nav className={styles.nav} aria-label="Sezioni">
-            <a href="#prenota" className={styles.navLink}>
-              {copy.nav.prices}
-            </a>
-            {photos.length > 0 ? (
-              <a href="#foto" className={styles.navLink}>
-                {copy.nav.photos}
-              </a>
-            ) : null}
-            {team > 0 ? (
-              <a href="#barbieri" className={styles.navLink}>
-                {solo ? copy.nav.teamOne : copy.nav.team}
-              </a>
-            ) : null}
-            <a href="#dove" className={styles.navLink}>
-              {copy.nav.where}
-            </a>
+          <nav className={styles.anchors} aria-label="Sezioni">
+            <a href="#servizi">{copy.anchors.services}</a>
+            {photos.length > 0 ? <a href="#foto">{copy.anchors.photos}</a> : null}
+            {team.length > 0 ? <a href="#barbieri">{copy.anchors.team}</a> : null}
+            {know.length > 0 ? <a href="#info">{copy.anchors.know}</a> : null}
+            <a href="#dove">{copy.anchors.where}</a>
           </nav>
-          <div className={styles.headerActions}>
-            <a href={tel} className={styles.call} aria-label={copy.callSr(salon.phone)}>
-              <PhoneIcon />
-              <span className={styles.callText}>{salon.phone}</span>
-            </a>
-            <a href={cta.href} className={styles.cta}>
-              {cta.header}
-            </a>
-          </div>
+          <a href={tel} className={cx(styles.phoneChip, styles.press)} aria-label={shopCopy.callSr(salon.phone)}>
+            <PhoneIcon size={16} />
+            {salon.phone}
+          </a>
         </div>
       </header>
 
       <main>
         <section className={styles.hero}>
-          <div className={`${styles.wrap} ${styles.heroInner}`}>
-            <div className={styles.heroText}>
-              <span className={styles.status}>
-                <span className={styles.statusDot} aria-hidden="true" />
-                {signText}
-              </span>
-              <h1 className={styles.title}>{salon.name}</h1>
-              <p className={styles.lead}>{salon.description ?? copy.heroLeadFallback}</p>
-              <div className={styles.heroButtons}>
-                <a href={cta.href} className={styles.heroCta}>
-                  {!bookingOn ? <PhoneIcon /> : null}
-                  {cta.hero}
-                </a>
-                <a href="#prenota" className={styles.heroGhost}>
-                  {showPrices ? copy.seeServices : copy.seeServicesNoPrices}
-                </a>
-              </div>
-            </div>
-            <div className={styles.heroCard}>
-              {salon.area ? <span className={styles.heroCardTitle}>{salon.area}</span> : null}
-              <ul className={styles.facts}>
-                {salon.address ? (
-                  <li className={styles.fact}>
-                    <span className={styles.factIcon}>
-                      <PinIcon />
-                    </span>
-                    <span className={styles.factText}>
-                      <span className={styles.factLabel}>{copy.facts.address}</span>
-                      <span className={styles.factValue}>{salon.address}</span>
-                    </span>
-                  </li>
-                ) : null}
-                <li className={styles.fact}>
-                  <span className={styles.factIcon}>
-                    <Svg>
-                      <circle cx="12" cy="12" r="8.5" />
-                      <path d="M12 7.5V12l3 2" />
-                    </Svg>
-                  </span>
-                  <span className={styles.factText}>
-                    <span className={styles.factLabel}>{copy.facts.today}</span>
-                    <span className={styles.factValue}>{todayRanges.length ? todayRanges.map(([a, b]) => `${formatMinutes(a)}–${formatMinutes(b)}`).join(" · ") : copy.where.closed}</span>
-                  </span>
-                </li>
-                {showPrices && from !== null ? (
-                  <li className={styles.fact}>
-                    <span className={styles.factIcon}>
-                      <Svg>
-                        <path d="M3.5 12.5V5a1.5 1.5 0 0 1 1.5-1.5h7.5l8 8-9 9z" />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                      </Svg>
-                    </span>
-                    <span className={styles.factText}>
-                      <span className={styles.factLabel}>{copy.facts.prices}</span>
-                      <span className={styles.factValue}>{copy.facts.from(formatPrice(from))}</span>
-                    </span>
-                  </li>
-                ) : !showPrices && team > 0 ? (
-                  <li className={styles.fact}>
-                    <span className={styles.factIcon}>
-                      <Svg>
-                        <circle cx="12" cy="8" r="3.8" />
-                        <path d="M4.5 20c.8-4 3.8-6 7.5-6s6.7 2 7.5 6" />
-                      </Svg>
-                    </span>
-                    <span className={styles.factText}>
-                      <span className={styles.factLabel}>{copy.facts.barbers}</span>
-                      <span className={styles.factValue}>{team}</span>
-                    </span>
-                  </li>
-                ) : null}
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        {photos.length > 0 ? (
-          <section id="foto" className={`${styles.section} ${styles.gallerySection}`}>
-            <div className={styles.wrap}>
-              <div className={styles.sectionHead}>
-                <div>
-                  <span className={styles.eyebrow}>{copy.gallery.eyebrow}</span>
-                  <h2 className={styles.h2}>{copy.gallery.title}</h2>
-                </div>
-                <p className={styles.sectionNote}>{copy.gallery.note(photos.length)}</p>
-              </div>
-              <Gallery photos={photos} />
-            </div>
-          </section>
-        ) : null}
-
-        <section id="prenota" className={`${styles.section} ${styles.bookSection}`}>
           <div className={styles.wrap}>
-            <div className={styles.sectionHead}>
-              <div>
-                <span className={styles.eyebrow}>{bookingOn ? copy.booking.eyebrow : copy.phone.eyebrow}</span>
-                <h2 className={styles.h2}>{bookingOn ? copy.booking.title : copy.phone.title}</h2>
-              </div>
-              <p className={styles.sectionNote}>{bookingOn ? copy.booking.note : copy.phone.note}</p>
+            <div className={styles.heroTop}>
+              <p className={styles.crumb}>
+                <Link href="/">{copy.crumbHome}</Link>
+                {city ? (
+                  <>
+                    {" · "}
+                    <Link href={`/barbieri/${citySlug(city)}`}>{copy.crumbCity(city)}</Link>
+                  </>
+                ) : null}
+                {zone ? ` · ${zone}` : null}
+              </p>
+              {preview ? null : <ShareButton title={salon.name} className={cx(styles.ghost, styles.press)} labelClassName={styles.ghostLabel} />}
             </div>
-            {bookingOn ? (
-              <ShopBooking
-                slug={salon.slug}
-                phone={salon.phone}
-                privacyHref="/privacy"
-                services={salon.services}
-                members={salon.members.map((m) => ({ id: m.id, name: m.name }))}
-                showPrices={showPrices}
-                today={today}
-                maxAdvanceDays={salon.maxAdvanceDays}
-                week={salon.week}
-                cancelLimit={cancelLimit}
-              />
-            ) : (
-              <div className={styles.phoneBook}>
-                <section className={styles.phoneList} aria-labelledby="pb-listino">
-                  <div className={styles.phoneListHead}>
-                    <h3 className={styles.phoneListTitle} id="pb-listino">
-                      {copy.phone.list}
-                    </h3>
-                    <span className={styles.count}>{copy.phone.count(salon.services.length)}</span>
-                  </div>
-                  {salon.services.length === 0 ? <p className={styles.sectionNote}>{copy.phone.empty}</p> : null}
-                  {!showPrices && salon.services.length > 0 ? <p className={styles.sectionNote}>{copy.phone.pricesHidden}</p> : null}
-                  <ul className={styles.priceList}>
-                    {salon.services.map((s) => (
-                      <li key={s.id} className={styles.priceRow}>
-                        <span className={styles.priceText}>
-                          <span className={styles.priceName}>{s.name}</span>
-                          <span className={styles.priceMeta}>{span(s.durationMin)}</span>
-                        </span>
-                        {showPrices ? <span className={styles.priceValue}>{formatPrice(s.priceCents)}</span> : null}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-                {/* NUOVO: prenotazione al telefono, in un riquadro suo (prima riusava il piè del modulo e si deformava) */}
-                <aside className={styles.phoneCard} aria-label={copy.phone.bar}>
-                  <span className={styles.phoneIcon} aria-hidden="true">
-                    <PhoneIcon />
+            <div className={styles.head}>
+              <div className={styles.ident}>
+                {salon.logoUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={salon.logoUrl} alt={logoAlt} width={128} height={128} className={styles.logoLg} />
+                ) : (
+                  <span className={styles.initialsLg} role="img" aria-label={logoAlt}>
+                    {initials(salon.name)}
                   </span>
-                  <p className={styles.phoneOnly}>{copy.phone.only}</p>
-                  <a href={tel} className={styles.phoneNumber}>
-                    {salon.phone}
-                  </a>
-                  <a href={tel} className={styles.phoneCall}>
-                    <PhoneIcon />
-                    {copy.callToBook}
-                  </a>
-                  <p className={styles.phoneChange}>{copy.phone.change}</p>
-                </aside>
+                )}
+                <div className={styles.identText}>
+                  <span className={cx(styles.pill, pill.open && styles.pillOpen)}>
+                    <span className={styles.dot} aria-hidden="true" />
+                    {pill.text}
+                  </span>
+                  <h1 className={styles.h1}>{salon.name}</h1>
+                  {salon.description ? <p className={styles.lead}>{salon.description}</p> : null}
+                  <div className={styles.facts}>
+                    {salon.address ? (
+                      <a href="#dove" className={styles.fact}>
+                        <PinIcon />
+                        <span>
+                          <b>{salon.address}</b>
+                          {salon.know.accessNote ? <small>{salon.know.accessNote}</small> : null}
+                        </span>
+                      </a>
+                    ) : null}
+                    <a href="#dove" className={styles.fact}>
+                      <ClockIcon />
+                      <span>
+                        <b className={styles.num}>{todayLine(salon.week, weekday)}</b>
+                        <small>{closedDaysLine(salon.week)}</small>
+                      </span>
+                    </a>
+                    {team.length > 0 ? (
+                      <a href="#barbieri" className={styles.fact}>
+                        <span className={styles.faces} aria-hidden="true">
+                          {team.slice(0, 3).map((m, i) => (
+                            <i key={m.id} className={TONES[i % 3]}>
+                              {first(m.name)}
+                            </i>
+                          ))}
+                        </span>
+                        <span>
+                          <b>{barbers.count}</b>
+                          <small>{barbers.names}</small>
+                        </span>
+                      </a>
+                    ) : null}
+                  </div>
+                </div>
               </div>
-            )}
+              <div className={styles.actions}>
+                {bookingOn ? (
+                  <a href="#prenota" className={cx(styles.btnLight, styles.press)}>
+                    {shopCopy.bookOnline}
+                  </a>
+                ) : null}
+                <a href={tel} className={cx(bookingOn ? styles.btnOutline : styles.btnLight, styles.press)}>
+                  <PhoneIcon />
+                  <span className={styles.num}>{salon.phone}</span>
+                </a>
+                <a href="#dove" className={styles.directions}>
+                  <PinIcon size={16} />
+                  {copy.directions}
+                </a>
+              </div>
+            </div>
           </div>
         </section>
 
-        {team > 0 ? (
-          <section id="barbieri" className={styles.section}>
-            <div className={styles.wrap}>
-              <div className={styles.sectionHead}>
-                <div>
-                  <span className={styles.eyebrow}>{solo ? copy.team.eyebrowOne : copy.team.eyebrow}</span>
-                  <h2 className={styles.h2}>{copy.team.title}</h2>
-                </div>
-                <p className={styles.sectionNote}>{copy.team.note(team)}</p>
-              </div>
-              <ul className={`${styles.team} ${solo ? styles.teamOne : ""}`}>
-                {salon.members.map((m) => (
-                  <li key={m.id} className={styles.member}>
-                    <span className={styles.portrait} aria-hidden="true">
-                      {Array.from(m.name.trim())[0]?.toUpperCase()}
+        <div className={styles.body}>
+          <div className={cx(styles.wrap, styles.layout)}>
+            <section id="servizi" className={cx(styles.section, styles.servicesArea)} aria-labelledby="h-servizi">
+              <h2 className={styles.h2} id="h-servizi">
+                {copy.services}
+              </h2>
+              <ul className={styles.services}>
+                {salon.services.map((s) => (
+                  <li key={s.id} className={styles.service}>
+                    <span className={styles.serviceText}>
+                      <b className={styles.serviceName}>{s.name}</b>
+                      <span className={styles.serviceMeta}>{span(s.durationMin)}</span>
                     </span>
-                    <span className={styles.memberName}>{m.name}</span>
-                    {bookingOn && !solo ? (
-                      <PickBarber id={m.id} className={styles.memberLink}>
-                        {copy.team.bookWith(m.name)}
-                      </PickBarber>
+                    {salon.showPrices ? <b className={cx(styles.price, styles.num)}>{formatPrice(s.priceCents)}</b> : null}
+                    {bookingOn ? (
+                      <BookPick kind="service" id={s.id} className={cx(styles.bookBtn, styles.press)} label={copy.bookSr(s.name)}>
+                        {copy.book}
+                      </BookPick>
                     ) : null}
                   </li>
                 ))}
               </ul>
-            </div>
-          </section>
-        ) : null}
+              {!salon.showPrices && salon.services.length > 0 ? <p className={styles.note}>{copy.pricesHidden}</p> : null}
+            </section>
 
-        <section id="dove" className={`${styles.section} ${styles.whereSection}`}>
-          <div className={styles.wrap}>
-            <div className={styles.sectionHead}>
-              <div>
-                <span className={styles.eyebrow}>{copy.where.eyebrow}</span>
-                <h2 className={styles.h2}>{salon.address ?? salon.name}</h2>
+            <aside id="prenota" className={styles.bookArea} aria-label={bookingOn ? shopCopy.bookOnline : copy.phoneTitle}>
+              <div className={styles.sticky}>
+                {bookingOn ? (
+                  <ShopBooking
+                    variant="card"
+                    slug={salon.slug}
+                    phone={salon.phone}
+                    privacyHref="/privacy"
+                    services={salon.services}
+                    members={team.map((m) => ({ id: m.id, name: m.name }))}
+                    showPrices={salon.showPrices}
+                    today={today}
+                    maxAdvanceDays={salon.maxAdvanceDays}
+                    week={salon.week}
+                    cancelLimit={cancelLimit}
+                  />
+                ) : (
+                  <div className={styles.phoneCard}>
+                    <h2 className={styles.phoneTitle}>{copy.phoneTitle}</h2>
+                    <p className={styles.phoneText}>{copy.phoneText}</p>
+                    <a href={tel} className={cx(styles.btn, styles.press)}>
+                      <PhoneIcon />
+                      <span className={styles.num}>{salon.phone}</span>
+                    </a>
+                  </div>
+                )}
               </div>
-            </div>
-            <div className={styles.whereGrid}>
-              <div className={styles.mapCard}>
-                <div className={styles.map} aria-hidden="true">
-                  <span className={styles.mapPin}>
-                    <PinIcon size={22} />
-                  </span>
-                </div>
-                <div className={styles.mapBody}>
-                  <span className={styles.mapName}>{salon.name}</span>
-                  {salon.address ? <span className={styles.mapAddress}>{salon.address}</span> : null}
-                  <div className={styles.mapButtons}>
+            </aside>
+
+            <div className={styles.rest}>
+              {photos.length > 0 ? (
+                <section id="foto" className={styles.section} aria-labelledby="h-foto">
+                  <h2 className={styles.h2Gap} id="h-foto">
+                    {copy.photos}
+                  </h2>
+                  <Gallery photos={photos} />
+                </section>
+              ) : null}
+
+              {team.length > 0 ? (
+                <section id="barbieri" className={styles.section} aria-labelledby="h-barbieri">
+                  <h2 className={styles.h2Team} id="h-barbieri">
+                    {copy.team}
+                  </h2>
+                  <ul className={styles.team}>
+                    {team.map((m, i) => (
+                      <li key={m.id} className={styles.barber}>
+                        <span className={cx(styles.avatar, TONES[i % 3])} aria-hidden="true">
+                          {first(m.name)}
+                        </span>
+                        <div>
+                          <b className={styles.barberName}>{m.name}</b>
+                          {m.bio ? <span className={styles.barberBio}>{m.bio}</span> : null}
+                        </div>
+                        {bookingOn && !solo ? (
+                          <BookPick kind="barber" id={m.id} className={cx(styles.barberBtn, styles.press)}>
+                            {shopCopy.team.bookWith(m.name)}
+                          </BookPick>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {know.length > 0 ? (
+                <section id="info" className={styles.section} aria-labelledby="h-info">
+                  <h2 className={styles.h2Gap} id="h-info">
+                    {copy.know}
+                  </h2>
+                  <dl className={styles.know}>
+                    {know.map((k) => (
+                      <div key={k.label} className={styles.knowRow}>
+                        <dt>{k.label}</dt>
+                        <dd>{k.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <p className={styles.knowNote}>{copy.knowNote}</p>
+                </section>
+              ) : null}
+
+              <section id="dove" className={cx(styles.section, styles.where)} aria-labelledby="h-dove">
+                <div>
+                  <h2 className={styles.h2} id="h-dove">
+                    {copy.where}
+                  </h2>
+                  {salon.address ? <p className={styles.address}>{salon.address}</p> : null}
+                  {salon.know.accessNote ? <p className={styles.accessNote}>{salon.know.accessNote}</p> : null}
+                  <div className={styles.whereBtns}>
                     {maps ? (
-                      <a href={maps} className={styles.darkButton} target="_blank" rel="noopener noreferrer">
-                        <Svg>
-                          <path d="M14 4h6v6M20 4l-9 9" />
-                          <path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4" />
-                        </Svg>
-                        {copy.where.openMaps}
+                      <a href={maps} className={cx(styles.btn, styles.press)} target="_blank" rel="noopener noreferrer">
+                        <PinIcon />
+                        {shopCopy.where.openMaps}
                       </a>
                     ) : null}
-                    <a href={tel} className={styles.lightButton}>
+                    <a href={tel} className={cx(styles.btnLine, styles.press)}>
                       <PhoneIcon />
-                      {salon.phone}
+                      {copy.call}
                     </a>
                   </div>
                 </div>
-              </div>
-              <div className={styles.hoursCard}>
-                <div className={styles.hoursHead}>
-                  <h3 className={styles.h3}>{copy.where.hours}</h3>
-                  {sign.open ? (
-                    <span className={styles.statusSmall}>
-                      <span className={styles.statusDot} aria-hidden="true" />
-                      {copy.where.openNow}
-                    </span>
-                  ) : null}
-                </div>
-                <ul className={styles.hours}>
+                <ul className={styles.hours} aria-label={shopCopy.where.hours}>
                   {hoursLines(salon.week, weekday).map((h, i) => {
-                    const day = salon.week[[1, 2, 3, 4, 5, 6, 0][i]!]!;
-                    const ranges = rangesOf(day);
+                    const ranges = rangesOf(salon.week[[1, 2, 3, 4, 5, 6, 0][i]!]!);
                     return (
-                      <li key={h.day} className={`${styles.hoursRow} ${h.today ? styles.hoursToday : ""}`}>
-                        <span className={styles.hoursDay}>
+                      <li key={h.day} className={cx(styles.hoursRow, ranges.length === 0 && styles.hoursClosed, h.today && styles.hoursToday)}>
+                        <span>
                           {h.day}
-                          {h.today ? <span className={styles.todayBadge}>{copy.where.today}</span> : null}
+                          {h.today ? ` · ${copy.today}` : ""}
                         </span>
-                        <span className={`${styles.hoursTime} ${ranges.length === 0 ? styles.hoursClosed : ""}`}>
-                          {ranges.length === 0 ? (
-                            <span className={styles.range}>{copy.where.closed}</span>
-                          ) : (
-                            ranges.map(([a, b], k) => (
-                              <span key={a}>
-                                {k > 0 ? " " : ""}
-                                <span className={styles.range}>
-                                  {formatMinutes(a)}–{formatMinutes(b)}
-                                </span>
-                              </span>
-                            ))
-                          )}
+                        <span className={cx(styles.hoursTime, styles.num)}>
+                          {ranges.length === 0 ? shopCopy.where.closed : ranges.map(([a, b]) => `${formatMinutes(a)}–${formatMinutes(b)}`).join(" · ")}
                         </span>
                       </li>
                     );
                   })}
                 </ul>
-              </div>
+              </section>
             </div>
           </div>
-        </section>
+        </div>
       </main>
 
       <footer className={styles.footer}>
-        <div className={`${styles.wrap} ${styles.footerRow}`}>
+        <div className={cx(styles.wrap, styles.footerRow)}>
           <span className={styles.footerLinks}>
             <span>
               © {salon.name}
               {city ? ` · ${city}` : ""}
             </span>
-            <Link href="/privacy">{copy.footer.privacy}</Link>
-            <CookieConsent buttonClassName={styles.footerButton} />
+            <Link href="/privacy">{shopCopy.footer.privacy}</Link>
+            {preview ? null : <CookieConsent buttonClassName={styles.footerButton} />}
           </span>
-          <Link href="/" className={styles.powered} aria-label="Prenotazioni con Taglendo">
-            <span>{copy.footer.poweredBy}</span>
-            <Image src="/brand/taglendo-icon.svg" alt="" width={20} height={20} className={styles.poweredIcon} />
-            <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={84} height={20} style={{ width: 84, height: "auto" }} />
+          <Link href="/" className={styles.powered}>
+            <Image src="/brand/taglendo-icon.svg" alt="" width={20} height={20} />
+            {shopCopy.footer.poweredBy} Taglendo
           </Link>
         </div>
       </footer>
 
-      <div className={styles.barSpace} />
-      <BottomBar hideWhileVisible={bookingOn ? "prenota-card" : undefined}>
-        <span className={styles.barText}>
-          <span className={styles.barSub}>
-            {sign.open ? <span className={styles.statusDot} aria-hidden="true" /> : null}
-            {barSign}
+      {preview ? null : (
+        <BottomBar hideWhileVisible={bookingOn ? "prenota-card" : undefined}>
+          <span className={styles.mbookText}>
+            <b className={styles.mbookName}>{salon.name}</b>
+            <span className={styles.mbookStatus}>
+              <span className={cx(styles.dot, pill.open && styles.dotOpen)} aria-hidden="true" />
+              {pill.short}
+            </span>
           </span>
-          <span className={styles.barMain}>{bookingOn ? copy.bookOnline : copy.phone.bar}</span>
-        </span>
-        <a href={cta.href} className={styles.cta}>
-          {cta.header}
-        </a>
-      </BottomBar>
+          <a href={book} className={cx(styles.mbookBtn, styles.press)}>
+            {bookingOn ? copy.book : copy.call}
+          </a>
+        </BottomBar>
+      )}
     </div>
   );
 }

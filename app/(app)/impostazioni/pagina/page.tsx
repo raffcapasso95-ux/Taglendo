@@ -15,7 +15,7 @@ async function Content() {
   if (role !== "owner") redirect("/impostazioni");
   const supabase = await createClient();
   const [{ data: row }, { data: photos }] = await Promise.all([
-    supabase.from("salons").select("name, area, description, phone, address, slug, booking_online, show_prices, logo_path, listed, lat").eq("id", salon.id).single(),
+    supabase.from("salons").select("name, area, description, phone, address, slug, booking_online, show_prices, logo_path, listed, lat, specialties, products, access_note, payment_methods, kids_until, step_free_access").eq("id", salon.id).single(),
     supabase.from("salon_photos").select("id, path").eq("salon_id", salon.id).order("sort").order("created_at"),
   ]);
   const publicUrl = (path: string) => supabase.storage.from("salon-photos").getPublicUrl(path).data.publicUrl;
@@ -33,6 +33,14 @@ async function Content() {
         showPrices: row?.show_prices ?? true,
         listed: row?.listed ?? true,
         located: row?.lat != null,
+      }}
+      know={{
+        specialties: row?.specialties ?? "",
+        products: row?.products ?? "",
+        accessNote: row?.access_note ?? "",
+        paymentMethods: row?.payment_methods ?? [],
+        kidsUntil: row?.kids_until != null ? String(row.kids_until) : "",
+        stepFree: row?.step_free_access == null ? "" : row.step_free_access ? "si" : "no",
       }}
       photos={(photos ?? []).map((p) => ({ id: p.id, url: publicUrl(p.path) }))}
       logoUrl={salonLogoUrl(row?.logo_path)}

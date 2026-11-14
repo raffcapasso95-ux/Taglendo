@@ -37,7 +37,7 @@ test.describe("Prenotazione online", () => {
     const visitor = await browser.newPage();
     const email = uniqueEmail("cliente");
     await visitor.goto(`/${slug}`);
-    await expect(visitor.getByRole("heading", { name: "Prenota in un minuto." })).toBeVisible();
+    await expect(visitor.locator("#prenota-card")).toBeVisible();
 
     await chooseFirstSlot(visitor);
     await fillData(visitor, email);
@@ -130,8 +130,8 @@ test.describe("Prenotazione online", () => {
     await adminUpdate("salons", `slug=eq.${slug}`, { booking_online: false });
     const visitor = await browser.newPage();
     await visitor.goto(`/${slug}`);
-    await expect(visitor.getByRole("heading", { name: "Servizi e prezzi." })).toBeVisible();
-    await expect(visitor.getByRole("heading", { name: "Prenota in un minuto." })).toHaveCount(0);
+    await expect(visitor.getByRole("heading", { name: "Prenota al telefono" })).toBeVisible();
+    await expect(visitor.locator("#prenota-card")).toHaveCount(0);
     await visitor.close();
   });
 

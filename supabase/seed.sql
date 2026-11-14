@@ -72,6 +72,16 @@ values (
   now() + interval '15 days', now(), 5, 44.4912, 11.3329, 'Bologna'
 );
 
+-- «Da sapere» (ridisegno del sito): le righe che il titolare compila in Salone › Pagina del salone
+update public.salons set
+  specialties = 'Sfumature, barba con panno caldo, rasatura a mano libera',
+  payment_methods = '{contanti,carta,bancomat}',
+  products = 'Proraso, Reuzel',
+  kids_until = 12,
+  step_free_access = true,
+  access_note = '5 min da Porta Saragozza'
+where id = '5a100000-0000-4000-8000-000000000001';
+
 insert into public.email_prefs (salon_id) values ('5a100000-0000-4000-8000-000000000001');
 
 -- Orari predefiniti: mar–sab 9:00–19:00, pausa 13:00–14:30, chiuso domenica e lunedì

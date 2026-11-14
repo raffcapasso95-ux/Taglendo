@@ -86,8 +86,7 @@ test.describe("Pagina del salone: foto e varianti", () => {
     for (const [i, name] of ["uno", "due", "tre"].entries()) await adminInsert("salon_photos", { salon_id: salon!.id, path: `${salon!.id}/${name}.jpg`, sort: i });
     await page.goto(`/${salon!.slug}`);
     await rejectCookies(page);
-    await expect(page.getByRole("heading", { name: "Dentro la barberia." })).toBeVisible();
-    await expect(page.getByText("3 foto · tocca per ingrandire")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Foto", exact: true })).toBeVisible();
     await page.getByRole("button", { name: /^Apri la foto 1 di 3/ }).click();
     const viewer = page.getByRole("dialog", { name: "Foto del salone" });
     await expect(viewer).toBeVisible();
@@ -109,6 +108,5 @@ test.describe("Pagina del salone: foto e varianti", () => {
     await expect(page.getByRole("link", { name: /^Prenota con/ })).toHaveCount(0);
     await card(page).getByRole("button", { name: /^Taglio uomo/ }).click();
     await expect(card(page).getByRole("heading", { name: "Quando vieni?" })).toBeVisible();
-    await expect(page.getByText("Il barbiere", { exact: true })).toBeVisible();
   });
 });
