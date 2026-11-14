@@ -5,7 +5,7 @@ const BOLOGNA = [44.4949, 11.3426] as const;
 type Row = { slug: string; distance_km: number; price_from_cents: number | null; services: Array<{ name: string; duration_min: number; price_cents: number | null }>; next_slots: string[] | null; city: string };
 
 const search = (tx: Tx, lat: number, lng: number, radius = 30) =>
-  tx.q<Row>(`select slug, distance_km, price_from_cents, services, next_slots, city from find_salons($1, $2, $3)`, [lat, lng, radius]);
+  tx.q<Row>(`select slug, distance_km, price_from_cents, services, next_slots, city from find_salons($1, $2, $3, 40, null, null)`, [lat, lng, radius]);
 
 /** Un salone di prova pronto per la ricerca, a Modena. */
 async function listedSalon(tx: Tx) {
@@ -85,14 +85,14 @@ describe("ricerca dei saloni", () => {
     await inTx(async (tx) => {
       await listedSalon(tx);
       await tx.as(null);
-      expect(await tx.error(`select * from find_salons(120, 11, 30)`, [])).toBe("22023");
-      expect(await tx.error(`select * from find_salons(44, 11, 5000)`, [])).toBe("22023");
+      expect(await tx.error(`select * from find_salons(120, 11, 30, 40, null, null)`, [])).toBe("22023");
+      expect(await tx.error(`select * from find_salons(44, 11, 5000, 40, null, null)`, [])).toBe("22023");
       const cities = await tx.q<{ city: string; salons: number }>(`select city, salons from salon_cities()`);
       expect(cities.map((c) => c.city)).toEqual(expect.arrayContaining(["Bologna", "Modena"]));
-      // gli ultimi arrivati: prima chi ha una foto
+      // gli ultimi arrivati: solo in ordine di arrivo, anche se il più recente non ha foto
       const recent = (await tx.q<{ slug: string }>(`select slug from recent_salons(24)`)).map((r) => r.slug);
       expect(recent).toContain("salone-di-prova");
-      expect(recent.indexOf("barberia-saragozza")).toBeLessThan(recent.indexOf("salone-di-prova"));
+      expect(recent.indexOf("salone-di-prova")).toBeLessThan(recent.indexOf("barberia-saragozza"));
     });
   });
 
@@ -148,6 +148,132 @@ describe("ricerca per servizio e data", () => {
       await tx.as(null);
       const names = await tx.q<{ name: string }>(`select name from service_names(12)`);
       expect(names.length).toBeGreaterThan(0);
+    });
+  });
+});
+
+describe("ricerca con i filtri (ridisegno del sito)", () => {
+  type F = { slug: string; next_slots: string[] | null; open_now: boolean; closes_min: number | null; is_new: boolean; barbers: number; services: Array<{ name: string }> };
+  const filtered = (tx: Tx, filters: object, radius = 30) =>
+    tx.q<F>(
+      `select slug, next_slots, open_now, closes_min, is_new, barbers, services from find_salons(44.4949, 11.3426, $1, 40, null, null, $2::jsonb)`,
+      [radius, JSON.stringify(filters)],
+    );
+  const demoIn = async (tx: Tx, filters: object) => (await filtered(tx, filters)).find((r) => r.slug === "barberia-saragozza");
+
+  it("senza filtri restituisce anche aperto ora, nuovo e numero di barbieri", async () => {
+    await inTx(async (tx) => {
+      await tx.as(null);
+      const demo = await demoIn(tx, {});
+      expect(demo).toBeDefined();
+      expect(typeof demo!.open_now).toBe("boolean");
+      expect(demo!.open_now).toBe(demo!.closes_min !== null);
+      expect(demo!.barbers).toBeGreaterThan(0);
+    });
+  });
+
+  it("servizi: tutti quelli scelti devono esserci; i servizi trovati vanno in testa", async () => {
+    await inTx(async (tx) => {
+      await tx.as(null);
+      const barba = await demoIn(tx, { services: ["Barba"] });
+      expect(barba!.services[0]!.name.toLowerCase()).toContain("barba");
+      expect(await demoIn(tx, { services: ["barba", "permanente"] })).toBeUndefined();
+    });
+  });
+
+  it("aperto ora segue gli orari e le chiusure di tutto il salone", async () => {
+    await inTx(async (tx) => {
+      await tx.asAdmin();
+      // il salone aperto tutto il giorno, ogni giorno
+      await tx.q(`update opening_hours set closed = false where salon_id = $1`, [SALON]);
+      await tx.q(`delete from opening_ranges where salon_id = $1`, [SALON]);
+      await tx.q(`insert into opening_ranges (salon_id, weekday, start_min, end_min) select $1, d, 0, 1440 from generate_series(0, 6) d`, [SALON]);
+      await tx.as(null);
+      expect((await demoIn(tx, { open_now: true }))?.closes_min).toBe(1440);
+      await tx.asAdmin();
+      await tx.q(`insert into closures (salon_id, starts_on, ends_on) values ($1, (now() at time zone 'Europe/Rome')::date, (now() at time zone 'Europe/Rome')::date)`, [SALON]);
+      await tx.as(null);
+      expect(await demoIn(tx, { open_now: true })).toBeUndefined();
+      expect((await demoIn(tx, {}))!.open_now).toBe(false);
+    });
+  });
+
+  it("fascia oraria e liberi oggi: solo orari in quella fascia, o di oggi", async () => {
+    await inTx(async (tx) => {
+      await tx.as(null);
+      for (const [band, lo, hi] of [["mattina", 0, 780], ["pomeriggio", 780, 1080], ["sera", 1080, 1440]] as const) {
+        const r = await demoIn(tx, { band });
+        if (!r) continue; // nessun posto in quella fascia nei prossimi 7 giorni: il salone non compare
+        const mins = await tx.q<{ m: number }>(
+          `select (extract(hour from t at time zone 'Europe/Rome') * 60 + extract(minute from t at time zone 'Europe/Rome'))::int as m from unnest($1::timestamptz[]) t`,
+          [r.next_slots],
+        );
+        expect(mins.every((x) => x.m >= lo && x.m < hi), band).toBe(true);
+      }
+      const today = await demoIn(tx, { free_today: true });
+      if (today) {
+        const days = await tx.q<{ d: boolean }>(`select bool_and((t at time zone 'Europe/Rome')::date = (now() at time zone 'Europe/Rome')::date) as d from unnest($1::timestamptz[]) t`, [today.next_slots]);
+        expect(days[0]!.d).toBe(true);
+      }
+    });
+  });
+
+  it("nuovi: solo i saloni arrivati da 30 giorni o meno; ordinamento per primo orario", async () => {
+    await inTx(async (tx) => {
+      await tx.asAdmin();
+      await tx.q(`update salons set created_at = now() - interval '40 days' where id = $1`, [SALON]);
+      await tx.as(null);
+      expect(await demoIn(tx, { is_new: true })).toBeUndefined();
+      expect((await demoIn(tx, {}))!.is_new).toBe(false);
+      const first = await filtered(tx, { sort: "first" }, 300);
+      const firsts = first.map((r) => r.next_slots?.[0] ?? "9999");
+      expect([...firsts].sort()).toEqual(firsts);
+    });
+  });
+
+  it("filtri non validi: errore", async () => {
+    await inTx(async (tx) => {
+      await tx.as(null);
+      for (const f of [{ band: "notte" }, { sort: "prezzo" }, { services: Array(9).fill("x").map((x, i) => x + i) }, [1]]) {
+        expect(await tx.error(`select * from find_salons(44.4, 11.3, 30, 40, null, null, $1::jsonb)`, [JSON.stringify(f)]), JSON.stringify(f)).toBe("22023");
+      }
+    });
+  });
+
+  it("città: barberie e quante hanno posto oggi e domani; gli ultimi arrivati con il primo posto di oggi", async () => {
+    await inTx(async (tx) => {
+      await tx.as(null);
+      const cities = await tx.q<{ city: string; salons: number; free_today: number; free_tomorrow: number }>(`select * from city_stats(12)`);
+      const bo = cities.find((c) => c.city === "Bologna")!;
+      expect(bo.salons).toBeGreaterThan(0);
+      expect(bo.free_today).toBeLessThanOrEqual(bo.salons);
+      expect(bo.free_tomorrow).toBeLessThanOrEqual(bo.salons);
+      const [r] = (await tx.q<{ slug: string; barbers: number; address: string }>(`select slug, barbers, address from recent_salons(24)`)).filter((x) => x.slug === "barberia-saragozza");
+      expect(r!.barbers).toBeGreaterThan(0);
+      expect(r!.address).toBeTruthy();
+    });
+  });
+});
+
+describe("«Da sapere» del salone", () => {
+  it("lo scrive solo il titolare, con valori controllati; la pagina pubblica lo mostra", async () => {
+    await inTx(async (tx) => {
+      const s = await createTestSalon(tx);
+      await tx.as(s.userId);
+      await tx.q(
+        `update salons set specialties = 'Sfumature', payment_methods = '{contanti,carta}', products = 'Proraso', kids_until = 12, step_free_access = true, access_note = '3 min dalla stazione' where id = $1`,
+        [s.salonId],
+      );
+      expect(await tx.error(`update salons set payment_methods = '{assegni}' where id = $1`, [s.salonId])).toBe("23514");
+      expect(await tx.error(`update salons set access_note = repeat('x', 61) where id = $1`, [s.salonId])).toBe("23514");
+      // un altro salone non lo tocca
+      await tx.q(`update salons set specialties = 'altro' where id = $1`, [SALON]);
+      await tx.as(null);
+      const [{ p }] = (await tx.q<{ p: Record<string, unknown> }>(`select public_salon('salone-di-prova') as p`)) as [{ p: Record<string, unknown> }];
+      expect(p).toMatchObject({ specialties: "Sfumature", payment_methods: ["contanti", "carta"], products: "Proraso", kids_until: 12, step_free_access: true, access_note: "3 min dalla stazione" });
+      await tx.asAdmin();
+      const [demo] = await tx.q<{ specialties: string | null }>(`select specialties from salons where id = $1`, [SALON]);
+      expect(demo!.specialties).not.toBe("altro");
     });
   });
 });
