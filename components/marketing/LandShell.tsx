@@ -79,15 +79,14 @@ export function LandShell({ audience, solid = false, children }: { audience: Aud
             )}
             {audience === "saloni" ? <span className={styles.logoTag}>{site.businessTag}</span> : null}
           </Link>
-          <nav className={styles.nav} aria-label="Sezioni">
+          <nav className={styles.nav} aria-label={audience === "clienti" ? site.servicesLabel : "Sezioni"}>
             {audience === "clienti" ? (
               <>
-                <Link href="/cerca" className={styles.navLink}>
-                  {site.search}
-                </Link>
-                <Link href="/#citta" className={styles.navLink}>
-                  {site.cities}
-                </Link>
+                {site.services.map((v) => (
+                  <Link key={v.name} href={`/cerca?servizio=${encodeURIComponent(v.query)}`} className={styles.navLink}>
+                    {v.name}
+                  </Link>
+                ))}
               </>
             ) : (
               <>

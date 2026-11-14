@@ -1,31 +1,36 @@
 import Link from "next/link";
+import { cx } from "@/components/ui/cx";
 import { searchCopy } from "@/lib/copy/search";
-import { formatPrice } from "@/lib/dates/format";
-import { citySlug, distanceLabel } from "@/lib/places/comuni";
-import type { CityCount, SalonHit, SearchResult } from "@/lib/search/load";
-import { RADIUS_KM } from "@/lib/search/rules";
-import { resultsTitle, slotChips, type SearchFilters } from "@/lib/search/rules";
 import { romeDate } from "@/lib/dates/rome";
+import { formatPrice } from "@/lib/dates/format";
+import { citySlug } from "@/lib/places/comuni";
+import type { CityCount, SalonHit, SearchResult } from "@/lib/search/load";
+import { activeTags, clockLabel, kmLabel, pinLabel, resetFilters, resultsTitle, searchHref, slotChips, type SearchFilters } from "@/lib/search/rules";
+import { FilterBar, type Base } from "./FilterBar";
 import { Results } from "./Results";
 import { SearchBox } from "./SearchBox";
 import type { SalonView } from "./types";
-import styles from "./Search.module.css";
+import styles from "./Cerca.module.css";
 
 const copy = searchCopy;
 
 export const toView = (h: SalonHit, now: Date): SalonView => ({
   slug: h.slug,
   name: h.name,
-  where: h.area || h.address || h.city || "",
+  where: h.address || h.area || h.city || "",
   lat: h.lat,
   lng: h.lng,
   coverUrl: h.coverUrl,
   logoUrl: h.logoUrl,
-  distance: distanceLabel(h.distanceKm),
-  price: h.priceFromCents !== null ? copy.card.from(formatPrice(h.priceFromCents)) : null,
-  services: h.services.map((x) => ({ name: x.name, duration: `${x.durationMin} min`, price: x.priceCents !== null ? formatPrice(x.priceCents) : null })),
+  distance: kmLabel(h.distanceKm),
+  services: h.services.map((x) => ({ name: x.name, price: x.priceCents !== null ? formatPrice(x.priceCents) : null })),
   ...(({ day, chips }) => ({ slotDay: day, slots: chips }))(slotChips(h.nextSlots, now)),
+  pin: h.nextSlots[0] ? pinLabel(h.nextSlots[0], now) : null,
   bookingOnline: h.bookingOnline,
+  open: h.openNow,
+  closes: h.openNow && h.closesMin !== null ? clockLabel(h.closesMin) : null,
+  isNew: h.isNew,
+  barbers: h.barbers,
 });
 
 export function CityLinks({ cities }: { cities: CityCount[] }) {
@@ -44,66 +49,127 @@ export function CityLinks({ cities }: { cities: CityCount[] }) {
   );
 }
 
-/** NUOVO: la pagina dei risultati, usata da /cerca e dalle pagine per città. */
+/** Da dove si parte per cambiare i filtri: il luogo cercato, come sta nell'indirizzo. */
+export function baseOf(result: SearchResult, typed: string): Base {
+  if (result.kind !== "ok") return typed ? { dove: typed } : {};
+  return result.near ? { lat: result.center.lat, lng: result.center.lng } : { dove: result.place ?? typed };
+}
+
+const hrefFor = (base: Base, f: SearchFilters) => searchHref({ ...base, ...f, servizio: f.service, data: f.date });
+
+/** La pagina dei risultati, usata da /cerca e dalle pagine per città: fascia di ricerca, filtri, elenco e mappa. */
 export function SearchPage({ result, cities, services, typed, filters }: { result: SearchResult; cities: CityCount[]; services: string[]; typed: string; filters: SearchFilters }) {
   const now = new Date();
   const today = romeDate(now);
   const ok = result.kind === "ok" ? result : null;
   const place = ok?.place ?? "";
+  const base = baseOf(result, typed);
   const title = !ok ? copy.results.headingEmpty : resultsTitle({ place: ok.place, near: ok.near, service: filters.service, date: filters.date, today });
   const filtered = Boolean(filters.service || filters.date);
+  const tags = activeTags(filters);
+  const count = ok?.hits.length ?? 0;
 
   return (
-    <div className={styles.page}>
-      <div className={styles.searchRow}>
-        <SearchBox initial={ok && !ok.near ? place : typed} service={filters.service ?? ""} date={filters.date} services={services} compact />
-      </div>
-      <h1 className={styles.title}>{title}</h1>
+    <div className={cx(styles.page, count > 0 && styles.pageFixed)}>
+      <section className={styles.band} aria-label={copy.results.searchLabel}>
+        <div className={styles.bandTop}>
+          <div className={styles.titleBlock}>
+            <p className={styles.crumb}>
+              <Link href="/">{copy.results.crumbHome}</Link> · <Link href="/cerca">{copy.results.crumbBarbers}</Link>
+              {place ? ` · ${place}` : ""}
+            </p>
+            <h1 className={styles.title}>{title}</h1>
+          </div>
+          <div className={styles.searchSlot}>
+            <SearchBox initial={ok && !ok.near ? place : typed} service={filters.service ?? ""} date={filters.date} services={services} compact submitLabel={copy.results.update} />
+          </div>
+        </div>
+        {ok ? <FilterBar base={base} filters={filters} count={count} /> : null}
+      </section>
 
       {result.kind === "none" && filtered ? (
-        <p className={styles.notice} role="status">
-          {copy.results.needPlace}
-        </p>
-      ) : null}
-
-      {result.kind === "unknown" ? (
-        <p className={styles.notice} role="status">
-          {copy.results.unknown(result.text)}
-        </p>
-      ) : null}
-
-      {ok && ok.hits.length > 0 ? (
-        <>
-          {ok.widened ? (
-            <p className={styles.notice} role="status">
-              {copy.results.wider(RADIUS_KM, place || "te")}
-            </p>
-          ) : null}
-          <Results salons={ok.hits.map((h) => toView(h, now))} center={ok.center} summary={`${copy.results.count(ok.hits.length, ok.radiusKm)} · ${copy.results.sorted}`} />
-        </>
-      ) : null}
-
-      {ok && ok.hits.length === 0 ? (
-        <div className={styles.empty}>
-          <p className={styles.emptyTitle}>{filtered ? copy.results.noneFiltered(place || "te") : copy.results.none(place || "te")}</p>
-          <p className={styles.emptyText}>{filtered ? copy.results.noneFilteredHint : copy.results.noneHint}</p>
-          <Link href="/per-i-saloni" className={styles.link}>
-            {copy.results.owner}
-          </Link>
+        <div className={styles.plain}>
+          <p className={styles.notice} role="status">
+            {copy.results.needPlace}
+          </p>
         </div>
       ) : null}
 
-      {!ok || ok.hits.length === 0 ? (
-        <section aria-labelledby="citta-t" className={styles.citiesBlock}>
-          {cities.length > 0 ? (
+      {result.kind === "unknown" ? (
+        <div className={styles.plain}>
+          <p className={styles.notice} role="status">
+            {copy.results.unknown(result.text)}
+          </p>
+        </div>
+      ) : null}
+
+      {ok && ok.hits.length > 0 ? (
+        <Results
+          salons={ok.hits.map((h) => toView(h, now))}
+          center={ok.center}
+          radiusKm={ok.radiusKm}
+          near={ok.near}
+          filters={filters}
+          summary={
             <>
-              <h2 id="citta-t" className={styles.emptyTitle}>
-                {copy.home.citiesTitle}
-              </h2>
-              <CityLinks cities={cities} />
+              <p className={styles.summaryText}>
+                <strong className={styles.num}>{ok.hits.length}</strong> {copy.results.count(ok.hits.length, ok.radiusKm)}
+                {ok.widened ? ` · ${copy.results.wider(30, place || "te")}` : ""}
+              </p>
+              {tags.length > 0 ? (
+                <ul className={styles.tags} aria-label={copy.filters.active}>
+                  {tags.map((t) => (
+                    <li key={t.id}>
+                      <Link href={hrefFor(base, t.off)} className={styles.tag} aria-label={copy.filters.remove(t.label)} scroll={false} replace>
+                        {t.label}
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                          <path d="M6 6l12 12M18 6 6 18" />
+                        </svg>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </>
-          ) : null}
-        </section>
+          }
+        />
+      ) : null}
+
+      {ok && ok.hits.length === 0 ? (
+        <div className={styles.plain}>
+          {tags.length > 0 ? (
+            <div className={styles.empty}>
+              <p className={styles.emptyTitle}>{copy.results.emptyFiltered}</p>
+              <p className={styles.emptyText}>{copy.results.emptyFilteredHint}</p>
+              <Link href={hrefFor(base, resetFilters(filters))} className={styles.btnLine} scroll={false} replace>
+                {copy.results.resetFilters}
+              </Link>
+            </div>
+          ) : (
+            <div className={styles.empty}>
+              <p className={styles.emptyTitle}>{filtered ? copy.results.noneFiltered(place || "te") : copy.results.none(place || "te")}</p>
+              <p className={styles.emptyText}>{filtered ? copy.results.noneFilteredHint : copy.results.noneHint}</p>
+              <Link href="/per-i-saloni" className={styles.link}>
+                {copy.results.owner}
+              </Link>
+            </div>
+          )}
+        </div>
+      ) : null}
+
+      {(!ok || ok.hits.length === 0) && tags.length === 0 ? (
+        <div className={styles.plain}>
+          <section aria-labelledby="citta-t" className={styles.citiesBlock}>
+            {cities.length > 0 ? (
+              <>
+                <h2 id="citta-t" className={styles.emptyTitle}>
+                  {copy.home.citiesTitle}
+                </h2>
+                <CityLinks cities={cities} />
+              </>
+            ) : null}
+          </section>
+        </div>
       ) : null}
     </div>
   );
@@ -113,12 +179,20 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
 export function SearchSkeleton() {
   return (
     <div className={styles.page} aria-busy="true">
-      <div className={styles.searchRow}>
-        <SearchBox services={[]} compact />
+      <section className={styles.band} aria-label={copy.results.searchLabel}>
+        <div className={styles.bandTop}>
+          <div className={styles.titleBlock}>
+            <h1 className={styles.title}>{copy.results.headingEmpty}</h1>
+          </div>
+          <div className={styles.searchSlot}>
+            <SearchBox services={[]} compact submitLabel={copy.results.update} />
+          </div>
+        </div>
+      </section>
+      <div className={styles.plain}>
+        <div className={styles.skeleton} aria-hidden="true" />
+        <div className={styles.skeleton} aria-hidden="true" />
       </div>
-      <h1 className={styles.title}>{copy.results.headingEmpty}</h1>
-      <div className={styles.skeleton} aria-hidden="true" />
-      <div className={styles.skeleton} aria-hidden="true" />
     </div>
   );
 }

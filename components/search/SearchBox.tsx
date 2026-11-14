@@ -81,6 +81,7 @@ export function SearchBox({
   services = [],
   tone = "light",
   compact = false,
+  submitLabel,
 }: {
   initial?: string;
   service?: string;
@@ -88,6 +89,8 @@ export function SearchBox({
   services?: readonly string[];
   tone?: "light" | "dark";
   compact?: boolean;
+  /** Il testo del pulsante (nei risultati: «Aggiorna»). */
+  submitLabel?: string;
 }) {
   const router = useRouter();
   const id = useId();
@@ -423,7 +426,7 @@ export function SearchBox({
 
         <button type="submit" className={styles.submit}>
           <SearchIcon />
-          <span>{copy.submit}</span>
+          <span>{submitLabel ?? copy.submit}</span>
         </button>
       </form>
       {missing ? (

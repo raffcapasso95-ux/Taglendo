@@ -300,3 +300,18 @@
   --site-h2-section: 30px;
   --site-h2-phone: 26px;
 }
+
+/* Ridisegno del sito — elenco e mappa (Cerca.dc.html) */
+:root {
+  --site-top: 68px;                             /* altezza della testata fissa */
+  --shadow-pin: 0 6px 16px rgba(62, 37, 50, .22);
+  --shadow-map-card: 0 16px 40px rgba(62, 37, 50, .22);
+  --shadow-search: 0 6px 20px rgba(62, 37, 50, .08);
+  --shadow-popover: 0 24px 60px rgba(62, 37, 50, .2);
+  --shadow-ctl: 0 4px 12px rgba(62, 37, 50, .15);
+  --shadow-selected: 0 10px 30px rgba(62, 37, 50, .12);
+  --map-overlay-bg: rgba(255, 255, 255, .92);
+  --zone-fill: rgba(242, 140, 111, .08);
+  --zone-line: rgba(242, 140, 111, .5);
+  --duration-pop: 200ms;
+}
