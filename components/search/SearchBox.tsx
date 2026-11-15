@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { MonthCalendar } from "@/components/agenda/MonthCalendar";
 import { cx } from "@/components/ui/cx";
 import { searchCopy } from "@/lib/copy/search";
 import { addDays, romeDate } from "@/lib/dates/rome";
@@ -101,6 +102,7 @@ export function SearchBox({
   const root = useRef<HTMLFormElement>(null);
   const placeInput = useRef<HTMLInputElement>(null);
   const [panel, setPanel] = useState<Panel>(null);
+  const [otherOpen, setOtherOpen] = useState(false);
   const [service, setService] = useState(initialService);
   const [place, setPlace] = useState(initial);
   const [date, setDate] = useState<string | null>(initialDate);
@@ -406,19 +408,28 @@ export function SearchBox({
                   );
                 })}
               </div>
-              <label className={styles.dayOther}>
+              <button type="button" className={styles.dayOther} aria-expanded={otherOpen} onClick={() => setOtherOpen(!otherOpen)}>
                 <span>{copy.otherDay}</span>
-                <input
-                  type="date"
-                  min={today ?? undefined}
-                  max={today ? addDays(today, MAX_DAYS_AHEAD) : undefined}
-                  value={date ?? ""}
-                  onChange={(e) => {
-                    setDate(e.target.value || null);
-                    if (e.target.value) setPanel(null);
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ transform: otherOpen ? "rotate(180deg)" : undefined }}>
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+              {otherOpen && today ? (
+                <MonthCalendar
+                  mode="agenda"
+                  plain
+                  heading="h4"
+                  today={today}
+                  selected={date}
+                  minDate={today}
+                  maxDate={addDays(today, MAX_DAYS_AHEAD)}
+                  onSelect={(d) => {
+                    setDate(d);
+                    setOtherOpen(false);
+                    setPanel(null);
                   }}
                 />
-              </label>
+              ) : null}
             </div>
           }
         >
