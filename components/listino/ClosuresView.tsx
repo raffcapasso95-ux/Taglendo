@@ -262,14 +262,18 @@ function ClosureDialog({ closure, today, operators, startFor, onClose, onDone, o
             {error}
           </div>
         ) : null}
-        <div className={dialog.pair}>
-          <label className={dialog.hint}>
-            <span className={dialog.sectionTitle}>{copy.from}</span>
-            <input type="date" className={dialog.dateInput} value={from} onChange={(e) => { setFrom(e.target.value); if (e.target.value > to) setTo(e.target.value); }} />
+        <div className={styles.dates}>
+          <label className={styles.dateField}>
+            <span className={styles.dateLabel}>{copy.from}</span>
+            <span className={styles.dateBox}>
+              <input type="date" className={styles.dateInput} value={from} onChange={(e) => { setFrom(e.target.value); if (e.target.value > to) setTo(e.target.value); }} />
+            </span>
           </label>
-          <label className={dialog.hint}>
-            <span className={dialog.sectionTitle}>{copy.to}</span>
-            <input type="date" className={dialog.dateInput} min={from} value={to} onChange={(e) => setTo(e.target.value)} />
+          <label className={styles.dateField}>
+            <span className={styles.dateLabel}>{copy.to}</span>
+            <span className={styles.dateBox}>
+              <input type="date" className={styles.dateInput} min={from} value={to} onChange={(e) => setTo(e.target.value)} />
+            </span>
           </label>
         </div>
         <section className={dialog.section}>
