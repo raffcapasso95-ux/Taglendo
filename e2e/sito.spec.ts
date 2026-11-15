@@ -25,7 +25,7 @@ test.describe("Sito commerciale", () => {
     await page.goto("/per-i-saloni");
     const costo = page.locator("#costo");
     await costo.scrollIntoViewIfNeeded();
-    await expect(costo.getByLabel("Zero euro")).toBeVisible();
+    await expect(costo.getByText("Zero euro")).toBeAttached(); // per i lettori di schermo; a vista c'è il contatore
     await expect(costo.getByText("Gratis durante la beta, con tutte le funzioni.")).toBeVisible();
     for (const [name, value] of [["Agenda per tutte le poltrone", "inclusa"], ["Fino a 3 barbieri", "inclusi"], ["Commissioni", "0 €"], ["Carta di credito", "non serve"]]) {
       await expect(costo.getByRole("listitem").filter({ hasText: name })).toContainText(value!);
@@ -88,6 +88,37 @@ test.describe("Sito commerciale", () => {
       await expect.poll(() => section.locator("[class*=hl]").first().evaluate((el) => Math.round(el.getBoundingClientRect().width))).toBeGreaterThan(100);
     }
     await expect(section.getByRole("link", { name: "Tutte le funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
+  });
+
+  test("Funzioni: la pagina nuova, con le email vere, i permessi e cosa Taglendo non fa", async ({ page, isMobile }) => {
+    await page.goto("/per-i-saloni/funzioni");
+    await expect(page).toHaveTitle("Funzioni · Taglendo per i saloni");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tutto quello che c’è dentro Taglendo.");
+    // la voce «Funzioni» della testata è quella corrente (il menu delle sezioni c'è solo da computer)
+    if (!isMobile) await expect(page.getByRole("banner").getByRole("link", { name: "Funzioni" })).toHaveAttribute("aria-current", "page");
+    // la barra delle sezioni porta alle quattro aree e alle domande
+    const nav = page.getByRole("navigation", { name: "Sezioni della pagina" });
+    for (const [label, id] of [["Agenda", "agenda"], ["La tua pagina", "pagina"], ["Prenotazioni", "prenotazioni"], ["Il tuo team", "team"], ["Tutto il resto", "tutto"], ["Cosa non fa", "nonfa"]]) {
+      await expect(nav.getByRole("link", { name: label })).toHaveAttribute("href", `#${id}`);
+      await expect(page.locator(`#${id}`)).toBeAttached();
+    }
+    // le email sono quelle vere dell'app
+    const mails = page.getByRole("list", { name: "Le email che partono da sole" });
+    await expect(mails.getByText("Il tuo codice: 482 913")).toBeVisible();
+    await expect(mails.getByText("Confermato: sabato 14 novembre alle 9:30")).toBeVisible();
+    await expect(mails.getByText("Nuova prenotazione: Gianni Ferraro · sab 9:30")).toBeVisible();
+    await expect(mails.getByText("Domani alle 9:30 da Barberia Porta Nuova")).toBeVisible();
+    // chi può fare cosa
+    const table = page.getByRole("table", { name: "Cosa può fare chi" });
+    await expect(table.getByRole("row", { name: /Cambia listino, orari e regole/ })).toContainText("no");
+    await expect(table.getByRole("row", { name: /Vede l’agenda di tutti/ })).toContainText("se lo attivi");
+    // le domande sulle impostazioni (la prima è aperta) e cosa non fa
+    await expect(page.getByText(/Scegli il preavviso minimo: 30 minuti, 2 ore o il giorno prima/)).toBeVisible();
+    await page.getByText("Posso nascondere i prezzi?").click();
+    await expect(page.getByText(/La pagina mostra servizi e durate senza prezzi/)).toBeVisible();
+    for (const item of ["Pagamenti online", "SMS", "Un’app da scaricare", "Catene e grandi saloni"]) await expect(page.locator("#nonfa").getByText(item, { exact: true })).toBeVisible();
+    await page.locator("#inizia").getByRole("link", { name: "Prova gratis" }).click();
+    await expect(page).toHaveURL(/\/registrati/);
   });
 
   test("chi ha già una sessione trova il suo tondo con il menu dell'account", async ({ page }) => {
@@ -168,6 +199,7 @@ test.describe("Sito commerciale", () => {
     expect(xml).toContain("/privacy</loc>");
     expect(xml).toContain("/barberia-saragozza</loc>");
     expect(xml).toContain("/per-i-saloni</loc>");
+    expect(xml).toContain("/per-i-saloni/funzioni</loc>");
     expect(xml).toContain("/barbieri/bologna</loc>");
     expect(xml).not.toContain("/agenda");
     const robots = await (await request.get("/robots.txt")).text();

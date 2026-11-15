@@ -7,7 +7,8 @@ I codici si riferiscono a `design/Schermate mancanti.dc.html`. `-D` indica la ve
 |---|---|
 | `/` | NUOVO: home per i clienti con la ricerca dei saloni (vedi `docs/ricerca-saloni.md`) |
 | `/cerca`, `/barbieri/[città]` | NUOVO: elenco dei saloni con mappa |
-| `/per-i-saloni` | Ridisegno: `home` (apertura con telefono animato, nastro, «Pronto in 3 passi», Prima e dopo, Cosa cambia, online/telefono, Listino Taglendo, domande, chiusura, piè di pagina nuovo). Le altre pagine del sito (privacy, termini, cookie) hanno ancora testata e piè di pagina precedenti |
+| `/per-i-saloni` | Ridisegno novembre 2026 (`design/ridisegno-sito-2026-11`): apertura con telefono e avviso animato, «Una giornata qualunque», «Pronto in tre passi» con schermate vere, «La pagina della tua barberia» (la pagina del salone vera in una finestra), «Il quaderno, e poi Taglendo», «Quanto costa?» (29 → 0 €), domande, chiusura. Niente ticker, interruttore clienti/saloni né piani a pagamento |
+| `/per-i-saloni/funzioni` | **Nuova.** Tutto quello che c'è dentro Taglendo: agenda, la tua pagina, prenotazioni (con le email vere), il tuo team (chi può fare cosa), domande sulle impostazioni, cosa Taglendo non fa. Testata chiara |
 | `/privacy` | G1 |
 | `/termini` | G4 |
 | `/cookie` | G5 |

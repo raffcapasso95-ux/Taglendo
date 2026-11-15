@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 /** Giro di controllo del sito pubblico e delle pagine d'accesso: nessun errore, nessuno scorrimento laterale, tocchi comodi. */
-const PAGES = ["/", "/registrati", "/accedi", "/password", "/privacy", "/termini", "/cookie", "/barberia-saragozza"];
+const PAGES = ["/", "/per-i-saloni", "/per-i-saloni/funzioni", "/cerca?dove=Bologna", "/registrati", "/accedi", "/password", "/privacy", "/termini", "/cookie", "/barberia-saragozza"];
 
 test.describe("Sito pubblico", () => {
   for (const path of PAGES) {
@@ -72,7 +72,7 @@ test.describe("Sito pubblico sul telefono", () => {
 
   test("a 320 px niente scorre di lato: home, accesso e pagina del salone", async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 700 });
-    for (const path of ["/", "/per-i-saloni", "/cerca?dove=Bologna", "/accedi", "/registrati", "/barberia-saragozza"]) {
+    for (const path of ["/", "/per-i-saloni", "/per-i-saloni/funzioni", "/cerca?dove=Bologna", "/accedi", "/registrati", "/barberia-saragozza"]) {
       await page.goto(path, { waitUntil: "networkidle" });
       expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), path).toBeLessThanOrEqual(0);
     }

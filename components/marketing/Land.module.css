@@ -1910,3 +1910,13 @@
   border-color: var(--on-plum-dim);
   color: var(--brand-cream);
 }
+
+/* la voce della pagina in cui si è */
+.page .navLink[aria-current="page"] {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+.header[data-tone="light"] .logoTag {
+  color: var(--text-secondary);
+}

@@ -89,28 +89,27 @@ export function PagePreview({ children, host }: { children: ReactNode; host: str
 
   return (
     <div className={styles.pgrid}>
-      <ol className={styles.pfeat} role="tablist" aria-label={copy.tabs}>
+      <div className={styles.pfeat} role="tablist" aria-label={copy.tabs}>
         {copy.features.map((f, n) => (
-          <li key={f.title}>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={i === n}
-              className={cx(styles.pbtn, i === n && styles.pbtnOn)}
-              onClick={() => {
-                setStopped(true);
-                setI(n);
-              }}
-            >
-              <span className={styles.pn}>{n + 1}</span>
-              <span>
-                <b>{f.title}</b>
-                <span className={styles.pd}>{f.text}</span>
-              </span>
-            </button>
-          </li>
+          <button
+            key={f.title}
+            type="button"
+            role="tab"
+            aria-selected={i === n}
+            className={cx(styles.pbtn, i === n && styles.pbtnOn)}
+            onClick={() => {
+              setStopped(true);
+              setI(n);
+            }}
+          >
+            <span className={styles.pn}>{n + 1}</span>
+            <span>
+              <b>{f.title}</b>
+              <span className={styles.pd}>{f.text}</span>
+            </span>
+          </button>
         ))}
-      </ol>
+      </div>
       <div className={styles.pvCol}>
         <div className={styles.browser}>
           <div className={styles.bbar} aria-hidden="true">

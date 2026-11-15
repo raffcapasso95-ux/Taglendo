@@ -56,9 +56,10 @@ const SALONI = "/per-i-saloni";
  * La cornice del sito: testata prugna fissa, contenuto, piè di pagina.
  * `clienti`: home con la ricerca, elenco dei saloni, pagine per città. `saloni`: la pagina per i barbieri.
  * `solid`: pagine senza apertura scura, la testata è subito piena.
+ * `light` (saloni): testata chiara e piena, per le pagine senza apertura su foto (Funzioni). `current`: la voce della pagina in cui si è.
  * `overlay` (clienti): la testata è trasparente sulla foto dell'apertura e diventa chiara appena si scorre.
  */
-export function LandShell({ audience, solid = false, overlay = false, children }: { audience: Audience; solid?: boolean; overlay?: boolean; children: React.ReactNode }) {
+export function LandShell({ audience, solid = false, overlay = false, light = false, current, children }: { audience: Audience; solid?: boolean; overlay?: boolean; light?: boolean; current?: "funzioni"; children: React.ReactNode }) {
   const f = searchCopy.footer;
   return (
     <div className={styles.page} data-land="">
@@ -67,14 +68,14 @@ export function LandShell({ audience, solid = false, overlay = false, children }
       <header
         className={styles.header}
         data-land-header=""
-        data-tone={audience === "clienti" ? (overlay ? "auto" : "light") : undefined}
-        data-solid={solid || (audience === "clienti" && !overlay) ? "true" : undefined}
-        data-scrolled={solid || (audience === "clienti" && !overlay) ? "true" : undefined}
+        data-tone={audience === "clienti" ? (overlay ? "auto" : "light") : light ? "light" : undefined}
+        data-solid={solid || light || (audience === "clienti" && !overlay) ? "true" : undefined}
+        data-scrolled={solid || light || (audience === "clienti" && !overlay) ? "true" : undefined}
       >
         <div className={styles.headerRow}>
           <Link href={audience === "clienti" ? "/" : SALONI} aria-label={audience === "clienti" ? "Taglendo, inizio pagina" : site.businessHome} className={styles.logo}>
             <Image src="/brand/taglendo-icon.svg" alt="" width={34} height={34} className={styles.logoIcon} priority />
-            {audience === "clienti" ? (
+            {audience === "clienti" || light ? (
               <>
                 <Image src="/brand/taglendo-logo.svg" alt="Taglendo" width={109} height={26} className={`${styles.logoWord} ${styles.logoDark}`} priority style={{ height: 26, width: "auto" }} />
                 {overlay ? <Image src="/brand/taglendo-logo-light.svg" alt="" aria-hidden="true" width={109} height={26} className={`${styles.logoWord} ${styles.logoLight}`} priority style={{ height: 26, width: "auto" }} /> : null}
@@ -101,7 +102,7 @@ export function LandShell({ audience, solid = false, overlay = false, children }
                 <Link href={`${SALONI}#pagina`} className={styles.navLink}>
                   {nav.page}
                 </Link>
-                <Link href={`${SALONI}/funzioni`} className={styles.navLink}>
+                <Link href={`${SALONI}/funzioni`} className={styles.navLink} aria-current={current === "funzioni" ? "page" : undefined}>
                   {nav.features}
                 </Link>
                 <Link href={`${SALONI}#costo`} className={styles.navLink}>

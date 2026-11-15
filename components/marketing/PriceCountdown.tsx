@@ -34,11 +34,12 @@ export function PriceCountdown() {
     };
   }, []);
   return (
-    <p ref={box} className={styles.bigNum} aria-label={saloniCopy.cost.zero}>
+    <p ref={box} className={styles.bigNum}>
       <span aria-hidden="true">
         {n}
         <span className={styles.euro}>€</span>
       </span>
+      <span className={styles.vh}>{saloniCopy.cost.zero}</span>
     </p>
   );
 }
