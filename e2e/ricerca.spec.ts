@@ -81,6 +81,23 @@ test.describe("Ricerca dei saloni", () => {
     await expect(page).toHaveURL(/\/cerca\?servizio=Barba$/);
     await expect(page.getByRole("combobox", { name: "Servizio" })).toHaveValue("Barba");
     await expect(page.getByText(/Scrivi una città o usa «Vicino a me»/)).toBeVisible();
+    // senza luogo la pagina non è vuota: i saloni di tutta Italia con quel servizio, senza distanze
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Barba in tutta Italia");
+    await expect(page.locator("[data-salon]").first()).toBeVisible();
+    await expect(page.locator("[data-salon]").first().getByText(/\d km|\d m$/)).toHaveCount(0);
+  });
+
+  test("risultati: elenco compatto o griglia (su computer), barra di ricerca nella fascia sotto il titolo", async ({ page, isMobile }) => {
+    await page.goto("/cerca?dove=Bologna");
+    const band = page.getByRole("region", { name: "La tua ricerca" });
+    await expect(band.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(band.getByRole("combobox", { name: "Servizio" })).toBeVisible();
+    await expect(band.getByRole("button", { name: "Filtri" })).toBeVisible();
+    if (isMobile) return await expect(page.getByRole("group", { name: "Come vedere i risultati" })).toBeHidden();
+    await page.getByRole("group", { name: "Come vedere i risultati" }).getByRole("button", { name: "Griglia" }).click();
+    await expect(page.getByRole("group", { name: "Come vedere i risultati" }).getByRole("button", { name: "Griglia" })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.locator('[data-salon="barberia-saragozza"]')).toBeVisible();
+    await expect(page.getByRole("region", { name: "Mappa dei saloni" })).toBeHidden();
   });
 
   test("lontano da tutto: niente saloni entro 30 km, si mostrano i più vicini; una città senza nome: lo dice", async ({ page }) => {

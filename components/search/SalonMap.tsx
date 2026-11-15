@@ -73,7 +73,7 @@ export function SalonMap({ salons, center, radiusKm, near, hovered, selected, on
       className: styles.tiles, // colori attenuati, in tono con il sito
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>',
     }).addTo(map);
-    L.circle([center.lat, center.lng], { radius: radiusKm * 1000, interactive: false, className: styles.zone }).addTo(map);
+    if (radiusKm > 0) L.circle([center.lat, center.lng], { radius: radiusKm * 1000, interactive: false, className: styles.zone }).addTo(map);
     if (near) L.marker([center.lat, center.lng], { icon: L.divIcon({ className: "", html: `<span class="${styles.me}"></span>`, iconSize: [0, 0] }), interactive: false, keyboard: false, title: copy.here }).addTo(map);
     const store = markers.current;
     for (const s of salons) {
@@ -92,7 +92,7 @@ export function SalonMap({ salons, center, radiusKm, near, hovered, selected, on
       if (touched || el.clientHeight === 0) return;
       programmatic = true;
       if (salons.length === 0) map.setView([center.lat, center.lng], 12, { animate: false });
-      else map.fitBounds(L.latLngBounds(salons.map((s) => [s.lat, s.lng] as [number, number])).extend([center.lat, center.lng]), { padding: [64, 64], maxZoom: 15, animate: false });
+      else map.fitBounds(L.latLngBounds(salons.map((s) => [s.lat, s.lng] as [number, number])).extend(radiusKm > 0 ? [center.lat, center.lng] : [salons[0].lat, salons[0].lng]), { padding: [64, 64], maxZoom: 15, animate: false });
       programmatic = false;
     };
     home.current = () => {

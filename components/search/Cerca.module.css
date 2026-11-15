@@ -31,11 +31,9 @@
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.bandTop {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--space-8);
+.bandIn {
+  max-width: calc(var(--site-wrap) - 2 * var(--site-gutter));
+  margin: 0 auto;
 }
 
 .titleBlock {
@@ -61,8 +59,7 @@
 }
 
 .searchSlot {
-  flex: 1;
-  max-width: 720px;
+  margin-top: var(--space-4);
   min-width: 0;
 }
 
@@ -300,11 +297,116 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
+  width: 100%;
+  max-width: var(--site-wrap);
+  margin: 0 auto;
 }
 
 .listCol {
   min-width: 0;
-  padding: var(--space-6) var(--site-gutter) var(--space-12);
+  padding: var(--space-5) var(--space-6) var(--space-12) var(--site-gutter);
+}
+
+.summaryRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-4);
+}
+
+.summaryRow .summary {
+  margin: 0;
+}
+
+.hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.modes {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: var(--space-1);
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+}
+
+.modeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--segmented-item-height);
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modeBtn[aria-pressed="true"] {
+  background: var(--action-primary);
+  color: var(--text-inverse);
+}
+
+/* ── Paginatore ────────────────────────────────────────────────────────── */
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gap {
+  min-width: 24px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.pageBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-icon-button);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pageBtn[aria-current="page"] {
+  background: var(--action-primary);
+  border-color: var(--action-primary);
+  color: var(--text-inverse);
+}
+
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
 }
 
 .summary {
@@ -360,9 +462,50 @@
 .mapPane {
   position: relative;
   min-height: 480px;
+  margin: var(--space-5) var(--site-gutter) var(--space-5) 0;
   background: var(--map-bg);
-  border-left: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-panel);
   overflow: hidden;
+}
+
+/* griglia: tutta la larghezza, senza mappa (solo su computer) */
+@media (min-width: 961px) {
+  .layout[data-mode="grid"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .layout[data-mode="grid"] .mapPane {
+    display: none;
+  }
+
+  .layout[data-mode="grid"] .listCol {
+    padding-right: var(--site-gutter);
+  }
+
+  .layout[data-mode="grid"] .list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .layout[data-mode="grid"] .card {
+    grid-template-columns: minmax(0, 1fr);
+    height: 100%;
+  }
+
+  .layout[data-mode="grid"] .photo {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+  }
+
+  .layout[data-mode="grid"] .list > li {
+    display: flex;
+  }
+
+  .layout[data-mode="grid"] .card {
+    width: 100%;
+  }
 }
 
 /* su computer la pagina è alta quanto lo schermo: la fascia in alto, poi l'elenco che scorre e la mappa ferma */
@@ -401,10 +544,10 @@
 
 .card {
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  gap: var(--space-5);
-  padding: 18px;
-  border-radius: var(--space-5);
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: 14px;
+  border-radius: var(--space-4);
   border: 1px solid var(--border-subtle);
   background: var(--surface);
   transition: border-color 200ms ease, box-shadow 200ms ease;
@@ -418,7 +561,7 @@
 .photo {
   position: relative;
   display: block;
-  min-height: 170px;
+  min-height: 112px;
   border-radius: var(--radius-card);
   overflow: hidden;
   background: var(--brand-peach);
@@ -470,7 +613,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .head {
@@ -482,7 +625,7 @@
 
 .name {
   margin: 0;
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1.2;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -543,10 +686,10 @@
 .service {
   display: inline-flex;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 3px 8px;
   border-radius: var(--radius-small-button);
   background: var(--surface-muted);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .service b {
@@ -559,7 +702,7 @@
   gap: var(--space-3);
   flex-wrap: wrap;
   margin-top: auto;
-  padding-top: var(--space-3);
+  padding-top: var(--space-2);
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -583,8 +726,8 @@
   align-items: center;
   gap: 6px;
   justify-content: center;
-  min-height: var(--segmented-item-height);
-  min-width: 62px;
+  min-height: var(--tap-min);
+  min-width: 56px;
   padding: 0 10px;
   border-radius: var(--radius-input);
   border: 1px solid var(--status-success-border);
@@ -1156,7 +1299,13 @@
 
   .mapPane {
     height: calc(100dvh - var(--site-top));
-    border-left: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .modes {
+    display: none;
   }
 
   .layout[data-view="list"] .mapPane,

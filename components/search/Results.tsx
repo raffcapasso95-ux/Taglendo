@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition, type ReactNode } from "react";
 import { cx } from "@/components/ui/cx";
 import { searchCopy } from "@/lib/copy/search";
-import { searchHref, type SearchFilters } from "@/lib/search/rules";
+import { pageNumbers, searchHref, type SearchFilters } from "@/lib/search/rules";
 import type { SalonView } from "./types";
 import styles from "./Cerca.module.css";
 
@@ -22,6 +22,41 @@ const Svg = ({ size = 16, d }: { size?: number; d: string }) => (
 const PIN = "M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21zM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z";
 const MAP = "M9 4 3 6.5v13L9 17l6 2.5 6-2.5v-13L15 6.5 9 4zM9 4v13M15 6.5v13";
 const LIST = "M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01";
+const GRID = "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z";
+
+/** Quante schede per pagina: nell'elenco accanto alla mappa ce ne stanno meno che nella griglia. */
+const PER_PAGE = { list: 6, grid: 12 } as const;
+/** Quanti servizi si vedono nella scheda: gli altri sono nella pagina del salone. */
+const SERVICES_SHOWN = 3;
+
+function Pager({ page, total, onPage }: { page: number; total: number; onPage: (n: number) => void }) {
+  if (total <= 1) return null;
+  return (
+    <nav className={styles.pager} aria-label={copy.results.pager}>
+      <button type="button" className={cx(styles.pageBtn, styles.press)} disabled={page === 1} onClick={() => onPage(page - 1)} aria-label={copy.results.prev}>
+        <Svg size={18} d="m15 6-6 6 6 6" />
+      </button>
+      <ol className={styles.pages}>
+        {pageNumbers(page, total).map((n, i) =>
+          n === 0 ? (
+            <li key={`gap${i}`} className={styles.gap} aria-hidden="true">
+              …
+            </li>
+          ) : (
+            <li key={n}>
+              <button type="button" className={cx(styles.pageBtn, styles.press, styles.num)} aria-current={n === page ? "page" : undefined} aria-label={copy.results.page(n)} onClick={() => onPage(n)}>
+                {n}
+              </button>
+            </li>
+          ),
+        )}
+      </ol>
+      <button type="button" className={cx(styles.pageBtn, styles.press)} disabled={page === total} onClick={() => onPage(page + 1)} aria-label={copy.results.next}>
+        <Svg size={18} d="m9 6 6 6-6 6" />
+      </button>
+    </nav>
+  );
+}
 
 /** La foto del salone; senza foto un riquadro caldo con il logo o l'iniziale. */
 function Photo({ salon }: { salon: SalonView }) {
@@ -65,10 +100,12 @@ function SalonCard({ salon: s, active, onActive }: { salon: SalonView; active: b
               {s.name}
             </Link>
           </h3>
-          <span className={styles.km}>
-            <Svg d={PIN} />
-            <span className={styles.num}>{s.distance}</span>
-          </span>
+          {s.distance ? (
+            <span className={styles.km}>
+              <Svg d={PIN} />
+              <span className={styles.num}>{s.distance}</span>
+            </span>
+          ) : null}
         </div>
         <p className={styles.status}>
           <Status s={s} />
@@ -76,12 +113,13 @@ function SalonCard({ salon: s, active, onActive }: { salon: SalonView; active: b
         </p>
         {s.services.length > 0 ? (
           <ul className={styles.services} aria-label={copy.card.services}>
-            {s.services.map((x) => (
+            {s.services.slice(0, SERVICES_SHOWN).map((x) => (
               <li key={x.name} className={styles.service}>
                 {x.name}
                 {x.price ? <b className={styles.num}>{x.price}</b> : null}
               </li>
             ))}
+            {s.services.length > SERVICES_SHOWN ? <li className={styles.service}>+{s.services.length - SERVICES_SHOWN}</li> : null}
           </ul>
         ) : null}
         <div className={styles.foot}>
@@ -129,10 +167,12 @@ function MapCard({ salon: s, onClose }: { salon: SalonView; onClose: () => void 
         <h3 className={styles.selName}>{s.name}</h3>
         <div className={styles.selRow}>
           <Status s={s} />
-          <span className={styles.km}>
-            <Svg d={PIN} />
-            <span className={styles.num}>{s.distance}</span>
-          </span>
+          {s.distance ? (
+            <span className={styles.km}>
+              <Svg d={PIN} />
+              <span className={styles.num}>{s.distance}</span>
+            </span>
+          ) : null}
         </div>
         {s.slots.length > 0 ? (
           <ul className={styles.slots} aria-label={copy.card.slotsLabel}>
@@ -181,6 +221,9 @@ export function Results({
 }) {
   const router = useRouter();
   const [view, setView] = useState<"list" | "map">("list");
+  // su computer: elenco accanto alla mappa, oppure griglia a tutta larghezza
+  const [mode, setMode] = useState<"list" | "grid">("list");
+  const [page, setPage] = useState(1);
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [zone, setZone] = useState(false);
@@ -192,6 +235,7 @@ export function Results({
   if (seen !== salons) {
     setSeen(salons);
     setSelected(null);
+    setPage(1);
     if (zone) {
       setZone(false);
       setToast(copy.map.zoneDone(salons.length));
@@ -220,20 +264,49 @@ export function Results({
     if (slug) document.querySelector(`[data-salon="${CSS.escape(slug)}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   };
   const chosen = salons.find((s) => s.slug === selected) ?? null;
+  const perPage = PER_PAGE[mode];
+  const pages = Math.max(1, Math.ceil(salons.length / perPage));
+  const current = Math.min(page, pages);
+  const shown = salons.slice((current - 1) * perPage, current * perPage);
+  const goPage = (n: number) => {
+    setPage(n);
+    // si riparte dall'inizio dell'elenco
+    document.querySelector("[data-list-col]")?.scrollTo({ top: 0, behavior: "smooth" });
+    if (window.innerWidth <= 960) window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const changeMode = (m: "list" | "grid") => {
+    // la salone in vista resta più o meno al suo posto: si torna alla pagina che lo contiene
+    const first = (current - 1) * perPage;
+    setMode(m);
+    setPage(Math.floor(first / PER_PAGE[m]) + 1);
+  };
 
   return (
-    <div className={styles.layout} data-view={view}>
-      <div className={styles.listCol}>
-        <div className={styles.summary} role="status">
-          {summary}
+    <div className={styles.layout} data-view={view} data-mode={mode}>
+      <div className={styles.listCol} data-list-col="">
+        <div className={styles.summaryRow}>
+          <div className={styles.summary} role="status">
+            {summary}
+          </div>
+          <div className={styles.modes} role="group" aria-label={copy.results.view}>
+            <button type="button" className={cx(styles.modeBtn, styles.press)} aria-pressed={mode === "list"} onClick={() => changeMode("list")}>
+              <Svg size={16} d={LIST} />
+              {copy.results.viewList}
+            </button>
+            <button type="button" className={cx(styles.modeBtn, styles.press)} aria-pressed={mode === "grid"} onClick={() => changeMode("grid")}>
+              <Svg size={16} d={GRID} />
+              {copy.results.viewGrid}
+            </button>
+          </div>
         </div>
         <ol className={styles.list}>
-          {salons.map((s) => (
+          {shown.map((s) => (
             <li key={s.slug}>
               <SalonCard salon={s} active={hovered === s.slug || selected === s.slug} onActive={setHovered} />
             </li>
           ))}
         </ol>
+        <Pager page={current} total={pages} onPage={goPage} />
       </div>
       <div className={styles.mapPane}>
         <SalonMap

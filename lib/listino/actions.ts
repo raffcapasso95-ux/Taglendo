@@ -5,7 +5,7 @@ import { requireSalon } from "@/lib/auth/session";
 import { listinoCopy } from "@/lib/copy/listino";
 import { addDays, dayRange, isValidDate, romeDate, romeMinutes, weekdayOf } from "@/lib/dates/rome";
 import { LIMITS } from "@/lib/rules/forms";
-import { saveWeek } from "@/lib/hours/week";
+import { saveMemberWeek, saveWeek } from "@/lib/hours/week";
 import { validateRanges, type Range, type WeekDay } from "@/lib/rules/hours";
 import { canSaveWeek, outsideHours } from "@/lib/rules/listino";
 import { createClient } from "@/lib/supabase/server";
@@ -103,6 +103,48 @@ export async function saveWeekHours(week: WeekDay[]): Promise<{ ok: true; outsid
     clean,
   );
   revalidatePath("/listino");
+  revalidatePath("/listino/orari");
+  revalidatePath("/agenda");
+  return { ok: true, outside };
+}
+
+/** Salva gli orari di un operatore (week null: torna a quelli del salone). Dice quanti suoi appuntamenti futuri restano fuori orario. */
+export async function saveOperatorWeek(memberId: string, week: WeekDay[] | null): Promise<{ ok: true; outside: number } | Failure> {
+  const ctx = await owner();
+  if (!ctx) return fail(errors.notOwner);
+  let clean: WeekDay[] | null = null;
+  if (week !== null) {
+    if (!Array.isArray(week) || week.length !== 7) return fail(errors.hours);
+    clean = week.map((d) => ({ closed: Boolean(d.closed), ranges: (d.ranges ?? []).map(([a, b]): Range => [Math.trunc(a), Math.trunc(b)]) }));
+    for (const d of clean) {
+      if (d.ranges.length > 0 && validateRanges(d.ranges)) return fail(errors.hours);
+      if (!d.closed && d.ranges.length === 0) return fail(errors.hours);
+    }
+    // un operatore può non lavorare mai? No: almeno un giorno
+    if (clean.every((d) => d.closed)) return fail(errors.hours);
+  }
+  const { supabase, salon } = ctx;
+  if (!(await saveMemberWeek(supabase, salon.id, memberId, clean))) return fail(errors.generic);
+
+  let outside = 0;
+  if (clean) {
+    const { data: future } = await supabase
+      .from("appointments")
+      .select("starts_at, ends_at")
+      .eq("salon_id", salon.id)
+      .eq("member_id", memberId)
+      .eq("status", "confermato")
+      .gte("starts_at", new Date().toISOString())
+      .limit(2000);
+    outside = outsideHours(
+      (future ?? []).map((a) => {
+        const start = new Date(a.starts_at);
+        const end = new Date(a.ends_at);
+        return { weekday: weekdayOf(romeDate(start)), startMin: romeMinutes(start), endMin: romeDate(end) === romeDate(start) ? romeMinutes(end) : 1440 };
+      }),
+      clean,
+    );
+  }
   revalidatePath("/listino/orari");
   revalidatePath("/agenda");
   return { ok: true, outside };

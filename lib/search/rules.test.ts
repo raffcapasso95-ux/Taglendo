@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NO_FILTERS, activeTags, clockLabel, countFilters, dayPhrase, kmLabel, pinLabel, isNarrowed, isOn, parseFilters, parseSearch, resetFilters, resultsTitle, searchHref, slotChips, slotLabel, toggleFilter, withKm } from "./rules";
+import { NO_FILTERS, activeTags, clockLabel, countFilters, dayPhrase, kmLabel, pageNumbers, pinLabel, isNarrowed, isOn, parseFilters, parseSearch, resetFilters, resultsTitle, searchHref, slotChips, slotLabel, toggleFilter, withKm } from "./rules";
 
 describe("ricerca dei saloni: cosa si cerca", () => {
   it("«Vicino a me» vince sul testo; coordinate strane non valgono", () => {
@@ -130,5 +130,19 @@ describe("etichette dell'elenco e della mappa", () => {
   it("sulla mappa: l'ora se è oggi, il giorno e l'ora se è un altro giorno", () => {
     expect(pinLabel("2026-11-14T16:30:00Z", now)).toEqual({ text: "17:30", today: true });
     expect(pinLabel("2026-11-15T08:00:00Z", now)).toEqual({ text: "dom 09:00", today: false });
+  });
+});
+
+describe("pageNumbers (paginatore)", () => {
+  it("poche pagine: tutte", () => {
+    expect(pageNumbers(1, 3)).toEqual([1, 2, 3]);
+  });
+  it("tante pagine: prima, ultima e vicine alla corrente, con «…» (0) nei buchi", () => {
+    expect(pageNumbers(1, 10)).toEqual([1, 2, 0, 10]);
+    expect(pageNumbers(5, 10)).toEqual([1, 0, 4, 5, 6, 0, 10]);
+    expect(pageNumbers(10, 10)).toEqual([1, 0, 9, 10]);
+  });
+  it("una pagina sola", () => {
+    expect(pageNumbers(1, 1)).toEqual([1]);
   });
 });
