@@ -48,7 +48,7 @@ export type RecentSalon = {
 export type SearchResult =
   | { kind: "none" }
   | { kind: "unknown"; text: string }
-  | { kind: "ok"; place: string | null; near: boolean; center: { lat: number; lng: number }; radiusKm: number; widened: boolean; hits: SalonHit[]; filters: SearchFilters };
+  | { kind: "ok"; place: string | null; near: boolean; center: { lat: number; lng: number }; radiusKm: number; widened: boolean; hits: SalonHit[]; filters: SearchFilters; /** Senza un luogo: i saloni di tutta Italia, senza distanze. */ anywhere?: boolean };
 
 const photoUrl = (path: string | null) => (path ? `${env.url()}/storage/v1/object/public/salon-photos/${path}` : null);
 
@@ -57,7 +57,7 @@ async function around(lat: number, lng: number, radius: number, filters: SearchF
     p_lat: lat,
     p_lng: lng,
     p_radius_km: radius,
-    p_limit: 40,
+    p_limit: 60,
     // servizio e giorno sempre passati (anche vuoti): così si usa la versione della ricerca con i filtri
     p_service: filters.service ?? "",
     p_date: filters.date as string,
@@ -105,9 +105,29 @@ async function searchAt(center: { lat: number; lng: number }, place: string | nu
   return { kind: "ok", place, near, center, radiusKm: widened ? WIDE_RADIUS_KM : radius, widened, hits, filters };
 }
 
+/** I centri da cui si copre l'Italia (la ricerca arriva a 300 km): nord, centro, sud e le due isole. */
+const ITALY = [
+  { lat: 45.2, lng: 9.2 },
+  { lat: 43.5, lng: 11.5 },
+  { lat: 41.5, lng: 13.8 },
+  { lat: 39.5, lng: 16.3 },
+  { lat: 37.6, lng: 14.0 },
+  { lat: 40.0, lng: 9.0 },
+];
+
+/** Servizio (o giorno) senza un luogo: i saloni di tutta Italia con quel servizio, i primi liberi per primi. */
+async function searchEverywhere(filters: SearchFilters): Promise<SearchResult> {
+  const lists = await Promise.all(ITALY.map((c) => around(c.lat, c.lng, 300, filters)));
+  const seen = new Map<string, SalonHit>();
+  for (const h of lists.flat()) if (!seen.has(h.slug)) seen.set(h.slug, h);
+  const hits = [...seen.values()].sort((a, b) => (a.nextSlots[0] ?? "~").localeCompare(b.nextSlots[0] ?? "~") || a.name.localeCompare(b.name, "it")).slice(0, 60);
+  const first = hits[0];
+  return { kind: "ok", place: null, near: false, center: first ? { lat: first.lat, lng: first.lng } : { lat: 42.5, lng: 12.5 }, radiusKm: 0, widened: false, hits, filters, anywhere: true };
+}
+
 /** La ricerca: un punto («Vicino a me»), un comune, o un indirizzo (con Google, se c'è la chiave). */
 export async function searchSalons(query: SearchQuery, filters: SearchFilters = NO_FILTERS): Promise<SearchResult> {
-  if (query.kind === "none") return { kind: "none" };
+  if (query.kind === "none") return filters.service || filters.date ? searchEverywhere(filters) : { kind: "none" };
   if (query.kind === "point") return searchAt(query, nearestComune(query.lat, query.lng)?.name ?? null, !query.zone, filters);
   const comune = findComune(query.text);
   if (comune) return searchAt(comune, comune.name, false, filters);

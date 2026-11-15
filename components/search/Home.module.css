@@ -52,7 +52,7 @@
   background: var(--brand-plum);
   color: var(--text-inverse);
   isolation: isolate;
-  overflow: hidden;
+  z-index: 2; /* i menu della ricerca escono dal riquadro e restano sopra la sezione che segue */
 }
 
 .heroBg {

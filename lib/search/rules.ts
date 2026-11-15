@@ -227,3 +227,16 @@ export function pinLabel(startsAt: string, now: Date): { text: string; today: bo
 
 /** «19:30» da minuti dalla mezzanotte. */
 export const clockLabel = (min: number) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
+
+/** Il numero delle pagine da mostrare: la prima, l'ultima e quelle vicine alla corrente (0 = «…»). */
+export function pageNumbers(page: number, total: number): number[] {
+  const keep = new Set([1, total, page - 1, page, page + 1].filter((n) => n >= 1 && n <= total));
+  const out: number[] = [];
+  let last = 0;
+  for (const n of [...keep].sort((a, b) => a - b)) {
+    if (last && n - last > 1) out.push(0);
+    out.push(n);
+    last = n;
+  }
+  return out;
+}

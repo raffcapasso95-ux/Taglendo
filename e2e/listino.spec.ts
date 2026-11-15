@@ -67,6 +67,37 @@ test.describe("Listino e orari", () => {
     await expect(page.getByRole("button", { name: /^martedì/i })).not.toContainText("14:30");
   });
 
+  test("orari dei barbieri: orari suoi, poi di nuovo come il salone; l'assenza si segna dal barbiere", async ({ page }) => {
+    await freshOwner(page, "Barberia Barbieri");
+    await page.goto("/listino/orari");
+    const team = page.getByRole("region", { name: "Orari dei barbieri" });
+    const rows = async () => (await adminSelect<{ member_id: string }>("member_hours", "select=member_id")).length; // di tutti i saloni di prova: si guarda quanto cambia
+    const before = await rows();
+    await expect(team.getByText("Come il salone").first()).toBeVisible();
+
+    await team.getByRole("button", { name: "Orari suoi" }).click();
+    await expect(page.getByText(/Orari di .* salvati/).filter({ visible: true })).toBeVisible();
+    expect(await rows()).toBe(before + 7);
+    await expect(team.getByText(/Orari suoi · 5 giorni a settimana/)).toBeVisible();
+    // la settimana del barbiere si cambia come quella del salone
+    await team.getByRole("button", { name: /^martedì/i }).click();
+    await dialog(page).getByRole("button", { name: /^Togli la fascia 14:30–19:00$/ }).click();
+    await dialog(page).getByRole("button", { name: "Salva" }).click();
+    await expect(dialog(page)).toBeHidden(); // chiuso solo a salvataggio fatto
+    await page.reload();
+    await expect(team.getByRole("button", { name: /^martedì/i })).not.toContainText("14:30");
+
+    // l'assenza: Ferie e chiusure si apre già sul barbiere
+    await team.getByRole("link", { name: /Segna un.assenza/ }).click();
+    await expect(dialog(page).getByRole("heading", { name: /chiusura/i })).toBeVisible();
+    await expect(dialog(page).getByRole("button", { pressed: true }).first()).toBeVisible();
+
+    await page.goto("/listino/orari");
+    await team.getByRole("button", { name: "Come il salone" }).click();
+    await expect(page.getByText(/segue di nuovo gli orari del salone/).filter({ visible: true })).toBeVisible();
+    expect(await rows()).toBe(before);
+  });
+
   test("tre fasce in un giorno e l'interruttore chiude un giorno subito", async ({ page }) => {
     await freshOwner(page, "Barberia Tre Fasce");
     await page.goto("/listino/orari");

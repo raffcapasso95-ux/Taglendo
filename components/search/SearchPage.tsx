@@ -14,7 +14,7 @@ import styles from "./Cerca.module.css";
 
 const copy = searchCopy;
 
-export const toView = (h: SalonHit, now: Date): SalonView => ({
+export const toView = (h: SalonHit, now: Date, anywhere = false): SalonView => ({
   slug: h.slug,
   name: h.name,
   where: h.address || h.area || h.city || "",
@@ -22,7 +22,7 @@ export const toView = (h: SalonHit, now: Date): SalonView => ({
   lng: h.lng,
   coverUrl: h.coverUrl,
   logoUrl: h.logoUrl,
-  distance: kmLabel(h.distanceKm),
+  distance: anywhere ? "" : kmLabel(h.distanceKm),
   services: h.services.map((x) => ({ name: x.name, price: x.priceCents !== null ? formatPrice(x.priceCents) : null })),
   ...(({ day, chips }) => ({ slotDay: day, slots: chips }))(slotChips(h.nextSlots, now)),
   pin: h.nextSlots[0] ? pinLabel(h.nextSlots[0], now) : null,
@@ -64,7 +64,9 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
   const ok = result.kind === "ok" ? result : null;
   const place = ok?.place ?? "";
   const base = baseOf(result, typed);
-  const title = !ok ? copy.results.headingEmpty : resultsTitle({ place: ok.place, near: ok.near, service: filters.service, date: filters.date, today });
+  const plainTitle = !ok ? copy.results.headingEmpty : resultsTitle({ place: ok.place, near: ok.near, service: filters.service, date: filters.date, today });
+  // senza un luogo: «Barba in tutta Italia · Oggi»
+  const title = ok?.anywhere ? plainTitle.replace(/^([^·]*?)(\s·|$)/, `$1 ${copy.results.everywhere}$2`) : plainTitle;
   const filtered = Boolean(filters.service || filters.date);
   const tags = activeTags(filters);
   const count = ok?.hits.length ?? 0;
@@ -72,7 +74,7 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
   return (
     <div className={cx(styles.page, count > 0 && styles.pageFixed)}>
       <section className={styles.band} aria-label={copy.results.searchLabel}>
-        <div className={styles.bandTop}>
+        <div className={styles.bandIn}>
           <div className={styles.titleBlock}>
             <p className={styles.crumb}>
               <Link href="/">{copy.results.crumbHome}</Link> · <Link href="/cerca">{copy.results.crumbBarbers}</Link>
@@ -83,8 +85,8 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
           <div className={styles.searchSlot}>
             <SearchBox initial={ok && !ok.near ? place : typed} service={filters.service ?? ""} date={filters.date} services={services} compact submitLabel={copy.results.update} />
           </div>
+          {ok ? <FilterBar base={base} filters={filters} count={count} /> : null}
         </div>
-        {ok ? <FilterBar base={base} filters={filters} count={count} /> : null}
       </section>
 
       {result.kind === "none" && filtered ? (
@@ -105,7 +107,7 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
 
       {ok && ok.hits.length > 0 ? (
         <Results
-          salons={ok.hits.map((h) => toView(h, now))}
+          salons={ok.hits.map((h) => toView(h, now, ok.anywhere))}
           center={ok.center}
           radiusKm={ok.radiusKm}
           near={ok.near}
@@ -113,9 +115,10 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
           summary={
             <>
               <p className={styles.summaryText}>
-                <strong className={styles.num}>{ok.hits.length}</strong> {copy.results.count(ok.hits.length, ok.radiusKm)}
+                <strong className={styles.num}>{ok.hits.length}</strong> {ok.anywhere ? copy.results.countAnywhere(ok.hits.length) : copy.results.count(ok.hits.length, ok.radiusKm)}
                 {ok.widened ? ` · ${copy.results.wider(30, place || "te")}` : ""}
               </p>
+              {ok.anywhere ? <p className={styles.hint}>{copy.results.needPlace}</p> : null}
               {tags.length > 0 ? (
                 <ul className={styles.tags} aria-label={copy.filters.active}>
                   {tags.map((t) => (
@@ -180,7 +183,7 @@ export function SearchSkeleton() {
   return (
     <div className={styles.page} aria-busy="true">
       <section className={styles.band} aria-label={copy.results.searchLabel}>
-        <div className={styles.bandTop}>
+        <div className={styles.bandIn}>
           <div className={styles.titleBlock}>
             <h1 className={styles.title}>{copy.results.headingEmpty}</h1>
           </div>

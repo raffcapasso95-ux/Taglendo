@@ -696,3 +696,58 @@
 .patronSelect {
   width: 100%;
 }
+
+/* Orari dei singoli barbieri */
+.team {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.member {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+}
+
+.memberHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.memberText {
+  min-width: 0;
+}
+
+.memberName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.memberSub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.absence {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}

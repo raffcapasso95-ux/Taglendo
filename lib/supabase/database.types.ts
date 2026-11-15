@@ -185,6 +185,58 @@ isOneToOne: true
       referencedColumns: ["id"]
     }
                   ]
+                },"member_hours": {
+                  Row: {
+                    "closed": boolean,"member_id": string,"salon_id": string,"weekday": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "closed"?: boolean,"member_id": string,"salon_id": string,"weekday": number
+                  }
+                  Update: {
+                    "closed"?: boolean,"member_id"?: string,"salon_id"?: string,"weekday"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "member_hours_member_id_fkey"
+      columns: ["member_id"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "member_hours_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"member_ranges": {
+                  Row: {
+                    "end_min": number,"member_id": string,"salon_id": string,"start_min": number,"weekday": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "end_min": number,"member_id": string,"salon_id": string,"start_min": number,"weekday": number
+                  }
+                  Update: {
+                    "end_min"?: number,"member_id"?: string,"salon_id"?: string,"start_min"?: number,"weekday"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "member_ranges_member_id_weekday_fkey"
+      columns: ["member_id","weekday"]
+isOneToOne: false
+      referencedRelation: "member_hours"
+      referencedColumns: ["member_id","weekday"]
+    },{
+      foreignKeyName: "member_ranges_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"members": {
                   Row: {
                     "active": boolean,"activity_seen_at": string | null,"agenda_color": number | null,"bio": string | null,"bookable_online": boolean,"chair_no": number,"id": string,"invite_email": string | null,"invite_expires_at": string | null,"invite_token": string | null,"name": string,"phone": string | null,"photo_path": string | null,"role": Database["public"]['Enums']["role_t"],"salon_id": string,"user_id": string | null
@@ -482,6 +534,9 @@ isOneToOne: false
 { Args: { "p_limit"?: number }; Returns: {
               "name": string,"salons": number
             }[]
+                           },
+"set_member_week":
+{ Args: { "p_member": string,"p_salon": string,"p_week": Json }; Returns: undefined
                            },
 "set_week_hours":
 { Args: { "p_salon": string,"p_week": Json }; Returns: undefined

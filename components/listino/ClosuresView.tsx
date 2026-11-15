@@ -27,6 +27,8 @@ type Props = {
   operators: Array<{ id: string; name: string }>;
   holidays: HolidayItem[];
   patron: Patron;
+  /** Dalla pagina Orari: «Segna un'assenza» apre già il foglio per questo barbiere. */
+  startFor?: string | null;
 };
 
 export function ClosuresView(props: Props) {
@@ -37,10 +39,10 @@ export function ClosuresView(props: Props) {
   );
 }
 
-function Inner({ canEdit, today, year, upcoming, past, operators, holidays, patron }: Props) {
+function Inner({ canEdit, today, year, upcoming, past, operators, holidays, patron, startFor }: Props) {
   const router = useRouter();
   const toast = useToast();
-  const [editing, setEditing] = useState<ClosureItem | "new" | null>(null);
+  const [editing, setEditing] = useState<ClosureItem | "new" | null>(canEdit && startFor && operators.some((o) => o.id === startFor) ? "new" : null);
   // NUOVO: festività. Lo stato si cambia subito (l'interruttore risponde al tocco), poi si salva
   const [closedNow, setClosedNow] = useState<Record<string, boolean>>({});
   const [holidayNotify, setHolidayNotify] = useState<Impacted[] | null>(null);
@@ -163,6 +165,7 @@ function Inner({ canEdit, today, year, upcoming, past, operators, holidays, patr
           closure={editing === "new" ? null : editing}
           today={today}
           operators={operators}
+          startFor={editing === "new" ? startFor : null}
           onClose={() => setEditing(null)}
           onDone={(message) => {
             setEditing(null);
@@ -180,16 +183,17 @@ type DialogProps = {
   closure: ClosureItem | null;
   today: string;
   operators: Array<{ id: string; name: string }>;
+  startFor?: string | null;
   onClose: () => void;
   onDone: (message: string) => void;
   onRefresh: () => void;
 };
 
-function ClosureDialog({ closure, today, operators, onClose, onDone, onRefresh }: DialogProps) {
+function ClosureDialog({ closure, today, operators, startFor, onClose, onDone, onRefresh }: DialogProps) {
   const [from, setFrom] = useState(closure?.startsOn ?? today);
   const [to, setTo] = useState(closure?.endsOn ?? today);
-  const [scope, setScope] = useState<"all" | "one">(closure?.memberId ? "one" : "all");
-  const [memberId, setMemberId] = useState<string | null>(closure?.memberId ?? operators[0]?.id ?? null);
+  const [scope, setScope] = useState<"all" | "one">(closure?.memberId || startFor ? "one" : "all");
+  const [memberId, setMemberId] = useState<string | null>(closure?.memberId ?? startFor ?? operators[0]?.id ?? null);
   const [note, setNote] = useState(closure?.note ?? "");
   const [impact, setImpact] = useState<Impacted[]>([]);
   const [notify, setNotify] = useState<Impacted[] | null>(null);
