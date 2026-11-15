@@ -6,6 +6,12 @@ const listed = async () => (await adminSelect<{ listed: boolean }>("salons", "se
 // il salone demo è a Bologna e compare nella ricerca; altre prove possono aggiungere saloni, quindi niente conteggi esatti
 const showDemo = () => adminUpdate("salons", "slug=eq.barberia-saragozza", { listed: true });
 
+// La ricerca mostra al massimo 40 saloni, dal più vicino: le altre prove ne creano a decine, tutti a Bologna.
+// Qui si tolgono dalla ricerca (restano nel database) così il salone demo è sempre nell'elenco.
+test.beforeAll(async () => {
+  await adminUpdate("salons", "slug=neq.barberia-saragozza", { listed: false });
+});
+
 test.describe("Ricerca dei saloni", () => {
   test.beforeEach(async ({ context, baseURL }) => {
     await showDemo();

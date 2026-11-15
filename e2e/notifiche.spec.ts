@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
-import { freshOwner, dialog, newButton, openAppointment } from "./agenda-helpers";
+import { freshOwner, dialog, newButton, nextOpenDay, openAppointment, pickDayAndTime } from "./agenda-helpers";
 import { adminSelect, adminUpdate, bookingCode, countMail, signIn, uniqueEmail, visibleText, waitForMail } from "./helpers";
 
 const CRON = "Bearer local-cron-secret";
@@ -182,7 +182,7 @@ test.describe("Email e avvisi", () => {
     await dialog(page).getByRole("button", { name: /^Nuovo( cliente)?$/ }).click();
     await dialog(page).getByLabel("Nome").fill("Carlo Verdi");
     await dialog(page).getByLabel(/^Email/).fill(email);
-    await dialog(page).getByRole("button", { name: /^\d{2}:\d{2}$/ }).first().click();
+    await pickDayAndTime(page, nextOpenDay(), "10:00"); // il giorno di apertura dopo oggi: non dipende dal giorno in cui gira la prova
     await dialog(page).getByRole("button", { name: "Fissa l’appuntamento" }).click();
     const mail = await waitForMail(email, /^Confermato: /);
     expect(mail.html).toContain("Carlo");
