@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense, type ReactNode } from "react";
 import { getAccount } from "@/components/marketing/AuthLinks";
+import { DayStrip } from "@/components/marketing/DayStrip";
 import { HeroNotice } from "@/components/marketing/HeroNotice";
 import { NotebookCompare } from "@/components/marketing/NotebookCompare";
 import { PagePreview } from "@/components/marketing/PagePreview";
@@ -129,7 +130,7 @@ export default function Page() {
             </h2>
             <p className={cx(styles.muted, styles.dayLead)}>{copy.day.lead}</p>
           </div>
-          <ol className={styles.day} data-reveal="">
+          <DayStrip>
             <span className={styles.rail} aria-hidden="true" />
             {copy.day.stops.map((s, i) => (
               <li key={s.time} className={cx(styles.stop, i === 0 && styles.stopNight)} style={{ "--d": `${i * 120}ms` } as React.CSSProperties}>
@@ -142,7 +143,7 @@ export default function Page() {
                 <span className={styles.stopText}>{s.text}</span>
               </li>
             ))}
-          </ol>
+          </DayStrip>
         </div>
       </section>
 

@@ -290,7 +290,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: currentColor;
+  background: currentcolor;
 }
 
 .salonText {
@@ -771,7 +771,7 @@
   }
 
   .section {
-    padding: 56px 0 56px;
+    padding: 56px 0;
   }
 
   .cats {

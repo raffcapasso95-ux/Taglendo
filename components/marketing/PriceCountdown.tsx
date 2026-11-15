@@ -9,14 +9,11 @@ export function PriceCountdown() {
   const [n, setN] = useState(29);
   const box = useRef<HTMLParagraphElement>(null);
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setN(0);
-      return;
-    }
     const el = box.current;
-    if (!el || !("IntersectionObserver" in window)) {
-      setN(0);
-      return;
+    // con movimento ridotto (o senza osservatore) il contatore mostra subito 0
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !el || !("IntersectionObserver" in window)) {
+      const t = setTimeout(() => setN(0), 0);
+      return () => clearTimeout(t);
     }
     let timer: ReturnType<typeof setInterval> | undefined;
     const io = new IntersectionObserver(

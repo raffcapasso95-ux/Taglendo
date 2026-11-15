@@ -342,21 +342,21 @@
 }
 
 /* con il movimento acceso: la linea si disegna (900 ms) e i momenti compaiono in sequenza */
-:global([data-motion="on"]) .day:not([data-in="true"]) .rail {
+.day[data-armed="true"]:not([data-in="true"]) .rail {
   transform: scaleX(0);
 }
 
-:global([data-motion="on"]) .day:not([data-in="true"]) .stop {
+.day[data-armed="true"]:not([data-in="true"]) .stop {
   opacity: 0;
   transform: translateY(8px);
 }
 
-:global([data-motion="on"]) .rail {
+.day[data-armed="true"] .rail {
   transform-origin: left;
   transition: transform 900ms cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-:global([data-motion="on"]) .stop {
+.day[data-armed="true"] .stop {
   transition: opacity 420ms var(--ease-out) var(--d, 0ms), transform 420ms var(--ease-out) var(--d, 0ms);
 }
 
@@ -1024,20 +1024,17 @@
   }
 
   .rail {
-    left: 29px;
-    right: auto;
-    top: 0;
-    bottom: 0;
+    inset: 0 auto 0 29px;
     width: 2px;
     height: auto;
     background: linear-gradient(180deg, var(--day-line) 0 26%, var(--border-strong) 26% 100%);
   }
 
-  :global([data-motion="on"]) .day:not([data-in="true"]) .rail {
+  .day[data-armed="true"]:not([data-in="true"]) .rail {
     transform: scaleY(0);
   }
 
-  :global([data-motion="on"]) .rail {
+  .day[data-armed="true"] .rail {
     transform-origin: top;
   }
 
@@ -1581,7 +1578,7 @@
   width: 1px;
   height: 1px;
   overflow: hidden;
-  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
 }
 
 /* e tutto il resto */

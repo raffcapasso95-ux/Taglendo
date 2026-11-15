@@ -528,7 +528,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: currentColor;
+  background: currentcolor;
 }
 
 .services {
@@ -728,7 +728,7 @@
   background: inherit;
   border-right: inherit;
   border-bottom: inherit;
-  border-radius: 0 0 2px 0;
+  border-radius: 0 0 2px;
 }
 
 .pdot {
@@ -940,10 +940,10 @@
   border-radius: var(--space-5);
   background: var(--surface);
   box-shadow: var(--shadow-map-card);
-  animation: selIn 220ms var(--ease-out) both;
+  animation: sel-in 220ms var(--ease-out) both;
 }
 
-@keyframes selIn {
+@keyframes sel-in {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -1124,10 +1124,7 @@
   .panel {
     position: fixed;
     z-index: 30;
-    left: 0;
-    right: 0;
-    top: auto;
-    bottom: 0;
+    inset: auto 0 0;
     width: auto;
     max-width: none;
     max-height: 82dvh;

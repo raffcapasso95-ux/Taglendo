@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition, type ReactNode } from "react";
+import { useEffect, useState, useTransition, type ReactNode } from "react";
 import { cx } from "@/components/ui/cx";
 import { searchCopy } from "@/lib/copy/search";
 import { searchHref, type SearchFilters } from "@/lib/search/rules";
@@ -185,34 +185,32 @@ export function Results({
   const [selected, setSelected] = useState<string | null>(null);
   const [zone, setZone] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [seen, setSeen] = useState(salons);
   const [, start] = useTransition();
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const asked = useRef(false);
 
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
-
-  // arrivati i risultati della zona: «N barberie in questa zona»
-  useEffect(() => {
+  // arrivati risultati nuovi: la scheda scelta si chiude e, se si era chiesta «questa zona», dice quante barberie ci sono
+  if (seen !== salons) {
+    setSeen(salons);
     setSelected(null);
-    if (!asked.current) return;
-    asked.current = false;
-    setZone(false);
-    setToast(copy.map.zoneDone(salons.length));
-    timers.current.push(setTimeout(() => setToast(null), 2600));
-  }, [salons]);
+    if (zone) {
+      setZone(false);
+      setToast(copy.map.zoneDone(salons.length));
+    }
+  }
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 2600);
+    return () => clearTimeout(t);
+  }, [toast]);
+  // se per qualche motivo non arriva niente, il pulsante torna com'era
+  useEffect(() => {
+    if (!zone) return;
+    const t = setTimeout(() => setZone(false), 8000);
+    return () => clearTimeout(t);
+  }, [zone]);
 
   const searchZone = (c: { lat: number; lng: number }) => {
-    asked.current = true;
     setZone(true);
-    // se per qualche motivo non arriva niente, il pulsante torna com'era
-    timers.current.push(
-      setTimeout(() => {
-        if (asked.current) {
-          asked.current = false;
-          setZone(false);
-        }
-      }, 8000),
-    );
     start(() => router.replace(searchHref({ lat: c.lat, lng: c.lng, zona: true, ...filters, servizio: filters.service, data: filters.date }), { scroll: false }));
   };
 

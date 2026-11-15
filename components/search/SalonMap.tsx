@@ -56,7 +56,10 @@ export function SalonMap({ salons, center, radiusKm, near, hovered, selected, on
   const home = useRef<() => void>(() => {});
   const markers = useRef(new Map<string, { marker: L.Marker; salon: SalonView }>());
   const handlers = useRef({ onHover, onSelect });
-  handlers.current = { onHover, onSelect };
+  // i gestori dei segnaposto leggono sempre le funzioni più recenti
+  useEffect(() => {
+    handlers.current = { onHover, onSelect };
+  });
   const [moved, setMoved] = useState(false);
 
   useEffect(() => {
@@ -115,7 +118,6 @@ export function SalonMap({ salons, center, radiusKm, near, hovered, selected, on
       map.remove();
     };
     // la mappa si ricostruisce solo se cambiano i risultati
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [salons, center.lat, center.lng, radiusKm, near]);
 
   // passaggio e scelta: l'etichetta si accende e sta sopra le altre
