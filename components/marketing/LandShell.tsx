@@ -5,13 +5,14 @@ import { LandEffects } from "@/components/marketing/LandEffects";
 import { CookieConsent } from "@/components/salon/CookieConsent";
 import { AccountMenu } from "@/components/marketing/AccountMenu";
 import { getAccount } from "@/components/marketing/AuthLinks";
-import { landCopy as copy } from "@/lib/copy/land";
+import { saloniCopy } from "@/lib/copy/saloni";
 import { searchCopy } from "@/lib/copy/search";
 import { marketingCopy } from "@/lib/copy/marketing";
 import { company } from "@/lib/site";
 import styles from "@/components/marketing/Land.module.css";
 
 const site = searchCopy.site;
+const nav = saloniCopy.nav;
 
 const Arrow = ({ size = 18 }: { size?: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -39,10 +40,10 @@ function GuestActions({ audience }: { audience: Audience }) {
   return (
     <>
       <Link className={`${styles.navLink} ${styles.login}`} href="/accedi">
-        {copy.nav.signIn}
+        {nav.signIn}
       </Link>
       <Link className={`${styles.btn} ${styles.btnSmall}`} href="/registrati">
-        {copy.nav.try}
+        {nav.try}
       </Link>
     </>
   );
@@ -95,16 +96,19 @@ export function LandShell({ audience, solid = false, overlay = false, children }
             ) : (
               <>
                 <Link href={`${SALONI}#come`} className={styles.navLink}>
-                  {copy.nav.how}
+                  {nav.how}
                 </Link>
-                <Link href={`${SALONI}#prezzi`} className={styles.navLink}>
-                  {copy.nav.prices}
+                <Link href={`${SALONI}#pagina`} className={styles.navLink}>
+                  {nav.page}
+                </Link>
+                <Link href={`${SALONI}/funzioni`} className={styles.navLink}>
+                  {nav.features}
+                </Link>
+                <Link href={`${SALONI}#costo`} className={styles.navLink}>
+                  {nav.cost}
                 </Link>
                 <Link href={`${SALONI}#domande`} className={styles.navLink}>
-                  {copy.nav.faq}
-                </Link>
-                <Link href="/" className={styles.navLink}>
-                  {site.toClients}
+                  {nav.faq}
                 </Link>
               </>
             )}

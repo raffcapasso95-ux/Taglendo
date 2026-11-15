@@ -79,10 +79,15 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn, preview =
   const know = knowRows({ ...salon.know, cancelOnline: salon.cancelOnline, cancelLimitMin: salon.cancelLimitMin });
   const book = bookingOn ? "#prenota" : tel;
   const logoAlt = copy.logoAlt(salon.name);
+  // nell'anteprima (home dei saloni) la pagina sta dentro un'altra: niente punti di riferimento doppi né un secondo titolo
+  const Top = preview ? "div" : "header";
+  const Main = preview ? "div" : "main";
+  const Foot = preview ? "div" : "footer";
+  const H1 = preview ? "p" : "h1";
 
   return (
     <div className={styles.page} id="top">
-      <header className={styles.top}>
+      <Top className={styles.top}>
         <div className={cx(styles.wrap, styles.topRow)}>
           <a href="#top" className={styles.brand}>
             {salon.logoUrl ? (
@@ -110,10 +115,10 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn, preview =
             {salon.phone}
           </a>
         </div>
-      </header>
+      </Top>
 
-      <main>
-        <section className={styles.hero}>
+      <Main>
+        <section className={styles.hero} id="intestazione">
           <div className={styles.wrap}>
             <div className={styles.heroTop}>
               <p className={styles.crumb}>
@@ -143,7 +148,7 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn, preview =
                     <span className={styles.dot} aria-hidden="true" />
                     {pill.text}
                   </span>
-                  <h1 className={styles.h1}>{salon.name}</h1>
+                  <H1 className={styles.h1}>{salon.name}</H1>
                   {salon.description ? <p className={styles.lead}>{salon.description}</p> : null}
                   <div className={styles.facts}>
                     {salon.address ? (
@@ -346,9 +351,9 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn, preview =
             </div>
           </div>
         </div>
-      </main>
+      </Main>
 
-      <footer className={styles.footer}>
+      <Foot className={styles.footer}>
         <div className={cx(styles.wrap, styles.footerRow)}>
           <span className={styles.footerLinks}>
             <span>
@@ -363,7 +368,7 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn, preview =
             {shopCopy.footer.poweredBy} Taglendo
           </Link>
         </div>
-      </footer>
+      </Foot>
 
       {preview ? null : (
         <BottomBar hideWhileVisible={bookingOn ? "prenota-card" : undefined}>

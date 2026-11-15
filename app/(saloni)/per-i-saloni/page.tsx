@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment, Suspense, type ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { getAccount } from "@/components/marketing/AuthLinks";
-import { BeforeAfter } from "@/components/marketing/BeforeAfter";
-import { ModeSwitch } from "@/components/marketing/ModeSwitch";
-import { Ticker } from "@/components/marketing/Ticker";
-import { PricingPlans } from "@/components/marketing/PricingPlans";
+import { HeroNotice } from "@/components/marketing/HeroNotice";
+import { NotebookCompare } from "@/components/marketing/NotebookCompare";
+import { PagePreview } from "@/components/marketing/PagePreview";
+import { PriceCountdown } from "@/components/marketing/PriceCountdown";
+import styles from "@/components/marketing/Saloni.module.css";
+import { PublicPage } from "@/components/salon/PublicPage";
 import { cx } from "@/components/ui/cx";
-import styles from "@/components/marketing/Land.module.css";
-import marketing from "@/components/marketing/Marketing.module.css";
-import { billingEnabled } from "@/lib/billing";
-import { landCopy as copy } from "@/lib/copy/land";
+import { saloniCopy as copy } from "@/lib/copy/saloni";
 import { marketingCopy } from "@/lib/copy/marketing";
+import { DEMO_SALON } from "@/lib/demo/salon";
+import { company, siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: marketingCopy.meta.title,
@@ -27,163 +28,147 @@ const Icon = ({ size = 18, children }: { size?: number; children: ReactNode }) =
     {children}
   </svg>
 );
-const Arrow = ({ size }: { size?: number }) => (
-  <Icon size={size}>
-    <path d="M5 12h14M13 6l6 6-6 6" />
-  </Icon>
-);
-
-/** Le parole del titolo entrano una dopo l'altra: --i è il turno di ciascuna. */
-function Words({ words, from }: { words: readonly string[]; from: number }) {
-  return words.map((w, i) => (
-    <Fragment key={w}>
-      <span className={styles.w} style={{ "--i": from + i } as React.CSSProperties}>
-        {w}
-      </span>{" "}
-    </Fragment>
-  ));
-}
-
-function GuestHeroCta({ live }: { live: boolean }) {
-  return (
-    <>
-      <Link className={cx(styles.btn, styles.btnLight)} href="#inizia">
-        {copy.hero.cta} <Arrow />
-      </Link>
-      <span className={styles.heroNote}>
-        <strong>{live ? copy.hero.noteLive : copy.hero.noteBeta}</strong>
-        <span>{live ? copy.hero.noteLiveSub : copy.hero.noteBetaSub}</span>
-      </span>
-    </>
-  );
-}
+const MOMENT_ICONS = [
+  <Icon key="notte">
+    <path d="M20 14.5A8 8 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z" />
+  </Icon>,
+  <Icon key="giorno">
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4" />
+  </Icon>,
+  <Icon key="barbiere">
+    <circle cx="12" cy="8" r="3.8" />
+    <path d="M4.5 20c.8-4 3.8-6 7.5-6s6.7 2 7.5 6" />
+  </Icon>,
+  <Icon key="sera">
+    <path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z" />
+    <path d="M10 20a2 2 0 0 0 4 0" />
+  </Icon>,
+];
 
 /** Chi è già dentro non deve vedere «Prova gratis»: lo salutiamo e lo mandiamo all'agenda. */
-async function HeroCta({ live }: { live: boolean }) {
+async function HeroCtas() {
   const account = await getAccount();
-  if (!account) return <GuestHeroCta live={live} />;
-  const first = account.name.split(" ")[0] || account.name;
+  if (account) {
+    const first = account.name.split(" ")[0] || account.name;
+    return (
+      <>
+        <div className={styles.ctas}>
+          <Link href="/agenda" className={styles.btnLight}>
+            {marketingCopy.account.heroCta}
+          </Link>
+        </div>
+        <p className={cx(styles.note, styles.hello)}>
+          <strong>{marketingCopy.account.heroHello(first)}</strong>
+          {account.salonName ? <span>{account.salonName}</span> : null}
+        </p>
+      </>
+    );
+  }
+  return <GuestCtas />;
+}
+
+function GuestCtas() {
   return (
     <>
-      <Link className={cx(styles.btn, styles.btnLight)} href="/agenda">
-        {marketingCopy.account.heroCta} <Arrow />
-      </Link>
-      <span className={styles.heroNote}>
-        <strong>{marketingCopy.account.heroHello(first)}</strong>
-        {account.salonName ? <span>{account.salonName}</span> : null}
-      </span>
+      <div className={styles.ctas}>
+        <Link href="/registrati" className={styles.btnLight}>
+          {copy.hero.cta}
+        </Link>
+        <Link href="#come" className={styles.btnGhost}>
+          {copy.hero.how}
+        </Link>
+      </div>
+      <p className={styles.note}>{copy.hero.note}</p>
     </>
   );
 }
 
 export default function Page() {
-  const live = billingEnabled();
-  const p = copy.prices;
-  const faq = marketingCopy.faq.items(!live);
-  const stops = marketingCopy.stops.items;
-
+  const host = siteUrl().replace(/^https?:\/\//, "");
   return (
     <>
-      <section className={styles.hero} id="top" data-land-hero="">
-        <Image src="/images/foto/hero.jpg" alt="" width={1600} height={2409} priority sizes="100vw" className={styles.heroBg} />
-        <div className={styles.heroInner}>
+      {/* 1 · Apertura: titolo, due righe di rassicurazione e il telefono con l'agenda vera */}
+      <section className={styles.hero} data-land-hero="" aria-labelledby="saloni-t">
+        <Image src="/images/foto/barbiere-sfumatura.jpg" alt="" fill priority sizes="100vw" className={styles.heroBg} />
+        <div className={styles.heroScrim} aria-hidden="true" />
+        <div className={cx(styles.wrap, styles.heroGrid)}>
           <div className={styles.heroText}>
-            <p className={cx(styles.kicker, styles.rise)} style={{ "--i": 0 } as React.CSSProperties}>
-              {copy.hero.kicker}
-            </p>
-            <h1 className={styles.h1}>
-              <span className={styles.line}>
-                <Words words={copy.hero.lines[0]} from={1} />
-              </span>
-              <span className={styles.line}>
-                <Words words={copy.hero.lines[1]} from={4} />
-                <span className={styles.accent}>
-                  <Words words={copy.hero.accent} from={5} />
-                </span>
-              </span>
-              <span className={styles.line}>
-                <span className={cx(styles.accent, styles.hl)}>
-                  <Words words={copy.hero.scribbled} from={6} />
-                  <svg className={styles.scribble} viewBox="0 0 200 18" preserveAspectRatio="none" aria-hidden="true">
-                    <path d="M3 12 C 40 4, 90 3, 130 7 S 185 13, 197 6" />
-                  </svg>
-                </span>
-              </span>
+            <p className={styles.kicker}>{copy.hero.kicker}</p>
+            <h1 className={styles.h1} id="saloni-t">
+              {copy.hero.title}{" "}
+              <span className={styles.accent}>{copy.hero.accent}</span>
             </h1>
-            <p className={cx(styles.lead, styles.rise)} style={{ "--i": 8 } as React.CSSProperties}>
-              {copy.hero.lead}
-            </p>
-            <div className={cx(styles.heroCta, styles.rise)} style={{ "--i": 9 } as React.CSSProperties}>
-              <Suspense fallback={<GuestHeroCta live={live} />}>
-                <HeroCta live={live} />
-              </Suspense>
-            </div>
+            <p className={styles.lead}>{copy.hero.lead}</p>
+            <Suspense fallback={<GuestCtas />}>
+              <HeroCtas />
+            </Suspense>
           </div>
-          <div className={cx(styles.heroDemo, styles.rise)} style={{ "--i": 6 } as React.CSSProperties}>
-            <div className={styles.phone}>
-              <div className={styles.phoneScreen}>
-                <div className={styles.phoneStatus} aria-hidden="true">
-                  <span>{copy.hero.phoneTime}</span>
-                  <span className={styles.phoneIsland} />
-                  <svg width="46" height="12" viewBox="0 0 46 12" fill="currentColor">
-                    <rect x="0" y="7" width="3" height="5" rx="1" />
-                    <rect x="5" y="5" width="3" height="7" rx="1" />
-                    <rect x="10" y="3" width="3" height="9" rx="1" />
-                    <rect x="15" y="1" width="3" height="11" rx="1" />
-                    <rect x="23" y="1.5" width="19" height="9" rx="2.5" fill="none" stroke="currentColor" strokeOpacity=".45" />
-                    <rect x="25" y="3.5" width="13" height="5" rx="1.2" />
-                    <rect x="43.2" y="4.5" width="1.6" height="3" rx=".8" fillOpacity=".45" />
-                  </svg>
-                </div>
-                {/* schermata vera dell'agenda, ferma: niente video che parte da solo */}
-                <Image src="/images/hero-agenda.jpg" alt={copy.hero.phoneTitle} width={1170} height={2400} priority sizes="(min-width: 1024px) 320px, 78vw" className={styles.phoneShot} draggable={false} />
+          <div className={styles.heroArt}>
+            <div className={styles.phoneBack} aria-hidden="true">
+              <div className={styles.screen}>
+                <Image src="/images/shot-salone-p.jpg" alt="" width={900} height={1900} sizes="230px" />
+              </div>
+            </div>
+            <div className={styles.phoneFront}>
+              <div className={styles.screen}>
+                <Image src="/images/shot-agenda-p.jpg" alt={copy.hero.agendaAlt} width={900} height={1900} priority sizes="300px" />
+                <HeroNotice />
               </div>
             </div>
           </div>
         </div>
-        <a className={styles.scrollHint} href="#come" aria-label={copy.hero.scroll}>
-          <Icon size={22}>
-            <path d="m6 9 6 6 6-6" />
-          </Icon>
-        </a>
       </section>
 
-      <div className={styles.tape} aria-label={copy.tape.label}>
-        <div className={styles.tapeTrack}>
-          {[0, 1].map((g) => (
-            <div key={g} className={styles.tapeGroup} aria-hidden={g === 1 || undefined}>
-              {copy.tape.items.map((t) => (
-                <span key={t} className={styles.tapeItem}>
-                  {t}
-                </span>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <section id="come" className={cx(styles.section, styles.come)} aria-labelledby="come-t">
+      {/* 2 · Una giornata qualunque */}
+      <section className={styles.sectionTop} aria-labelledby="giornata-t">
         <div className={styles.wrap}>
-          <div className={cx(styles.head, styles.headRow, styles.reveal)} data-reveal="">
-            <div>
-              <p className={styles.eyebrow}>{copy.how.eyebrow}</p>
-              <h2 className={styles.h2} id="come-t">
-                {copy.how.title}
-              </h2>
-            </div>
-            <p className={styles.p}>{copy.how.lead}</p>
+          <div className={styles.dayHead}>
+            <h2 className={cx(styles.h2, styles.dayTitle)} id="giornata-t">
+              {copy.day.title}
+            </h2>
+            <p className={cx(styles.muted, styles.dayLead)}>{copy.day.lead}</p>
           </div>
-          <ol className={styles.steps}>
-            {copy.how.steps.map((s, i) => (
-              <li key={s.n} className={cx(styles.step, styles.reveal)} style={{ "--i": i } as React.CSSProperties} data-reveal="">
-                <div className={styles.stepHead}>
-                  <span className={styles.stepNum}>{s.n}</span>
-                  <span className={styles.stepLine} aria-hidden="true" />
+          <ol className={styles.day} data-reveal="">
+            <span className={styles.rail} aria-hidden="true" />
+            {copy.day.stops.map((s, i) => (
+              <li key={s.time} className={cx(styles.stop, i === 0 && styles.stopNight)} style={{ "--d": `${i * 120}ms` } as React.CSSProperties}>
+                <span className={styles.tick} aria-hidden="true" />
+                <span className={styles.time}>
+                  <b className={styles.num}>{s.time}</b>
+                  {MOMENT_ICONS[i]}
+                </span>
+                <b className={styles.stopTitle}>{s.title}</b>
+                <span className={styles.stopText}>{s.text}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* 3 · Pronto in tre passi: schermate vere */}
+      <section className={styles.section} id="come" aria-labelledby="passi-t">
+        <div className={styles.wrap}>
+          <div className={styles.stepsHead}>
+            <h2 className={styles.h2} id="passi-t">
+              {copy.steps.title}
+            </h2>
+            <p className={cx(styles.muted, styles.stepsLead)}>{copy.steps.lead}</p>
+          </div>
+          <ol className={styles.three}>
+            {copy.steps.items.map((s, i) => (
+              <li key={s.title} className={styles.step}>
+                <div className={cx(styles.stepBox, [styles.tonePeach, styles.tonePlum, styles.toneMint][i])}>
+                  <div className={styles.miniPhone}>
+                    <div className={styles.screen}>
+                      <Image src={s.img} alt={s.alt} width={900} height={1900} sizes="236px" />
+                    </div>
+                  </div>
                 </div>
-                <h3 className={styles.h3}>{s.t}</h3>
-                <p className={styles.p}>{s.d}</p>
-                <div className={styles.stepShot}>
-                  <Image src={s.img} alt={s.alt} width={780} height={1688} sizes="(min-width: 820px) 300px, 70vw" />
+                <div>
+                  <span className={cx(styles.stepNum, styles.num)}>{String(i + 1).padStart(2, "0")}</span>
+                  <h3 className={styles.stepTitle}>{s.title}</h3>
+                  <p className={styles.stepText}>{s.text}</p>
                 </div>
               </li>
             ))}
@@ -191,181 +176,130 @@ export default function Page() {
         </div>
       </section>
 
-      <section id="prima" className={cx(styles.section, styles.primaSec)} aria-labelledby="prima-t">
+      {/* 4 · La pagina della tua barberia: la pagina vera, in una finestra */}
+      <section className={cx(styles.section, styles.dark)} id="pagina" aria-labelledby="pagina-t">
         <div className={styles.wrap}>
-          <div className={cx(styles.head, styles.reveal)} data-reveal="">
-            <p className={styles.eyebrow}>{copy.before.eyebrow}</p>
-            <h2 className={styles.h2} id="prima-t">
-              {copy.before.title}
-            </h2>
-            <p className={styles.p}>{copy.before.lead}</p>
-          </div>
-          <div className={styles.reveal} data-reveal="">
-            <BeforeAfter extra={{ root: cx(styles.compare, styles.Marketing_compare), paper: styles.Marketing_paper, handle: styles.handle, tagLeft: styles.tagLeft, tagRight: styles.tagRight }} />
-          </div>
-        </div>
-      </section>
-
-      <section className={cx(styles.section, styles.dark)} aria-labelledby="cambia-t">
-        <div className={styles.wrap}>
-          <div className={cx(styles.head, styles.reveal)} data-reveal="">
-            <p className={cx(styles.eyebrow, styles.eyebrowLight)}>{copy.stops.eyebrow}</p>
-            <h2 className={styles.h2} id="cambia-t">
-              {copy.stops.title}
-            </h2>
-          </div>
-          <ul className={styles.stops}>
-            {stops.map((s) => (
-              <li key={s.old} className={cx(styles.stop, styles.reveal)} data-reveal="">
-                <div className={styles.stopImgBox}>
-                  <Image src={s.img} alt={s.alt} width={900} height={675} className={styles.stopImg} sizes="(min-width: 820px) 33vw, 100vw" />
-                </div>
-                <div className={styles.stopText}>
-                  <span className={styles.stopLabel}>{copy.stops.before}</span>
-                  <p className={styles.stopOld}>
-                    <span className={styles.strike}>{s.old}</span>
-                  </p>
-                  <span className={cx(styles.stopLabel, styles.stopLabelNow)}>
-                    <Icon size={16}>
-                      <path d="m5 12 5 5 9-10" />
-                    </Icon>
-                    {copy.stops.with}
-                  </span>
-                  <p className={styles.stopNow}>{s.now}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
-
-      <section id="modalita" className={styles.section} aria-labelledby="modalita-t">
-        <div className={cx(styles.wrap, styles.modeGrid)}>
-          <ModeSwitch />
-        </div>
-      </section>
-
-      <section id="prezzi" className={styles.section} aria-labelledby="prezzi-t">
-        <div className={cx(styles.wrap, styles.priceGrid)}>
-          <div className={cx(styles.priceText, styles.reveal)} data-reveal="">
-            <p className={styles.eyebrow}>{p.eyebrow}</p>
-            {live ? null : (
-              <p className={styles.bigPrice} aria-hidden="true">
-                <Ticker from={29} className={styles.ticker} />
-                <span className={styles.bigEuro}>€</span>
-              </p>
-            )}
-            <h2 className={styles.h2} id="prezzi-t">
-              {live ? marketingCopy.prices.titleLive : p.title}
-            </h2>
-            {live ? null : (
-              <>
-                <p className={styles.p}>{p.leadOne}</p>
-                <p className={styles.p}>{p.leadTwo}</p>
-                <p className={styles.p}>{p.leadThree}</p>
-              </>
-            )}
-            <Link className={styles.btn} href="/registrati">
-              {p.cta} <Arrow />
+          <div className={styles.pageHead}>
+            <div>
+              <h2 className={styles.h2} id="pagina-t">
+                {copy.page.title}
+              </h2>
+              <p className={styles.pageLead}>{copy.page.lead}</p>
+            </div>
+            <Link href="/barberia-saragozza" className={styles.btnLight}>
+              {copy.page.example}
             </Link>
           </div>
-          {live ? (
-            <div className={cx(styles.board, styles.reveal)} data-reveal="">
-              <PricingPlans />
+          <PagePreview host={host}>
+            <PublicPage salon={DEMO_SALON} weekday={6} nowMin={15 * 60} today="2026-11-14" bookingOn preview />
+          </PagePreview>
+          <div className={styles.pnote}>
+            <p>{copy.page.note}</p>
+            <Link href="/per-i-saloni/funzioni">
+              {copy.page.all}
+              <Icon size={18}>
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </Icon>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 5 · Il quaderno, e poi Taglendo */}
+      <section className={styles.section} aria-labelledby="quaderno-t">
+        <div className={styles.wrap}>
+          <div className={styles.compareHead}>
+            <h2 className={styles.h2} id="quaderno-t">
+              {copy.notebook.title}
+            </h2>
+            <p className={cx(styles.muted, styles.compareLead)}>{copy.notebook.lead}</p>
+          </div>
+          <NotebookCompare />
+        </div>
+      </section>
+
+      {/* 6 · Quanto costa: il contatore da 29 € a 0 € */}
+      <section className={styles.costSection} id="costo" aria-labelledby="costo-t">
+        <div className={styles.wrap}>
+          <div className={styles.cost}>
+            <div>
+              <h2 className={styles.h2} id="costo-t">
+                {copy.cost.title}
+              </h2>
+              <PriceCountdown />
+              <p className={styles.costLead}>{copy.cost.lead}</p>
             </div>
-          ) : (
-            <div className={cx(styles.board, styles.reveal)} data-reveal="">
-              <p className={styles.boardTitle}>{p.board}</p>
-              <ul className={styles.items}>
-                {p.items.map((it) => (
-                  <li key={it.n} className={styles.item}>
-                    <span className={styles.itemName}>
-                      {it.n}
-                      {it.s ? <span className={styles.itemSub}>{it.s}</span> : null}
-                    </span>
+            <div className={styles.costList}>
+              <ul className={styles.costItems}>
+                {copy.cost.list.map((c) => (
+                  <li key={c.name}>
+                    <span>{c.name}</span>
                     <span className={styles.dots} aria-hidden="true" />
-                    <span className={styles.itemPrice}>{it.p}</span>
+                    <b className={styles.num}>{c.value}</b>
                   </li>
                 ))}
               </ul>
-              <p className={styles.total}>
-                <span>{p.total}</span>
-                <span className={styles.dots} aria-hidden="true" />
-                <strong>{p.totalValue}</strong>
-              </p>
+              <Link href="/registrati" className={cx(styles.btnDark, styles.costCta)}>
+                {copy.cost.cta}
+              </Link>
             </div>
-          )}
+          </div>
         </div>
       </section>
 
-      <section id="domande" className={styles.section} aria-labelledby="domande-t">
+      {/* 7 · Domande frequenti */}
+      <section className={styles.faqSection} id="domande" aria-labelledby="domande-t">
         <div className={cx(styles.wrap, styles.faqGrid)}>
-          <div className={cx(styles.head, styles.reveal)} data-reveal="">
-            <p className={styles.eyebrow}>{copy.faq.eyebrow}</p>
+          <div>
             <h2 className={styles.h2} id="domande-t">
               {copy.faq.title}
             </h2>
-            <p className={styles.p}>
-              {copy.faq.more} <a href="mailto:aiuto@taglendo.it">aiuto@taglendo.it</a>.
+            <p className={cx(styles.muted, styles.faqMore)}>
+              {copy.faq.more} <a href={`mailto:${company.email}`}>{company.email}</a>. {copy.faq.reply}
             </p>
           </div>
-          <div className={cx(marketing.faqList, styles.faqList, styles.reveal)} data-reveal="">
-            {faq.map((q) => (
-              <details key={q.q} className={marketing.faqItem}>
-                <summary className={marketing.faqQuestion}>
-                  <span>{q.q}</span>
-                  <span className={marketing.chev} aria-hidden="true">
-                    <Icon>
+          <div className={styles.faq}>
+            {copy.faq.items.map((f, i) => (
+              <details key={f.q} open={i === 0}>
+                <summary>
+                  {f.q}
+                  <span className={styles.plus} aria-hidden="true">
+                    <Icon size={18}>
                       <path d="M12 5v14M5 12h14" />
                     </Icon>
                   </span>
                 </summary>
-                <p className={marketing.faqAnswer}>{q.a}</p>
+                <p>{f.a}</p>
               </details>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="inizia" className={styles.startSec} aria-labelledby="inizia-t">
+      {/* 8 · Chiusura */}
+      <section className={styles.finalSection} id="inizia" aria-labelledby="chiusura-t">
         <div className={styles.wrap}>
-          <div className={cx(styles.startCard, styles.reveal)} data-reveal="">
-            <div className={styles.startText}>
-              <p className={cx(styles.eyebrow, styles.eyebrowLight)}>{copy.start.eyebrow}</p>
-              <h2 className={styles.startTitle} id="inizia-t">
-                {copy.start.title}
-                <span className={styles.startAccent}>{copy.start.accent}</span>
+          <div className={styles.final}>
+            <div>
+              <h2 className={cx(styles.h2, styles.finalTitle)} id="chiusura-t">
+                {copy.final.title}
               </h2>
-              <p className={styles.startLead}>{copy.start.lead}</p>
-              <ul className={styles.checks}>
-                {copy.start.checks.map((c) => (
-                  <li key={c} className={styles.check}>
-                    <Icon>
-                      <path d="m5 12 5 5 9-10" />
-                    </Icon>
-                    {c}
-                  </li>
-                ))}
-              </ul>
+              <p className={styles.finalText}>{copy.final.text}</p>
             </div>
-            <div className={styles.startCta}>
-              <Link className={cx(styles.btn, styles.btnLight, styles.startBtn)} href="/registrati">
-                {copy.start.cta} <Arrow />
-              </Link>
-              <p className={styles.startLogin}>
-                {copy.start.login} <Link href="/accedi">{copy.start.loginLink}</Link>
-              </p>
-            </div>
+            <Link href="/registrati" className={styles.btnLight}>
+              {copy.final.cta}
+            </Link>
           </div>
         </div>
       </section>
 
-      <div className={styles.bar} data-land-bar="" data-hidden="true">
-        <span className={styles.barText}>
-          <span className={styles.barSub}>{copy.bar.sub}</span>
-          <span className={styles.barMain}>{live ? copy.bar.mainLive : copy.bar.mainBeta}</span>
+      {/* Telefono: barra fissa in basso */}
+      <div className={styles.mbar} data-land-bar="" data-hidden="true">
+        <span className={styles.mbarText}>
+          <b>{copy.bar.main}</b>
+          <span>{copy.bar.sub}</span>
         </span>
-        <Link className={cx(styles.btn, styles.btnSmall)} href="#inizia">
+        <Link href="/registrati" className={styles.btnDark}>
           {copy.bar.cta}
         </Link>
       </div>

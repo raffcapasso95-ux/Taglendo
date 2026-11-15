@@ -326,3 +326,22 @@
   --radius-xl: 32px;
   --home-h1: clamp(40px, 5.3vw, 76px);
 }
+
+/* Ridisegno del sito — home dei saloni e Funzioni (Saloni.dc.html, Funzioni.dc.html) */
+:root {
+  --plum-deep: #2E1B25;                          /* notte, telefono, piè di pagina */
+  --day-line: rgba(255, 247, 240, .35);
+  --day-gradient: linear-gradient(90deg, #2E1B25 0%, #3E2532 24%, #FBF0E9 24%, #FBF0E9 74%, #F8D6C6 100%);
+  --day-gradient-phone: linear-gradient(180deg, #3E2532 0%, #3E2532 26%, #FBF0E9 26%, #FBF0E9 80%, #F8D6C6 100%);
+  --hero-scrim: linear-gradient(90deg, rgba(46, 27, 37, .95) 0%, rgba(46, 27, 37, .82) 48%, rgba(46, 27, 37, .4) 100%);
+  --paper: #FFF9E8;                              /* il quaderno */
+  --paper-line: #E7D9BC;
+  --paper-ink: #2F3A66;
+  --paper-margin: #E9A3A3;
+  --shadow-browser: 0 30px 80px rgba(0, 0, 0, .35);
+  --shadow-phone-soft: 0 30px 60px rgba(46, 27, 37, .3);
+  --step-mint: #EEF6F1;
+  --dim: rgba(46, 27, 37, .28);
+  --dotted: rgba(62, 37, 50, .3);
+  --big-number: clamp(104px, 12vw, 168px);
+}
