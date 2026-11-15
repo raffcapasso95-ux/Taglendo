@@ -751,3 +751,52 @@
   font-weight: 700;
   text-decoration: none;
 }
+
+/* Foglio «Nuova chiusura»: date come i campi grandi del resto dell'app */
+.dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.dateField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.dateLabel {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.dateBox {
+  display: flex;
+  align-items: center;
+  min-height: var(--field-height-large);
+  padding: 0 14px;
+  border: var(--field-border-width) solid var(--border-subtle);
+  border-radius: var(--radius-field-large);
+  background: var(--surface);
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.dateBox:focus-within {
+  border-color: var(--brand-plum);
+  box-shadow: 0 0 0 .5px var(--brand-plum);
+}
+
+.dateInput {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--field-height-large);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
