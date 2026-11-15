@@ -23,12 +23,16 @@ type Props = {
   localMarks?: (month: string) => MonthMarks;
   /** L'ultimo giorno prenotabile: dopo, i giorni sono spenti. */
   maxDate?: string;
+  /** Per scegliere una data in un modulo: niente segni di chiuso o appuntamenti, niente scorciatoie dei mesi. */
+  plain?: boolean;
+  /** Con `plain`: il primo giorno scegliibile. */
+  minDate?: string;
 };
 
 const WEEK = ["L", "M", "M", "G", "V", "S", "D"];
 
 /** Calendario del mese nello stile Taglendo: puntino sui giorni con appuntamenti, tratteggio sui giorni chiusi. */
-export function MonthCalendar({ mode, selected, today, onSelect, heading: Heading = "h3", monthsClassName, localMarks, maxDate }: Props) {
+export function MonthCalendar({ mode, selected, today, onSelect, heading: Heading = "h3", monthsClassName, localMarks, maxDate, plain = false, minDate }: Props) {
   const [view, setView] = useState(monthOf(selected ?? today));
   const [marks, setMarks] = useState<Record<string, MonthMarks>>({});
   const asked = useRef(new Set<string>());
@@ -38,12 +42,12 @@ export function MonthCalendar({ mode, selected, today, onSelect, heading: Headin
 
   // i segni del mese (chiuso, con appuntamenti) si chiedono una volta sola per mese
   useEffect(() => {
-    if (localMarks || asked.current.has(view)) return;
+    if (plain || localMarks || asked.current.has(view)) return;
     asked.current.add(view);
     loadMonthMarks(view)
       .then((m) => setMarks((prev) => ({ ...prev, [view]: m })))
       .catch(() => asked.current.delete(view));
-  }, [view, localMarks]);
+  }, [view, localMarks, plain]);
 
   // la scorciatoia del mese attivo resta in vista
   useEffect(() => {
@@ -58,7 +62,7 @@ export function MonthCalendar({ mode, selected, today, onSelect, heading: Headin
   return (
     <div className={styles.cal} data-cal-mode={mode}>
       <div className={styles.head}>
-        <button type="button" className={styles.nav} aria-label="Mese precedente" disabled={book && view <= todayMonth} onClick={() => setView(addMonths(view, -1))}>
+        <button type="button" className={styles.nav} aria-label="Mese precedente" disabled={(book && view <= todayMonth) || (minDate != null && view <= monthOf(minDate))} onClick={() => setView(addMonths(view, -1))}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="m15 6-6 6 6 6" />
           </svg>
@@ -72,6 +76,7 @@ export function MonthCalendar({ mode, selected, today, onSelect, heading: Headin
           </svg>
         </button>
       </div>
+      {plain ? null : (
       <div className={cx(styles.months, monthsClassName)} role="group" aria-label="Vai al mese">
         {monthRange(todayMonth, SHORTCUT_MONTHS).map((m) => (
           <button key={m} type="button" className={cx(styles.monthChip, m === view && styles.monthChipOn)} aria-pressed={m === view} data-cal-goto={m} onClick={() => setView(m)}>
@@ -79,6 +84,7 @@ export function MonthCalendar({ mode, selected, today, onSelect, heading: Headin
           </button>
         ))}
       </div>
+      )}
       <div className={styles.grid} ref={gridRef}>
         {WEEK.map((w, i) => (
           <span key={i} className={styles.dow} aria-hidden="true">
@@ -101,7 +107,7 @@ export function MonthCalendar({ mode, selected, today, onSelect, heading: Headin
               aria-label={`${dayLabel(d)}${isClosed ? ", chiuso" : ""}${isBusy ? ", con appuntamenti" : ""}`}
               aria-pressed={on}
               data-date={d}
-              disabled={book && (isClosed || past || (maxDate != null && d > maxDate))}
+              disabled={(book && (isClosed || past)) || (maxDate != null && d > maxDate) || (minDate != null && d < minDate)}
               onClick={() => onSelect(d)}
             >
               <span className={styles.num}>{Number(d.slice(8, 10))}</span>
@@ -111,14 +117,18 @@ export function MonthCalendar({ mode, selected, today, onSelect, heading: Headin
         })}
       </div>
       <div className={styles.foot}>
-        <span className={styles.legend}>
-          <span className={styles.dot} aria-hidden="true" />
-          con appuntamenti
-        </span>
-        <span className={styles.legend}>
-          <span className={styles.closedMark} aria-hidden="true" />
-          chiuso
-        </span>
+        {plain ? null : (
+          <>
+            <span className={styles.legend}>
+              <span className={styles.dot} aria-hidden="true" />
+              con appuntamenti
+            </span>
+            <span className={styles.legend}>
+              <span className={styles.closedMark} aria-hidden="true" />
+              chiuso
+            </span>
+          </>
+        )}
         <button
           type="button"
           className={styles.today}

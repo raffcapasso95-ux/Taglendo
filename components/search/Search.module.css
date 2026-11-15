@@ -299,6 +299,12 @@
 }
 
 .dayOther {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
   min-height: var(--tap-min);
   color: var(--text-secondary);
   font-size: 14px;
@@ -309,16 +315,7 @@
   display: flex;
 }
 
-.dayOther input {
-  min-height: 40px;
-  padding: 0 var(--space-2);
-  border: 1px solid var(--border-strong);
-  border-radius: var(--radius-button);
-  background: var(--surface);
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 16px;
-}
+
 
 .geoError {
   margin: 0;
