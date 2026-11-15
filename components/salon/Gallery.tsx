@@ -1,11 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { cx } from "@/components/ui/cx";
 import { shopCopy } from "@/lib/copy/shop";
+import page from "./Page.module.css";
 import styles from "./Shop.module.css";
 
 type Photo = { url: string; alt: string };
 const copy = shopCopy.gallery;
+/** Quante foto entrano nel mosaico; le altre si vedono nel visore («Vedi tutte le foto»). */
+const MOSAIC = 5;
 
 const Icon = ({ d }: { d: string }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -13,12 +17,13 @@ const Icon = ({ d }: { d: string }) => (
   </svg>
 );
 
-/** Le foto del salone: mosaico (una fila da scorrere su telefono) e visore a tutto schermo con frecce e tastiera. */
+/** Le foto del salone: mosaico (carosello su telefono; lì si vedono tutte) e visore a tutto schermo con frecce e tastiera. */
 export function Gallery({ photos }: { photos: Photo[] }) {
   const [current, setCurrent] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   const n = photos.length;
+  const shown = Math.min(n, MOSAIC);
 
   const show = useCallback((i: number) => setCurrent(((i % n) + n) % n), [n]);
 
@@ -31,26 +36,35 @@ export function Gallery({ photos }: { photos: Photo[] }) {
   }, []);
 
   const photo = photos[current]!;
+  const sizeClass = shown < MOSAIC ? page[`mosaic${shown}` as "mosaic1"] : undefined;
   return (
     <>
-      <ul className={`${styles.gallery} ${styles[`gallery${Math.min(n, 8)}` as "gallery4"] ?? ""}`}>
-        {photos.map((p, i) => (
-          <li key={p.url} className={styles.shot}>
-            <button
-              type="button"
-              className={styles.shotButton}
-              aria-label={copy.open(i + 1, n, p.alt)}
-              onClick={(e) => {
-                opener.current = e.currentTarget;
-                show(i);
-                dialog.current?.showModal();
-              }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.url} alt={p.alt} width={900} height={675} loading={i === 0 ? "eager" : "lazy"} decoding="async" />
-            </button>
-          </li>
-        ))}
+      <ul className={cx(page.mosaic, sizeClass)}>
+        {photos.map((p, i) => {
+          const more = n > MOSAIC && i === MOSAIC - 1;
+          return (
+            <li key={p.url} className={i >= MOSAIC ? page.extra : undefined}>
+              <button
+                type="button"
+                className={page.shot}
+                aria-label={more ? copy.all(n) : copy.open(i + 1, n, p.alt)}
+                onClick={(e) => {
+                  opener.current = e.currentTarget;
+                  show(i);
+                  dialog.current?.showModal();
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.url} alt={more ? "" : p.alt} width={900} height={675} loading={i === 0 ? "eager" : "lazy"} decoding="async" />
+                {more ? (
+                  <span className={page.more} aria-hidden="true">
+                    {copy.seeAll}
+                  </span>
+                ) : null}
+              </button>
+            </li>
+          );
+        })}
       </ul>
       <dialog
         ref={dialog}

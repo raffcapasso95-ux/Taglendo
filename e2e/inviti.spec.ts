@@ -102,7 +102,11 @@ test.describe("Operatori e inviti", () => {
     const contacts = page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ });
     // ogni clic parte dall'interruttore e aspetta che il salvataggio sul server sia finito
     const toggle = async (expected: "true" | "false") => {
-      await Promise.all([page.waitForResponse((r) => r.request().method() === "POST"), page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ }).click()]);
+      // la risposta giusta è quella del salvataggio («contacts»), non un'altra richiesta della pagina
+      await Promise.all([
+        page.waitForResponse((r) => r.request().method() === "POST" && (r.request().postData() ?? "").includes("contacts")),
+        page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ }).click(),
+      ]);
       await expect(page.getByRole("switch", { name: /Vedere telefono ed email dei clienti/ })).toHaveAttribute("aria-checked", expected);
     };
     await expect(contacts).toHaveAttribute("aria-checked", "false");

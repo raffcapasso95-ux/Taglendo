@@ -14,9 +14,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/cerca" },
 };
 
-type Params = { dove?: string | string[]; lat?: string | string[]; lng?: string | string[]; servizio?: string | string[]; data?: string | string[] };
+type Raw = string | string[] | undefined;
+type Params = { dove?: Raw; lat?: Raw; lng?: Raw; zona?: Raw; servizio?: Raw; data?: Raw; oggi?: Raw; aperto?: Raw; nuovi?: Raw; fascia?: Raw; km?: Raw; servizi?: Raw; ordina?: Raw };
 
-/** NUOVO · Elenco dei saloni: `?dove=Bologna` oppure `?lat=&lng=` («Vicino a me»), con `&servizio=` e `&data=` facoltativi. */
+/** Elenco dei saloni: `?dove=Bologna` oppure `?lat=&lng=` («Vicino a me»), con servizio, giorno e filtri nell'indirizzo (vedi lib/search/rules.ts). */
 async function Content({ searchParams }: { searchParams: Promise<Params> }) {
   const params = await searchParams;
   await connection(); // la data di oggi va letta a ogni visita, non quando la pagina si prepara

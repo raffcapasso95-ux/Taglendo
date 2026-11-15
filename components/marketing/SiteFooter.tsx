@@ -42,9 +42,8 @@ export function SiteFooter() {
         </div>
         <div className={styles.footerBottom}>
           <span>
-            © 2026 Taglendo <Field value={company.legalName} /> · P.IVA <Field value={company.vat} /> · Sede legale <Field value={company.address} />
+            © 2026 Taglendo
           </span>
-          <span>{f.photos}</span>
         </div>
       </div>
     </footer>

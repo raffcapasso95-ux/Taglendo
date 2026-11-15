@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireSalon } from "@/lib/auth/session";
 import { paginaCopy } from "@/lib/copy/pagina";
 import { LIMITS, isPhone } from "@/lib/rules/forms";
+import { parseKnow, type KnowField, type KnowInput } from "@/lib/rules/know";
 import { updateSalonPosition } from "@/lib/places/geocode";
 import { createClient } from "@/lib/supabase/server";
 
@@ -44,6 +45,17 @@ export async function saveSalonPage(input: { name: string; area: string; descrip
   if (error) return { ok: false, error: errors.generic };
   // la ricerca dei saloni usa la posizione: segue l'indirizzo
   await updateSalonPosition(supabase, salonId, address);
+  refresh();
+  return { ok: true };
+}
+
+/** «Da sapere»: specialità, pagamenti, prodotti, bambini, accesso. Tutto facoltativo. */
+export async function saveSalonKnow(input: KnowInput): Promise<{ ok: true } | { ok: false; error: string; field?: KnowField }> {
+  const { salonId, supabase } = await owner();
+  const parsed = parseKnow(input);
+  if (!parsed.ok) return { ok: false, field: parsed.field, error: errors.know[parsed.field] };
+  const { error } = await supabase.from("salons").update(parsed.value).eq("id", salonId);
+  if (error) return { ok: false, error: errors.generic };
   refresh();
   return { ok: true };
 }

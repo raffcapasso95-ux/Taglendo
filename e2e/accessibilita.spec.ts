@@ -12,7 +12,7 @@ async function scan(page: Page, label: string) {
 }
 
 test.describe("Accessibilità: pagine pubbliche", () => {
-  for (const path of ["/", "/accedi", "/registrati", "/password", "/privacy", "/termini", "/cookie"]) {
+  for (const path of ["/", "/per-i-saloni", "/per-i-saloni/funzioni", "/cerca?dove=Bologna", "/accedi", "/registrati", "/password", "/privacy", "/termini", "/cookie"]) {
     test(`axe su ${path}`, async ({ page }) => {
       await page.goto(path);
       await scan(page, path);

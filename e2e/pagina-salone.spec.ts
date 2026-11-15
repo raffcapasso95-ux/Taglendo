@@ -35,6 +35,40 @@ test.describe("Pagina del salone", () => {
     await expect(page.getByText("1 di 8")).toBeVisible();
   });
 
+  test("«Da sapere»: si compila, resta dopo il ricaricamento e compare sulla pagina pubblica", async ({ page, browser }) => {
+    await freshOwner(page, "Barberia Da Sapere");
+    await page.goto("/impostazioni/pagina");
+    const save = page.getByRole("button", { name: "Salva «Da sapere»" });
+    await expect(save).toBeDisabled();
+    await page.getByLabel("Specialità").fill("Sfumature e barba");
+    await page.getByRole("button", { name: "Carta", exact: true }).click();
+    await page.getByRole("button", { name: "Contanti", exact: true }).click();
+    await page.getByLabel("Bambini fino a (anni)").fill("12");
+    await page.getByRole("group", { name: "Ingresso senza gradini" }).getByRole("button", { name: "Sì" }).click();
+    await page.getByLabel("Come arrivare").fill("3 min dalla stazione");
+    await save.click();
+    await expect(page.getByText("Da sapere salvato").filter({ visible: true })).toBeVisible();
+    await page.reload();
+    await expect(page.getByLabel("Specialità")).toHaveValue("Sfumature e barba");
+    await expect(page.getByRole("button", { name: "Carta", exact: true })).toHaveAttribute("aria-pressed", "true");
+
+    // un'età sbagliata si dice e non si salva
+    await page.getByLabel("Bambini fino a (anni)").fill("40");
+    await save.click();
+    await expect(page.getByText("Scrivi un’età tra 1 e 17, oppure lascia vuoto.")).toBeVisible();
+
+    const slug = (await page.getByText(/\/barberia-da-sapere/).first().innerText()).split("/").pop()!;
+    const visitor = await browser.newPage();
+    await visitor.goto(`/${slug}`);
+    const know = visitor.locator("#info");
+    await expect(know.getByText("Sfumature e barba")).toBeVisible();
+    await expect(know.getByText("In salone: contanti e carta")).toBeVisible();
+    await expect(know.getByText("Sì, fino a 12 anni")).toBeVisible();
+    await expect(know.getByText("Ingresso senza gradini")).toBeVisible();
+    await expect(visitor.getByText("3 min dalla stazione").first()).toBeVisible();
+    await visitor.close();
+  });
+
   test("il logo si carica, compare in agenda e sulla pagina pubblica, e si toglie", async ({ page, browser }) => {
     await freshOwner(page, "Barberia Col Logo");
     await page.goto("/impostazioni/pagina");

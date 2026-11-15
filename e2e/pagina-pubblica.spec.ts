@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { freshOwner } from "./agenda-helpers";
-import { adminUpdate, signIn, visibleText } from "./helpers";
+import { adminSelect, adminUpdate, signIn, visibleText } from "./helpers";
 
 const SALON = "5a100000-0000-4000-8000-000000000001";
 const PAGE = "/barberia-saragozza";
@@ -11,10 +11,12 @@ test.describe("Pagina pubblica del salone", () => {
     await page.goto(PAGE);
     await expect(page).toHaveTitle(/Barberia Saragozza/);
     await expect(page.getByRole("heading", { level: 1, name: "Barberia Saragozza" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Prenota in un minuto." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Servizi", exact: true })).toBeVisible();
+    await expect(page.locator("#prenota-card")).toBeVisible();
     await expect(page.locator("#prenota-card").getByRole("button", { name: /^Taglio uomo.*20 €/ })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Chi ti taglia." })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Via Saragozza 48, Bologna" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Chi ti taglia" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Orari e indirizzo" })).toBeVisible();
+    await expect(page.getByText("Via Saragozza 48, Bologna").first()).toBeVisible();
     await expect(page.getByText("Lunedì").first()).toBeVisible();
     await expect(page.getByRole("link", { name: "051 644 2190" }).first()).toHaveAttribute("href", "tel:+390516442190");
   });
@@ -31,7 +33,7 @@ test.describe("Pagina pubblica del salone", () => {
       await page.goto(PAGE);
       await expect(page.locator("#prenota-card").getByRole("button", { name: /^Taglio uomo/ })).toBeVisible();
       await expect(page.getByText(/\d+ €/)).toHaveCount(0);
-      await expect(page.getByRole("link", { name: "Vedi servizi" })).toBeVisible();
+      await expect(page.getByText("Prezzi in salone.")).toBeVisible();
     } finally {
       await adminUpdate("salons", `id=eq.${SALON}`, { show_prices: true });
     }
@@ -89,5 +91,59 @@ test.describe("Salone nell'app", () => {
     await visitor.goto(new globalThis.URL(href!).pathname);
     await expect(visitor.getByRole("heading", { level: 1, name: "Barberia Nuova Pagina" })).toBeVisible();
     await visitor.close();
+  });
+});
+
+test.describe("Pagina del salone (ridisegno del sito)", () => {
+  test("intestazione: percorso, logo con le iniziali, stato, tre fatti, azioni", async ({ page, viewport }) => {
+    await page.goto(PAGE);
+    // il percorso c'è solo da computer (sul telefono è nascosto)
+    if ((viewport?.width ?? 0) >= 900) await expect(page.getByRole("link", { name: "Barbieri a Bologna" })).toHaveAttribute("href", "/barbieri/bologna");
+    await expect(page.getByRole("img", { name: "Logo di Barberia Saragozza" })).toBeVisible(); // senza logo: iniziali nello squircle
+    await expect(page.getByText(/^(Aperto ora · chiude alle|Chiuso ·|In pausa ·)/).first()).toBeVisible();
+    await expect(page.getByText("Chiuso dom. e lun.")).toBeVisible();
+    await expect(page.getByText("3 barbieri")).toBeVisible();
+    await expect(page.getByText("Andrea, Marco e Simone")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Indicazioni" })).toHaveAttribute("href", "#dove");
+  });
+
+  test("«Da sapere» mostra solo le righe compilate e «Disdette» dalle regole", async ({ page }) => {
+    await page.goto(PAGE);
+    const know = page.locator("#info");
+    await expect(know.getByRole("heading", { name: "Da sapere" })).toBeVisible();
+    await expect(know.getByText("In salone: contanti, carta e bancomat")).toBeVisible();
+    await expect(know.getByText("Sì, fino a 12 anni")).toBeVisible();
+    await expect(know.getByText("Gratis fino a 2 ore prima")).toBeVisible();
+    await expect(know.getByText("Queste informazioni le scrive il salone.")).toBeVisible();
+  });
+
+  test("«Prenota» su un servizio apre il modulo su quel servizio (e salta alla scelta del barbiere)", async ({ page }) => {
+    await page.goto(PAGE);
+    await page.locator("#servizi").getByRole("link", { name: "Prenota Barba" }).click();
+    const card = page.locator("#prenota-card");
+    await expect(card.getByRole("heading", { name: "Con chi?" })).toBeVisible();
+    await expect(card.getByText("Passo 2 di 4 · Barbiere")).toBeVisible();
+  });
+
+  test("un salone senza foto, senza logo e senza «Da sapere» è curato: iniziali, niente sezioni vuote", async ({ page }) => {
+    await freshOwner(page, "Barberia Senza Foto");
+    const [salon] = await adminSelect<{ slug: string }>("salons", "select=slug&name=eq.Barberia Senza Foto&order=created_at.desc&limit=1");
+    await page.goto(`/${salon!.slug}`);
+    await expect(page.getByRole("heading", { level: 1, name: "Barberia Senza Foto" })).toBeVisible();
+    await expect(page.getByRole("img", { name: "Logo di Barberia Senza Foto" })).toHaveText("BS");
+    await expect(page.locator("#foto")).toHaveCount(0);
+    await expect(page.locator("#info")).toHaveCount(0);
+    await expect(page.getByRole("navigation", { name: "Sezioni" }).getByRole("link", { name: "Da sapere" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Orari e indirizzo" })).toBeVisible();
+  });
+
+  test("«Condividi» copia l'indirizzo della pagina dove non c'è la condivisione del telefono", async ({ page, context }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]).catch(() => {});
+    await page.addInitScript(() => {
+      Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
+    });
+    await page.goto(PAGE);
+    await page.getByRole("button", { name: "Condividi" }).click();
+    await expect(page.getByRole("button", { name: "Indirizzo copiato" })).toBeVisible();
   });
 });

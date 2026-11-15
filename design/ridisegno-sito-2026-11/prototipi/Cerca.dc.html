@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Barbieri a Napoli · Taglendo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:Manrope;src:url("/_blob/0934ad8566f18feaf7ed742aecd241bb") format("truetype");font-weight:200 800}
+body{margin:0;background:#FFF7F0}
+a{color:#3E2532}a:hover{color:#523342}
+.tg *{box-sizing:border-box}
+.tg{font-family:Manrope,Arial,sans-serif;color:#3E2532;background:#FFF7F0;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:clip}
+.wrap{max-width:1248px;margin:0 auto;padding:0 32px}
+.muted{color:#725C66}
+.num{font-variant-numeric:tabular-nums}
+.h2{margin:0;font-size:40px;line-height:1.1;font-weight:700;letter-spacing:-.035em}
+.lbl{font-size:13px;font-weight:600;letter-spacing:.04em;color:#725C66}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:12px;background:#3E2532;color:#FFF7F0;font:inherit;font-weight:600;font-size:16px;text-decoration:none;white-space:nowrap;border:0;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms ease}
+.btn:hover{background:#523342;color:#FFF7F0}
+.btn:active,.press:active{transform:scale(.97)}
+.btn-l{background:#FFF7F0;color:#3E2532}.btn-l:hover{background:#FFFFFF;color:#3E2532}
+.btn-o{background:transparent;color:inherit;border:1px solid currentColor}
+.slot{display:inline-flex;align-items:center;justify-content:center;min-height:40px;min-width:62px;padding:0 10px;border-radius:8px;border:1px solid #7FB29B;background:#EEF6F1;color:#21624E;font:inherit;font-weight:600;font-size:14px;font-variant-numeric:tabular-nums;text-decoration:none;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms ease,color 160ms ease}
+.slot:active{transform:scale(.96)}
+.slot.on{background:#3E2532;border-color:#3E2532;color:#FFF7F0}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid #E6D9DC;background:#FFFFFF;font:inherit;font-size:14px;font-weight:600;color:#3E2532;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,transform 160ms cubic-bezier(.23,1,.32,1)}
+.chip:active{transform:scale(.96)}
+.chip.on{background:#3E2532;border-color:#3E2532;color:#FFF7F0}
+.sq{border-radius:22%}
+.bw{filter:grayscale(1)}
+.rise{animation:rise 480ms cubic-bezier(.23,1,.32,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.fade{animation:fade 300ms ease both}
+@keyframes fade{from{opacity:0}}
+.toast-in{animation:toast 420ms cubic-bezier(.23,1,.32,1) both}
+@keyframes toast{from{opacity:0;transform:translateY(-14px) scale(.97)}}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+details .plus{transition:transform 220ms cubic-bezier(.23,1,.32,1)}
+details[open] .plus{transform:rotate(45deg)}
+:focus-visible{outline:3px solid #3E2532;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.rise,.fade,.toast-in{animation:none}*{transition-duration:1ms!important}}
+.tg{-webkit-tap-highlight-color:transparent}
+.tg input,.tg select,.tg textarea{font-size:16px}
+@media (max-width:960px){
+ .chip,.slot{min-height:48px}
+ .slot{font-size:15px}
+ .btn{min-height:48px}
+}
+
+.mapin{position:absolute;inset:0;transform-origin:44% 56%;transition:transform 420ms cubic-bezier(.77,0,.175,1)}
+.radius{position:absolute;left:44%;top:56%;width:300px;height:300px;margin:-150px 0 0 -150px;border-radius:50%;background:rgba(242,140,111,.08);border:1.5px dashed rgba(242,140,111,.5)}
+.me{position:absolute;left:44%;top:56%;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:#F28C6F;border:3px solid #FFFFFF;box-shadow:0 2px 8px rgba(62,37,50,.3);transform:scale(calc(1 / var(--z,1)))}
+.pins .pin{position:absolute;display:inline-flex;align-items:center;gap:6px;padding:6px 12px 6px 9px;border-radius:999px;border:2px solid #21624E;background:#FFFFFF;color:#3E2532;font:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;box-shadow:0 6px 16px rgba(62,37,50,.22);transition:transform 220ms cubic-bezier(.23,1,.32,1),background-color 200ms ease,color 200ms ease,border-color 200ms ease;font-variant-numeric:tabular-nums}
+.pins .pin::after{content:"";position:absolute;left:50%;bottom:-6px;width:10px;height:10px;transform:translateX(-50%) rotate(45deg);background:inherit;border-right:inherit;border-bottom:inherit;border-radius:0 0 2px 0}
+.pins .pin .pdot{width:8px;height:8px;border-radius:50%;background:#21624E;flex-shrink:0}
+.pins .pin .pname{display:none;font-weight:600}
+.pins .pin.tom{border-style:dashed;border-color:#A88C99;color:#725C66}
+.pins .pin.tom .pdot{background:#A88C99}
+.pins .pin.hov .pname,.pins .pin.on .pname{display:inline}
+.pins .pin.hov .pname::before,.pins .pin.on .pname::before{content:"· "}
+.pins .pin.on{background:#3E2532;border-color:#3E2532;color:#FFF7F0}
+.pins .pin.on .pdot{background:#7FB29B}
+.mbtn{position:absolute;left:50%;top:16px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:999px;border:0;background:#3E2532;color:#FFF7F0;font:inherit;font-weight:600;box-shadow:0 8px 20px rgba(62,37,50,.28);cursor:pointer;z-index:5;animation:rise 300ms cubic-bezier(.23,1,.32,1) both}
+.mtoast{position:absolute;left:50%;top:16px;transform:translateX(-50%);margin:0;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;background:#FFFFFF;color:#21624E;font-weight:600;font-size:14px;box-shadow:0 8px 20px rgba(62,37,50,.18);z-index:5;white-space:nowrap}
+.mctl{position:absolute;right:16px;top:16px;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:0 4px 12px rgba(62,37,50,.15);z-index:4}
+.mctl button{width:48px;height:48px;display:flex;align-items:center;justify-content:center;border:0;border-bottom:1px solid #E6D9DC;background:#FFFFFF;color:#3E2532;cursor:pointer}
+.mctl button:last-child{border-bottom:0}
+.mctl button:hover{background:#FBF0E9}
+.legend{position:absolute;left:16px;top:16px;margin:0;display:flex;gap:14px;padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.92);font-size:13px;color:#725C66;z-index:4}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:12px;height:12px;border-radius:50%;box-sizing:border-box}
+.selcard{position:absolute;left:24px;right:24px;bottom:24px;display:flex;gap:16px;align-items:flex-start;padding:14px;border-radius:20px;background:#FFFFFF;box-shadow:0 16px 40px rgba(62,37,50,.22);z-index:5}
+.xbtn{width:32px;height:32px;border-radius:50%;border:0;background:#FBF0E9;color:#3E2532;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.vtoggle{display:none}
+@media (prefers-reduced-motion:reduce){.mapin{transition:none}}
+
+.fbar{display:flex;align-items:center;gap:16px;margin-top:16px;min-width:0}
+.searchband{position:relative;z-index:3}
+.fpanel{position:absolute;left:32px;top:calc(100% - 8px);width:640px;max-width:calc(100% - 64px);padding:24px;border-radius:24px;background:#FFFFFF;border:1px solid #E6D9DC;box-shadow:0 24px 60px rgba(62,37,50,.2);transform-origin:top left;animation:pop 200ms cubic-bezier(.23,1,.32,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(-6px) scale(.97)}}
+@media (prefers-reduced-motion:reduce){.fpanel{animation:none}}
+.fgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px 28px}
+.fgrid fieldset{border:0;margin:0;padding:0;min-width:0}
+.fgrid legend{padding:0;margin-bottom:10px;font-size:14px;font-weight:700}
+.fchips{display:flex;flex-wrap:wrap;gap:8px}
+.seg{display:flex;padding:4px;border-radius:999px;background:#FBF0E9}
+.seg button{flex:1;min-height:40px;border:0;border-radius:999px;background:transparent;font:inherit;font-size:14px;font-weight:600;color:#3E2532;cursor:pointer;transition:background-color 160ms ease,color 160ms ease}
+.seg button.on{background:#3E2532;color:#FFF7F0}
+.fbtn.open{border-color:#3E2532}
+
+.searchband{background:#FBF0E9;border-bottom:1px solid #E6D9DC;padding:20px 32px 16px}
+.sbtop{display:flex;justify-content:space-between;align-items:flex-end;gap:32px}
+.spill{flex:1;max-width:720px;display:flex;align-items:center;background:#FFFFFF;border:1px solid #E6D9DC;border-radius:999px;padding:6px 6px 6px 8px;box-shadow:0 6px 20px rgba(62,37,50,.08)}
+.spill label{flex:1;min-width:0;display:flex;flex-direction:column;padding:2px 18px;border-right:1px solid #E6D9DC}
+.spill label:nth-child(3){border-right:0}
+.spill .l{font-size:12px;font-weight:600;color:#725C66}
+.spill input,.spill select{border:0;background:transparent;font:inherit;font-size:16px;font-weight:600;color:#3E2532;padding:0;outline:none;width:100%;appearance:none;-webkit-appearance:none}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);height:calc(100vh - 240px);height:calc(100dvh - 240px);min-height:760px}
+.list{overflow:auto;padding:24px 32px 40px}
+.map{position:relative;background:#F3E9E0;overflow:hidden;border-left:1px solid #E6D9DC}
+.item{display:grid;grid-template-columns:190px minmax(0,1fr);gap:20px;padding:18px;border-radius:20px;border:1px solid #E6D9DC;background:#FFFFFF;text-align:left;font:inherit;color:#3E2532;cursor:pointer;width:100%;transition:border-color 200ms ease,box-shadow 200ms ease,transform 160ms cubic-bezier(.23,1,.32,1)}
+.item:active{transform:scale(.99)}
+.pulse{animation:pulse 2s cubic-bezier(.23,1,.32,1) infinite}
+@keyframes pulse{from{transform:scale(.6);opacity:.9}to{transform:scale(1.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pulse{animation:none;opacity:0}}
+.pin{position:absolute;transform:translate(-50%,-100%);display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font:inherit;font-size:14px;font-weight:700;cursor:pointer;border:0;transition:transform 220ms cubic-bezier(.23,1,.32,1),background-color 200ms ease,color 200ms ease;box-shadow:0 6px 16px rgba(62,37,50,.22)}
+.pin::after{content:"";position:absolute;left:50%;bottom:-5px;width:10px;height:10px;transform:translateX(-50%) rotate(45deg);background:inherit;border-radius:2px;z-index:-1}
+@media (max-width:960px){
+ .layout{grid-template-columns:minmax(0,1fr);height:auto}
+ .map{height:600px;border-left:0}
+ .layout.v-list .map{display:none}
+ .layout.v-map .list{display:none}
+ .vtoggle{display:inline-flex;position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:20;align-items:center;gap:8px;min-height:48px;padding:0 22px;border-radius:999px;border:0;background:#3E2532;color:#FFF7F0;font:inherit;font-weight:600;box-shadow:0 10px 24px rgba(62,37,50,.3);cursor:pointer}
+ .legend{display:none}
+ .selcard{left:12px;right:12px;bottom:84px}
+ .selcard > span:first-child{width:64px!important;height:64px!important}
+ .list{padding:16px}
+ .item{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:12px}
+ .navd{display:none!important}
+ .filters{overflow-x:auto;flex-wrap:nowrap!important;width:100%}
+ .searchband{padding:16px}
+ .fpanel{position:fixed;left:0;right:0;top:auto;bottom:0;width:auto;max-width:none;max-height:82vh;overflow:auto;border-radius:24px 24px 0 0;padding:20px 16px calc(16px + env(safe-area-inset-bottom));transform-origin:bottom center;z-index:30}
+ .fgrid{gap:18px}
+ .item span[style*="min-height: 170px"]{min-height:120px!important}
+ .sbtop h1{font-size:26px!important}
+ header a[href="Saloni.dc.html"]{white-space:nowrap;padding:0 12px!important;font-size:14px!important}
+ .item b[style*="white-space: nowrap"]{white-space:normal!important;font-size:18px!important}
+ .list{padding-bottom:96px}
+ .fgrid{grid-template-columns:minmax(0,1fr)}
+ .sbtop{flex-direction:column;align-items:stretch;gap:14px}
+ .spill{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-radius:20px;padding:6px;gap:0}
+ .spill label{padding:8px 12px;border-right:0;border-bottom:1px solid #E6D9DC}
+ .spill label:nth-child(1){border-right:1px solid #E6D9DC}
+ .spill label:nth-child(2){grid-column:1 / -1;order:3}
+ .spill label:nth-child(3){order:2;border-bottom:1px solid #E6D9DC}
+ .spill .btn{grid-column:1 / -1;order:4;width:100%;margin-top:6px;border-radius:14px!important}
+ .fbar .navd{display:inline-flex!important}
+ .fbar{flex-wrap:wrap;gap:10px}
+ .fbar > label{order:-1;margin-left:auto}
+}
+
+</style>
+</helmet>
+<div class="tg">
+
+<header style="background: #FFF7F0; border-bottom: 1px solid #E6D9DC; position: relative; z-index: 4">
+  <div style="height: 72px; padding: 0 32px; display: flex; align-items: center; gap: 28px">
+    <a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none" aria-label="Taglendo, home"><img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 32px; height: 32px"><img src="/_blob/1418e113c6c1af21cabc2496df544105" alt="" style="width: 124px; height: auto"></a>
+    <nav class="navd" aria-label="Servizi" style="display: flex; gap: 22px; font-size: 15px; font-weight: 600"><a href="#" style="text-decoration: none">Taglio</a><a href="#" style="text-decoration: none">Barba</a><a href="#" style="text-decoration: none">Sfumatura</a><a href="#" style="text-decoration: none">Rasatura</a><a href="#" style="text-decoration: none">Bambini</a></nav>
+    <a href="Saloni.dc.html" style="margin-left: auto; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #A88C99">Hai un salone?</a>
+  </div>
+</header>
+<section class="searchband" aria-label="La tua ricerca">
+  <div class="sbtop">
+    <div style="min-width: 0"><p class="muted" style="margin: 0; font-size: 14px"><a href="Main.dc.html" style="color: #725C66">Home</a> · Barbieri · Napoli</p><h1 style="margin: 4px 0 0; font-size: 32px; font-weight: 700; letter-spacing: -0.03em">Barbieri a Napoli</h1></div>
+    <form role="search" aria-label="Modifica la ricerca" class="spill">
+      <label><span class="l">Cosa</span><select><option>Taglio uomo</option><option>Barba</option><option>Taglio e barba</option></select></label>
+      <label><span class="l">Dove</span><input value="Napoli"></label>
+      <label><span class="l">Quando</span><select><option>Oggi</option><option>Domani</option><option>Questo weekend</option></select></label>
+      <button type="button" class="btn press" style="border-radius: 999px; min-height: 48px; padding: 0 22px">Aggiorna</button>
+    </form>
+  </div>
+  <div class="fbar">
+    <div class="filters" style="display: flex; gap: 8px; align-items: center; min-width: 0; flex: 1">
+      <button type="button" class="chip fbtn {{ panelCls }}" onClick="{{ togglePanel }}" aria-expanded="{{ panel }}" aria-controls="tutti-filtri" style="border-radius: 999px; white-space: nowrap"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filtri<sc-if value="{{ hasActive }}" hint-placeholder-val="{{ true }}"><span class="num" style="min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: #F28C6F; color: #2E1B25; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center">{{ nActive }}</span></sc-if></button>
+      <span aria-hidden="true" style="width: 1px; height: 24px; background: #E6D9DC; flex-shrink: 0"></span>
+      <sc-for list="{{ quick }}" as="f" hint-placeholder-count="6"><button type="button" class="chip {{ f.cls }}" onClick="{{ f.pick }}" aria-pressed="{{ f.on }}" style="border-radius: 999px; white-space: nowrap">{{ f.label }}</button></sc-for>
+    </div>
+    <label class="chip navd" style="border-radius: 999px; gap: 6px; flex-shrink: 0"><span class="muted">Ordina</span><select onChange="{{ setSort }}" style="border: 0; background: transparent; font: inherit; font-weight: 600; color: #3E2532; cursor: pointer"><option value="km">Più vicini</option><option value="first">Primo orario libero</option></select></label>
+  </div>
+  <sc-if value="{{ panel }}" hint-placeholder-val="{{ false }}">
+  <div id="tutti-filtri" class="fpanel" role="dialog" aria-label="Tutti i filtri">
+    <div class="fgrid">
+      <fieldset><legend>Distanza massima</legend><div class="seg"><sc-for list="{{ kms }}" as="k" hint-placeholder-count="4"><button type="button" class="{{ k.cls }}" onClick="{{ k.pick }}" aria-pressed="{{ k.on }}">{{ k.label }}</button></sc-for></div></fieldset>
+      <fieldset><legend>Quando</legend><div class="fchips"><sc-for list="{{ whens }}" as="f" hint-placeholder-count="3"><button type="button" class="chip {{ f.cls }}" onClick="{{ f.pick }}" aria-pressed="{{ f.on }}">{{ f.label }}</button></sc-for></div></fieldset>
+      <fieldset><legend>Fascia oraria</legend><div class="fchips"><sc-for list="{{ bands }}" as="f" hint-placeholder-count="3"><button type="button" class="chip {{ f.cls }}" onClick="{{ f.pick }}" aria-pressed="{{ f.on }}"><span>{{ f.label }}</span><span class="muted" style="font-weight: 400">{{ f.sub }}</span></button></sc-for></div></fieldset>
+      <fieldset><legend>Servizio</legend><div class="fchips"><sc-for list="{{ svcs }}" as="f" hint-placeholder-count="4"><button type="button" class="chip {{ f.cls }}" onClick="{{ f.pick }}" aria-pressed="{{ f.on }}">{{ f.label }}</button></sc-for></div></fieldset>
+    </div>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #E6D9DC">
+      <button type="button" onClick="{{ reset }}" style="border: 0; background: transparent; font: inherit; font-weight: 600; color: #3E2532; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; min-height: 44px">Azzera tutto</button>
+      <button type="button" class="btn press" onClick="{{ togglePanel }}" style="border-radius: 999px">{{ showLabel }}</button>
+    </div>
+  </div>
+  </sc-if>
+</section>
+<div class="layout {{ viewCls }}">
+  <section class="list" aria-label="Barbieri trovati">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; min-height: 32px">
+      <p style="margin: 0; font-size: 15px" aria-live="polite"><b class="num" style="font-weight: 700">{{ countLabel }}</b> <span class="muted">entro {{ kmLabel }}</span></p>
+      <sc-if value="{{ hasActive }}" hint-placeholder-val="{{ true }}"><div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; min-width: 0"><sc-for list="{{ activeTags }}" as="t" hint-placeholder-count="2"><button type="button" onClick="{{ t.off }}" aria-label="Togli il filtro {{ t.label }}" class="press" style="display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 8px 0 12px; border-radius: 999px; border: 0; background: #F8D6C6; font: inherit; font-size: 13px; font-weight: 600; color: #3E2532; cursor: pointer">{{ t.label }}<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button></sc-for></div></sc-if>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 14px"><sc-if value="{{ show0 }}" hint-placeholder-val="{{ true }}"><button type="button" class="item rise" onClick="{{ p0 }}" onMouseEnter="{{ h0 }}" onMouseLeave="{{ hOff }}" style="animation-delay: 0ms; order: {{ o0 }}; border-color: {{ bd0 }}; box-shadow: {{ sh0 }}">
+  <span style="position: relative; display: block; border-radius: 14px; overflow: hidden; background: #3E2532; min-height: 170px"><img src="/_blob/57e573ea058de07abd6f25aca0835892" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; display: block"></span>
+  <span style="min-width: 0; display: flex; flex-direction: column; gap: 8px">
+    <span style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><b style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Figarò</b><span class="num" style="font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; color: #725C66"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>0,8 km</span></span>
+    <span style="font-size: 14px; display: flex; flex-wrap: wrap; gap: 4px 10px"><span style="color: #21624E; font-weight: 600">● Aperto · fino alle 19:30</span><span class="muted">Via Toledo 116, Napoli</span></span>
+    <span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Taglio uomo</span><b class="num" style="font-weight: 600">20 €</b></span><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Barba</span><b class="num" style="font-weight: 600">12 €</b></span><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Rasatura</span><b class="num" style="font-weight: 600">18 €</b></span></span>
+    <span style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding-top: 10px; border-top: 1px solid #F1E6E8">
+      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span class="muted" style="font-size: 13px; margin-right: 2px">Oggi</span><span class="slot" style="min-width: 0">17:30</span><span class="slot" style="min-width: 0">18:15</span><span class="slot" style="min-width: 0">19:00</span></span>
+      <span style="font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px">Vedi<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+    </span>
+  </span>
+</button></sc-if><sc-if value="{{ show1 }}" hint-placeholder-val="{{ true }}"><button type="button" class="item rise" onClick="{{ p1 }}" onMouseEnter="{{ h1 }}" onMouseLeave="{{ hOff }}" style="animation-delay: 70ms; order: {{ o1 }}; border-color: {{ bd1 }}; box-shadow: {{ sh1 }}">
+  <span style="position: relative; display: block; border-radius: 14px; overflow: hidden; background: #3E2532; min-height: 170px"><img src="/_blob/151441b5a70cee04b32807b48dc1f39a" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 40% 50%; display: block"></span>
+  <span style="min-width: 0; display: flex; flex-direction: column; gap: 8px">
+    <span style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><b style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Barberia Da Nino</b><span class="num" style="font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; color: #725C66"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>1,1 km</span></span>
+    <span style="font-size: 14px; display: flex; flex-wrap: wrap; gap: 4px 10px"><span style="color: #21624E; font-weight: 600">● Aperto · fino alle 20:00</span><span class="muted">Via Toledo 210, Napoli</span></span>
+    <span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Taglio uomo</span><b class="num" style="font-weight: 600">20 €</b></span><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Barba</span><b class="num" style="font-weight: 600">12 €</b></span><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Bambino</span><b class="num" style="font-weight: 600">15 €</b></span></span>
+    <span style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding-top: 10px; border-top: 1px solid #F1E6E8">
+      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span class="muted" style="font-size: 13px; margin-right: 2px">Oggi</span><span class="slot" style="min-width: 0">18:45</span><span class="slot" style="min-width: 0">19:15</span></span>
+      <span style="font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px">Vedi<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+    </span>
+  </span>
+</button></sc-if><sc-if value="{{ show2 }}" hint-placeholder-val="{{ true }}"><button type="button" class="item rise" onClick="{{ p2 }}" onMouseEnter="{{ h2 }}" onMouseLeave="{{ hOff }}" style="animation-delay: 140ms; order: {{ o2 }}; border-color: {{ bd2 }}; box-shadow: {{ sh2 }}">
+  <span style="position: relative; display: block; border-radius: 14px; overflow: hidden; background: #3E2532; min-height: 170px"><img src="/_blob/81e4d80c61a6ef40dd3c7f715a0f1ca8" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block"><span style="position: absolute; left: 10px; top: 10px; padding: 3px 8px; border-radius: 6px; background: #FFF7F0; font-size: 12px; font-weight: 700">2 barbieri</span></span>
+  <span style="min-width: 0; display: flex; flex-direction: column; gap: 8px">
+    <span style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><b style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Salone Gennaro</b><span class="num" style="font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; color: #725C66"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>2,4 km</span></span>
+    <span style="font-size: 14px; display: flex; flex-wrap: wrap; gap: 4px 10px"><span style="color: #21624E; font-weight: 600">● Aperto · fino alle 20:00</span><span class="muted">Via Scarlatti 64, Napoli</span></span>
+    <span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Taglio uomo</span><b class="num" style="font-weight: 600">18 €</b></span><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Sfumatura</span><b class="num" style="font-weight: 600">22 €</b></span><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Bambino</span><b class="num" style="font-weight: 600">14 €</b></span></span>
+    <span style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding-top: 10px; border-top: 1px solid #F1E6E8">
+      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span class="muted" style="font-size: 13px; margin-right: 2px">Oggi</span><span class="slot" style="min-width: 0">18:00</span><span class="slot" style="min-width: 0">19:30</span></span>
+      <span style="font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px">Vedi<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+    </span>
+  </span>
+</button></sc-if><sc-if value="{{ show3 }}" hint-placeholder-val="{{ true }}"><button type="button" class="item rise" onClick="{{ p3 }}" onMouseEnter="{{ h3 }}" onMouseLeave="{{ hOff }}" style="animation-delay: 210ms; order: {{ o3 }}; border-color: {{ bd3 }}; box-shadow: {{ sh3 }}">
+  <span style="position: relative; display: block; border-radius: 14px; overflow: hidden; background: #3E2532; min-height: 170px"><img src="/_blob/ddf12a07ff5981aa739df84295e9083b" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block"><span style="position: absolute; left: 10px; top: 10px; padding: 3px 8px; border-radius: 6px; background: #FFF7F0; font-size: 12px; font-weight: 700">Nuovo</span></span>
+  <span style="min-width: 0; display: flex; flex-direction: column; gap: 8px">
+    <span style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><b style="font-size: 20px; font-weight: 700; letter-spacing: -0.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Pasquale Barber</b><span class="num" style="font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; color: #725C66"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>9,4 km</span></span>
+    <span style="font-size: 14px; display: flex; flex-wrap: wrap; gap: 4px 10px"><span style="color: #725C66; font-weight: 600">● Chiuso · apre domani alle 9:00</span><span class="muted">Via Luigi Rocco 178, Arzano</span></span>
+    <span style="display: flex; flex-wrap: wrap; gap: 6px"><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Taglio uomo</span><b class="num" style="font-weight: 600">20 €</b></span><span style="display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 8px; background: #FBF0E9; font-size: 13px"><span>Taglio e barba</span><b class="num" style="font-weight: 600">30 €</b></span></span>
+    <span style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; padding-top: 10px; border-top: 1px solid #F1E6E8">
+      <span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span class="muted" style="font-size: 13px; margin-right: 2px">Domani</span><span class="slot" style="min-width: 0">09:00</span><span class="slot" style="min-width: 0">09:30</span><span class="slot" style="min-width: 0">11:00</span></span>
+      <span style="font-size: 14px; font-weight: 600; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px">Vedi<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></span>
+    </span>
+  </span>
+</button></sc-if></div>
+    <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}"><div class="rise" style="padding: 40px 28px; border-radius: 20px; border: 1.5px dashed #A88C99; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px">
+      <img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 44px; height: 44px; opacity: .9">
+      <b style="font-size: 19px; font-weight: 700">Nessuna barberia con questi filtri</b>
+      <span class="muted" style="max-width: 26em">Prova ad allargare la distanza o a togliere un filtro: spesso c’è posto domani mattina.</span>
+      <button type="button" class="btn press" onClick="{{ reset }}" style="border-radius: 999px; margin-top: 6px">Azzera i filtri</button>
+    </div></sc-if>
+    <div style="margin-top: 24px; padding: 18px 20px; border-radius: 18px; background: #FBF0E9; display: flex; align-items: center; gap: 14px">
+      <img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 40px; height: 40px"><span style="flex: 1">Il tuo barbiere non c’è? <b style="font-weight: 700">Digli di Taglendo:</b> per i saloni è gratis.</span>
+    </div>
+  </section>
+  <section class="map" aria-label="Mappa dei barbieri">
+    <div class="mapin" style="transform: scale({{ z }}); --z: {{ z }}">
+      <svg viewBox="0 0 700 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%">
+  <path d="M0 640 C 120 600, 210 660, 300 700 S 470 760, 700 720 L 700 800 L 0 800 Z" fill="#D8E3E6"/>
+  <path d="M0 640 C 120 600, 210 660, 300 700 S 470 760, 700 720" fill="none" stroke="#C8D6DA" stroke-width="3"/>
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round">
+    <path d="M60 0 L 300 520 L 330 700" stroke-width="14"/>
+    <path d="M0 300 C 200 330, 420 300, 700 360" stroke-width="12"/>
+    <path d="M420 0 C 400 200, 360 360, 320 470" stroke-width="10"/>
+    <path d="M0 470 C 180 460, 420 520, 700 500" stroke-width="10"/>
+    <path d="M150 0 L 210 240 L 140 640" stroke-width="7"/>
+    <path d="M560 0 L 520 300 L 600 700" stroke-width="7"/>
+    <path d="M0 160 L 700 200" stroke-width="6"/>
+    <path d="M250 300 L 470 420 M 300 380 L 520 330 M 200 520 L 420 600" stroke-width="5"/>
+  </g>
+  <g fill="#E6EBDD"><rect x="460" y="560" width="120" height="70" rx="14"/><rect x="40" y="350" width="90" height="80" rx="14"/></g>
+  <g font-family="Manrope, Arial, sans-serif" font-size="15" font-weight="600" fill="#A88C99"><text x="250" y="560">Centro storico</text><text x="500" y="300">Vomero</text><text x="380" y="120">Arzano · 9 km</text><text x="80" y="720">Golfo di Napoli</text></g>
+</svg>
+      <span aria-hidden="true" class="radius"></span>
+      <span aria-label="Tu sei qui" class="me"><span class="pulse" style="position: absolute; inset: -9px; border-radius: 50%; border: 2px solid #F28C6F"></span></span>
+      <div class="pins"><sc-if value="{{ show0 }}" hint-placeholder-val="{{ true }}"><button type="button" class="pin {{ pc0 }}" onClick="{{ p0 }}" onMouseEnter="{{ h0 }}" onMouseLeave="{{ hOff }}" aria-label="Figarò, primo posto oggi alle 17:30" style="left: 42%; top: 58%; z-index: {{ pz0 }}; transform: translate(-50%,-100%) scale({{ ps0 }})"><span class="pdot"></span><span class="pt">17:30</span><span class="pname">Figarò</span></button></sc-if><sc-if value="{{ show1 }}" hint-placeholder-val="{{ true }}"><button type="button" class="pin {{ pc1 }}" onClick="{{ p1 }}" onMouseEnter="{{ h1 }}" onMouseLeave="{{ hOff }}" aria-label="Barberia Da Nino, primo posto oggi alle 18:45" style="left: 47%; top: 46%; z-index: {{ pz1 }}; transform: translate(-50%,-100%) scale({{ ps1 }})"><span class="pdot"></span><span class="pt">18:45</span><span class="pname">Barberia Da Nino</span></button></sc-if><sc-if value="{{ show2 }}" hint-placeholder-val="{{ true }}"><button type="button" class="pin {{ pc2 }}" onClick="{{ p2 }}" onMouseEnter="{{ h2 }}" onMouseLeave="{{ hOff }}" aria-label="Salone Gennaro, primo posto oggi alle 18:00" style="left: 68%; top: 34%; z-index: {{ pz2 }}; transform: translate(-50%,-100%) scale({{ ps2 }})"><span class="pdot"></span><span class="pt">18:00</span><span class="pname">Salone Gennaro</span></button></sc-if><sc-if value="{{ show3 }}" hint-placeholder-val="{{ true }}"><button type="button" class="pin {{ pc3 }}" onClick="{{ p3 }}" onMouseEnter="{{ h3 }}" onMouseLeave="{{ hOff }}" aria-label="Pasquale Barber, primo posto domani alle 09:00" style="left: 58%; top: 18%; z-index: {{ pz3 }}; transform: translate(-50%,-100%) scale({{ ps3 }})"><span class="pdot"></span><span class="pt">dom 09:00</span><span class="pname">Pasquale Barber</span></button></sc-if></div>
+    </div>
+    <sc-if value="{{ moved }}" hint-placeholder-val="{{ false }}"><button type="button" class="mbtn zone press" onClick="{{ searchZone }}"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>{{ zoneLabel }}</button></sc-if>
+    <sc-if value="{{ toastOn }}" hint-placeholder-val="{{ false }}"><p class="mtoast toast-in" role="status"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>{{ toast }}</p></sc-if>
+    <div class="mctl">
+      <button type="button" class="press" onClick="{{ zoomIn }}" aria-label="Ingrandisci"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button type="button" class="press" onClick="{{ zoomOut }}" aria-label="Riduci"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+      <button type="button" class="press" onClick="{{ locate }}" aria-label="Torna alla mia posizione"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3"/><circle cx="12" cy="12" r="7.5"/></svg></button>
+    </div>
+    <p class="legend"><span><i style="background: #FFFFFF; border: 2px solid #21624E"></i>libero oggi</span><span><i style="background: #FFFFFF; border: 2px dashed #A88C99"></i>libero domani</span></p>
+    <sc-if value="{{ hasSel }}" hint-placeholder-val="{{ true }}"><div class="selcard rise">
+      <span style="width: 96px; height: 96px; border-radius: 16px; overflow: hidden; flex-shrink: 0; background: #3E2532"><img src="{{ selImg }}" alt="" style="width: 100%; height: 100%; object-fit: cover; display: block"></span>
+      <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px"><b style="font-size: 18px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ selName }}</b><button type="button" onClick="{{ closeSel }}" aria-label="Chiudi" class="xbtn"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"/></svg></button></div>
+        <span style="font-size: 14px"><span style="color: {{ selStCol }}; font-weight: 600">● {{ selSt }}</span> <span class="muted">· {{ selKm }}</span></span>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 2px"><span class="muted" style="font-size: 13px">{{ selDay }}</span><sc-for list="{{ selSlots }}" as="t" hint-placeholder-count="3"><a href="Salone.dc.html" class="slot" style="min-width: 0; text-decoration: none">{{ t }}</a></sc-for><a href="Salone.dc.html" class="btn" style="margin-left: auto; min-height: 44px; border-radius: 999px">Vedi la pagina</a></div>
+      </div>
+    </div></sc-if>
+  </section>
+  <button type="button" class="vtoggle press" onClick="{{ toggleView }}">{{ viewLabel }}</button>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"scene": {"editor": "enum", "options": ["base", "selezionato", "filtri", "zona", "vuoto", "mappa"], "default": "base"}, "$preview": {"width": 1440, "height": 1000}}'>
+class Component extends DCLogic {
+state = this.initState();
+initState() {
+  const base = { sel: 0, hov: -1, q: {}, km: 10, sort: 'km', panel: false, z: 1, moved: false, searching: false, toast: '', view: 'list' };
+  const sc = (this.props && this.props.scene) || 'base';
+  const S = { selezionato: { sel: 1, hov: 2 }, filtri: { panel: true, q: { oggi: true, barba: true } }, zona: { z: 1.6, moved: true, sel: -1 }, vuoto: { q: { nuovi: true, sera: true } }, mappa: { view: 'map', sel: 1 } };
+  return Object.assign(base, S[sc] || {});
+}
+componentWillUnmount() { clearTimeout(this.t1); clearTimeout(this.t2); }
+renderVals() {
+  const S = this.state, v = {};
+  const IM = ['/_blob/57e573ea058de07abd6f25aca0835892', '/_blob/151441b5a70cee04b32807b48dc1f39a', '/_blob/81e4d80c61a6ef40dd3c7f715a0f1ca8', '/_blob/ddf12a07ff5981aa739df84295e9083b'], NM = ['Figarò', 'Barberia Da Nino', 'Salone Gennaro', 'Pasquale Barber'], AD = ['Via Toledo 116, Napoli · primo posto oggi alle 17:30', 'Via Toledo 210, Napoli · primo posto oggi alle 18:45', 'Via Scarlatti 64, Napoli · primo posto oggi alle 18:00', 'Via Luigi Rocco 178, Arzano · primo posto domani alle 09:00'], FD = [{"km": 0.8, "oggi": 1, "aperto": 1, "mattina": 0, "pomeriggio": 1, "sera": 1, "nuovi": 0, "svc": ["barba", "rasatura"], "first": 1050}, {"km": 1.1, "oggi": 1, "aperto": 1, "mattina": 0, "pomeriggio": 0, "sera": 1, "nuovi": 0, "svc": ["barba", "bambini"], "first": 1125}, {"km": 2.4, "oggi": 1, "aperto": 1, "mattina": 0, "pomeriggio": 0, "sera": 1, "nuovi": 0, "svc": ["sfumatura", "bambini"], "first": 1080}, {"km": 9.4, "oggi": 0, "aperto": 0, "mattina": 1, "pomeriggio": 0, "sera": 0, "nuovi": 1, "svc": ["barba"], "first": 1980}];
+  const LBL = { oggi: 'Liberi oggi', aperto: 'Aperto ora', mattina: 'Mattina', pomeriggio: 'Pomeriggio', sera: 'Sera', nuovi: 'Nuovi su Taglendo', barba: 'Barba', sfumatura: 'Sfumatura', rasatura: 'Rasatura', bambini: 'Bambini' };
+  const SVC = ['barba', 'sfumatura', 'rasatura', 'bambini'], BANDS = ['mattina', 'pomeriggio', 'sera'];
+  const q = S.q, on = (k) => !!q[k];
+  const toggle = (k) => () => { const n = Object.assign({}, this.state.q); if (n[k]) delete n[k]; else n[k] = true; this.setState({ q: n }); };
+  const pass = (d) => {
+    if (d.km > S.km) return false;
+    if (on('oggi') && !d.oggi) return false;
+    if (on('aperto') && !d.aperto) return false;
+    if (on('nuovi') && !d.nuovi) return false;
+    const bs = BANDS.filter(on); if (bs.length && !bs.some(b => d[b])) return false;
+    if (SVC.some(k => on(k) && d.svc.indexOf(k) < 0)) return false;
+    return true;
+  };
+  const vis = FD.map(pass);
+  const order = FD.map((d, i) => i).sort((a, b) => S.sort === 'km' ? FD[a].km - FD[b].km : FD[a].first - FD[b].first);
+  const sel = S.sel < 0 ? -1 : (vis[S.sel] ? S.sel : vis.indexOf(true));
+  FD.forEach((d, i) => { const isOn = sel === i;
+    v['show' + i] = vis[i]; v['o' + i] = order.indexOf(i);
+    const hv = S.hov === i;
+    v['p' + i] = () => this.setState({ sel: i });
+    v['h' + i] = () => this.setState({ hov: i });
+    v['bd' + i] = isOn || hv ? '#3E2532' : '#E6D9DC'; v['sh' + i] = isOn ? '0 10px 30px rgba(62,37,50,0.12)' : 'none';
+    v['pc' + i] = (d.oggi ? '' : 'tom ') + (isOn ? 'on' : (hv ? 'hov' : ''));
+    v['ps' + i] = ((isOn || hv) ? 1.08 : 1) / S.z; v['pz' + i] = isOn ? 4 : (hv ? 3 : 1); });
+  v.hOff = () => this.setState({ hov: -1 });
+  const n = vis.filter(Boolean).length;
+  v.hasSel = sel >= 0; v.selImg = sel >= 0 ? IM[sel] : ''; v.selName = sel >= 0 ? NM[sel].replace('&amp;', '&') : '';
+  const SL = [["17:30", "18:15", "19:00"], ["18:45", "19:15"], ["18:00", "19:30"], ["09:00", "09:30", "11:00"]], ST = [["Aperto · fino alle 19:30", true], ["Aperto · fino alle 20:00", true], ["Aperto · fino alle 20:00", true], ["Chiuso · apre domani alle 9:00", false]], KM = ["0,8 km", "1,1 km", "2,4 km", "9,4 km"], DY = ["Oggi", "Oggi", "Oggi", "Domani"];
+  v.selSlots = sel >= 0 ? SL[sel] : []; v.selSt = sel >= 0 ? ST[sel][0] : ''; v.selStCol = sel >= 0 && ST[sel][1] ? '#21624E' : '#725C66'; v.selKm = sel >= 0 ? KM[sel] : ''; v.selDay = sel >= 0 ? DY[sel] : '';
+  v.closeSel = () => this.setState({ sel: -1 });
+  v.z = S.z; v.moved = S.moved; v.zoneLabel = S.searching ? 'Cerco in questa zona…' : 'Cerca in questa zona';
+  v.toastOn = !!S.toast; v.toast = S.toast;
+  v.zoomIn = () => this.setState({ z: Math.min(2.2, this.state.z + 0.3), moved: true, toast: '' });
+  v.zoomOut = () => this.setState({ z: Math.max(0.8, this.state.z - 0.3), moved: true, toast: '' });
+  v.locate = () => this.setState({ z: 1, moved: false, toast: '' });
+  v.searchZone = () => { if (this.state.searching) return; this.setState({ searching: true }); clearTimeout(this.t1); this.t1 = setTimeout(() => { this.setState({ searching: false, moved: false, toast: n + (n === 1 ? ' barberia' : ' barberie') + ' in questa zona' }); clearTimeout(this.t2); this.t2 = setTimeout(() => this.setState({ toast: '' }), 2600); }, 700); };
+  v.viewCls = S.view === 'map' ? 'v-map' : 'v-list'; v.viewLabel = S.view === 'map' ? 'Elenco' : 'Mappa';
+  v.toggleView = () => this.setState({ view: this.state.view === 'map' ? 'list' : 'map' });
+  v.empty = n === 0;
+  v.countLabel = n === 1 ? '1 barberia' : n + ' barberie';
+  v.kmLabel = S.km + ' km';
+  v.showLabel = n === 0 ? 'Nessun risultato' : (n === 1 ? 'Mostra 1 barberia' : 'Mostra ' + n + ' barberie');
+  const mk = (k, extra) => Object.assign({ label: LBL[k], on: on(k), cls: on(k) ? 'on' : '', pick: toggle(k) }, extra || {});
+  v.quick = ['oggi', 'aperto', 'sera', 'barba', 'bambini', 'nuovi'].map(k => mk(k));
+  v.whens = ['oggi', 'aperto', 'nuovi'].map(k => mk(k));
+  const SUB = { mattina: 'prima delle 13', pomeriggio: '13–18', sera: 'dopo le 18' };
+  v.bands = BANDS.map(k => mk(k, { sub: SUB[k] }));
+  v.svcs = SVC.map(k => mk(k));
+  v.kms = [2, 5, 10, 20].map(k => ({ label: k + ' km', on: S.km === k, cls: S.km === k ? 'on' : '', pick: () => this.setState({ km: k }) }));
+  const act = Object.keys(q).map(k => ({ label: LBL[k], off: toggle(k) }));
+  if (S.km !== 10) act.push({ label: 'Entro ' + S.km + ' km', off: () => this.setState({ km: 10 }) });
+  v.activeTags = act; v.nActive = act.length; v.hasActive = act.length > 0;
+  v.panel = S.panel; v.panelCls = S.panel ? 'open' : '';
+  v.togglePanel = () => this.setState({ panel: !this.state.panel });
+  v.reset = () => this.setState({ q: {}, km: 10 });
+  v.setSort = (e) => this.setState({ sort: e.target.value });
+  return v;
+}
+}
+</script>
+</body>
+</html>

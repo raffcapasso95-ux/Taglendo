@@ -2166,3 +2166,14 @@
     top: calc(var(--space-16) + var(--space-4));
   }
 }
+
+/* Ridisegno del sito: il modulo nella colonna a destra */
+.bookCard {
+  display: grid;
+  min-width: 0;
+}
+
+.bookCard .bookPanel {
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-book), inset 0 0 0 1px var(--border-subtle);
+}

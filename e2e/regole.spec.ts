@@ -41,7 +41,7 @@ test.describe("Regole di prenotazione", () => {
     await page.getByRole("button", { name: "Salva", exact: true }).click();
     await expect(page.getByText("Regole salvate").filter({ visible: true })).toBeVisible();
     await visitor.reload();
-    await expect(visitor.getByRole("heading", { name: "Servizi e prezzi." })).toBeVisible();
+    await expect(visitor.getByRole("heading", { name: "Prenota al telefono" })).toBeVisible();
     await page.goto("/salone");
     await expect(visibleText(page, "Solo telefono").first()).toBeVisible();
     await visitor.close();

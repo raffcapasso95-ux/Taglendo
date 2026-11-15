@@ -313,14 +313,14 @@ isOneToOne: false
                   ]
                 },"salons": {
                   Row: {
-                    "address": string | null,"area": string | null,"barbers_contacts": boolean,"barbers_edit": boolean,"barbers_see_all": boolean,"booking_online": boolean,"cancel_limit_min": number,"cancel_online": boolean,"city": string | null,"closed_holidays": (string)[],"cover_path": string | null,"created_at": string,"deleted_at": string | null,"description": string | null,"id": string,"instagram": string | null,"lat": number | null,"listed": boolean,"lng": number | null,"logo_path": string | null,"max_advance_days": number,"min_notice_min": number,"name": string,"onboarding_step": number,"patron_day": string | null,"patron_name": string | null,"phone": string | null,"plan": Database["public"]['Enums']["plan_t"],"show_prices": boolean,"slot_step_min": number,"slug": string,"stripe_customer_id": string | null,"stripe_subscription_id": string | null,"sub_status": Database["public"]['Enums']["sub_status_t"],"timezone": string,"trial_ends_at": string,"vat_number": string | null
+                    "access_note": string | null,"address": string | null,"area": string | null,"barbers_contacts": boolean,"barbers_edit": boolean,"barbers_see_all": boolean,"booking_online": boolean,"cancel_limit_min": number,"cancel_online": boolean,"city": string | null,"closed_holidays": (string)[],"cover_path": string | null,"created_at": string,"deleted_at": string | null,"description": string | null,"id": string,"instagram": string | null,"kids_until": number | null,"lat": number | null,"listed": boolean,"lng": number | null,"logo_path": string | null,"max_advance_days": number,"min_notice_min": number,"name": string,"onboarding_step": number,"patron_day": string | null,"patron_name": string | null,"payment_methods": (string)[],"phone": string | null,"plan": Database["public"]['Enums']["plan_t"],"products": string | null,"show_prices": boolean,"slot_step_min": number,"slug": string,"specialties": string | null,"step_free_access": boolean | null,"stripe_customer_id": string | null,"stripe_subscription_id": string | null,"sub_status": Database["public"]['Enums']["sub_status_t"],"timezone": string,"trial_ends_at": string,"vat_number": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"city"?: string | null,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"lat"?: number | null,"listed"?: boolean,"lng"?: number | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name": string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"show_prices"?: boolean,"slot_step_min"?: number,"slug": string,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
+                    "access_note"?: string | null,"address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"city"?: string | null,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"kids_until"?: number | null,"lat"?: number | null,"listed"?: boolean,"lng"?: number | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name": string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"payment_methods"?: (string)[],"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"products"?: string | null,"show_prices"?: boolean,"slot_step_min"?: number,"slug": string,"specialties"?: string | null,"step_free_access"?: boolean | null,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
                   }
                   Update: {
-                    "address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"city"?: string | null,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"lat"?: number | null,"listed"?: boolean,"lng"?: number | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name"?: string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"show_prices"?: boolean,"slot_step_min"?: number,"slug"?: string,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
+                    "access_note"?: string | null,"address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"city"?: string | null,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"kids_until"?: number | null,"lat"?: number | null,"listed"?: boolean,"lng"?: number | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name"?: string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"payment_methods"?: (string)[],"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"products"?: string | null,"show_prices"?: boolean,"slot_step_min"?: number,"slug"?: string,"specialties"?: string | null,"step_free_access"?: boolean | null,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
                   }
                   Relationships: [
                     
@@ -414,6 +414,11 @@ isOneToOne: false
 "check_booking_code":
 { Args: { "p_code_hash": string,"p_email": string,"p_salon": string }; Returns: Json
                            },
+"city_stats":
+{ Args: { "p_limit"?: number }; Returns: {
+              "city": string,"free_today": number,"free_tomorrow": number,"salons": number
+            }[]
+                           },
 "confirm_online_booking":
 { Args: { "p_email": string,"p_marketing": boolean,"p_member": string,"p_name": string,"p_phone": string,"p_salon": string,"p_service": string,"p_starts": string }; Returns: Json
                            },
@@ -424,12 +429,12 @@ isOneToOne: false
 { Args: { "p_client": string }; Returns: number
                            },
 "find_salons":
-{ Args: { "p_lat": number,"p_limit"?: number,"p_lng": number,"p_radius_km"?: number }; Returns: {
+{ Args: { "p_date": string,"p_lat": number,"p_limit": number,"p_lng": number,"p_radius_km": number,"p_service": string }; Returns: {
               "address": string,"area": string,"booking_online": boolean,"city": string,"cover_path": string,"distance_km": number,"lat": number,"lng": number,"logo_path": string,"name": string,"next_slots": (string)[],"price_from_cents": number,"services": Json,"slug": string
             }[]
                            } |
-{ Args: { "p_date": string,"p_lat": number,"p_limit": number,"p_lng": number,"p_radius_km": number,"p_service": string }; Returns: {
-              "address": string,"area": string,"booking_online": boolean,"city": string,"cover_path": string,"distance_km": number,"lat": number,"lng": number,"logo_path": string,"name": string,"next_slots": (string)[],"price_from_cents": number,"services": Json,"slug": string
+{ Args: { "p_date": string,"p_filters": Json,"p_lat": number,"p_limit": number,"p_lng": number,"p_radius_km": number,"p_service": string }; Returns: {
+              "address": string,"area": string,"barbers": number,"booking_online": boolean,"city": string,"closes_min": number,"cover_path": string,"distance_km": number,"is_new": boolean,"lat": number,"lng": number,"logo_path": string,"name": string,"next_slots": (string)[],"open_now": boolean,"price_from_cents": number,"services": Json,"slug": string
             }[]
                            },
 "free_slots":
@@ -456,7 +461,7 @@ isOneToOne: false
                            },
 "recent_salons":
 { Args: { "p_limit"?: number }; Returns: {
-              "area": string,"city": string,"cover_path": string,"logo_path": string,"name": string,"price_from_cents": number,"services": (string)[],"slug": string
+              "address": string,"area": string,"barbers": number,"city": string,"cover_path": string,"first_today": string,"logo_path": string,"name": string,"price_from_cents": number,"services": (string)[],"slug": string
             }[]
                            },
 "register_salon":

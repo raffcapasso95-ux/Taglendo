@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { cx } from "@/components/ui/cx";
-import styles from "./Shop.module.css";
+import styles from "./Page.module.css";
 
 /** La barra in basso del telefono: si abbassa mentre il cliente è dentro la prenotazione, per non coprirne i campi. */
 export function BottomBar({ hideWhileVisible, children }: { hideWhileVisible?: string; children: ReactNode }) {
@@ -18,7 +18,7 @@ export function BottomBar({ hideWhileVisible, children }: { hideWhileVisible?: s
   }, [hideWhileVisible]);
 
   return (
-    <div className={cx(styles.bar, hidden && styles.barHidden)} aria-hidden={hidden || undefined} inert={hidden}>
+    <div className={cx(styles.mbook, hidden && styles.mbookHidden)} aria-hidden={hidden || undefined} inert={hidden}>
       {children}
     </div>
   );

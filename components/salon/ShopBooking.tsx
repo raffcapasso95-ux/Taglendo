@@ -33,6 +33,8 @@ type Props = {
   week: DayHours[];
   /** Tempo di annullamento gratuito, già scritto («2 ore»), o null se si annulla solo al telefono. */
   cancelLimit: string | null;
+  /** «card»: il modulo da solo, nella colonna a destra della pagina (ridisegno del sito); senza il riquadro «Annulli gratis». */
+  variant?: "full" | "card";
 };
 
 type Step = "servizio" | "barbiere" | "orario" | "dati" | "codice" | "fatto";
@@ -56,7 +58,7 @@ const Chev = () => (
   </svg>
 );
 
-export function ShopBooking({ slug, phone, privacyHref, services, members, showPrices, today, maxAdvanceDays, week, cancelLimit }: Props) {
+export function ShopBooking({ slug, phone, privacyHref, services, members, showPrices, today, maxAdvanceDays, week, cancelLimit, variant = "full" }: Props) {
   const team = members.length;
   const solo = team <= 1;
   const steps: Step[] = solo ? ["servizio", "orario", "dati"] : ["servizio", "barbiere", "orario", "dati"];
@@ -120,6 +122,24 @@ export function ShopBooking({ slug, phone, privacyHref, services, members, showP
     window.addEventListener("shop:pick-barber", onPick);
     return () => window.removeEventListener("shop:pick-barber", onPick);
   }, [members, serviceId, go]);
+
+  // «Prenota» su una riga dei servizi
+  useEffect(() => {
+    const onPick = (e: Event) => {
+      const id = (e as CustomEvent<{ id: string }>).detail.id;
+      if (!services.some((s) => s.id === id)) return;
+      if (id !== serviceId) {
+        setServiceId(id);
+        setStartMin(null);
+        setDay(null);
+        setCache(new Map());
+        setLoaded(false);
+      }
+      go(solo || memberId !== null ? "orario" : "barbiere");
+    };
+    window.addEventListener("shop:pick-service", onPick);
+    return () => window.removeEventListener("shop:pick-service", onPick);
+  }, [services, serviceId, memberId, solo, go]);
 
   const addDays_ = (days: DaySlots[], from: string, count: number) =>
     setCache((prev) => {
@@ -389,7 +409,7 @@ export function ShopBooking({ slug, phone, privacyHref, services, members, showP
   const priceLine = (s: Service) => (showPrices ? formatPrice(s.priceCents) : null);
 
   return (
-    <div className={styles.bookLayout} id="prenota-card" ref={rootRef}>
+    <div className={variant === "card" ? styles.bookCard : styles.bookLayout} id="prenota-card" ref={rootRef}>
       {showingWizard ? (
         <div className={cx(styles.bookPanel, styles.wizard)}>
           <div className={styles.wzHead}>
@@ -760,7 +780,7 @@ export function ShopBooking({ slug, phone, privacyHref, services, members, showP
           </div>
         </div>
       ) : null}
-      {aside}
+      {variant === "full" ? aside : null}
     </div>
   );
 }

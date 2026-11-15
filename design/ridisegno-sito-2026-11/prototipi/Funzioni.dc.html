@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Funzioni · Taglendo per i saloni</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:Manrope;src:url("/_blob/0934ad8566f18feaf7ed742aecd241bb") format("truetype");font-weight:200 800}
+body{margin:0;background:#FFF7F0}
+a{color:#3E2532}a:hover{color:#523342}
+.tg *{box-sizing:border-box}
+.tg{font-family:Manrope,Arial,sans-serif;color:#3E2532;background:#FFF7F0;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:clip}
+.wrap{max-width:1248px;margin:0 auto;padding:0 32px}
+.muted{color:#725C66}
+.num{font-variant-numeric:tabular-nums}
+.h2{margin:0;font-size:40px;line-height:1.1;font-weight:700;letter-spacing:-.035em}
+.lbl{font-size:13px;font-weight:600;letter-spacing:.04em;color:#725C66}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:12px;background:#3E2532;color:#FFF7F0;font:inherit;font-weight:600;font-size:16px;text-decoration:none;white-space:nowrap;border:0;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms ease}
+.btn:hover{background:#523342;color:#FFF7F0}
+.btn:active,.press:active{transform:scale(.97)}
+.btn-l{background:#FFF7F0;color:#3E2532}.btn-l:hover{background:#FFFFFF;color:#3E2532}
+.btn-o{background:transparent;color:inherit;border:1px solid currentColor}
+.slot{display:inline-flex;align-items:center;justify-content:center;min-height:40px;min-width:62px;padding:0 10px;border-radius:8px;border:1px solid #7FB29B;background:#EEF6F1;color:#21624E;font:inherit;font-weight:600;font-size:14px;font-variant-numeric:tabular-nums;text-decoration:none;cursor:pointer;transition:transform 160ms cubic-bezier(.23,1,.32,1),background-color 160ms ease,color 160ms ease}
+.slot:active{transform:scale(.96)}
+.slot.on{background:#3E2532;border-color:#3E2532;color:#FFF7F0}
+.chip{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid #E6D9DC;background:#FFFFFF;font:inherit;font-size:14px;font-weight:600;color:#3E2532;cursor:pointer;transition:background-color 160ms ease,border-color 160ms ease,transform 160ms cubic-bezier(.23,1,.32,1)}
+.chip:active{transform:scale(.96)}
+.chip.on{background:#3E2532;border-color:#3E2532;color:#FFF7F0}
+.sq{border-radius:22%}
+.bw{filter:grayscale(1)}
+.rise{animation:rise 480ms cubic-bezier(.23,1,.32,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.fade{animation:fade 300ms ease both}
+@keyframes fade{from{opacity:0}}
+.toast-in{animation:toast 420ms cubic-bezier(.23,1,.32,1) both}
+@keyframes toast{from{opacity:0;transform:translateY(-14px) scale(.97)}}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+details .plus{transition:transform 220ms cubic-bezier(.23,1,.32,1)}
+details[open] .plus{transform:rotate(45deg)}
+:focus-visible{outline:3px solid #3E2532;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.rise,.fade,.toast-in{animation:none}*{transition-duration:1ms!important}}
+.tg{-webkit-tap-highlight-color:transparent}
+.tg input,.tg select,.tg textarea{font-size:16px}
+@media (max-width:960px){
+ .chip,.slot{min-height:48px}
+ .slot{font-size:15px}
+ .btn{min-height:48px}
+}
+
+.fhero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.hart{position:relative;height:400px;min-width:0}
+.hdesk{position:absolute;left:0;right:-160px;top:20px;border-radius:16px;overflow:hidden;border:1px solid #E6D9DC;box-shadow:0 24px 60px rgba(62,37,50,.16);background:#FFFFFF}
+.hdesk img{display:block;width:100%;height:auto}
+.hphone{position:absolute;left:-24px;bottom:-80px;transform:rotate(-3deg)}
+.subnav{position:sticky;top:72px;z-index:9;background:rgba(255,247,240,.94);border-top:1px solid #E6D9DC;border-bottom:1px solid #E6D9DC}
+.subin{display:flex;gap:6px;overflow-x:auto;padding:10px 0}
+.subin a{flex-shrink:0;display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:999px;text-decoration:none;font-weight:600;font-size:15px;transition:background-color 160ms ease}
+.subin a:hover{background:#FBF0E9}
+.mails{position:relative;width:100%;max-width:520px;display:flex;flex-direction:column;gap:10px}
+.mail{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:18px;background:#FFFFFF;box-shadow:0 10px 30px rgba(62,37,50,.12);margin-left:calc(var(--i) * 18px);margin-right:calc((3 - var(--i)) * 18px)}
+.mail .who{font-weight:600;color:#3E2532}
+.mail .who.me{color:#21624E}
+.perm{width:100%;max-width:560px;background:#FFFFFF;border-radius:22px;padding:8px 20px 12px;box-shadow:0 16px 40px rgba(33,98,78,.12)}
+.perm table{width:100%;border-collapse:collapse;font-size:15px}
+.perm caption{text-align:left;padding:12px 0 6px;font-size:13px;font-weight:600;color:#725C66}
+.perm th,.perm td{padding:12px 8px;border-top:1px solid #E6D9DC;text-align:center}
+.perm thead th{border-top:0;font-weight:700}
+.perm tbody th{text-align:left;font-weight:500;padding-left:0}
+.perm .yes{display:inline-flex;width:28px;height:28px;border-radius:50%;background:#EEF6F1;color:#21624E;align-items:center;justify-content:center}
+.perm .no{color:#A88C99}
+.perm .opt{font-size:13px;font-weight:600;color:#725C66;white-space:nowrap}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.nobox{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);gap:48px;padding:48px 0;border-top:2px solid #3E2532}
+.nogrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 36px}
+.nof b{display:block;font-size:18px;font-weight:700;text-decoration:line-through;text-decoration-color:#F28C6F;text-decoration-thickness:2px}
+.nof p{margin:6px 0 0;color:#725C66}
+.toc{display:flex;flex-direction:column;border-top:1px solid #E6D9DC}
+.fsec{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:48px;align-items:center;border-radius:32px;padding:56px;overflow:hidden;scroll-margin-top:150px}
+.fsec:nth-child(even) .ftext{order:2}
+.fsec.dark{color:#FFF7F0}
+.fl{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.fl li{display:flex;gap:12px;align-items:flex-start}
+.fl b{font-weight:600}
+.fl .ck{width:26px;height:26px;border-radius:50%;background:#FFFFFF;color:#21624E;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:-1px}
+.fsec.dark .fl .muted{color:#D9C7CE}
+.fsec.dark .fl .ck{background:rgba(255,247,240,.12);color:#7FB29B}
+.fvis{min-width:0;display:flex;justify-content:center}
+.shot{width:100%;border-radius:18px;overflow:hidden;background:#FFFFFF;box-shadow:0 24px 60px rgba(62,37,50,.18);border:1px solid #E6D9DC}
+.shot img{display:block;width:100%;height:auto}
+.shot.mini{height:420px;position:relative;pointer-events:none}
+.phones{height:440px;overflow:hidden;display:flex;justify-content:center;align-items:flex-start;margin:-56px 0 -56px;padding-top:56px}
+.faqf{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.7fr);gap:56px;align-items:start}
+.fqlist{border-bottom:1px solid #E6D9DC}
+.fq{border-top:1px solid #E6D9DC;padding:20px 0}
+.fq summary{display:flex;justify-content:space-between;align-items:center;gap:16px;font-size:18px;font-weight:700;min-height:32px}
+.fq .plus{width:32px;height:32px;border-radius:50%;border:1px solid #E6D9DC;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.fq p{margin:10px 0 0;max-width:40em;color:#725C66}
+.fq[open] p{animation:rise 260ms cubic-bezier(.23,1,.32,1) both}
+.scard{break-inside:avoid;margin:0 0 20px;padding:22px;border-radius:24px;background:#FFFFFF;border:1px solid #E6D9DC}
+.schead{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.schead h3{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.scard dl{margin:0}
+.srow2{padding:12px 0;border-top:1px solid #F1E6E8}
+.srow2 dt{font-weight:600;font-size:15px}
+.srow2 dd{margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px}
+.srow2 .opt{display:inline-flex;align-items:center;min-height:30px;padding:0 12px;border-radius:999px;background:#FBF0E9;font-size:13px;font-weight:600;color:#3E2532}
+.show-m{display:none!important}
+.grp{border-top:2px solid #3E2532;padding-top:18px;min-width:0}
+.grp h3{margin:0 0 14px;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.fl.sm{gap:10px;font-size:15px}
+.fl.sm li{flex-direction:column;gap:0;padding-left:0}
+.fl.sm .ck{display:none}
+.fl.sm .muted{display:block;font-size:14px}
+
+@media (max-width:960px){
+ .wrap{padding:0 16px}
+ .navd{display:none!important}
+ .fhero{grid-template-columns:minmax(0,1fr);gap:28px}
+ .fsec .ftext{order:0!important}
+ .hart{height:260px}
+ .hdesk{right:-40px}
+ .hphone{display:none}
+ .subnav{top:72px}
+ .nobox,.nogrid{grid-template-columns:minmax(0,1fr);gap:20px}
+ .mail{margin-left:0;margin-right:0}
+ .perm{padding:4px 12px 8px}
+ .perm .opt{white-space:normal}
+ .h1{font-size:40px!important}
+ .h2{font-size:28px!important}
+ .fsec{grid-template-columns:minmax(0,1fr);padding:28px 20px;gap:28px;border-radius:24px}
+ .shot.mini{height:480px;max-width:330px;margin:0 auto}
+ .shot.mini > div{width:390px!important;transform:scale(0.84)!important}
+ .phones{height:360px;margin:0 0 -28px;padding-top:0}
+ .faqf{grid-template-columns:minmax(0,1fr);gap:24px}
+ .tg div[style*="padding: 56px;"]{padding:28px 22px!important}
+ .tg section[style*="padding: 104px 0 88px"]{padding-top:64px!important;padding-bottom:56px!important}
+ .tg section[style*="0 0 104px"]{padding-bottom:56px!important}
+ .perm table{font-size:14px}
+ .perm th,.perm td{padding:10px 4px}
+ .perm .opt{font-size:12px}
+ .fq summary{font-size:16px}
+ .nobox{padding:32px 0}
+ .hart{display:none}
+ .hide-m{display:none!important}
+ .show-m{display:flex!important}
+ .fhero{gap:0}
+
+}
+
+</style>
+</helmet>
+<div class="tg">
+
+<header style="background: #FFF7F0; border-bottom: 1px solid #E6D9DC; position: sticky; top: 0; z-index: 10">
+  <div class="wrap" style="height: 72px; display: flex; align-items: center; gap: 24px">
+    <a href="Saloni.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none" aria-label="Taglendo per i saloni"><img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 32px; height: 32px"><img src="/_blob/1418e113c6c1af21cabc2496df544105" alt="" style="width: 124px; height: auto"></a>
+    <nav class="navd" aria-label="Sezioni" style="display: flex; gap: 24px; font-size: 15px; font-weight: 600; margin-left: auto"><a href="Saloni.dc.html#come" style="text-decoration: none">Come funziona</a><a href="Saloni.dc.html#pagina" style="text-decoration: none">La tua pagina</a><a href="Funzioni.dc.html" aria-current="page" style="text-decoration: underline; text-underline-offset: 6px">Funzioni</a><a href="Saloni.dc.html#costo" style="text-decoration: none">Quanto costa</a></nav>
+    <a href="#" class="navd" style="font-size: 15px; font-weight: 600; text-decoration: none">Accedi</a>
+    <a href="#" class="btn" style="min-height: 44px; border-radius: 999px">Prova gratis</a>
+  </div>
+</header>
+
+<section style="padding: 64px 0 56px; overflow: hidden">
+  <div class="wrap fhero">
+    <div style="min-width: 0">
+      <p class="lbl rise" style="margin: 0 0 14px">Funzioni</p>
+      <h1 class="h1 rise" style="animation-delay: 60ms; margin: 0; font-size: 64px; line-height: 1.02; font-weight: 700; letter-spacing: -0.045em">Tutto quello che c’è dentro Taglendo.</h1>
+      <p class="muted rise" style="animation-delay: 120ms; margin: 18px 0 0; font-size: 19px; max-width: 34em">Niente moduli da comprare a parte: durante la beta è tutto incluso, per ogni barbiere del salone.</p>
+    </div>
+    <div class="hart rise" style="animation-delay: 180ms" aria-hidden="true">
+      <div class="hdesk"><img src="/_blob/4ccd30eb8c8118ba59b3a362144055de" alt=""></div>
+      <div class="hphone"><div style="position: relative; width: 190px; flex-shrink: 0; border-radius: 26px; background: #2E1B25; padding: 6px; box-shadow: 0 30px 60px rgba(46,27,37,0.25); "><div style="border-radius: 20px; overflow: hidden; background: #FFF7F0"><img src="/_blob/030c9e740a82ccdc3a0a0015107454ef" alt="" style="display: block; width: 100%; height: auto"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<nav class="subnav" aria-label="Sezioni della pagina"><div class="wrap"><div class="subin"><a href="#agenda">Agenda</a><a href="#pagina">La tua pagina</a><a href="#prenotazioni">Prenotazioni</a><a href="#team">Il tuo team</a><a href="#tutto">Tutto il resto</a><a href="#nonfa">Cosa non fa</a></div></div></nav>
+<div class="wrap" style="display: flex; flex-direction: column; gap: 20px; padding-top: 28px"><section id="agenda" class="fsec" style="background: #FBF0E9">
+  <div class="ftext">
+    <p class="lbl" style="margin: 0 0 10px; color: #725C66">Agenda</p>
+    <h2 class="h2" style="font-size: 36px">Un’agenda con una colonna per barbiere.</h2>
+    <p style="margin: 12px 0 22px; font-size: 17px; color: #725C66">La apri la mattina e c’è già tutto: chi viene, a che ora, per cosa e con chi. I posti liberi sono in verde.</p>
+    <ul class="fl"><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Griglia, righe o elenco</b> <span class=muted>sul computer</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Poltrone, lista o griglia</b> <span class=muted>sul telefono</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Appuntamenti a mano</b> <span class=muted>per chi chiama o passa in negozio</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>“In negozio ora”</b> <span class=muted>per chi entra senza prenotare</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Sposta un appuntamento</b> <span class=muted>il cliente riceve un’email</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Messaggi WhatsApp pronti</b> <span class=muted>li invii tu, con un tocco</span></span></li></ul>
+  </div>
+  <div class="fvis"><div class="shot hide-m"><img src="/_blob/4ccd30eb8c8118ba59b3a362144055de" alt="L’agenda di Taglendo sul computer"></div><div class="phones show-m"><div style="position: relative; width: 240px; flex-shrink: 0; border-radius: 33px; background: #2E1B25; padding: 7px; box-shadow: 0 30px 60px rgba(46,27,37,0.25); "><div style="border-radius: 26px; overflow: hidden; background: #FFF7F0"><img src="/_blob/91caa56f2a525cb30c8b3a9be1465246" alt="L’agenda di Taglendo sul telefono" style="display: block; width: 100%; height: auto"></div></div></div></div>
+</section><section id="pagina" class="fsec dark" style="background: #3E2532">
+  <div class="ftext">
+    <p class="lbl" style="margin: 0 0 10px; color: #F8D6C6">La tua pagina</p>
+    <h2 class="h2" style="font-size: 36px">La pagina della barberia, pronta in dieci minuti.</h2>
+    <p style="margin: 12px 0 22px; font-size: 17px; color: #D9C7CE">Servizi, foto, barbieri, orari e mappa. Il cliente prenota da lì, senza scaricare app e senza registrarsi.</p>
+    <ul class="fl"><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Logo e presentazione</b> <span class=muted>funziona anche senza foto</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Fino a 8 foto</b> <span class=muted>con una copertina a scelta</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Prezzi visibili o nascosti</b></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>“Prenota con…”</b> <span class=muted>per ogni barbiere</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Solo telefono</b> <span class=muted>se non vuoi la prenotazione online</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Nella ricerca di Taglendo</b> <span class=muted>per i clienti della tua zona</span></span></li></ul>
+  </div>
+  <div class="fvis"><div class="shot mini"><div style="width: 1440px; transform: scale(0.42); transform-origin: top left"><dc-import name="Salone" hint-size="1440px,2800px"></dc-import></div></div></div>
+</section><section id="prenotazioni" class="fsec" style="background: #F8D6C6">
+  <div class="ftext">
+    <p class="lbl" style="margin: 0 0 10px; color: #725C66">Prenotazioni</p>
+    <h2 class="h2" style="font-size: 36px">Il cliente prenota in quattro passi.</h2>
+    <p style="margin: 12px 0 22px; font-size: 17px; color: #725C66">Cosa, con chi, quando, i suoi dati. Conferma con un codice via email, così non arrivano prenotazioni false.</p>
+    <ul class="fl"><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Solo gli orari davvero liberi</b> <span class=muted>calcolati su durata e barbiere</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>“Chi è libero prima”</b> <span class=muted>per chi non ha preferenze</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Codice di conferma via email</b></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Annulla da solo</b> <span class=muted>dal link nell’email, entro il limite che scegli</span></span></li></ul>
+  </div>
+  <div class="fvis"><div class="mails" aria-label="Le email che partono da sole"><div class="mail" style="--i: 0"><img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 36px; height: 36px; flex-shrink: 0"><div style="min-width: 0; flex: 1"><div style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px"><span class="muted">Barberia Porta Nuova · <span class="who ">al cliente</span></span><span class="muted num">09:12</span></div><b style="display: block; font-weight: 700; margin-top: 2px">Il tuo codice: 482 913</b><span class="muted" style="font-size: 14px">Inseriscilo per confermare la prenotazione.</span></div></div><div class="mail" style="--i: 1"><img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 36px; height: 36px; flex-shrink: 0"><div style="min-width: 0; flex: 1"><div style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px"><span class="muted">Barberia Porta Nuova · <span class="who ">al cliente</span></span><span class="muted num">09:13</span></div><b style="display: block; font-weight: 700; margin-top: 2px">Confermato: sabato 14 novembre alle 9:30</b><span class="muted" style="font-size: 14px">Taglio uomo con Chiara · Via Roma 77, Torino</span></div></div><div class="mail" style="--i: 2"><img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 36px; height: 36px; flex-shrink: 0"><div style="min-width: 0; flex: 1"><div style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px"><span class="muted">Barberia Porta Nuova · <span class="who me">a te</span></span><span class="muted num">09:13</span></div><b style="display: block; font-weight: 700; margin-top: 2px">Nuova prenotazione: Gianni Ferraro · sab 9:30</b><span class="muted" style="font-size: 14px">Taglio uomo con Chiara. È già in agenda.</span></div></div><div class="mail" style="--i: 3"><img src="/_blob/b12359ad754d73675d3e7f8f277e3bbf" alt="" style="width: 36px; height: 36px; flex-shrink: 0"><div style="min-width: 0; flex: 1"><div style="display: flex; justify-content: space-between; gap: 10px; font-size: 13px"><span class="muted">Barberia Porta Nuova · <span class="who ">al cliente</span></span><span class="muted num">ven 18:00</span></div><b style="display: block; font-weight: 700; margin-top: 2px">Domani alle 9:30 da Barberia Porta Nuova</b><span class="muted" style="font-size: 14px">A domani, Gianni. Non riesci a venire? Annulla dal link.</span></div></div></div></div>
+</section><section id="team" class="fsec" style="background: #EEF6F1">
+  <div class="ftext">
+    <p class="lbl" style="margin: 0 0 10px">Il tuo team</p>
+    <h2 class="h2" style="font-size: 36px">Fino a tre poltrone, un accesso per barbiere.</h2>
+    <p class="muted" style="margin: 12px 0 22px; font-size: 17px">Inviti ogni barbiere con la sua email. Ognuno entra con la sua password, ha il suo colore in agenda e decidi tu se è prenotabile online.</p>
+    <ul class="fl"><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Invito via email</b> <span class=muted>il link vale 7 giorni</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Colore e foto</b> <span class=muted>per riconoscerlo in agenda</span></span></li><li><span class="ck"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Prenotabile online</b> <span class=muted>sì o no, barbiere per barbiere</span></span></li></ul>
+  </div>
+  <div class="fvis"><div class="perm"><table><caption>Cosa può fare chi</caption><thead><tr><th scope="col"></th><th scope="col">Titolare</th><th scope="col">Barbieri</th></tr></thead><tbody><tr><th scope="row">Vede la sua agenda</th><td><span class="yes"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="vh">sì</span></span></td><td><span class="yes"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="vh">sì</span></span></td></tr><tr><th scope="row">Vede l’agenda di tutti</th><td><span class="yes"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="vh">sì</span></span></td><td><span class="opt">se lo attivi</span></td></tr><tr><th scope="row">Fissa e sposta appuntamenti</th><td><span class="yes"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="vh">sì</span></span></td><td><span class="opt">se lo attivi</span></td></tr><tr><th scope="row">Vede telefono ed email dei clienti</th><td><span class="yes"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="vh">sì</span></span></td><td><span class="opt">se lo attivi</span></td></tr><tr><th scope="row">Cambia listino, orari e regole</th><td><span class="yes"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="vh">sì</span></span></td><td><span class="no">—<span class="vh">no</span></span></td></tr><tr><th scope="row">Statistiche</th><td><span class="yes"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span class="vh">sì</span></span></td><td><span class="no">—<span class="vh">no</span></span></td></tr></tbody></table></div></div>
+</section></div>
+
+<section id="tutto" style="padding: 104px 0 88px">
+  <div class="wrap">
+    <div class="faqf">
+      <div style="min-width: 0"><h2 class="h2">E tutto il resto.</h2><p class="muted" style="margin: 12px 0 0; font-size: 17px">Le domande che ci fanno i barbieri sulle impostazioni di Taglendo.</p><p style="margin: 20px 0 0; font-size: 15px">Non trovi quello che cerchi? <a href="mailto:aiuto@taglendo.it" style="font-weight: 600">Scrivici</a></p></div>
+      <div class="fqlist"><details class="fq" open><summary>Posso decidere quanto prima mi prenotano?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Sì. Scegli il preavviso minimo: 30 minuti, 2 ore o il giorno prima. E fin dove si può prenotare: 2 settimane, 1 mese o 2 mesi.</p></details><details class="fq" ><summary>Ogni quanto vengono proposti gli orari?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Ogni 15 o 30 minuti, come preferisci. Il cliente vede solo gli orari davvero liberi, calcolati sulla durata del servizio.</p></details><details class="fq" ><summary>Il cliente può annullare da solo?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Sì, dal link nell’email, fino a 2 o 24 ore prima. L’orario torna libero da solo. Se preferisci, l’annullamento si fa solo al telefono.</p></details><details class="fq" ><summary>Che email ricevono i clienti?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Il codice per confermare, la conferma, il promemoria (da 2 a 48 ore prima, decidi tu) e un’email se l’appuntamento viene annullato o spostato. Di ognuna vedi l’anteprima.</p></details><details class="fq" ><summary>E io come vengo avvisato?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Quando arriva una prenotazione online, quando un cliente annulla e, se vuoi, ogni mattina alle 8:00 con il riepilogo della giornata.</p></details><details class="fq" ><summary>Posso nascondere i prezzi?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Sì. La pagina mostra servizi e durate senza prezzi: utile se li concordi in salone.</p></details><details class="fq" ><summary>Come gestisco ferie, chiusure e pausa pranzo?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Gli orari di ogni giorno possono avere più fasce. Ferie e chiusure le segni una volta: in quei giorni la pagina non propone orari.</p></details><details class="fq" ><summary>Dove trovo i miei clienti?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Nella rubrica, che si riempie con le prenotazioni. Per ognuno vedi servizi e appuntamenti, e puoi esportare i dati quando vuoi.</p></details><details class="fq" ><summary>Ci sono le statistiche?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Sì, per giorno, settimana e anno, e per barbiere se siete in più di uno. Le vede solo il titolare.</p></details><details class="fq" ><summary>Chi può cambiare queste impostazioni?<span class="plus"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span></summary><p>Solo il titolare. Le modifiche valgono subito, sulla pagina e in agenda.</p></details></div>
+    </div>
+  </div>
+</section>
+
+<section id="nonfa" style="padding: 0 0 104px">
+  <div class="wrap">
+    <div class="nobox">
+      <div style="min-width: 0"><h2 class="h2" style="font-size: 36px">Cosa Taglendo non fa.</h2><p class="muted" style="margin: 12px 0 0; font-size: 17px; max-width: 22em">Meglio dirlo subito. Sono scelte, non dimenticanze.</p></div>
+      <div class="nogrid"><div class="nof"><b>Pagamenti online</b><p>Il cliente paga in salone, come ha sempre fatto. Niente carte da salvare, niente commissioni.</p></div><div class="nof"><b>SMS</b><p>I promemoria partono via email. Su WhatsApp il messaggio è già pronto: lo mandi tu con un tocco.</p></div><div class="nof"><b>Un’app da scaricare</b><p>Si usa dal browser, sul telefono e sul computer. Se vuoi, la aggiungi alla schermata Home.</p></div><div class="nof"><b>Catene e grandi saloni</b><p>È pensato per barberie da una a tre poltrone. Per questo resta semplice.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding: 0 0 104px">
+  <div class="wrap">
+    <div style="border-radius: 28px; background: #3E2532; color: #FFF7F0; padding: 56px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px">
+      <div><h2 class="h2" style="font-size: 36px">Provalo con la tua barberia.</h2><p style="margin: 8px 0 0; color: #D9C7CE">Gratis durante la beta · Senza carta di credito · Zero commissioni</p></div>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px"><a href="#" class="btn btn-l" style="min-height: 56px; padding: 0 28px; border-radius: 999px">Prova gratis</a><a href="Saloni.dc.html#domande" class="btn btn-o" style="min-height: 56px; border-radius: 999px; border-color: rgba(255,247,240,0.45)">Domande frequenti</a></div>
+    </div>
+  </div>
+</section>
+<footer style="background: #2E1B25; color: #FFF7F0; padding: 56px 0 32px">
+  <div class="wrap">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 32px">
+      <div><img src="/_blob/ec0de53bbd71baabea1b1d8f2c1ead3d" alt="Taglendo" style="width: 140px; height: auto"><p style="margin: 12px 0 0; font-size: 14px; color: #D9C7CE; max-width: 26em">Agenda e prenotazioni online per barberie, in Italia.</p></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px"><b style="font-weight: 600; color: #F8D6C6">Per i clienti</b><a href="Main.dc.html" style="color: #D9C7CE; text-decoration: none">Cerca un barbiere</a><a href="Cerca.dc.html" style="color: #D9C7CE; text-decoration: none">Barbieri vicino a te</a></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px"><b style="font-weight: 600; color: #F8D6C6">Per i saloni</b><a href="Saloni.dc.html" style="color: #D9C7CE; text-decoration: none">Taglendo per i saloni</a><a href="Saloni.dc.html" style="color: #D9C7CE; text-decoration: none">Registra il salone</a><a href="Saloni.dc.html" style="color: #D9C7CE; text-decoration: none">Accedi</a></div>
+      <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px"><b style="font-weight: 600; color: #F8D6C6">Taglendo</b><a href="mailto:aiuto@taglendo.it" style="color: #D9C7CE; text-decoration: none">aiuto@taglendo.it</a><span style="color: #D9C7CE">Privacy · Termini · Cookie</span></div>
+    </div>
+    <p style="margin: 40px 0 0; padding-top: 20px; border-top: 1px solid rgba(255,247,240,0.14); font-size: 13px; color: #D9C7CE">© 2026 Taglendo</p>
+  </div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview": {"width": 1440, "height": 4600}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

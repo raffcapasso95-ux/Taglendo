@@ -15,6 +15,8 @@ export type PublicSalon = {
   name: string;
   address: string | null;
   area: string | null;
+  /** Il comune (per il percorso «Barbieri a …»), o null. */
+  city: string | null;
   phone: string;
   description: string | null;
   instagram: string | null;
@@ -33,10 +35,12 @@ export type PublicSalon = {
   /** Indirizzi delle foto del salone (la prima è la copertina). */
   photos: string[];
   week: DayHours[];
+  /** «Da sapere»: campi facoltativi scritti dal salone. */
+  know: { specialties: string | null; paymentMethods: string[]; products: string | null; kidsUntil: number | null; stepFreeAccess: boolean | null; accessNote: string | null };
 };
 
 type Raw = {
-  id: string; slug: string; name: string; address: string | null; area: string | null; phone: string;
+  id: string; slug: string; name: string; address: string | null; area: string | null; city?: string | null; phone: string;
   description: string | null; instagram: string | null; cover_path: string | null; logo_path?: string | null;
   booking_online: boolean; cancel_online: boolean; show_prices: boolean; cancel_limit_min: number;
   min_notice_min: number; max_advance_days: number; sub_status: AccessInput["sub_status"]; trial_ends_at: string;
@@ -44,6 +48,8 @@ type Raw = {
   members: Array<{ id: string; name: string; bio: string | null; photo_path: string | null; chair_no: number }>;
   photos?: string[];
   hours: Array<{ weekday: number; closed: boolean; ranges: Array<[number, number]> }>;
+  specialties?: string | null; payment_methods?: string[] | null; products?: string | null; kids_until?: number | null;
+  step_free_access?: boolean | null; access_note?: string | null;
 };
 
 const CLOSED: DayHours = CLOSED_DAY;
@@ -59,7 +65,7 @@ export const loadPublicSalon = cache(async (slug: string): Promise<PublicSalon |
     return h ? dayFromRanges({ closed: h.closed, ranges: h.ranges }) : CLOSED;
   });
   return {
-    id: r.id, slug: r.slug, name: r.name, address: r.address, area: r.area, phone: r.phone, description: r.description,
+    id: r.id, slug: r.slug, name: r.name, address: r.address, area: r.area, city: r.city ?? null, phone: r.phone, description: r.description,
     instagram: r.instagram, coverPath: r.cover_path, logoUrl: salonLogoUrl(r.logo_path), bookingOnline: r.booking_online, cancelOnline: r.cancel_online,
     showPrices: r.show_prices, cancelLimitMin: r.cancel_limit_min, minNoticeMin: r.min_notice_min, maxAdvanceDays: r.max_advance_days,
     access: { sub_status: r.sub_status, trial_ends_at: r.trial_ends_at },
@@ -67,5 +73,9 @@ export const loadPublicSalon = cache(async (slug: string): Promise<PublicSalon |
     members: r.members.map((m) => ({ id: m.id, name: m.name, bio: m.bio, photoPath: m.photo_path, chairNo: m.chair_no })),
     photos: (r.photos ?? []).map((path) => `${env.url()}/storage/v1/object/public/salon-photos/${path}`),
     week,
+    know: {
+      specialties: r.specialties ?? null, paymentMethods: r.payment_methods ?? [], products: r.products ?? null,
+      kidsUntil: r.kids_until ?? null, stepFreeAccess: r.step_free_access ?? null, accessNote: r.access_note ?? null,
+    },
   };
 });

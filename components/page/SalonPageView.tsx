@@ -7,19 +7,20 @@ import listino from "@/components/listino/Listino.module.css";
 import rules from "@/components/settings/Rules.module.css";
 import settings from "@/components/settings/Settings.module.css";
 import { CloseIcon, GlobeIcon, OpenIcon, PlusIcon, StarIcon, TagIcon, ClockIcon } from "@/components/settings/SettingsIcons";
-import { Field, ToastProvider, useToast, AddressField } from "@/components/ui";
+import { Field, Segmented, ToastProvider, useToast, AddressField } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { cx } from "@/components/ui/cx";
 import field from "@/components/ui/Field.module.css";
 import toggle from "@/components/ui/Toggle.module.css";
 import { paginaCopy as copy } from "@/lib/copy/pagina";
 import { initials } from "@/lib/rules/agenda";
-import { addSalonPhoto, makeCover, removeSalonLogo, removeSalonPhoto, saveSalonPage, setSalonLogo, setSalonSwitch, type PageResult } from "@/lib/page/actions";
+import { addSalonPhoto, makeCover, removeSalonLogo, removeSalonPhoto, saveSalonKnow, saveSalonPage, setSalonLogo, setSalonSwitch, type PageResult } from "@/lib/page/actions";
+import { PAYMENTS, type KnowField, type KnowInput } from "@/lib/rules/know";
 
 type Initial = { name: string; area: string; description: string; phone: string; address: string; bookingOnline: boolean; showPrices: boolean; listed: boolean; located: boolean };
 type Photo = { id: string; url: string };
 
-export function SalonPageView(props: { host: string; slug: string; initial: Initial; photos: Photo[]; logoUrl: string | null }) {
+export function SalonPageView(props: { host: string; slug: string; initial: Initial; know: KnowInput; photos: Photo[]; logoUrl: string | null }) {
   return (
     <ToastProvider>
       <Inner {...props} />
@@ -42,7 +43,7 @@ function SwitchRow({ tone, icon, label, sub, on, onToggle }: { tone: 0 | 1 | 2; 
   );
 }
 
-function Inner({ host, slug, initial, photos, logoUrl }: { host: string; slug: string; initial: Initial; photos: Photo[]; logoUrl: string | null }) {
+function Inner({ host, slug, initial, know: knowInitial, photos, logoUrl }: { host: string; slug: string; initial: Initial; know: KnowInput; photos: Photo[]; logoUrl: string | null }) {
   const router = useRouter();
   const toast = useToast();
   const [form, setForm] = useState(initial);
@@ -51,6 +52,17 @@ function Inner({ host, slug, initial, photos, logoUrl }: { host: string; slug: s
   const [listed, setListed] = useState(initial.listed);
   const [errors, setErrors] = useState<Partial<Record<"name" | "phone" | "address" | "description" | "form", string>>>({});
   const [pending, start] = useTransition();
+  const [know, setKnow] = useState(knowInitial);
+  const [knowError, setKnowError] = useState<{ field?: KnowField; message: string } | null>(null);
+  const knowDirty = JSON.stringify(know) !== JSON.stringify(knowInitial);
+  const saveKnow = () =>
+    start(async () => {
+      setKnowError(null);
+      const r = await saveSalonKnow(know);
+      if (!r.ok) return setKnowError({ field: r.field, message: r.error });
+      toast(copy.know.saved);
+      router.refresh();
+    });
   const fileRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
   const set = (k: keyof Initial) => (v: string) => setForm((f) => ({ ...f, [k]: v }));
@@ -234,6 +246,68 @@ function Inner({ host, slug, initial, photos, logoUrl }: { host: string; slug: s
               ) : null}
               <Button type="submit" size="large" disabled={pending || !dirty}>
                 {copy.save}
+              </Button>
+            </form>
+          </section>
+
+          <section className={settings.section} aria-labelledby="pg-know">
+            <h2 className={settings.title} id="pg-know">
+              {copy.know.title}
+            </h2>
+            <form
+              className={settings.pfForm}
+              onSubmit={(e) => {
+                e.preventDefault();
+                saveKnow();
+              }}
+            >
+              <p className={settings.phHint}>{copy.know.hint}</p>
+              <Field size="large" label={copy.know.specialties} name="specialties" value={know.specialties} onChange={(e) => setKnow({ ...know, specialties: e.target.value })} maxLength={120} hint={copy.know.specialtiesHint} error={knowError?.field === "specialties" ? knowError.message : undefined} />
+              <fieldset className={settings.knowPay}>
+                <legend className={field.label}>{copy.know.payments}</legend>
+                <div className={settings.knowChips}>
+                  {PAYMENTS.map((p) => {
+                    const on = know.paymentMethods.includes(p);
+                    return (
+                      <button
+                        key={p}
+                        type="button"
+                        className={settings.knowChip}
+                        aria-pressed={on}
+                        onClick={() => setKnow({ ...know, paymentMethods: on ? know.paymentMethods.filter((x) => x !== p) : [...know.paymentMethods, p] })}
+                      >
+                        {copy.know.paymentLabels[p]}
+                      </button>
+                    );
+                  })}
+                </div>
+              </fieldset>
+              <Field size="large" label={copy.know.products} name="products" value={know.products} onChange={(e) => setKnow({ ...know, products: e.target.value })} maxLength={80} hint={copy.know.productsHint} error={knowError?.field === "products" ? knowError.message : undefined} />
+              <Field size="large" label={copy.know.kids} name="kidsUntil" inputMode="numeric" value={know.kidsUntil} onChange={(e) => setKnow({ ...know, kidsUntil: e.target.value })} maxLength={2} hint={copy.know.kidsHint} error={knowError?.field === "kidsUntil" ? knowError.message : undefined} />
+              <div className={field.field}>
+                <span className={field.label} id="know-step">
+                  {copy.know.stepFree}
+                </span>
+                <Segmented
+                  label={copy.know.stepFree}
+                  value={know.stepFree}
+                  onChange={(v) => setKnow({ ...know, stepFree: v })}
+                  options={[
+                    { value: "", label: copy.know.stepFreeOptions[""] },
+                    { value: "si", label: copy.know.stepFreeOptions.si },
+                    { value: "no", label: copy.know.stepFreeOptions.no },
+                  ]}
+                  fullWidth
+                />
+              </div>
+              <Field size="large" label={copy.know.accessNote} name="accessNote" value={know.accessNote} onChange={(e) => setKnow({ ...know, accessNote: e.target.value })} maxLength={60} hint={copy.know.accessNoteHint} error={knowError?.field === "accessNote" ? knowError.message : undefined} />
+              {knowError && !knowError.field ? (
+                <p className={field.error} role="alert">
+                  {knowError.message}
+                </p>
+              ) : null}
+              <Button type="submit" size="large" disabled={pending || !knowDirty}>
+                {copy.know.save}
               </Button>
             </form>
           </section>

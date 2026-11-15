@@ -749,3 +749,53 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* «Da sapere» (ridisegno del sito) */
+.knowPay {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--field-gap);
+}
+
+.knowChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.knowChip {
+  min-height: var(--control-height-small);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-icon-button);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.knowChip:active {
+  transform: scale(0.97);
+}
+
+.knowChip[aria-pressed="true"] {
+  background: var(--action-primary);
+  border-color: var(--action-primary);
+  color: var(--text-inverse);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knowChip {
+    transition: none;
+  }
+
+  .knowChip:active {
+    transform: none;
+  }
+}

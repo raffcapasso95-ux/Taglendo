@@ -275,3 +275,73 @@
 @media (max-width: 1023px) {
   :root { --person-size: 46px; }
 }
+
+/* Ridisegno del sito (novembre 2026) — design/ridisegno-sito-2026-11 */
+:root {
+  --site-wrap: 1248px;                          /* larghezza della colonna, padding compreso */
+  --site-gutter: 32px;
+  --site-gutter-phone: 16px;
+  --radius-squircle: 22%;                       /* l'unica forma di marca: lo squircle del logo */
+  --on-plum-soft: #D9C7CE;                      /* testo secondario su prugna */
+  --on-plum-line: rgba(255, 247, 240, .14);
+  --on-plum-ghost: rgba(255, 247, 240, .3);
+  --on-plum-outline: rgba(255, 247, 240, .4);
+  --on-plum-hover: rgba(255, 247, 240, .08);
+  --open-on-plum: #CFE6DA;                      /* «Aperto ora» su prugna */
+  --open-on-plum-bg: rgba(127, 178, 155, .16);
+  --plum-glow: radial-gradient(120% 140% at 100% 0%, #523342 0%, rgba(82, 51, 66, 0) 55%);
+  --shadow-logo: 0 0 0 5px rgba(255, 247, 240, .12), 0 18px 40px rgba(20, 10, 16, .35);
+  --shadow-book: 0 20px 50px rgba(62, 37, 50, .10);
+  --photo-veil: rgba(46, 27, 37, .55);
+  --sticky-top: 96px;                           /* sotto la barra in alto da 72 px */
+  --site-h1-salon: 60px;
+  --site-h1-salon-phone: 36px;
+  --site-h2: 40px;
+  --site-h2-section: 30px;
+  --site-h2-phone: 26px;
+}
+
+/* Ridisegno del sito — elenco e mappa (Cerca.dc.html) */
+:root {
+  --site-top: 68px;                             /* altezza della testata fissa */
+  --shadow-pin: 0 6px 16px rgba(62, 37, 50, .22);
+  --shadow-map-card: 0 16px 40px rgba(62, 37, 50, .22);
+  --shadow-search: 0 6px 20px rgba(62, 37, 50, .08);
+  --shadow-popover: 0 24px 60px rgba(62, 37, 50, .2);
+  --shadow-ctl: 0 4px 12px rgba(62, 37, 50, .15);
+  --shadow-selected: 0 10px 30px rgba(62, 37, 50, .12);
+  --map-overlay-bg: rgba(255, 255, 255, .92);
+  --zone-fill: rgba(242, 140, 111, .08);
+  --zone-line: rgba(242, 140, 111, .5);
+  --duration-pop: 200ms;
+}
+
+/* Ridisegno del sito — home clienti (Main.dc.html) */
+:root {
+  --hero-veil: linear-gradient(180deg, rgba(46, 27, 37, .55) 0%, rgba(46, 27, 37, .25) 35%, rgba(46, 27, 37, .88) 100%);
+  --tile-fade: linear-gradient(to top, rgba(46, 27, 37, .85), rgba(46, 27, 37, 0) 55%);
+  --shadow-phone: 0 0 0 1px rgba(255, 247, 240, .18), 0 30px 60px rgba(0, 0, 0, .35);
+  --shadow-notice: 0 12px 32px rgba(62, 37, 50, .35);
+  --on-plum-body: #D9C7CE;
+  --radius-xl: 32px;
+  --home-h1: clamp(40px, 5.3vw, 76px);
+}
+
+/* Ridisegno del sito — home dei saloni e Funzioni (Saloni.dc.html, Funzioni.dc.html) */
+:root {
+  --plum-deep: #2E1B25;                          /* notte, telefono, piè di pagina */
+  --day-line: rgba(255, 247, 240, .35);
+  --day-gradient: linear-gradient(90deg, #2E1B25 0%, #3E2532 24%, #FBF0E9 24%, #FBF0E9 74%, #F8D6C6 100%);
+  --day-gradient-phone: linear-gradient(180deg, #3E2532 0%, #3E2532 26%, #FBF0E9 26%, #FBF0E9 80%, #F8D6C6 100%);
+  --hero-scrim: linear-gradient(90deg, rgba(46, 27, 37, .95) 0%, rgba(46, 27, 37, .82) 48%, rgba(46, 27, 37, .4) 100%);
+  --paper: #FFF9E8;                              /* il quaderno */
+  --paper-line: #E7D9BC;
+  --paper-ink: #2F3A66;
+  --paper-margin: #E9A3A3;
+  --shadow-browser: 0 30px 80px rgba(0, 0, 0, .35);
+  --shadow-phone-soft: 0 30px 60px rgba(46, 27, 37, .3);
+  --step-mint: #EEF6F1;
+  --dim: rgba(46, 27, 37, .28);
+  --dotted: rgba(62, 37, 50, .3);
+  --big-number: clamp(104px, 12vw, 168px);
+}

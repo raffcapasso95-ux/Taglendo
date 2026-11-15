@@ -1,0 +1,1116 @@
+/* Pagina del salone — design/ridisegno-sito-2026-11/prototipi/Salone.dc.html. Colori e misure solo dai token. */
+
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: clip; /* non hidden: romperebbe il modulo sticky */
+  background: var(--canvas);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-body);
+  line-height: var(--line-body);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wrap {
+  max-width: var(--site-wrap);
+  margin: 0 auto;
+  padding: 0 var(--site-gutter);
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.muted {
+  color: var(--text-secondary);
+}
+
+.press {
+  transition: transform var(--duration-fast) var(--ease-out), background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.press:active {
+  transform: scale(0.97);
+}
+
+:where(.page) :focus-visible {
+  outline: var(--focus-ring) solid var(--brand-plum);
+  outline-offset: 3px;
+}
+
+/* ── Barra in alto ─────────────────────────────────────────────────────── */
+
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--canvas);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.topRow {
+  height: var(--site-header-height);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.brand {
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.logoSm,
+.initialsSm {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: block;
+  object-fit: cover;
+  border-radius: var(--radius-squircle);
+}
+
+.initialsSm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.brandText {
+  min-width: 0;
+}
+
+.brandName {
+  display: block;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.brandArea {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.anchors {
+  display: flex;
+  gap: var(--space-5);
+  margin-left: auto;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.anchors a {
+  color: var(--text-primary);
+  text-decoration: none;
+  padding: var(--space-2) 0;
+}
+
+.phoneChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-icon-button);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ── Intestazione prugna ───────────────────────────────────────────────── */
+
+.hero {
+  background: var(--brand-plum);
+  background-image: var(--plum-glow);
+  color: var(--text-inverse);
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-5);
+}
+
+.crumb {
+  margin: 0;
+  font-size: 14px;
+  color: var(--on-plum-soft);
+}
+
+.crumb a {
+  color: var(--on-plum-soft);
+}
+
+.ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
+  margin-left: auto;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--on-plum-ghost);
+  background: transparent;
+  color: var(--text-inverse);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-12);
+  align-items: end;
+  padding: 36px 0 var(--space-12);
+}
+
+.ident {
+  min-width: 0;
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.logoLg,
+.initialsLg {
+  width: 128px;
+  height: 128px;
+  flex-shrink: 0;
+  display: block;
+  object-fit: cover;
+  border-radius: var(--radius-squircle);
+  box-shadow: var(--shadow-logo);
+}
+
+.initialsLg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-peach);
+  color: var(--brand-plum);
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.identText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.pill {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--on-plum-hover);
+  color: var(--on-plum-soft);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pillOpen {
+  background: var(--open-on-plum-bg);
+  color: var(--open-on-plum);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--on-plum-soft);
+  flex-shrink: 0;
+}
+
+.pillOpen .dot,
+.dotOpen {
+  background: var(--status-success-border);
+}
+
+.h1 {
+  margin: 0;
+  font-size: var(--site-h1-salon);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  overflow-wrap: anywhere;
+}
+
+.lead {
+  margin: 0;
+  font-size: 18px;
+  color: var(--brand-peach);
+  max-width: 32em;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  margin-top: 10px;
+  padding-top: 18px;
+  border-top: 1px solid var(--on-plum-line);
+}
+
+.fact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-inverse);
+  text-decoration: none;
+  min-width: 0;
+}
+
+.fact > svg {
+  color: var(--brand-peach);
+  flex-shrink: 0;
+}
+
+.fact b {
+  display: block;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.fact small {
+  display: block;
+  font-size: 13px;
+  color: var(--on-plum-soft);
+}
+
+.faces {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.faces i {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+  border: 2px solid var(--brand-plum);
+  color: var(--brand-plum);
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.faces i:first-child {
+  margin-left: 0;
+}
+
+.tone0 {
+  background: var(--brand-cream);
+}
+
+.tone1 {
+  background: var(--brand-peach);
+}
+
+.tone2 {
+  background: var(--surface-muted);
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  min-width: 240px;
+}
+
+.btnLight,
+.btnOutline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 56px;
+  padding: 0 30px;
+  border-radius: var(--radius-pill);
+  font-size: 17px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btnLight {
+  background: var(--brand-cream);
+  color: var(--brand-plum);
+}
+
+.btnOutline {
+  border: 1px solid var(--on-plum-outline);
+  color: var(--text-inverse);
+  font-size: 16px;
+}
+
+.directions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--brand-peach);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .anchors a:hover {
+    color: var(--action-primary-hover);
+  }
+
+  .ghost:hover,
+  .btnOutline:hover {
+    background: var(--on-plum-hover);
+  }
+
+  .btnLight:hover {
+    background: var(--surface);
+  }
+
+  .directions:hover,
+  .crumb a:hover {
+    color: var(--text-inverse);
+  }
+}
+
+/* ── Corpo: due colonne ────────────────────────────────────────────────── */
+
+.body {
+  padding: 40px 0 88px;
+}
+
+.layout {
+  display: grid;
+  grid-template: "services book" auto "rest book" 1fr / minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 56px 40px;
+  align-items: start;
+}
+
+.servicesArea {
+  grid-area: services;
+  min-width: 0;
+}
+
+.rest {
+  grid-area: rest;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.bookArea {
+  grid-area: book;
+  min-width: 0;
+  align-self: stretch;
+  scroll-margin-top: var(--sticky-top);
+}
+
+.sticky {
+  position: sticky;
+  top: var(--sticky-top);
+}
+
+.section {
+  scroll-margin-top: var(--sticky-top);
+}
+
+.h2,
+.h2Gap,
+.h2Team {
+  margin: 0 0 var(--space-3);
+  font-size: var(--site-h2-section);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.h2Gap {
+  margin-bottom: var(--space-4);
+}
+
+.h2Team {
+  margin-bottom: var(--space-5);
+}
+
+/* Servizi */
+
+.services {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.service {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 18px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.serviceText {
+  flex: 1;
+  min-width: 0;
+}
+
+.serviceName {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.serviceMeta {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bookBtn {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--brand-plum);
+  background: var(--surface);
+  color: var(--brand-plum);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.note {
+  margin: var(--space-3) 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Barbieri */
+
+.team {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barber {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: var(--space-5);
+  border-radius: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-plum);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.avatar.tone0 {
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+}
+
+.barberName {
+  display: block;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.barberBio {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.barberBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-icon-button);
+  border: 1px solid var(--border-strong);
+  color: var(--brand-plum);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* Da sapere */
+
+.know {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 var(--space-8);
+  margin: 0;
+}
+
+.knowRow {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: 14px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.knowRow dt {
+  font-weight: 600;
+}
+
+.knowRow dd {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.knowNote {
+  margin: var(--space-3) 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Orari e indirizzo */
+
+.where {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 40px;
+}
+
+.address {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.accessNote {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+}
+
+.whereBtns {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-4);
+}
+
+.btn,
+.btnLine {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-height);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn {
+  background: var(--action-primary);
+  color: var(--text-inverse);
+}
+
+.btnLine {
+  border: 1px solid var(--brand-plum);
+  color: var(--brand-plum);
+}
+
+.hours {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+}
+
+.hoursRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 10px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.hoursClosed {
+  color: var(--text-secondary);
+}
+
+.hoursToday {
+  font-weight: 700;
+}
+
+.hoursTime {
+  text-align: right;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bookBtn:hover,
+  .barberBtn:hover {
+    background: var(--surface-muted);
+  }
+
+  .btn:hover {
+    background: var(--action-primary-hover);
+  }
+
+  .btnLine:hover {
+    background: var(--surface);
+  }
+}
+
+/* Solo telefono (prenotazione al telefono, nella colonna a destra) */
+
+.phoneCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  border-radius: var(--radius-panel);
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-book);
+}
+
+.phoneTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.phoneText {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ── Fondo ─────────────────────────────────────────────────────────────── */
+
+.footer {
+  border-top: 1px solid var(--border-subtle);
+  padding: var(--space-6) 0 96px;
+}
+
+.footerRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  align-items: center;
+}
+
+.footerLinks a,
+.footerButton {
+  color: var(--text-secondary);
+}
+
+.footerButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.powered {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+/* ── Barra in basso del telefono ───────────────────────────────────────── */
+
+.mbook {
+  display: none;
+}
+
+.mbookText {
+  min-width: 0;
+  flex: 1;
+}
+
+.mbookName {
+  display: block;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mbookStatus {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.mbookBtn {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height);
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-pill);
+  background: var(--action-primary);
+  color: var(--text-inverse);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ── Telefono ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 960px) {
+  .wrap {
+    padding: 0 var(--site-gutter-phone);
+  }
+
+  .anchors,
+  .phoneChip,
+  .crumb,
+  .ghostLabel {
+    display: none;
+  }
+
+  .head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+    padding: var(--space-5) 0 28px;
+  }
+
+  .ident {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .logoLg,
+  .initialsLg {
+    width: 80px;
+    height: 80px;
+  }
+
+  .initialsLg {
+    font-size: 28px;
+  }
+
+  .h1 {
+    font-size: var(--site-h1-salon-phone);
+  }
+
+  .facts {
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .actions {
+    min-width: 0;
+  }
+
+  .btnLight,
+  .btnOutline {
+    min-height: var(--control-height-large);
+  }
+
+  .body {
+    padding: var(--space-6) 0 56px;
+  }
+
+  .layout {
+    grid-template:
+      "services" auto
+      "book" auto
+      "rest" auto / minmax(0, 1fr);
+    row-gap: var(--space-8);
+  }
+
+  .rest {
+    gap: var(--space-8);
+  }
+
+  .sticky {
+    position: static;
+  }
+
+  .h2,
+  .h2Gap,
+  .h2Team {
+    font-size: var(--site-h2-phone);
+  }
+
+  .service {
+    flex-wrap: wrap;
+    row-gap: var(--space-2);
+  }
+
+  .bookBtn {
+    min-height: var(--control-height);
+  }
+
+  .team {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .barber {
+    flex-flow: row wrap;
+    align-items: center;
+    padding: 14px;
+  }
+
+  .avatar {
+    width: 48px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .barber > div {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .barberBtn {
+    flex-basis: 100%;
+    justify-content: center;
+    min-height: var(--control-height);
+  }
+
+  .know,
+  .where {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .where {
+    gap: var(--space-6);
+  }
+
+  .footer {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .footerLinks a,
+  .footerButton,
+  .powered {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap-min);
+  }
+
+  .mbook {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 20;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 10px var(--space-4) calc(10px + env(safe-area-inset-bottom, 0px));
+    background: var(--site-bar-bg);
+    border-top: 1px solid var(--border-subtle);
+    transition: transform var(--duration-sheet-close) var(--ease-out);
+  }
+
+  .mbookHidden {
+    transform: translateY(110%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .press,
+  .mbook {
+    transition: none;
+  }
+
+  .press:active {
+    transform: none;
+  }
+}
+
+/* ── Foto: mosaico 2fr / 1fr / 1fr, carosello sul telefono ─────────────── */
+
+.mosaic {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 150px 150px;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+}
+
+.mosaic > li {
+  min-width: 0;
+  min-height: 0;
+}
+
+.mosaic > li:first-child {
+  grid-row: span 2;
+}
+
+.mosaic1 {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: 308px;
+}
+
+.mosaic2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: 308px;
+}
+
+.mosaic2 > li:first-child {
+  grid-row: auto;
+}
+
+.mosaic3 {
+  grid-template-columns: 2fr 1fr;
+}
+
+.mosaic4 > li:last-child {
+  grid-column: span 2;
+}
+
+.shot {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: var(--surface-skeleton);
+  cursor: zoom-in;
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--photo-veil);
+  color: var(--text-inverse);
+  font-weight: 600;
+}
+
+@media (max-width: 960px) {
+  .mosaic {
+    display: flex;
+    overflow-x: auto;
+    margin: 0 calc(-1 * var(--site-gutter-phone));
+    padding: 0 var(--site-gutter-phone);
+    border-radius: 0;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 var(--site-gutter-phone);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .mosaic::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mosaic > li {
+    flex: 0 0 72%;
+    height: 220px;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    scroll-snap-align: start;
+  }
+
+  .mosaic1 > li {
+    flex-basis: 100%;
+  }
+
+  .more {
+    display: none;
+  }
+}
+
+/* oltre la quinta, le foto stanno solo nel carosello del telefono */
+.extra {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .extra {
+    display: block;
+  }
+}
+
+.mbookStatus .dot {
+  background: var(--border-strong);
+}
+
+.mbookStatus .dotOpen {
+  background: var(--status-success);
+}

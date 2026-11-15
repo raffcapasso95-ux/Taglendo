@@ -2,87 +2,123 @@ import { expect, test } from "@playwright/test";
 import { signIn } from "./helpers";
 
 test.describe("Sito commerciale", () => {
-  test("la pagina iniziale mostra il prodotto e porta a registrazione e accesso", async ({ page }) => {
+  test("la pagina iniziale mostra il prodotto e porta a registrazione e accesso", async ({ page, isMobile }) => {
     await page.goto("/per-i-saloni");
     await expect(page).toHaveTitle(/Taglendo — Prenotazioni online e agenda per barbieri/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("La tua agenda online, sempre in tasca.");
-    const hero = page.locator("#top");
-    await expect(hero.getByRole("link", { name: "Prova gratis" })).toHaveAttribute("href", "#inizia");
-    await expect(hero.getByText("Gratis durante la beta")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Prova gratis" }).first()).toBeVisible();
+    const hero = page.locator("[data-land-hero]");
+    await expect(hero.getByRole("link", { name: "Prova gratis" })).toHaveAttribute("href", "/registrati");
+    await expect(hero.getByText("Gratis durante la beta · Senza carta di credito · Zero commissioni")).toBeVisible();
     // le immagini ci sono davvero
     const loaded = await hero.locator("img").evaluateAll((imgs) => (imgs as HTMLImageElement[]).map((i) => i.complete && i.naturalWidth > 0));
     expect(loaded.every(Boolean)).toBe(true);
-    for (const heading of ["Lo stesso venerdì, sul quaderno e su Taglendo.", "Pronto in 3 passi.", "Online o al telefono: decidi tu.", "Tre cose che smetti di fare.", "Domande frequenti"]) {
+    for (const heading of ["Una giornata qualunque, con Taglendo.", "Pronto in tre passi.", "La pagina della tua barberia.", "Il quaderno, e poi Taglendo.", "Quanto costa?", "Domande frequenti"]) {
       await expect(page.getByRole("heading", { name: heading })).toBeVisible();
     }
+    // le sezioni scartate dal ridisegno non ci sono più
+    await expect(page.getByText(/Tre cose che smetti di fare|Online o al telefono: decidi tu/)).toHaveCount(0);
+    // il menu delle sezioni c'è solo da computer
+    if (!isMobile) await expect(page.getByRole("banner").getByRole("link", { name: "Funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
   });
 
-  test("nella beta i prezzi dicono «Gratis durante la beta»", async ({ page }) => {
+  test("Quanto costa: il contatore scende da 29 a 0 e nessun piano a pagamento è in pagina", async ({ page }) => {
     await page.goto("/per-i-saloni");
-    const prezzi = page.locator("#prezzi");
-    await expect(prezzi.getByRole("heading", { name: "Gratis durante la beta." })).toBeVisible();
-    await expect(prezzi.getByText("Quando partiranno gli abbonamenti ti avvisiamo con largo anticipo")).toBeVisible();
-    await expect(prezzi.getByText("Listino Taglendo")).toBeVisible();
-    await expect(prezzi.getByText("Agenda per poltrona")).toBeVisible();
-    await expect(prezzi.getByText("Totale durante la beta")).toBeVisible();
-    // nessuna cifra di abbonamento in pagina
+    const costo = page.locator("#costo");
+    await costo.scrollIntoViewIfNeeded();
+    await expect(costo.getByText("Zero euro")).toBeAttached(); // per i lettori di schermo; a vista c'è il contatore
+    await expect(costo.getByText("Gratis durante la beta, con tutte le funzioni.")).toBeVisible();
+    for (const [name, value] of [["Agenda per tutte le poltrone", "inclusa"], ["Fino a 3 barbieri", "inclusi"], ["Commissioni", "0 €"], ["Carta di credito", "non serve"]]) {
+      await expect(costo.getByRole("listitem").filter({ hasText: name })).toContainText(value!);
+    }
+    // il contatore arriva a 0 (il valore visibile, non l'etichetta)
+    await expect.poll(() => costo.locator("[aria-hidden=true]").first().innerText(), { timeout: 5000 }).toMatch(/^0\s*€/);
     await expect(page.getByText(/9,90|19,90/)).toHaveCount(0);
-    await expect(prezzi.getByRole("button", { name: "2" })).toHaveCount(0);
+    await expect(page.getByText(/piano|abbonamento/i)).toHaveCount(0);
   });
 
-  test("«Prima e dopo» si muove con le frecce e con il trascinamento", async ({ page }) => {
+  test("«Il quaderno, e poi Taglendo» si muove con le frecce della tastiera", async ({ page }) => {
     await page.goto("/per-i-saloni");
-    const handle = page.getByRole("slider", { name: /Sposta il confronto/ });
-    await handle.scrollIntoViewIfNeeded();
-    await expect(handle).toHaveAttribute("aria-valuenow", "50");
-    await handle.focus();
+    const range = page.getByRole("slider", { name: "Confronta quaderno e Taglendo" });
+    await range.scrollIntoViewIfNeeded();
+    await expect(range).toHaveValue("50");
+    await range.focus();
     await page.keyboard.press("ArrowLeft");
-    await expect(handle).toHaveAttribute("aria-valuenow", "45");
-    await page.keyboard.press("ArrowRight");
-    await page.keyboard.press("ArrowRight");
-    await expect(handle).toHaveAttribute("aria-valuenow", "55");
-    const box = (await handle.boundingBox())!;
-    const container = (await page.locator("section#prima [role=slider]").locator("..").boundingBox())!;
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(container.x + container.width * 0.2, box.y + box.height / 2, { steps: 6 });
-    await page.mouse.up();
-    const now = Number(await handle.getAttribute("aria-valuenow"));
-    expect(now).toBeLessThan(30);
+    await expect(range).toHaveValue("49");
+    await page.keyboard.press("End");
+    await expect(range).toHaveValue("100");
+    await expect(page.getByText("Prima", { exact: true })).toBeVisible();
+    await expect(page.getByText("Con Taglendo", { exact: true })).toBeVisible();
   });
 
   test("le domande si aprono e rispondono secondo la beta", async ({ page }) => {
     await page.goto("/per-i-saloni");
-    const q = page.getByText("Ci sono commissioni sulle prenotazioni?");
+    const q = page.getByText("Quanto costa davvero?");
     await q.scrollIntoViewIfNeeded();
     await expect(page.getByText(/Durante la beta Taglendo è gratis/)).toBeHidden();
     await q.click();
-    await expect(page.getByText(/Durante la beta Taglendo è gratis e sulle prenotazioni non ci sono mai commissioni/)).toBeVisible();
-    await page.getByText("I miei clienti devono scaricare un’app?").click();
-    await expect(page.getByText(/Aprono il tuo link dal telefono/)).toBeVisible();
+    await expect(page.getByText(/Durante la beta Taglendo è gratis, con tutte le funzioni e senza carta di credito/)).toBeVisible();
+    await expect(page.getByText(/Aprono la pagina del salone dal telefono/)).toBeVisible(); // la prima è aperta
+    await page.getByText("Posso far prenotare solo al telefono?").click();
+    await expect(page.getByText(/Spegni la prenotazione online/)).toBeVisible();
   });
 
-  test("la chiusura porta alla registrazione e all'accesso", async ({ page }) => {
+  test("la chiusura porta alla registrazione", async ({ page }) => {
     await page.goto("/per-i-saloni");
     const end = page.locator("#inizia");
     await end.scrollIntoViewIfNeeded();
-    await expect(end.getByRole("heading", { name: "Meno telefonate, più tagli." })).toBeVisible();
-    await expect(end.getByText("Senza carta di credito")).toBeVisible();
-    await expect(end.getByRole("link", { name: "Accedi" })).toHaveAttribute("href", "/accedi");
-    await end.getByRole("link", { name: /Crea il mio link gratis/ }).click();
+    await expect(end.getByRole("heading", { name: "Il prossimo cliente può prenotare stasera." })).toBeVisible();
+    await end.getByRole("link", { name: "Prova gratis" }).click();
     await expect(page).toHaveURL(/\/registrati/);
   });
 
-  test("online o al telefono: l'interruttore cambia testo e anteprima", async ({ page }) => {
+  test("«La pagina della tua barberia»: cinque voci, l'anteprima è la pagina vera e scorre alla voce scelta", async ({ page, isMobile }) => {
     await page.goto("/per-i-saloni");
-    const online = page.getByRole("tab", { name: "Prenotazione online" });
-    await online.scrollIntoViewIfNeeded();
-    await expect(online).toHaveAttribute("aria-selected", "true");
-    await expect(page.getByText("Primi orari liberi")).toBeVisible();
-    await page.getByRole("tab", { name: "Solo al telefono" }).click();
-    await expect(page.getByText("Nessun appuntamento entra senza passare da te")).toBeVisible();
-    await expect(page.getByText("Primi orari liberi")).toBeHidden();
+    const section = page.locator("#pagina");
+    await section.scrollIntoViewIfNeeded();
+    const tabs = section.getByRole("tablist", { name: "Le parti della pagina" }).getByRole("tab");
+    await expect(tabs).toHaveCount(5);
+    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
+    // l'anteprima è la pagina di «Barberia Porta Nuova», senza un secondo titolo né un secondo «main»
+    await expect(section.getByText("Barberia Porta Nuova").first()).toBeAttached();
+    await expect(page.locator("main")).toHaveCount(1);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+    if (!isMobile) {
+      await tabs.nth(2).click();
+      await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+      await expect.poll(() => section.locator("[class*=hl]").first().evaluate((el) => Math.round(el.getBoundingClientRect().width))).toBeGreaterThan(100);
+    }
+    await expect(section.getByRole("link", { name: "Tutte le funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
+  });
+
+  test("Funzioni: la pagina nuova, con le email vere, i permessi e cosa Taglendo non fa", async ({ page, isMobile }) => {
+    await page.goto("/per-i-saloni/funzioni");
+    await expect(page).toHaveTitle("Funzioni · Taglendo per i saloni");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tutto quello che c’è dentro Taglendo.");
+    // la voce «Funzioni» della testata è quella corrente (il menu delle sezioni c'è solo da computer)
+    if (!isMobile) await expect(page.getByRole("banner").getByRole("link", { name: "Funzioni" })).toHaveAttribute("aria-current", "page");
+    // la barra delle sezioni porta alle quattro aree e alle domande
+    const nav = page.getByRole("navigation", { name: "Sezioni della pagina" });
+    for (const [label, id] of [["Agenda", "agenda"], ["La tua pagina", "pagina"], ["Prenotazioni", "prenotazioni"], ["Il tuo team", "team"], ["Tutto il resto", "tutto"], ["Cosa non fa", "nonfa"]]) {
+      await expect(nav.getByRole("link", { name: label })).toHaveAttribute("href", `#${id}`);
+      await expect(page.locator(`#${id}`)).toBeAttached();
+    }
+    // le email sono quelle vere dell'app
+    const mails = page.getByRole("list", { name: "Le email che partono da sole" });
+    await expect(mails.getByText("Il tuo codice: 482 913")).toBeVisible();
+    await expect(mails.getByText("Confermato: sabato 14 novembre alle 9:30")).toBeVisible();
+    await expect(mails.getByText("Nuova prenotazione: Gianni Ferraro · sab 9:30")).toBeVisible();
+    await expect(mails.getByText("Domani alle 9:30 da Barberia Porta Nuova")).toBeVisible();
+    // chi può fare cosa
+    const table = page.getByRole("table", { name: "Cosa può fare chi" });
+    await expect(table.getByRole("row", { name: /Cambia listino, orari e regole/ })).toContainText("no");
+    await expect(table.getByRole("row", { name: /Vede l’agenda di tutti/ })).toContainText("se lo attivi");
+    // le domande sulle impostazioni (la prima è aperta) e cosa non fa
+    await expect(page.getByText(/Scegli il preavviso minimo: 30 minuti, 2 ore o il giorno prima/)).toBeVisible();
+    await page.getByText("Posso nascondere i prezzi?").click();
+    await expect(page.getByText(/La pagina mostra servizi e durate senza prezzi/)).toBeVisible();
+    for (const item of ["Pagamenti online", "SMS", "Un’app da scaricare", "Catene e grandi saloni"]) await expect(page.locator("#nonfa").getByText(item, { exact: true })).toBeVisible();
+    await page.locator("#inizia").getByRole("link", { name: "Prova gratis" }).click();
+    await expect(page).toHaveURL(/\/registrati/);
   });
 
   test("chi ha già una sessione trova il suo tondo con il menu dell'account", async ({ page }) => {
@@ -125,14 +161,15 @@ test.describe("Sito commerciale", () => {
     await expect(page.getByRole("dialog", { name: "Cookie" })).toBeVisible();
   });
 
-  test("il piè di pagina porta alle pagine legali e mostra i dati ancora da completare", async ({ page }) => {
+  test("il piè di pagina porta alle pagine legali e in fondo dice solo «© 2026 Taglendo»", async ({ page }) => {
     await page.goto("/per-i-saloni");
     const footer = page.getByRole("contentinfo");
-    await expect(footer.getByRole("link", { name: "Informativa privacy" })).toHaveAttribute("href", "/privacy");
-    await expect(footer.getByRole("link", { name: "Termini di servizio" })).toHaveAttribute("href", "/termini");
+    await expect(footer.getByRole("link", { name: "Privacy", exact: true })).toHaveAttribute("href", "/privacy");
+    await expect(footer.getByRole("link", { name: "Termini", exact: true })).toHaveAttribute("href", "/termini");
     await expect(footer.getByRole("link", { name: "Cookie", exact: true })).toHaveAttribute("href", "/cookie");
     await expect(footer.getByRole("link", { name: "aiuto@taglendo.it" })).toHaveAttribute("href", "mailto:aiuto@taglendo.it");
-    await expect(footer.getByText(/^\[.+\]$/)).toHaveCount(3); // ragione sociale, P.IVA, sede
+    await expect(footer.getByText("© 2026 Taglendo", { exact: true })).toBeVisible();
+    await expect(footer.getByText(/^\[.+\]$/)).toHaveCount(0); // niente dati segnaposto per ora
   });
 
   test("le pagine legali hanno indice, avviso di bozza e testi", async ({ page }) => {
@@ -162,6 +199,7 @@ test.describe("Sito commerciale", () => {
     expect(xml).toContain("/privacy</loc>");
     expect(xml).toContain("/barberia-saragozza</loc>");
     expect(xml).toContain("/per-i-saloni</loc>");
+    expect(xml).toContain("/per-i-saloni/funzioni</loc>");
     expect(xml).toContain("/barbieri/bologna</loc>");
     expect(xml).not.toContain("/agenda");
     const robots = await (await request.get("/robots.txt")).text();
@@ -178,8 +216,10 @@ test.describe("Sito commerciale", () => {
   test("sul telefono la barra in basso ricorda di provare", async ({ page }, info) => {
     await page.goto("/per-i-saloni");
     const bar = page.getByText("Gratis durante la beta").filter({ visible: true });
-    if (info.project.name === "telefono") await expect(page.getByText("App per barbieri")).toBeVisible();
-    else await expect(page.getByText("App per barbieri")).toBeHidden();
+    if (info.project.name === "telefono") {
+      await page.locator("#costo").scrollIntoViewIfNeeded();
+      await expect(page.getByText("Senza carta di credito", { exact: true }).filter({ visible: true }).first()).toBeVisible();
+    }
     await expect(bar.first()).toBeVisible();
   });
 
@@ -188,7 +228,7 @@ test.describe("Sito commerciale", () => {
     const header = page.getByRole("banner");
     const bg = () => header.evaluate((h) => getComputedStyle(h).backgroundColor);
     expect(await bg()).toBe("rgba(0, 0, 0, 0)"); // sull'apertura è trasparente, sopra la foto
-    await page.locator("#prezzi").scrollIntoViewIfNeeded();
+    await page.locator("#costo").scrollIntoViewIfNeeded();
     await expect(header).toHaveAttribute("data-scrolled", "true");
     await expect.poll(bg).not.toBe("rgba(0, 0, 0, 0)"); // dopo la transizione del colore
     const top = await header.evaluate((h) => Math.round(h.getBoundingClientRect().top));
