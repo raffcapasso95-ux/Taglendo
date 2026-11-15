@@ -110,6 +110,8 @@ export const shopCopy = {
   page: {
     anchors: { services: "Servizi", photos: "Foto", team: "Barbieri", know: "Da sapere", where: "Orari e indirizzo" },
     crumbHome: "Taglendo",
+    backResults: "Torna ai risultati",
+    backHome: "Torna alla home",
     crumbCity: (city: string) => `Barbieri a ${city}`,
     logoAlt: (name: string) => `Logo di ${name}`,
     directions: "Indicazioni",

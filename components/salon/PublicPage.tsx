@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { BackLink } from "./BackLink";
 import { BookPick } from "./BookPick";
 import { BottomBar } from "./BottomBar";
 import { CookieConsent } from "./CookieConsent";
@@ -121,6 +122,7 @@ export function PublicPage({ salon, weekday, nowMin, today, bookingOn, preview =
         <section className={styles.hero} id="intestazione">
           <div className={styles.wrap}>
             <div className={styles.heroTop}>
+              {preview ? null : <BackLink className={cx(styles.back, styles.press)} />}
               <p className={styles.crumb}>
                 <Link href="/">{copy.crumbHome}</Link>
                 {city ? (

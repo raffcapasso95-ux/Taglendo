@@ -145,9 +145,22 @@
 .heroTop {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-4);
   padding-top: var(--space-5);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3) 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  color: var(--text-inverse);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--on-plum-hover);
 }
 
 .crumb {

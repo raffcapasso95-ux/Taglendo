@@ -111,6 +111,26 @@ test.describe("Ricerca dei saloni", () => {
     await expect(page.getByText(/Non trovo «Xyzabc»/)).toBeVisible();
   });
 
+  test("dalla pagina del salone si torna ai risultati (con i filtri), o alla home se si arriva da fuori", async ({ page, browser }) => {
+    await page.goto("/cerca?dove=Bologna&servizio=Barba");
+    await page.locator('[data-salon="barberia-saragozza"]').getByRole("link", { name: "Barberia Saragozza", exact: true }).click();
+    await expect(page).toHaveURL(/\/barberia-saragozza$/, { timeout: 30_000 });
+    const back = page.getByRole("link", { name: "Torna ai risultati" });
+    await expect(back).toBeVisible();
+    await back.click();
+    await expect(page).toHaveURL(/\/cerca\?dove=Bologna&servizio=Barba$/);
+    await expect(page.locator('[data-salon="barberia-saragozza"]')).toBeVisible();
+
+    // arrivando da fuori (scheda nuova, nessuna ricerca): si torna alla home
+    const fresh = await browser.newContext();
+    const direct = await fresh.newPage();
+    await direct.goto("/barberia-saragozza");
+    const home = direct.getByRole("link", { name: "Torna alla home" });
+    await expect(home).toBeVisible();
+    await expect(home).toHaveAttribute("href", "/");
+    await fresh.close();
+  });
+
   test("«Vicino a me» usa la posizione del telefono", async ({ browser }) => {
     const ctx = await browser.newContext({ geolocation: { latitude: 44.4949, longitude: 11.3426 }, permissions: ["geolocation"] });
     const page = await ctx.newPage();
