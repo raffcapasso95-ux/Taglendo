@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
-import { Button, Card, Field, ResponsiveDialog, Segmented, Toggle, ToastProvider, useToast } from "@/components/ui";
+import { Button, Card, Field, ResponsiveDialog, Toggle, ToastProvider, useToast } from "@/components/ui";
 import dialog from "@/components/agenda/Dialogs.module.css";
+import { MonthCalendar } from "@/components/agenda/MonthCalendar";
+import { DateButton } from "@/components/ui/DateButton";
 import { deleteClosure, closureImpact, saveClosure, savePatron, setHolidayClosed, type Impacted } from "@/lib/listino/actions";
 import type { ClosureItem, HolidayItem } from "@/lib/listino/closures";
 import type { Patron } from "@/lib/rules/holidays";
@@ -198,6 +200,7 @@ function ClosureDialog({ closure, today, operators, startFor, onClose, onDone, o
   const [impact, setImpact] = useState<Impacted[]>([]);
   const [notify, setNotify] = useState<Impacted[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [picking, setPicking] = useState<"from" | "to" | null>(null);
   const [saving, startSave] = useTransition();
   const [, startImpact] = useTransition();
 
@@ -262,37 +265,52 @@ function ClosureDialog({ closure, today, operators, startFor, onClose, onDone, o
             {error}
           </div>
         ) : null}
-        <div className={dialog.pair}>
-          <label className={dialog.hint}>
-            <span className={dialog.sectionTitle}>{copy.from}</span>
-            <input type="date" className={dialog.dateInput} value={from} onChange={(e) => { setFrom(e.target.value); if (e.target.value > to) setTo(e.target.value); }} />
-          </label>
-          <label className={dialog.hint}>
-            <span className={dialog.sectionTitle}>{copy.to}</span>
-            <input type="date" className={dialog.dateInput} min={from} value={to} onChange={(e) => setTo(e.target.value)} />
-          </label>
+        <div className={styles.dates}>
+          <DateButton label={copy.from} value={from} open={picking === "from"} controls="closure-cal" onToggle={() => setPicking(picking === "from" ? null : "from")} />
+          <DateButton label={copy.to} value={to} open={picking === "to"} controls="closure-cal" onToggle={() => setPicking(picking === "to" ? null : "to")} />
         </div>
+        {picking ? (
+          <div id="closure-cal" className={styles.datePop}>
+            <MonthCalendar
+              key={picking}
+              mode="agenda"
+              plain
+              heading="h4"
+              today={today}
+              selected={picking === "from" ? from : to}
+              minDate={picking === "to" ? from : today}
+              onSelect={(d) => {
+                if (picking === "from") {
+                  setFrom(d);
+                  if (d > to) setTo(d);
+                } else setTo(d);
+                setPicking(null);
+              }}
+            />
+          </div>
+        ) : null}
         <section className={dialog.section}>
-          <h3 className={dialog.sectionTitle}>{copy.who}</h3>
-          <Segmented
-            label={copy.who}
-            value={scope}
-            onChange={setScope}
-            options={[
-              { value: "all", label: copy.all },
-              { value: "one", label: copy.one },
-            ]}
-            fullWidth
-          />
-          {scope === "one" ? (
-            <div className={dialog.chips} role="group" aria-label={copy.chooseBarber}>
-              {operators.map((o) => (
-                <button key={o.id} type="button" className={o.id === memberId ? dialog.chipOn : dialog.chip} aria-pressed={o.id === memberId} onClick={() => setMemberId(o.id)}>
-                  {o.name}
-                </button>
-              ))}
-            </div>
-          ) : null}
+          <h3 className={styles.fieldTitle}>{copy.who}</h3>
+          <div className={styles.whoRow} role="radiogroup" aria-label={copy.who}>
+            <button type="button" role="radio" aria-checked={scope === "all"} className={cx(styles.whoChip, scope === "all" && styles.whoChipOn)} onClick={() => setScope("all")}>
+              {copy.all}
+            </button>
+            {operators.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                role="radio"
+                aria-checked={scope === "one" && o.id === memberId}
+                className={cx(styles.whoChip, scope === "one" && o.id === memberId && styles.whoChipOn)}
+                onClick={() => {
+                  setScope("one");
+                  setMemberId(o.id);
+                }}
+              >
+                {o.name}
+              </button>
+            ))}
+          </div>
         </section>
         <Field size="large" label={`${copy.note} · ${copy.optional}`} maxLength={80} value={note} onChange={(e) => setNote(e.target.value)} />
         {impact.length > 0 ? (

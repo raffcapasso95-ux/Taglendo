@@ -61,7 +61,9 @@ test.describe("Ricerca dei saloni", () => {
       d.setDate(d.getDate() + ((9 - d.getDay()) % 7 || 7));
       return d.toISOString().slice(0, 10);
     })();
-    await page.getByRole("dialog", { name: "Scegli il giorno" }).getByLabel("Altra data").fill(tuesday);
+    const pop = page.getByRole("dialog", { name: "Scegli il giorno" });
+    await pop.getByRole("button", { name: "Altra data" }).click();
+    await pop.locator(`[data-date="${tuesday}"]`).click();
     await expect(page.getByRole("button", { name: /^Quando: / })).not.toContainText("Qualsiasi data");
     // «bolo» + Cerca: si prende la prima città suggerita
     await page.getByRole("button", { name: "Cerca", exact: true }).click();
