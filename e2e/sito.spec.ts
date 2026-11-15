@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { signIn } from "./helpers";
 
 test.describe("Sito commerciale", () => {
-  test("la pagina iniziale mostra il prodotto e porta a registrazione e accesso", async ({ page }) => {
+  test("la pagina iniziale mostra il prodotto e porta a registrazione e accesso", async ({ page, isMobile }) => {
     await page.goto("/per-i-saloni");
     await expect(page).toHaveTitle(/Taglendo — Prenotazioni online e agenda per barbieri/);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("La tua agenda online, sempre in tasca.");
@@ -17,7 +17,8 @@ test.describe("Sito commerciale", () => {
     }
     // le sezioni scartate dal ridisegno non ci sono più
     await expect(page.getByText(/Tre cose che smetti di fare|Online o al telefono: decidi tu/)).toHaveCount(0);
-    await expect(page.getByRole("banner").getByRole("link", { name: "Funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
+    // il menu delle sezioni c'è solo da computer
+    if (!isMobile) await expect(page.getByRole("banner").getByRole("link", { name: "Funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
   });
 
   test("Quanto costa: il contatore scende da 29 a 0 e nessun piano a pagamento è in pagina", async ({ page }) => {
