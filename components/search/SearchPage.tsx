@@ -7,6 +7,7 @@ import { citySlug } from "@/lib/places/comuni";
 import type { CityCount, SalonHit, SearchResult } from "@/lib/search/load";
 import { activeTags, clockLabel, kmLabel, pinLabel, resetFilters, resultsTitle, searchHref, slotChips, type SearchFilters } from "@/lib/search/rules";
 import { FilterBar, type Base } from "./FilterBar";
+import { RememberSearch } from "./RememberSearch";
 import { Results } from "./Results";
 import { SearchBox } from "./SearchBox";
 import type { SalonView } from "./types";
@@ -73,6 +74,7 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
 
   return (
     <div className={cx(styles.page, count > 0 && styles.pageFixed)}>
+      <RememberSearch />
       <section className={styles.band} aria-label={copy.results.searchLabel}>
         <div className={styles.bandIn}>
           <div className={styles.titleBlock}>
