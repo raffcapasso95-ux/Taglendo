@@ -90,7 +90,8 @@ test.describe("Listino e orari", () => {
     // l'assenza: Ferie e chiusure si apre già sul barbiere
     await team.getByRole("link", { name: /Segna un.assenza/ }).click();
     await expect(dialog(page).getByRole("heading", { name: /chiusura/i })).toBeVisible();
-    await expect(dialog(page).getByRole("button", { pressed: true }).first()).toBeVisible();
+    await expect(dialog(page).getByRole("radio", { checked: true })).toHaveCount(1);
+    await expect(dialog(page).getByRole("radio", { name: "Tutto il salone" })).not.toBeChecked();
 
     await page.goto("/listino/orari");
     await team.getByRole("button", { name: "Come il salone" }).click();
@@ -158,8 +159,11 @@ test.describe("Ferie e chiusure", () => {
     await page.goto("/listino/chiusure");
     await expect(text(page, "Nessuna chiusura in programma.")).toBeVisible();
     await page.getByRole("button", { name: "+ Aggiungi una chiusura" }).click();
-    await dialog(page).getByLabel("Dal", { exact: true }).fill(day);
-    await dialog(page).getByLabel("Al", { exact: true }).fill(day);
+    for (const which of ["Dal", "Al"]) {
+      await dialog(page).getByRole("button", { name: new RegExp(`^${which}:`) }).click();
+      if (!(await dialog(page).locator(`[data-date="${day}"]`).count())) await dialog(page).getByRole("button", { name: "Mese successivo" }).click(); // il giorno è nel mese dopo
+      await dialog(page).locator(`[data-date="${day}"]`).click();
+    }
     await dialog(page).getByLabel(/^Nota/).fill("Corso di aggiornamento");
     await expect(dialog(page).getByText("1 appuntamento in questi giorni")).toBeVisible();
     await expect(dialog(page).getByText(/Mario Verdi\. Dopo il salvataggio ti aiutiamo ad avvisarli su WhatsApp\./)).toBeVisible();
