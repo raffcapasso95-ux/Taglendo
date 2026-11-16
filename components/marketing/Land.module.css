@@ -1978,6 +1978,11 @@
 
 .menuBtn[aria-expanded="true"] {
   background: var(--surface-muted);
+  color: var(--brand-plum);
+}
+
+.menuPanel:focus {
+  outline: none;
 }
 
 /* il foglio si apre sotto la testata (che con il foglio aperto è piena) */
