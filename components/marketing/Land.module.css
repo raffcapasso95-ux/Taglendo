@@ -1937,3 +1937,10 @@
     display: inline;
   }
 }
+
+/* A 320 px la testata dei saloni (marchio, lente, «Prova gratis») non ci sta tutta: resta l'icona del marchio */
+@media (max-width: 359px) {
+  .header[data-audience="saloni"] .logoWord {
+    display: none;
+  }
+}

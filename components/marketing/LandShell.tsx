@@ -62,6 +62,7 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
       <header
         className={styles.header}
         data-land-header=""
+        data-audience={audience}
         data-tone={audience === "clienti" ? (overlay ? "auto" : "light") : light ? "light" : undefined}
         data-solid={solid || light || (audience === "clienti" && !overlay) ? "true" : undefined}
         data-scrolled={solid || light || (audience === "clienti" && !overlay) ? "true" : undefined}
