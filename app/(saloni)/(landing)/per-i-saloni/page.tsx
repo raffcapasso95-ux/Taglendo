@@ -6,15 +6,12 @@ import { getAccount } from "@/components/marketing/AuthLinks";
 import { DayStrip } from "@/components/marketing/DayStrip";
 import { HeroNotice } from "@/components/marketing/HeroNotice";
 import { NotebookCompare } from "@/components/marketing/NotebookCompare";
-import { PagePreview } from "@/components/marketing/PagePreview";
 import { PriceCountdown } from "@/components/marketing/PriceCountdown";
 import styles from "@/components/marketing/Saloni.module.css";
-import { PublicPage } from "@/components/salon/PublicPage";
 import { cx } from "@/components/ui/cx";
 import { saloniCopy as copy } from "@/lib/copy/saloni";
 import { marketingCopy } from "@/lib/copy/marketing";
-import { DEMO_SALON } from "@/lib/demo/salon";
-import { company, siteUrl } from "@/lib/site";
+import { company } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: marketingCopy.meta.title,
@@ -92,7 +89,6 @@ function GuestCtas() {
 }
 
 export default function Page() {
-  const host = siteUrl().replace(/^https?:\/\//, "");
   return (
     <>
       {/* 1 · Apertura: titolo, due righe di rassicurazione e il telefono con l'agenda vera */}
@@ -183,28 +179,51 @@ export default function Page() {
         </div>
       </section>
 
-      {/* 4 · La pagina della tua barberia: la pagina vera, in una finestra */}
+      {/* 4 · La pagina della tua barberia: una schermata vera, con tre richiami */}
       <section className={cx(styles.section, styles.dark)} id="pagina" aria-labelledby="pagina-t">
-        <div className={styles.wrap}>
-          <div className={styles.pageHead}>
-            <div>
-              <h2 className={styles.h2} id="pagina-t">
-                {copy.page.title}
-              </h2>
-              <p className={styles.pageLead}>{copy.page.lead}</p>
+        <div className={cx(styles.wrap, styles.pgLayout)}>
+          <div className={styles.pgText}>
+            <h2 className={styles.h2} id="pagina-t">
+              {copy.page.title}
+            </h2>
+            <p className={styles.pageLead}>{copy.page.lead}</p>
+            <ol className={styles.pgList}>
+              {copy.page.features.map((f, n) => (
+                <li key={f.title} className={styles.pgItem}>
+                  <span className={cx(styles.pgNum, styles.num)} aria-hidden="true">
+                    {n + 1}
+                  </span>
+                  <span>
+                    <b className={styles.pgTitle}>{f.title}</b>
+                    <span className={styles.pgText2}>{f.text}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <div className={styles.pgCtas}>
+              <Link href="/per-i-saloni/funzioni" className={styles.btnLight}>
+                {copy.page.all}
+                <Icon size={18}>
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </Icon>
+              </Link>
+              <p className={styles.pnote}>{copy.page.note}</p>
             </div>
-            <Link href="/per-i-saloni/funzioni" className={styles.btnLight}>
-              {copy.page.all}
-              <Icon size={18}>
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </Icon>
-            </Link>
           </div>
-          <PagePreview host={host}>
-            <PublicPage salon={DEMO_SALON} weekday={6} nowMin={15 * 60} today="2026-11-14" bookingOn preview />
-          </PagePreview>
-          <div className={styles.pnote}>
-            <p>{copy.page.note}</p>
+          <div className={styles.pgArt}>
+            <div className={styles.pgPhone}>
+              <div className={styles.screen}>
+                <Image src="/images/shot-salone-p.jpg" alt={copy.page.phoneAlt} width={780} height={1688} sizes="(max-width: 960px) 80vw, 340px" />
+              </div>
+            </div>
+            <ul className={styles.pgPins}>
+              {copy.page.pins.map((t, n) => (
+                <li key={t} className={cx(styles.pgPin, n === 1 && styles.pgPinRight)} style={{ "--y": ["13%", "35%", "63%"][n] } as React.CSSProperties}>
+                  <span className={styles.pgDot} aria-hidden="true" />
+                  {t}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>

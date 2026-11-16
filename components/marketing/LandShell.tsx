@@ -78,8 +78,8 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
             ) : (
               <Image src="/brand/taglendo-logo-light.svg" alt="Taglendo" width={109} height={26} className={`${styles.logoWord} ${styles.logoLight}`} priority style={{ height: 26, width: "auto" }} />
             )}
-            {audience === "saloni" ? <span className={styles.logoTag}>{site.businessTag}</span> : null}
           </Link>
+
           <nav className={styles.nav} aria-label={audience === "clienti" ? site.servicesLabel : "Sezioni"}>
             {audience === "clienti" ? (
               <>
@@ -94,17 +94,11 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
                 <Link href={`${SALONI}#come`} className={styles.navLink}>
                   {nav.how}
                 </Link>
-                <Link href={`${SALONI}#pagina`} className={styles.navLink}>
-                  {nav.page}
-                </Link>
                 <Link href={`${SALONI}/funzioni`} className={styles.navLink} aria-current={current === "funzioni" ? "page" : undefined}>
                   {nav.features}
                 </Link>
                 <Link href={`${SALONI}#costo`} className={styles.navLink}>
                   {nav.cost}
-                </Link>
-                <Link href={`${SALONI}#domande`} className={styles.navLink}>
-                  {nav.faq}
                 </Link>
               </>
             )}
