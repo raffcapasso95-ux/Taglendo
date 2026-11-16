@@ -128,6 +128,13 @@ test.describe("Sito commerciale", () => {
       await expect(menu).toBeVisible();
       for (const label of items) await expect(menu.getByRole("link", { name: label, exact: true })).toBeVisible();
       await expect(menu.getByRole("link", { name: cta })).toBeVisible();
+      // la X si vede (testo scuro su fondo chiaro) e la testata resta piena anche se la pagina si muove
+      const x = page.getByRole("button", { name: "Chiudi il menu" }).first();
+      const [fg, bg] = await x.evaluate((el) => [getComputedStyle(el).color, getComputedStyle(el).backgroundColor]);
+      expect(fg).not.toBe(bg);
+      expect(fg).not.toBe("rgb(255, 247, 240)"); // non panna su fondo chiaro
+      await page.mouse.wheel(0, 40);
+      await expect(page.locator("[data-land-header]")).toHaveAttribute("data-scrolled", "true");
       await page.keyboard.press("Escape");
       await expect(menu).toBeHidden();
       await expect(page.getByRole("button", { name: "Apri il menu" })).toBeFocused();

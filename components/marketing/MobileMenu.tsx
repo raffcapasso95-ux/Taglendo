@@ -21,12 +21,14 @@ export function MobileMenu({ items, current, children }: { items: NavItem[]; cur
   useEffect(() => {
     if (!open) return;
     const header = document.querySelector<HTMLElement>("[data-land-header]");
-    // con il foglio aperto la testata è piena, come dopo lo scorrimento
+    // con il foglio aperto la testata è piena, come dopo lo scorrimento (LandEffects lo rispetta anche se la pagina si muove)
+    header?.setAttribute("data-menu", "open");
     header?.setAttribute("data-scrolled", "true");
     const html = document.documentElement;
     const before = html.style.overflow;
     html.style.overflow = "hidden";
-    panel.current?.querySelector<HTMLElement>("a, button")?.focus();
+    // il fuoco va al foglio (non alla prima voce, che si vedrebbe cerchiata appena si apre)
+    panel.current?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
@@ -39,6 +41,7 @@ export function MobileMenu({ items, current, children }: { items: NavItem[]; cur
       document.removeEventListener("keydown", onKey);
       mq.removeEventListener("change", onWide);
       html.style.overflow = before;
+      header?.removeAttribute("data-menu");
       if (header) header.setAttribute("data-scrolled", header.dataset.solid === "true" || window.scrollY > 24 ? "true" : "false");
       btn?.focus({ preventScroll: true });
     };
@@ -52,7 +55,7 @@ export function MobileMenu({ items, current, children }: { items: NavItem[]; cur
         </svg>
       </button>
       {open ? <button type="button" className={styles.menuScrim} aria-label={copy.close} tabIndex={-1} onClick={() => setOpen(false)} /> : null}
-      <div id={id} ref={panel} className={styles.menuPanel} role="dialog" aria-modal="true" aria-label={copy.title} hidden={!open}>
+      <div id={id} ref={panel} className={styles.menuPanel} role="dialog" aria-modal="true" aria-label={copy.title} tabIndex={-1} hidden={!open}>
         <nav aria-label={copy.title} className={styles.menuList}>
           <NavLinks items={items} current={current} layout="list" onNavigate={() => setOpen(false)} />
         </nav>
