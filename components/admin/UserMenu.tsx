@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { removeAdmin, setUserBlocked, type AdminResult } from "@/lib/admin/actions";
+import { setUserBlocked, type AdminResult } from "@/lib/admin/actions";
 import type { UserRow } from "@/lib/admin/load";
 import { adminCopy } from "@/lib/copy/admin";
 import { ActionDialog } from "./ActionDialog";
@@ -13,17 +13,17 @@ import styles from "./Admin.module.css";
 const copy = adminCopy.users;
 
 /** Il menu «⋯» di un'utenza: apri il salone, blocca o sblocca l'accesso, togli dagli amministratori. */
-export function UserMenu({ row, self }: { row: UserRow; self: boolean }) {
+export function UserMenu({ row }: { row: UserRow }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top?: number; bottom?: number; right: number } | null>(null);
-  const [ask, setAsk] = useState<"block" | "remove" | null>(null);
+  const [ask, setAsk] = useState<"block" | null>(null);
   const [message, setMessage] = useState<AdminResult | null>(null);
   const [pending, start] = useTransition();
   const button = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const label = copy.label(row.name);
-  const hasItems = Boolean(row.salon_id) || (!row.is_admin && row.user_id) || (row.is_admin && !self);
+  const hasItems = Boolean(row.salon_id) || (!row.is_admin && row.user_id);
 
   useEffect(() => {
     if (!open) return;
@@ -124,20 +124,6 @@ export function UserMenu({ row, self }: { row: UserRow; self: boolean }) {
               </button>
             )
           ) : null}
-          {row.is_admin && !self ? (
-            <button
-              type="button"
-              role="menuitem"
-              className={styles.menuDanger}
-              onClick={() => {
-                setOpen(false);
-                setAsk("remove");
-              }}
-            >
-              <Icon name="shieldOff" />
-              {copy.removeAdmin}
-            </button>
-          ) : null}
         </div>
       ) : null}
 
@@ -151,16 +137,6 @@ export function UserMenu({ row, self }: { row: UserRow; self: boolean }) {
         onClose={() => setAsk(null)}
         onConfirm={(reason) => run(() => setUserBlocked(row.user_id!, true, reason))}
       />
-      <ActionDialog
-        open={ask === "remove"}
-        title={copy.removeTitle}
-        text={copy.removeFor(row.email ?? row.name)}
-        confirm={adminCopy.actions.confirm}
-        tone="danger"
-        onClose={() => setAsk(null)}
-        onConfirm={() => run(() => removeAdmin(row.user_id!))}
-      />
-
       {message ? (
         <p className={`${styles.toast} ${message.ok ? "" : styles.toastErr}`} role={message.ok ? "status" : "alert"}>
           {message.ok ? message.message : message.error}

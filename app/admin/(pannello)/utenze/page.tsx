@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
-import { AddAdmin } from "@/components/admin/AddAdmin";
 import { agoLabel, dateLabel } from "@/components/admin/format";
+import { Icon } from "@/components/admin/Icons";
+import { Avatar } from "@/components/ui/Avatar";
 import styles from "@/components/admin/Admin.module.css";
 import { UserMenu } from "@/components/admin/UserMenu";
 import { ViewToggle } from "@/components/admin/ViewToggle";
-import { getAdmin } from "@/lib/admin/session";
 import { PAGE_SIZE, USER_FILTERS, loadUsers, parseUserFilters, userHref, type UserFilters, type UserRow } from "@/lib/admin/load";
 import { adminCopy } from "@/lib/copy/admin";
 
@@ -44,17 +44,20 @@ function SalonLink({ r }: { r: UserRow }) {
       {r.salon_name}
     </Link>
   ) : (
-    <span className={styles.muted}>{copy.noSalon}</span>
+    <span className={styles.muted}>—</span>
   );
 }
 
-function Row({ r, self }: { r: UserRow; self: string | null }) {
+function Row({ r }: { r: UserRow }) {
   return (
     <tr>
       <td data-label={copy.cols.user}>
-        <span>
-          {r.name}
-          <span className={styles.sub}>{r.email ?? "—"}</span>
+        <span className={styles.nameCell}>
+          <Avatar name={r.name} size="md" />
+          <span className={styles.nameText}>
+            {r.name}
+            <span className={styles.sub}>{r.email ?? "—"}</span>
+          </span>
         </span>
       </td>
       <td data-label={copy.cols.role}>{copy.roles[r.role]}</td>
@@ -67,22 +70,25 @@ function Row({ r, self }: { r: UserRow; self: string | null }) {
       <td data-label={copy.cols.access}>{r.last_sign_in_at ? agoLabel(r.last_sign_in_at) : copy.never}</td>
       <td data-label={copy.cols.since} className={styles.hideMid}>{r.created_at ? dateLabel(r.created_at) : "—"}</td>
       <td data-label="" className={styles.actionsCell}>
-        <UserMenu row={r} self={r.user_id === self} />
+        <UserMenu row={r} />
       </td>
     </tr>
   );
 }
 
-function UserCard({ r, self }: { r: UserRow; self: string | null }) {
+function UserCard({ r }: { r: UserRow }) {
   return (
     <li>
       <article className={styles.sCard}>
         <div className={styles.sCardHead}>
-          <span>
-            <strong>{r.name}</strong>
-            <span className={styles.sub}>{r.email ?? "—"}</span>
+          <span className={styles.nameCell}>
+            <Avatar name={r.name} size="md" />
+            <span className={styles.nameText}>
+              <strong>{r.name}</strong>
+              <span className={styles.sub}>{r.email ?? "—"}</span>
+            </span>
           </span>
-          <UserMenu row={r} self={r.user_id === self} />
+          <UserMenu row={r} />
         </div>
         <Badges r={r} />
         <dl className={styles.sCardFacts}>
@@ -113,9 +119,8 @@ function UserCard({ r, self }: { r: UserRow; self: string | null }) {
 async function Content({ searchParams }: { searchParams: Promise<Params> }) {
   await connection();
   const f = parseUserFilters(await searchParams);
-  const [data, me] = await Promise.all([loadUsers(f), getAdmin()]);
+  const data = await loadUsers(f);
   if (!data) return <p className={styles.notice}>{adminCopy.errors.load}</p>;
-  const self = me?.id ?? null;
   const pages = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
   return (
     <>
@@ -125,7 +130,7 @@ async function Content({ searchParams }: { searchParams: Promise<Params> }) {
           <input id="q" name="q" type="search" defaultValue={f.q} placeholder={copy.search} className={styles.input} autoComplete="off" />
         </div>
         {f.stato !== "all" ? <input type="hidden" name="stato" value={f.stato} /> : null}
-        {f.view === "schede" ? <input type="hidden" name="vista" value="schede" /> : null}
+        {f.view === "tabella" ? <input type="hidden" name="vista" value="tabella" /> : null}
         <button type="submit" className={styles.btn}>
           {copy.submit}
         </button>
@@ -160,7 +165,7 @@ async function Content({ searchParams }: { searchParams: Promise<Params> }) {
       ) : f.view === "schede" ? (
         <ul className={styles.gridCards}>
           {data.rows.map((r) => (
-            <UserCard key={r.row_id} r={r} self={self} />
+            <UserCard key={r.row_id} r={r} />
           ))}
         </ul>
       ) : (
@@ -189,7 +194,7 @@ async function Content({ searchParams }: { searchParams: Promise<Params> }) {
             </thead>
             <tbody>
               {data.rows.map((r) => (
-                <Row key={r.row_id} r={r} self={self} />
+                <Row key={r.row_id} r={r} />
               ))}
             </tbody>
           </table>
@@ -227,7 +232,10 @@ export default function Page({ searchParams }: { searchParams: Promise<Params> }
           <h1>{copy.title}</h1>
           <p className={styles.lead}>{copy.lead}</p>
         </div>
-        <AddAdmin />
+        <Link href="/admin/amministratori" className={`${styles.btn} ${styles.btnLine}`}>
+          <Icon name="shield" />
+          {copy.adminsLink}
+        </Link>
       </div>
       <Suspense fallback={<p className={styles.lead}>…</p>}>
         <Content searchParams={searchParams} />
