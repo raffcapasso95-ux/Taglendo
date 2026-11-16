@@ -163,7 +163,7 @@
 }
 
 .dayDow {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -700,7 +700,7 @@
 }
 
 .weekDay .dayDow {
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .weekDay .dayNum {

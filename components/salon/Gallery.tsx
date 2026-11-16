@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { cx } from "@/components/ui/cx";
 import { shopCopy } from "@/lib/copy/shop";
@@ -54,8 +55,7 @@ export function Gallery({ photos }: { photos: Photo[] }) {
                   dialog.current?.showModal();
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={p.url} alt={more ? "" : p.alt} width={900} height={675} loading={i === 0 ? "eager" : "lazy"} decoding="async" />
+                <Image src={p.url} alt={more ? "" : p.alt} width={900} height={675} sizes="(max-width: 960px) 50vw, 33vw" loading={i === 0 ? "eager" : "lazy"} />
                 {more ? (
                   <span className={page.more} aria-hidden="true">
                     {copy.seeAll}
@@ -78,8 +78,7 @@ export function Gallery({ photos }: { photos: Photo[] }) {
           if (e.key === "ArrowRight") show(current + 1);
         }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo.url} alt={photo.alt} />
+        <Image src={photo.url} alt={photo.alt} width={1600} height={1200} sizes="100vw" />
         <div className={styles.viewerBar}>
           <span className={styles.viewerText}>
             {copy.of(current + 1, n)} · {photo.alt}

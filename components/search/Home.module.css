@@ -381,7 +381,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: var(--segmented-item-height);
+  min-height: var(--tap-min);
   padding: 0 14px;
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-subtle);

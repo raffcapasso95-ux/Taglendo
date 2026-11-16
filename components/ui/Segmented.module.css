@@ -36,3 +36,10 @@
 .full .item {
   flex: 1;
 }
+
+/* sul telefono si tocca con il dito: almeno 44 px */
+@media (max-width: 1023px) {
+  .item {
+    min-height: var(--tap-min);
+  }
+}

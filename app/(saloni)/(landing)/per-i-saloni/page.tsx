@@ -81,6 +81,12 @@ function GuestCtas() {
         </Link>
       </div>
       <p className={styles.note}>{copy.hero.note}</p>
+      <Link href="/per-i-saloni/funzioni" className={styles.heroMore}>
+        {copy.hero.features}
+        <Icon size={16}>
+          <path d="M5 12h14M13 6l6 6-6 6" />
+        </Icon>
+      </Link>
     </>
   );
 }
@@ -187,8 +193,11 @@ export default function Page() {
               </h2>
               <p className={styles.pageLead}>{copy.page.lead}</p>
             </div>
-            <Link href="/barberia-saragozza" className={styles.btnLight}>
-              {copy.page.example}
+            <Link href="/per-i-saloni/funzioni" className={styles.btnLight}>
+              {copy.page.all}
+              <Icon size={18}>
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </Icon>
             </Link>
           </div>
           <PagePreview host={host}>
@@ -196,12 +205,6 @@ export default function Page() {
           </PagePreview>
           <div className={styles.pnote}>
             <p>{copy.page.note}</p>
-            <Link href="/per-i-saloni/funzioni">
-              {copy.page.all}
-              <Icon size={18}>
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </Icon>
-            </Link>
           </div>
         </div>
       </section>

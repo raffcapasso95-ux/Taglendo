@@ -57,7 +57,17 @@ const SearchIcon = () => (
 /** Un campo della barra: etichetta piccola sopra, valore sotto, riquadro di suggerimenti che si apre dal campo. */
 function Segment({ icon, label, children, panel, open, className }: { icon: ReactNode; label: string; children: ReactNode; panel: ReactNode; open: boolean; className?: string }) {
   return (
-    <div className={cx(styles.segment, open && styles.segmentOn, className)}>
+    <div
+      className={cx(styles.segment, open && styles.segmentOn, className)}
+      onClick={(e) => {
+        // toccare l'etichetta o il bordo del campo equivale a toccare il campo (l'area utile è tutto il riquadro)
+        const t = e.target as HTMLElement;
+        if (t.closest("input, button, a, [role=listbox], [role=dialog]") || t.closest(`.${styles.pop}`)) return;
+        const control = e.currentTarget.querySelector<HTMLElement>(`.${styles.segmentBody} input, .${styles.segmentBody} button`);
+        if (control instanceof HTMLInputElement) control.focus();
+        else control?.click();
+      }}
+    >
       <span className={styles.segmentIcon}>{icon}</span>
       <span className={styles.segmentBody}>
         <span className={styles.segmentLabel} aria-hidden="true">

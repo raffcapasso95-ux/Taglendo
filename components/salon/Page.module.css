@@ -177,7 +177,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 40px;
+  min-height: var(--tap-min);
   padding: 0 14px;
   margin-left: auto;
   border-radius: var(--radius-pill);
@@ -293,6 +293,7 @@
 .fact {
   display: flex;
   align-items: center;
+  min-height: var(--tap-min);
   gap: 10px;
   color: var(--text-inverse);
   text-decoration: none;

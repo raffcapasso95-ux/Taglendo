@@ -34,7 +34,7 @@
 }
 
 .period {
-  min-height: var(--segmented-item-height);
+  min-height: var(--tap-min);
   padding: 0 var(--space-4);
   border-radius: var(--radius-pill);
   color: var(--text-primary);
@@ -243,6 +243,9 @@
 }
 
 .rankName {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
   color: var(--text-primary);
   font-size: 15px;
   font-weight: 700;

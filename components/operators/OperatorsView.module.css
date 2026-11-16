@@ -59,7 +59,7 @@
 
 .label {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: .14em;
   text-transform: uppercase;
@@ -128,8 +128,8 @@
 }
 
 .linkMuted {
-  min-height: 28px;
-  margin-top: -10px;
+  min-height: var(--tap-min);
+  margin-top: -14px;
   color: var(--text-secondary);
   font-size: 12px;
   font-weight: 600;

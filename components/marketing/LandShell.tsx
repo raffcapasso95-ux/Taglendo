@@ -62,6 +62,7 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
       <header
         className={styles.header}
         data-land-header=""
+        data-audience={audience}
         data-tone={audience === "clienti" ? (overlay ? "auto" : "light") : light ? "light" : undefined}
         data-solid={solid || light || (audience === "clienti" && !overlay) ? "true" : undefined}
         data-scrolled={solid || light || (audience === "clienti" && !overlay) ? "true" : undefined}
@@ -109,6 +110,15 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
             )}
           </nav>
           <div className={styles.headerActions}>
+            {audience === "saloni" ? (
+              <Link href="/" className={`${styles.navLink} ${styles.clientLink}`} aria-label={nav.clientAria}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="6.5" />
+                  <path d="m16 16 4.5 4.5" />
+                </svg>
+                <span className={styles.clientText}>{nav.client}</span>
+              </Link>
+            ) : null}
             <Suspense fallback={<GuestActions audience={audience} />}>
               <AuthActions audience={audience} />
             </Suspense>
@@ -147,6 +157,11 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
                   <li>
                     <Link className={styles.fLink} href={SALONI}>
                       {f.forSalons}
+                    </Link>
+                  </li>
+                  <li>
+                    <Link className={styles.fLink} href={`${SALONI}/funzioni`}>
+                      {f.features}
                     </Link>
                   </li>
                   <li>
