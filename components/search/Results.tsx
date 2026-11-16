@@ -26,9 +26,9 @@ const LIST = "M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01";
 const GRID = "M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z";
 
 /** Quante schede per pagina: nell'elenco accanto alla mappa ce ne stanno meno che nella griglia. */
-const PER_PAGE = { list: 6, grid: 12 } as const;
+const PER_PAGE = { list: 8, grid: 12 } as const;
 /** Quanti servizi si vedono nella scheda: gli altri sono nella pagina del salone. */
-const SERVICES_SHOWN = 3;
+const SERVICES_SHOWN = 2;
 
 function Pager({ page, total, onPage }: { page: number; total: number; onPage: (n: number) => void }) {
   if (total <= 1) return null;
@@ -84,67 +84,71 @@ const Status = ({ s }: { s: SalonView }) => (
   </span>
 );
 
-/** Una scheda dell'elenco: foto, nome e distanza, aperto o chiuso, servizi con prezzo, orari liberi del giorno, «Vedi». */
+/**
+ * Una scheda dell'elenco, a riga compatta: foto piccola, nome e distanza, aperto o chiuso, i servizi in una riga, gli orari liberi sotto.
+ * Tutta la scheda è un tocco (il nome si estende su di lei); gli orari restano link a sé.
+ */
 function SalonCard({ salon: s, active, onActive }: { salon: SalonView; active: boolean; onActive: (slug: string | null) => void }) {
   const href = `/${s.slug}`;
+  const shown = s.services.slice(0, SERVICES_SHOWN);
+  const more = s.services.length - shown.length;
   return (
     <article className={cx(styles.card, active && styles.cardOn)} data-salon={s.slug} onMouseEnter={() => onActive(s.slug)} onMouseLeave={() => onActive(null)} aria-labelledby={`sal-${s.slug}`}>
-      <Link href={href} className={styles.photo} tabIndex={-1} aria-hidden="true">
+      <span className={styles.photo} aria-hidden="true">
         <Photo salon={s} />
         {s.isNew ? <span className={styles.badge}>{copy.card.newBadge}</span> : s.barbers >= 2 ? <span className={styles.badge}>{copy.card.barbers(s.barbers)}</span> : null}
-      </Link>
+      </span>
       <div className={styles.body}>
         <div className={styles.head}>
           <h3 className={styles.name} id={`sal-${s.slug}`}>
-            <Link href={href} onFocus={() => onActive(s.slug)} onBlur={() => onActive(null)}>
+            <Link href={href} className={styles.cover} onFocus={() => onActive(s.slug)} onBlur={() => onActive(null)}>
               {s.name}
             </Link>
           </h3>
-          {s.distance ? (
-            <span className={styles.km}>
-              <Svg d={PIN} />
-              <span className={styles.num}>{s.distance}</span>
-            </span>
-          ) : null}
+          {s.distance ? <span className={cx(styles.km, styles.num)}>{s.distance}</span> : null}
         </div>
         <p className={styles.status}>
           <Status s={s} />
-          {s.where ? <span>{s.where}</span> : null}
         </p>
         {s.services.length > 0 ? (
           <ul className={styles.services} aria-label={copy.card.services}>
-            {s.services.slice(0, SERVICES_SHOWN).map((x) => (
+            {shown.map((x) => (
               <li key={x.name} className={styles.service}>
                 {x.name}
                 {x.price ? <b className={styles.num}>{x.price}</b> : null}
               </li>
             ))}
-            {s.services.length > SERVICES_SHOWN ? <li className={styles.service}>+{s.services.length - SERVICES_SHOWN}</li> : null}
+            {more > 0 ? <li className={styles.service}>+{more}</li> : null}
           </ul>
         ) : null}
-        <div className={styles.foot}>
-          {s.slots.length > 0 ? (
-            <>
-              <span className={styles.day}>{s.slotDay}</span>
-              <ul className={styles.slots} aria-label={copy.card.slotsLabel}>
-                {s.slots.slice(0, 3).map((t) => (
+      </div>
+      <div className={styles.slotRow}>
+        {s.slots.length > 0 ? (
+          <>
+            <ul className={styles.slots} aria-label={copy.card.slotsLabel}>
+              {s.slots.slice(0, 3).map((t, i) => {
+                const day = t.day ?? (i === 0 && s.slotDay && s.slotDay !== "Oggi" ? s.slotDay : null);
+                return (
                   <li key={`${t.day ?? ""}${t.time}`}>
-                    <Link href={href} className={cx(styles.slot, styles.num)} aria-label={copy.card.slotAria(s.name, `${t.day ?? s.slotDay} ${t.time}`)}>
-                      {t.day ? <span className={styles.slotDay}>{t.day}</span> : null}
+                    <Link href={href} className={cx(styles.slot, styles.num)} aria-label={copy.card.slotAria(s.name, `${day ?? s.slotDay} ${t.time}`)}>
+                      {day ? (
+                        <>
+                          <span className={styles.slotDay}>{day}</span>{" "}
+                        </>
+                      ) : null}
                       {t.time}
                     </Link>
                   </li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <p className={styles.noSlot}>{s.bookingOnline ? copy.card.noSlot : copy.card.phoneOnly}</p>
-          )}
-          <Link href={href} className={styles.see}>
-            {copy.card.view}
-            <Svg size={16} d="m9 6 6 6-6 6" />
-          </Link>
-        </div>
+                );
+              })}
+            </ul>
+            <Link href={href} className={cx(styles.slot, styles.slotMore)} aria-label={copy.card.see}>
+              <Svg size={16} d="m9 6 6 6-6 6" />
+            </Link>
+          </>
+        ) : (
+          <p className={styles.noSlot}>{s.bookingOnline ? copy.card.noSlot : copy.card.phoneOnly}</p>
+        )}
       </div>
     </article>
   );
