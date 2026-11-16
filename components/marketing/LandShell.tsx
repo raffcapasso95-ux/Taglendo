@@ -160,6 +160,11 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
                     </Link>
                   </li>
                   <li>
+                    <Link className={styles.fLink} href={`${SALONI}/funzioni`}>
+                      {f.features}
+                    </Link>
+                  </li>
+                  <li>
                     <Link className={styles.fLink} href="/registrati">
                       {f.register}
                     </Link>

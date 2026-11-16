@@ -8,6 +8,7 @@ export const saloniCopy = {
     lead: "I clienti prenotano dalla pagina della tua barberia, a qualsiasi ora. Tu vedi ogni appuntamento sul telefono e sul computer.",
     cta: "Prova gratis",
     how: "Guarda come funziona",
+    features: "Scopri tutte le funzioni",
     note: "Gratis durante la beta · Senza carta di credito · Zero commissioni",
     agendaAlt: "L’agenda di oggi su Taglendo",
     pageAlt: "La pagina del salone sul telefono",
@@ -36,7 +37,6 @@ export const saloniCopy = {
   page: {
     title: "La pagina della tua barberia.",
     lead: "Ogni barberia su Taglendo ha la sua pagina, pronta appena finisci il primo avvio. Guarda cosa trova il tuo cliente.",
-    example: "Apri la pagina d’esempio",
     tabs: "Le parti della pagina",
     features: [
       { title: "Il tuo logo, in alto", text: "Nome, orari di oggi, indirizzo e i tuoi barbieri. Anche senza foto." },

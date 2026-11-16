@@ -59,6 +59,7 @@ export const searchCopy = {
     near: "Barbieri vicino a te",
     salons: "Per i saloni",
     forSalons: "Taglendo per i saloni",
+    features: "Tutte le funzioni",
     register: "Registra il salone",
     signIn: "Accedi",
     company: "Taglendo",

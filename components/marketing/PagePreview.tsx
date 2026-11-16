@@ -6,7 +6,7 @@ import { saloniCopy } from "@/lib/copy/saloni";
 import styles from "./Saloni.module.css";
 
 const copy = saloniCopy.page;
-const NATURAL = 1440;
+const NATURAL = 1200;
 /** Per ogni voce: gli elementi della pagina (dentro l'anteprima) che si evidenziano. */
 const TARGETS = [["#intestazione"], ["#servizi"], ["#prenota-card"], ["#foto", "#barbieri"], ["#info", "#dove"]] as const;
 
@@ -27,6 +27,7 @@ export function PagePreview({ children, host }: { children: ReactNode; host: str
   const [offset, setOffset] = useState(0);
   const view = useRef<HTMLDivElement>(null);
   const scaler = useRef<HTMLDivElement>(null);
+  const mover = useRef<HTMLDivElement>(null);
   const reduced = useRef(false);
 
   // la misura: quanto è larga la finestra e se siamo su telefono
@@ -51,9 +52,10 @@ export function PagePreview({ children, host }: { children: ReactNode; host: str
   // dove sta la parte scelta, in pixel della pagina a grandezza naturale
   const place = useCallback(
     (index: number) => {
-      const root = scaler.current;
+      const root = mover.current;
       const wrap = view.current;
       if (!root || !wrap || compact) return setBox(null);
+      // si misura dal contenitore che scorre (non da quello fermo): così lo scorrimento già fatto non sposta le misure
       const base = root.getBoundingClientRect();
       const rects = TARGETS[index]!.flatMap((sel) => {
         const r = root.querySelector(sel)?.getBoundingClientRect();
@@ -121,7 +123,7 @@ export function PagePreview({ children, host }: { children: ReactNode; host: str
           <div className={styles.pv} ref={view}>
             {/* è solo una vetrina: niente focus né lettori di schermo dentro la pagina d'esempio */}
             <div ref={scaler} className={styles.scaler} style={compact ? { width: "100%" } : { width: NATURAL, transform: `scale(${scale})` }} aria-hidden="true" inert>
-              <div className={styles.mover} style={{ transform: `translateY(-${offset}px)` }}>
+              <div className={styles.mover} ref={mover} style={{ transform: `translateY(-${offset}px)` }}>
                 {children}
                 {box && !compact ? <span className={styles.hl} style={{ left: box.left, top: box.top, width: box.width, height: box.height }} /> : null}
               </div>
