@@ -357,8 +357,8 @@ test.describe("Barbieri vicino a te: filtri, ordine, mappa (ridisegno del sito)"
     await page.getByRole("button", { name: "Cerca in questa zona" }).click();
     await expect(page).toHaveURL(/\/cerca\?lat=[\d.]+&lng=[\d.]+&zona=1/);
     await expect(page.getByText(/barberi[ae] in questa zona/)).toBeVisible();
-    // torna alla mia posizione: il pulsante sparisce
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Barbieri a");
+    // il titolo c'è; sul telefono, con la mappa a tutto schermo, la fascia in alto è nascosta
+    if (!isMobile) await expect(page.getByRole("heading", { level: 1 })).toContainText("Barbieri a");
   });
 
   test("flusso: ricerca con filtri → scheda → pagina del salone → prenotazione", async ({ page }) => {
