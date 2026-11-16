@@ -1,6 +1,6 @@
 /** Testi della home dei saloni e della pagina Funzioni (ridisegno di novembre 2026, design/ridisegno-sito-2026-11). */
 export const saloniCopy = {
-  nav: { how: "Come funziona", page: "La tua pagina", features: "Funzioni", cost: "Quanto costa", faq: "Domande", signIn: "Accedi", try: "Prova gratis", client: "Cerchi un barbiere?", clientAria: "Cerchi un barbiere? Vai al sito per i clienti" },
+  nav: { how: "Come funziona", page: "La tua pagina", features: "Funzioni", cost: "Quanto costa", faq: "Domande", signIn: "Accedi", try: "Prova gratis", client: "Cerchi un barbiere?", clientAria: "Cerchi un barbiere? Vai al sito per i clienti", switchLabel: "Per chi è Taglendo", forSalons: "Saloni", forClients: "Clienti" },
   hero: {
     kicker: "Per barbieri, da 1 a 3 poltrone",
     title: "La tua agenda online,",
@@ -36,15 +36,15 @@ export const saloniCopy = {
   },
   page: {
     title: "La pagina della tua barberia.",
-    lead: "Ogni barberia su Taglendo ha la sua pagina, pronta appena finisci il primo avvio. Guarda cosa trova il tuo cliente.",
-    tabs: "Le parti della pagina",
+    lead: "Appena finisci il primo avvio, la tua barberia ha la sua pagina: è quella che i clienti aprono dal telefono per prenotare.",
     features: [
-      { title: "Il tuo logo, in alto", text: "Nome, orari di oggi, indirizzo e i tuoi barbieri. Anche senza foto." },
-      { title: "Servizi e prezzi", text: "Ogni servizio ha il suo Prenota. I prezzi puoi anche nasconderli." },
-      { title: "Prenotazione a passi", text: "Cosa, con chi, quando, i dati. Resta sempre a lato mentre si scorre." },
-      { title: "Foto e barbieri", text: "Fino a otto foto e un “Prenota con…” per ogni barbiere." },
-      { title: "Da sapere, orari e mappa", text: "Specialità, pagamento, chiusure e ferie sempre aggiornati." },
+      { title: "Subito chiaro", text: "Nome, se sei aperto adesso, indirizzo e prezzi: il cliente capisce tutto senza scorrere." },
+      { title: "Servizi con il loro «Prenota»", text: "Un tocco sul servizio e parte la prenotazione. I prezzi, se vuoi, li nascondi." },
+      { title: "Prenotazione in quattro passi", text: "Cosa, con chi, quando e i suoi dati. Conferma con un codice via email." },
+      { title: "Foto, barbieri e da sapere", text: "Fino a otto foto, un «Prenota con…» per ogni barbiere, specialità e modi di pagamento." },
     ],
+    pins: ["Aperto o chiuso, in automatico dai tuoi orari", "Un tocco per prenotare", "Indirizzo, orari e prezzi sempre aggiornati"],
+    phoneAlt: "La pagina di una barberia sul telefono, come la vede il cliente",
     note: "Funziona anche senza foto: in alto ci sono il tuo logo e i tuoi orari.",
     all: "Tutte le funzioni",
   },

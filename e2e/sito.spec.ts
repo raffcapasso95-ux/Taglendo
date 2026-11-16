@@ -71,22 +71,17 @@ test.describe("Sito commerciale", () => {
     await expect(page).toHaveURL(/\/registrati/);
   });
 
-  test("«La pagina della tua barberia»: cinque voci, l'anteprima è la pagina vera e scorre alla voce scelta", async ({ page, isMobile }) => {
+  test("«La pagina della tua barberia»: quattro punti, una schermata vera del telefono e il link a Funzioni", async ({ page, isMobile }) => {
     await page.goto("/per-i-saloni");
     const section = page.locator("#pagina");
     await section.scrollIntoViewIfNeeded();
-    const tabs = section.getByRole("tablist", { name: "Le parti della pagina" }).getByRole("tab");
-    await expect(tabs).toHaveCount(5);
-    await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
-    // l'anteprima è la pagina di «Barberia Porta Nuova», senza un secondo titolo né un secondo «main»
-    await expect(section.getByText("Barberia Porta Nuova").first()).toBeAttached();
+    await expect(section.getByRole("heading", { level: 2, name: "La pagina della tua barberia." })).toBeVisible();
+    await expect(section.getByRole("listitem").filter({ hasText: /Servizi con il loro/ })).toBeVisible();
+    await expect(section.getByRole("img", { name: /pagina di una barberia sul telefono/ })).toBeVisible();
+    // i richiami sul telefono ci sono su computer; sul telefono si nascondono per non coprire la schermata
+    await expect(section.getByText("Un tocco per prenotare")).toBeVisible({ visible: !isMobile });
     await expect(page.locator("main")).toHaveCount(1);
     await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
-    if (!isMobile) {
-      await tabs.nth(2).click();
-      await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
-      await expect.poll(() => section.locator("[class*=hl]").first().evaluate((el) => Math.round(el.getBoundingClientRect().width))).toBeGreaterThan(100);
-    }
     await expect(section.getByRole("link", { name: "Tutte le funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
     // la pagina d'esempio non esiste online: niente pulsante che porta a una pagina vuota
     await expect(page.getByRole("link", { name: /pagina d.esempio/i })).toHaveCount(0);
@@ -95,27 +90,14 @@ test.describe("Sito commerciale", () => {
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "Tutte le funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
   });
 
-  test("anteprima della pagina: il riquadro evidenzia la parte scelta, anche dopo aver cambiato voce più volte", async ({ page, isMobile }) => {
-    test.skip(isMobile, "sul telefono l'anteprima non ha il riquadro");
+  test("la testata dei saloni ha poche voci e un link a «Cerchi un barbiere?» verso la home dei clienti", async ({ page, isMobile }) => {
     await page.goto("/per-i-saloni");
-    const section = page.locator("section", { has: page.getByRole("tablist", { name: "Le parti della pagina" }) });
-    const tabs = section.getByRole("tab");
-    for (const [n, target] of [[4, "#info"], [1, "#servizi"], [3, "#foto"], [1, "#servizi"]] as const) {
-      await tabs.nth(n).click();
-      // il riquadro e la parte scelta si sovrappongono (si aspetta la fine dello scorrimento)
-      await expect
-        .poll(async () =>
-          page.evaluate((sel) => {
-            const hl = document.querySelector<HTMLElement>("[class*=hl]")?.getBoundingClientRect();
-            const el = document.querySelector(`[inert] ${sel}`)?.getBoundingClientRect();
-            if (!hl || !el) return false;
-            const cx = el.left + el.width / 2;
-            const cy = el.top + el.height / 2;
-            return cx >= hl.left && cx <= hl.right && cy >= hl.top && cy <= hl.bottom;
-          }, target),
-        )
-        .toBe(true);
-    }
+    const header = page.getByRole("banner");
+    const toClients = header.getByRole("link", { name: /Cerchi un barbiere/ });
+    await expect(toClients).toHaveAttribute("href", "/");
+    if (!isMobile) await expect(header.getByRole("navigation").getByRole("link")).toHaveCount(3);
+    await toClients.click();
+    await expect(page).toHaveURL(/\/$/);
   });
 
   test("Funzioni: la pagina nuova, con le email vere, i permessi e cosa Taglendo non fa", async ({ page, isMobile }) => {

@@ -1921,7 +1921,7 @@
   color: var(--text-secondary);
 }
 
-/* Testata dei saloni: ritorno al sito per i clienti. Sul telefono resta la sola lente, sopra i 720 px anche il testo */
+/* Testata dei saloni: il link verso i clienti è una voce come le altre; sul telefono resta la sola lente */
 .page .clientLink {
   gap: var(--space-2);
   min-width: var(--tap-min);
