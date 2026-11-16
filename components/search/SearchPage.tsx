@@ -5,8 +5,11 @@ import { romeDate } from "@/lib/dates/rome";
 import { formatPrice } from "@/lib/dates/format";
 import { citySlug } from "@/lib/places/comuni";
 import type { CityCount, SalonHit, SearchResult } from "@/lib/search/load";
-import { activeTags, clockLabel, kmLabel, pinLabel, resetFilters, resultsTitle, searchHref, slotChips, type SearchFilters } from "@/lib/search/rules";
+import { activeTags, clockLabel, dayPhrase, kmLabel, pinLabel, resetFilters, resultsTitle, searchHref, slotChips, type SearchFilters } from "@/lib/search/rules";
+import { addDays } from "@/lib/dates/rome";
+import { siteUrl } from "@/lib/site";
 import { FilterBar, type Base } from "./FilterBar";
+import { CollapsibleSearch } from "./CollapsibleSearch";
 import { RememberSearch } from "./RememberSearch";
 import { Results } from "./Results";
 import { SearchBox } from "./SearchBox";
@@ -58,6 +61,33 @@ export function baseOf(result: SearchResult, typed: string): Base {
 
 const hrefFor = (base: Base, f: SearchFilters) => searchHref({ ...base, ...f, servizio: f.service, data: f.date });
 
+const weekdayDay = (date: string) => {
+  const t = new Intl.DateTimeFormat("it-IT", { weekday: "short", day: "numeric", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`)).replace(".", "");
+  return t.charAt(0).toUpperCase() + t.slice(1);
+};
+
+/** I dati strutturati per i motori di ricerca: l'elenco dei saloni e il percorso (Home › Barbieri › città). */
+function structuredData(hits: SalonHit[], place: string) {
+  const base = siteUrl().replace(/\/$/, "");
+  const data = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      itemListElement: hits.slice(0, 10).map((h, i) => ({ "@type": "ListItem", position: i + 1, url: `${base}/${h.slug}`, name: h.name })),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: copy.results.crumbHome, item: `${base}/` },
+        { "@type": "ListItem", position: 2, name: copy.results.crumbBarbers, item: `${base}/cerca` },
+        ...(place ? [{ "@type": "ListItem", position: 3, name: place }] : []),
+      ],
+    },
+  ];
+  return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
 /** La pagina dei risultati, usata da /cerca e dalle pagine per città: fascia di ricerca, filtri, elenco e mappa. */
 export function SearchPage({ result, cities, services, typed, filters }: { result: SearchResult; cities: CityCount[]; services: string[]; typed: string; filters: SearchFilters }) {
   const now = new Date();
@@ -71,10 +101,13 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
   const filtered = Boolean(filters.service || filters.date);
   const tags = activeTags(filters);
   const count = ok?.hits.length ?? 0;
+  const searchBox = <SearchBox initial={ok && !ok.near ? place : typed} service={filters.service ?? ""} date={filters.date} services={services} compact submitLabel={copy.results.update} />;
+  const others = cities.filter((c) => c.city !== place);
 
   return (
     <div className={cx(styles.page, count > 0 && styles.pageFixed)}>
       <RememberSearch />
+      {ok && ok.hits.length > 0 ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData(ok.hits, place) }} /> : null}
       <section className={styles.band} aria-label={copy.results.searchLabel}>
         <div className={styles.bandIn}>
           <div className={styles.titleBlock}>
@@ -85,9 +118,27 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
             <h1 className={styles.title}>{title}</h1>
           </div>
           <div className={styles.searchSlot}>
-            <SearchBox initial={ok && !ok.near ? place : typed} service={filters.service ?? ""} date={filters.date} services={services} compact submitLabel={copy.results.update} />
+            {count > 0 ? (
+              <CollapsibleSearch summary={[filters.service ?? copy.results.anyService, ok?.anywhere ? copy.results.anyWhere : ok?.near ? copy.results.nearYou : place || copy.results.anyWhere, filters.date ? dayPhrase(filters.date, today) : copy.results.anyDate]}>
+                {searchBox}
+              </CollapsibleSearch>
+            ) : (
+              searchBox
+            )}
           </div>
           {ok ? <FilterBar base={base} filters={filters} count={count} /> : null}
+          {ok ? (
+            <nav className={styles.days} aria-label={copy.results.day}>
+              <Link href={hrefFor(base, { ...filters, date: null })} className={cx(styles.chip, !filters.date && styles.chipOpen)} aria-current={!filters.date ? "true" : undefined} scroll={false} replace>
+                {copy.results.anyDay}
+              </Link>
+              {Array.from({ length: 7 }, (_, i) => addDays(today, i)).map((d, i) => (
+                <Link key={d} href={hrefFor(base, { ...filters, date: d })} className={cx(styles.chip, filters.date === d && styles.chipOpen)} aria-current={filters.date === d ? "true" : undefined} scroll={false} replace>
+                  {i === 0 ? copy.results.today : i === 1 ? copy.results.tomorrow : weekdayDay(d)}
+                </Link>
+              ))}
+            </nav>
+          ) : null}
         </div>
       </section>
 
@@ -114,6 +165,16 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
           radiusKm={ok.radiusKm}
           near={ok.near}
           filters={filters}
+          footer={
+            others.length > 0 ? (
+              <section aria-labelledby="altre-citta" className={styles.otherCities}>
+                <h2 id="altre-citta" className={styles.otherTitle}>
+                  {copy.results.otherCities}
+                </h2>
+                <CityLinks cities={others} />
+              </section>
+            ) : null
+          }
           summary={
             <>
               <p className={styles.summaryText}>

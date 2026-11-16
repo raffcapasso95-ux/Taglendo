@@ -88,7 +88,7 @@ const Status = ({ s }: { s: SalonView }) => (
  * Una scheda dell'elenco, a riga compatta: foto piccola, nome e distanza, aperto o chiuso, i servizi in una riga, gli orari liberi sotto.
  * Tutta la scheda è un tocco (il nome si estende su di lei); gli orari restano link a sé.
  */
-function SalonCard({ salon: s, active, onActive }: { salon: SalonView; active: boolean; onActive: (slug: string | null) => void }) {
+function SalonCard({ salon: s, active, onActive, onMap }: { salon: SalonView; active: boolean; onActive: (slug: string | null) => void; onMap: (slug: string) => void }) {
   const href = `/${s.slug}`;
   const shown = s.services.slice(0, SERVICES_SHOWN);
   const more = s.services.length - shown.length;
@@ -149,6 +149,9 @@ function SalonCard({ salon: s, active, onActive }: { salon: SalonView; active: b
         ) : (
           <p className={styles.noSlot}>{s.bookingOnline ? copy.card.noSlot : copy.card.phoneOnly}</p>
         )}
+        <button type="button" className={cx(styles.slot, styles.slotMore, styles.onMap)} aria-label={copy.results.showOnMap} onClick={() => onMap(s.slug)}>
+          <Svg size={18} d={PIN} />
+        </button>
       </div>
     </article>
   );
@@ -214,6 +217,7 @@ export function Results({
   near,
   filters,
   summary,
+  footer,
 }: {
   salons: SalonView[];
   center: { lat: number; lng: number };
@@ -221,6 +225,7 @@ export function Results({
   near: boolean;
   filters: SearchFilters;
   summary: ReactNode;
+  footer?: ReactNode;
 }) {
   const router = useRouter();
   const [view, setView] = useState<"list" | "map">("list");
@@ -259,6 +264,12 @@ export function Results({
   const searchZone = (c: { lat: number; lng: number }) => {
     setZone(true);
     start(() => router.replace(searchHref({ lat: c.lat, lng: c.lng, zona: true, ...filters, servizio: filters.service, data: filters.date }), { scroll: false }));
+  };
+
+  // «Mostra sulla mappa»: sul telefono passa alla mappa, con la scheda del salone aperta in basso
+  const showOnMap = (slug: string) => {
+    setSelected(slug);
+    setView("map");
   };
 
   const pick = (slug: string | null) => {
@@ -305,11 +316,12 @@ export function Results({
         <ol className={styles.list}>
           {shown.map((s) => (
             <li key={s.slug}>
-              <SalonCard salon={s} active={hovered === s.slug || selected === s.slug} onActive={setHovered} />
+              <SalonCard salon={s} active={hovered === s.slug || selected === s.slug} onActive={setHovered} onMap={showOnMap} />
             </li>
           ))}
         </ol>
         <Pager page={current} total={pages} onPage={goPage} />
+        {footer}
       </div>
       <div className={styles.mapPane}>
         <SalonMap

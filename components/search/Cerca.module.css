@@ -1420,3 +1420,108 @@
     font-size: 16px;
   }
 }
+
+/* ── Dal confronto con altri siti di prenotazione ──────────────────────── */
+
+/* il giorno si cambia da qui, senza riaprire la ricerca: una riga che scorre di lato */
+.days {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.days::-webkit-scrollbar {
+  display: none;
+}
+
+.days .chip {
+  flex: 0 0 auto;
+  text-decoration: none;
+}
+
+/* ricerca ridotta a una riga sul telefono */
+.summaryBtn {
+  display: none;
+}
+
+@media (max-width: 719px) {
+  .collapse .summaryBtn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: var(--control-height);
+    padding: 0 var(--space-4);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  /* sul telefono la scheda intera è un tocco: la freccia lascia posto agli orari */
+  .slotRow .slotMore:not(.onMap) {
+    display: none;
+  }
+
+  .collapse[data-open="false"] .collapseBody {
+    display: none;
+  }
+
+  .collapse[data-open="true"] .collapseBody {
+    margin-top: var(--space-3);
+  }
+}
+
+.summaryText2 {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.summaryText2 span + span::before {
+  content: "·";
+  margin: 0 var(--space-2);
+  color: var(--text-secondary);
+}
+
+.summaryEdit {
+  flex-shrink: 0;
+  color: var(--brand-plum);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* altre città, sotto l'elenco */
+.otherCities {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-10);
+}
+
+.otherTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* «Mostra sulla mappa»: l'ultimo tasto della riga degli orari */
+.onMap {
+  margin-left: auto;
+  font: inherit;
+  cursor: pointer;
+}
