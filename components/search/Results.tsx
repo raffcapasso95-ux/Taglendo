@@ -164,7 +164,7 @@ function MapCard({ salon: s, onClose }: { salon: SalonView; onClose: () => void 
     <div className={styles.sel} role="group" aria-label={s.name}>
       <Link href={href} className={styles.selPhoto} tabIndex={-1} aria-hidden="true">
         {s.coverUrl ? (
-          <Image src={s.coverUrl} alt="" fill sizes="96px" />
+          <Image src={s.coverUrl} alt="" fill sizes="(max-width: 960px) 100vw, 360px" />
         ) : (
           Array.from(s.name)[0]
         )}
@@ -218,6 +218,7 @@ export function Results({
   filters,
   summary,
   footer,
+  mapBar,
 }: {
   salons: SalonView[];
   center: { lat: number; lng: number };
@@ -226,6 +227,8 @@ export function Results({
   filters: SearchFilters;
   summary: ReactNode;
   footer?: ReactNode;
+  /** Il riepilogo della ricerca (servizio · luogo · giorno) per la barra sulla mappa del telefono. */
+  mapBar: string[];
 }) {
   const router = useRouter();
   const [view, setView] = useState<"list" | "map">("list");
@@ -285,8 +288,7 @@ export function Results({
   const goPage = (n: number) => {
     setPage(n);
     // si riparte dall'inizio dell'elenco
-    document.querySelector("[data-list-col]")?.scrollTo({ top: 0, behavior: "smooth" });
-    if (window.innerWidth <= 960) window.scrollTo({ top: 0, behavior: "smooth" });
+    document.querySelector("[data-list-col]")?.scrollIntoView({ block: "start", behavior: "smooth" });
   };
   const changeMode = (m: "list" | "grid") => {
     // la salone in vista resta più o meno al suo posto: si torna alla pagina che lo contiene
@@ -324,6 +326,17 @@ export function Results({
         {footer}
       </div>
       <div className={styles.mapPane}>
+        <div className={styles.mapBar}>
+          <p className={styles.mapBarText}>
+            {mapBar.map((part, i) => (
+              <span key={i}>{part}</span>
+            ))}
+          </p>
+          <button type="button" className={styles.mapBarBtn} onClick={() => setView("list")}>
+            <Svg size={18} d={LIST} />
+            {copy.results.list}
+          </button>
+        </div>
         <SalonMap
           salons={salons}
           center={center}
@@ -340,10 +353,12 @@ export function Results({
         {chosen ? <MapCard salon={chosen} onClose={() => setSelected(null)} /> : null}
       </div>
       {/* sul telefono: passa da elenco a mappa, sempre a portata di pollice */}
-      <button type="button" className={cx(styles.floatSwitch, styles.press)} onClick={() => setView(view === "list" ? "map" : "list")}>
-        <Svg size={18} d={view === "list" ? MAP : LIST} />
-        {view === "list" ? copy.results.map : copy.results.list}
-      </button>
+      {view === "list" ? (
+        <button type="button" className={cx(styles.floatSwitch, styles.press)} onClick={() => setView("map")}>
+          <Svg size={18} d={MAP} />
+          {copy.results.map}
+        </button>
+      ) : null}
     </div>
   );
 }

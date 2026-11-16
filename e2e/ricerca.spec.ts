@@ -174,6 +174,23 @@ test.describe("Ricerca dei saloni", () => {
     }
   });
 
+  test("da computer: pagina a tutta larghezza, scorre la pagina (non l'elenco) e la mappa resta ferma sotto la testata", async ({ page, isMobile }) => {
+    test.skip(isMobile, "su telefono elenco e mappa si alternano");
+    await page.setViewportSize({ width: 1440, height: 800 });
+    await page.goto("/cerca?dove=Bologna");
+    // a tutta larghezza: il titolo sta al bordo, non in una colonna centrata
+    const left = await page.getByRole("heading", { level: 1 }).evaluate((el) => Math.round(el.getBoundingClientRect().left));
+    expect(left).toBeLessThanOrEqual(32);
+    // l'elenco non scorre per conto suo
+    expect(await page.locator("[data-list-col]").evaluate((el) => getComputedStyle(el).overflowY)).toBe("visible");
+    // la mappa è «sticky»: scorrendo una lista lunga resta sotto la testata (con pochi saloni non c'è da scorrere, ma lo stile è lo stesso)
+    const pane = page.getByRole("region", { name: "Mappa dei saloni" }).locator("xpath=..");
+    await expect(pane).toBeVisible();
+    const style = await pane.evaluate((el) => ({ position: getComputedStyle(el).position, top: parseFloat(getComputedStyle(el).top) }));
+    expect(style.position).toBe("sticky");
+    expect(style.top).toBeGreaterThanOrEqual(68); // sotto la testata fissa
+  });
+
   test("«Vicino a me» usa la posizione del telefono", async ({ browser }) => {
     const ctx = await browser.newContext({ geolocation: { latitude: 44.4949, longitude: 11.3426 }, permissions: ["geolocation"] });
     const page = await ctx.newPage();
@@ -340,8 +357,8 @@ test.describe("Barbieri vicino a te: filtri, ordine, mappa (ridisegno del sito)"
     await page.getByRole("button", { name: "Cerca in questa zona" }).click();
     await expect(page).toHaveURL(/\/cerca\?lat=[\d.]+&lng=[\d.]+&zona=1/);
     await expect(page.getByText(/barberi[ae] in questa zona/)).toBeVisible();
-    // torna alla mia posizione: il pulsante sparisce
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Barbieri a");
+    // il titolo c'è; sul telefono, con la mappa a tutto schermo, la fascia in alto è nascosta
+    if (!isMobile) await expect(page.getByRole("heading", { level: 1 })).toContainText("Barbieri a");
   });
 
   test("flusso: ricerca con filtri → scheda → pagina del salone → prenotazione", async ({ page }) => {

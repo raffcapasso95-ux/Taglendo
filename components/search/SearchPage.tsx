@@ -103,9 +103,12 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
   const count = ok?.hits.length ?? 0;
   const searchBox = <SearchBox initial={ok && !ok.near ? place : typed} service={filters.service ?? ""} date={filters.date} services={services} compact submitLabel={copy.results.update} />;
   const others = cities.filter((c) => c.city !== place);
+  // il riepilogo dice solo ciò che è stato scelto («Barba · Bologna · Domani»); senza scelte, il luogo
+  const where = ok?.anywhere ? copy.results.anyWhere : ok?.near ? copy.results.nearYou : place || copy.results.anyWhere;
+  const summaryParts = [filters.service, where, filters.date ? dayPhrase(filters.date, today) : null].filter((p): p is string => Boolean(p));
 
   return (
-    <div className={cx(styles.page, count > 0 && styles.pageFixed)}>
+    <div className={styles.page}>
       <RememberSearch />
       {ok && ok.hits.length > 0 ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData(ok.hits, place) }} /> : null}
       <section className={styles.band} aria-label={copy.results.searchLabel}>
@@ -119,7 +122,7 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
           </div>
           <div className={styles.searchSlot}>
             {count > 0 ? (
-              <CollapsibleSearch summary={[filters.service ?? copy.results.anyService, ok?.anywhere ? copy.results.anyWhere : ok?.near ? copy.results.nearYou : place || copy.results.anyWhere, filters.date ? dayPhrase(filters.date, today) : copy.results.anyDate]}>
+              <CollapsibleSearch summary={summaryParts}>
                 {searchBox}
               </CollapsibleSearch>
             ) : (
@@ -129,11 +132,11 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
           {ok ? <FilterBar base={base} filters={filters} count={count} /> : null}
           {ok ? (
             <nav className={styles.days} aria-label={copy.results.day}>
-              <Link href={hrefFor(base, { ...filters, date: null })} className={cx(styles.chip, !filters.date && styles.chipOpen)} aria-current={!filters.date ? "true" : undefined} scroll={false} replace>
+              <Link href={hrefFor(base, { ...filters, date: null })} className={cx(styles.dayTab, !filters.date && styles.dayTabOn)} aria-current={!filters.date ? "true" : undefined} scroll={false} replace>
                 {copy.results.anyDay}
               </Link>
               {Array.from({ length: 7 }, (_, i) => addDays(today, i)).map((d, i) => (
-                <Link key={d} href={hrefFor(base, { ...filters, date: d })} className={cx(styles.chip, filters.date === d && styles.chipOpen)} aria-current={filters.date === d ? "true" : undefined} scroll={false} replace>
+                <Link key={d} href={hrefFor(base, { ...filters, date: d })} className={cx(styles.dayTab, filters.date === d && styles.dayTabOn)} aria-current={filters.date === d ? "true" : undefined} scroll={false} replace>
                   {i === 0 ? copy.results.today : i === 1 ? copy.results.tomorrow : weekdayDay(d)}
                 </Link>
               ))}
@@ -165,6 +168,7 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
           radiusKm={ok.radiusKm}
           near={ok.near}
           filters={filters}
+          mapBar={summaryParts}
           footer={
             others.length > 0 ? (
               <section aria-labelledby="altre-citta" className={styles.otherCities}>
