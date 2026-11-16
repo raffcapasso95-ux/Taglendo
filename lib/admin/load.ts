@@ -94,9 +94,9 @@ export async function loadOverview(): Promise<Overview | null> {
   return error ? null : (data as unknown as Overview);
 }
 
-export async function loadSalons(f: Filters): Promise<{ total: number; rows: SalonRow[] } | null> {
+export async function loadSalons(f: Filters, limit = PAGE_SIZE): Promise<{ total: number; rows: SalonRow[] } | null> {
   const supabase = await createClient();
-  const { data, error } = await supabase.rpc("admin_salons", { p_q: f.q || undefined, p_status: f.stato, p_sort: f.sort, p_dir: f.dir, p_limit: PAGE_SIZE, p_offset: (f.page - 1) * PAGE_SIZE });
+  const { data, error } = await supabase.rpc("admin_salons", { p_q: f.q || undefined, p_status: f.stato, p_sort: f.sort, p_dir: f.dir, p_limit: limit, p_offset: (f.page - 1) * limit });
   return error ? null : (data as unknown as { total: number; rows: SalonRow[] });
 }
 

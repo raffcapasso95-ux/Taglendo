@@ -713,3 +713,273 @@ a.card:hover {
     transition: none;
   }
 }
+
+/* ——— a modi dashboard ——— */
+.navLink {
+  gap: var(--space-2);
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kpi {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+}
+
+.kpiTop {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.kpiBig {
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.spark {
+  width: 96px;
+  height: 36px;
+  flex: none;
+  fill: none;
+  stroke: var(--brand-plum);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-4);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.tile h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.tileHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.tileHead a {
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.mixBar {
+  display: flex;
+  height: 14px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--border-subtle);
+}
+
+.mixSeg {
+  min-width: 4px;
+}
+
+.mixList {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mixList a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--tap-min);
+  color: inherit;
+  text-decoration: none;
+}
+
+.mixList a:hover .mixName {
+  text-decoration: underline;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border-radius: 4px;
+}
+
+.mixName {
+  flex: 1;
+}
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feed li + li {
+  border-top: 1px solid var(--border-subtle);
+}
+
+.feed a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 56px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.feed a:hover strong {
+  text-decoration: underline;
+}
+
+.feedText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.feedText strong,
+.feedText span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feedText span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.miniStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.miniStats li {
+  display: flex;
+  flex-direction: column;
+}
+
+.miniStats strong {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+@media (min-width: 1024px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 248px minmax(0, 1fr);
+  }
+
+  .bar {
+    height: 100dvh;
+    align-self: start;
+    padding-top: 0;
+  }
+
+  .barIn {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-6);
+    height: 100%;
+    max-width: none;
+    margin: 0;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .nav {
+    flex-direction: column;
+    margin-right: 0;
+  }
+
+  .navLink {
+    border-radius: var(--radius-input);
+  }
+
+  .who {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+    margin-top: auto;
+  }
+
+  .whoMail {
+    max-width: none;
+  }
+
+  .main {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0;
+    padding: var(--space-8) var(--space-8) var(--space-16);
+  }
+}
+
+.kpis > li {
+  display: flex;
+}
+
+.kpis .kpi {
+  flex: 1;
+}
+
+@media (max-width: 599px) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+
+  .kpi {
+    padding: var(--space-4);
+  }
+
+  .kpiBig {
+    font-size: 32px;
+  }
+
+  .spark {
+    display: none;
+  }
+}
