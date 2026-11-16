@@ -489,16 +489,6 @@
     gap: var(--space-4);
   }
 
-  .layout[data-mode="grid"] .card {
-    grid-template-columns: minmax(0, 1fr);
-    height: 100%;
-  }
-
-  .layout[data-mode="grid"] .photo {
-    min-height: 0;
-    aspect-ratio: 16 / 9;
-  }
-
   .layout[data-mode="grid"] .list > li {
     display: flex;
   }
@@ -540,13 +530,14 @@
   background: var(--map-bg);
 }
 
-/* ── Scheda ────────────────────────────────────────────────────────────── */
+/* ── Scheda (riga compatta) ────────────────────────────────────────────── */
 
 .card {
+  position: relative;
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
-  gap: var(--space-4);
-  padding: 14px;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-3);
   border-radius: var(--space-4);
   border: 1px solid var(--border-subtle);
   background: var(--surface);
@@ -561,8 +552,9 @@
 .photo {
   position: relative;
   display: block;
-  min-height: 112px;
-  border-radius: var(--radius-card);
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-input);
   overflow: hidden;
   background: var(--brand-peach);
 }
@@ -587,72 +579,75 @@
 
 .noPhoto img {
   position: static;
-  width: 72px;
-  height: 72px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-squircle);
 }
 
 .initial {
-  font-size: 44px;
+  font-size: 24px;
   font-weight: 700;
 }
 
 .badge {
   position: absolute;
-  left: var(--space-2);
-  top: var(--space-2);
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-small-button);
+  left: 4px;
+  top: 4px;
+  padding: 1px 6px;
+  border-radius: 6px;
   background: var(--brand-plum);
   color: var(--text-inverse);
   font-size: 12px;
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .body {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 2px;
 }
 
 .head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .name {
   margin: 0;
-  font-size: 18px;
+  min-width: 0;
+  font-size: 17px;
   line-height: 1.2;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
-.name a {
+/* il nome si estende su tutta la scheda: un tocco ovunque apre il salone (gli orari stanno sopra e sono link a sé) */
+.cover {
   color: inherit;
   text-decoration: none;
 }
 
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
 .km {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
   flex-shrink: 0;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
   white-space: nowrap;
 }
 
 .status {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 2px var(--space-3);
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
 }
 
@@ -660,7 +655,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .stateOpen {
@@ -674,42 +669,43 @@
   background: currentcolor;
 }
 
+/* i servizi in una riga sola: «Barba 12 € · Taglio uomo 20 € · +2» */
 .services {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  flex-wrap: nowrap;
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .service {
   display: inline-flex;
-  gap: 6px;
-  padding: 3px 8px;
-  border-radius: var(--radius-small-button);
-  background: var(--surface-muted);
-  font-size: 13px;
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.service + .service::before {
+  content: "·";
+  margin: 0 6px;
 }
 
 .service b {
   font-weight: 700;
+  color: var(--text-primary);
 }
 
-.foot {
+.slotRow {
+  grid-column: 1 / -1;
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-  margin-top: auto;
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--border-subtle);
-}
-
-.day {
-  font-size: 14px;
-  color: var(--text-secondary);
-  white-space: nowrap;
+  gap: 6px;
 }
 
 .slots {
@@ -738,6 +734,14 @@
   text-decoration: none;
 }
 
+.slotMore {
+  min-width: var(--tap-min);
+  padding: 0;
+  border-color: var(--border-subtle);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
 .slotDay {
   font-weight: 400;
   font-size: 12px;
@@ -745,20 +749,8 @@
 
 .noSlot {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-secondary);
-}
-
-.see {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: var(--tap-min);
-  color: var(--text-primary);
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
 }
 
 /* ── Nessun risultato ──────────────────────────────────────────────────── */
@@ -1314,37 +1306,6 @@
     display: none;
   }
 
-  .card {
-    grid-template-columns: 96px minmax(0, 1fr);
-    gap: var(--space-3);
-    padding: var(--space-3);
-  }
-
-  .photo {
-    align-self: start;
-    min-height: 0;
-    aspect-ratio: 4 / 5;
-  }
-
-  .name {
-    font-size: 18px;
-  }
-
-  .head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 2px;
-  }
-
-  .foot {
-    flex-wrap: wrap;
-  }
-
-  .slot {
-    min-height: var(--control-height);
-    font-size: 15px;
-  }
-
   .legend {
     display: none;
   }
@@ -1458,4 +1419,109 @@
   .sortSelect {
     font-size: 16px;
   }
+}
+
+/* ── Dal confronto con altri siti di prenotazione ──────────────────────── */
+
+/* il giorno si cambia da qui, senza riaprire la ricerca: una riga che scorre di lato */
+.days {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.days::-webkit-scrollbar {
+  display: none;
+}
+
+.days .chip {
+  flex: 0 0 auto;
+  text-decoration: none;
+}
+
+/* ricerca ridotta a una riga sul telefono */
+.summaryBtn {
+  display: none;
+}
+
+@media (max-width: 719px) {
+  .collapse .summaryBtn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    width: 100%;
+    min-height: var(--control-height);
+    padding: 0 var(--space-4);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  /* sul telefono la scheda intera è un tocco: la freccia lascia posto agli orari */
+  .slotRow .slotMore:not(.onMap) {
+    display: none;
+  }
+
+  .collapse[data-open="false"] .collapseBody {
+    display: none;
+  }
+
+  .collapse[data-open="true"] .collapseBody {
+    margin-top: var(--space-3);
+  }
+}
+
+.summaryText2 {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.summaryText2 span + span::before {
+  content: "·";
+  margin: 0 var(--space-2);
+  color: var(--text-secondary);
+}
+
+.summaryEdit {
+  flex-shrink: 0;
+  color: var(--brand-plum);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* altre città, sotto l'elenco */
+.otherCities {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-10);
+}
+
+.otherTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* «Mostra sulla mappa»: l'ultimo tasto della riga degli orari */
+.onMap {
+  margin-left: auto;
+  font: inherit;
+  cursor: pointer;
 }

@@ -81,6 +81,9 @@ test.describe("Ricerca dei saloni", () => {
     await page.goto("/");
     await page.getByRole("main").getByRole("link", { name: /^Barba/ }).first().click();
     await expect(page).toHaveURL(/\/cerca\?servizio=Barba$/);
+    // i campi possono stare dietro la riga di riepilogo (telefono, con risultati)
+    const editBtn = page.getByRole("button", { name: /Modifica$/ });
+    if (await editBtn.isVisible()) await editBtn.click();
     await expect(page.getByRole("combobox", { name: "Servizio" })).toHaveValue("Barba");
     await expect(page.getByText(/Scrivi una città o usa «Vicino a me»/)).toBeVisible();
     // senza luogo la pagina non è vuota: i saloni di tutta Italia con quel servizio, senza distanze
@@ -93,6 +96,8 @@ test.describe("Ricerca dei saloni", () => {
     await page.goto("/cerca?dove=Bologna");
     const band = page.getByRole("region", { name: "La tua ricerca" });
     await expect(band.getByRole("heading", { level: 1 })).toBeVisible();
+    // sul telefono i campi stanno dietro la riga di riepilogo («Modifica»)
+    if (isMobile) await band.getByRole("button", { name: /Modifica$/ }).click();
     await expect(band.getByRole("combobox", { name: "Servizio" })).toBeVisible();
     await expect(band.getByRole("button", { name: "Filtri" })).toBeVisible();
     if (isMobile) return await expect(page.getByRole("group", { name: "Come vedere i risultati" })).toBeHidden();
@@ -133,6 +138,42 @@ test.describe("Ricerca dei saloni", () => {
     await fresh.close();
   });
 
+  test("dal confronto con altri siti: giorni rapidi, ricerca ridotta sul telefono, «Mostra sulla mappa» e dati strutturati", async ({ page, isMobile }) => {
+    await page.goto("/cerca?dove=Bologna");
+    // la riga dei giorni: «Qualsiasi giorno» è scelto; toccando un giorno la ricerca si aggiorna con la data
+    const days = page.getByRole("navigation", { name: "Giorno" });
+    await expect(days.getByRole("link", { name: "Qualsiasi giorno" })).toHaveAttribute("aria-current", "true");
+    await days.getByRole("link", { name: "Domani" }).click();
+    await expect(page).toHaveURL(/\/cerca\?dove=Bologna&data=\d{4}-\d{2}-\d{2}$/);
+    await expect(page.getByRole("navigation", { name: "Giorno" }).getByRole("link", { name: "Domani" })).toHaveAttribute("aria-current", "true");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("domani");
+
+    // dati strutturati: l'elenco dei saloni e il percorso
+    const ld = await page.locator('script[type="application/ld+json"]').first().textContent();
+    expect(ld).toContain("ItemList");
+    expect(ld).toContain("BreadcrumbList");
+    expect(ld).toContain("/barberia-saragozza");
+
+    if (isMobile) {
+      // i tre campi sono ridotti a una riga: «Modifica» li apre
+      const edit = page.getByRole("button", { name: /(Modifica|Chiudi)$/ });
+      await expect(edit).toHaveAttribute("aria-expanded", "false");
+      await expect(page.getByRole("combobox", { name: "Servizio" })).toBeHidden();
+      await edit.click();
+      await expect(page.getByRole("combobox", { name: "Servizio" })).toBeVisible();
+      await edit.click();
+      // «Mostra sulla mappa» passa alla mappa con la scheda del salone aperta
+      await page.locator('[data-salon="barberia-saragozza"]').getByRole("button", { name: "Mostra sulla mappa" }).click();
+      await expect(page.getByRole("region", { name: "Mappa dei saloni" })).toBeVisible();
+      await expect(page.getByRole("group", { name: "Barberia Saragozza" })).toBeVisible();
+    } else {
+      // da computer i campi ci sono sempre
+      await expect(page.getByRole("combobox", { name: "Servizio" })).toBeVisible();
+      await page.locator('[data-salon="barberia-saragozza"]').getByRole("button", { name: "Mostra sulla mappa" }).click();
+      await expect(page.getByRole("group", { name: "Barberia Saragozza" })).toBeVisible();
+    }
+  });
+
   test("«Vicino a me» usa la posizione del telefono", async ({ browser }) => {
     const ctx = await browser.newContext({ geolocation: { latitude: 44.4949, longitude: 11.3426 }, permissions: ["geolocation"] });
     const page = await ctx.newPage();
@@ -168,11 +209,11 @@ test.describe("Ricerca dei saloni", () => {
     const map = page.getByRole("region", { name: "Mappa dei saloni" });
     if (isMobile) {
       await expect(map).toBeHidden();
-      await page.getByRole("button", { name: "Mappa" }).click();
+      await page.getByRole("button", { name: "Mappa", exact: true }).click();
       await expect(map).toBeVisible();
       await page.getByRole("button", { name: "Elenco" }).click();
       await expect(map).toBeHidden();
-      await page.getByRole("button", { name: "Mappa" }).click();
+      await page.getByRole("button", { name: "Mappa", exact: true }).click();
     } else {
       // su computer elenco e mappa stanno insieme, senza pulsante per passare dall'una all'altro
       await expect(map).toBeVisible();
