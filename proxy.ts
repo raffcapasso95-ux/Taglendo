@@ -70,6 +70,9 @@ export async function proxy(request: NextRequest) {
     return res;
   };
 
+  if (!signedIn && matches(path, ["/admin"]) && path !== "/admin/accedi") {
+    return redirect("/admin/accedi");
+  }
   if (!signedIn && matches(path, PROTECTED)) {
     return redirect("/accedi", { next: path + request.nextUrl.search });
   }

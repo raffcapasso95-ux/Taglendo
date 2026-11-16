@@ -8,9 +8,10 @@ import { signedPhotoUrls } from "./photoUrls";
 
 async function permissions(role: "owner" | "barber", salonId: string) {
   const supabase = await createClient();
-  if (role === "owner") return { canEdit: true, canSeeContacts: true };
-  const { data } = await supabase.from("salons").select("barbers_edit, barbers_contacts").eq("id", salonId).single();
-  return { canEdit: data?.barbers_edit ?? false, canSeeContacts: data?.barbers_contacts ?? false };
+  const { data } = await supabase.from("salons").select("barbers_edit, barbers_contacts, suspended_at").eq("id", salonId).single();
+  const open = !data?.suspended_at; // sospeso: si guarda e basta
+  if (role === "owner") return { canEdit: open, canSeeContacts: true };
+  return { canEdit: open && (data?.barbers_edit ?? false), canSeeContacts: data?.barbers_contacts ?? false };
 }
 
 /** La rubrica: tutti i clienti del salone con le loro statistiche, pronti da filtrare nel browser. */

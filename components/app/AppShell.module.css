@@ -493,3 +493,16 @@
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
+
+.suspended {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-3) var(--space-4) 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: var(--status-error-bg);
+  border: 1px solid var(--status-error-border);
+  color: var(--status-error);
+  font-size: 14px;
+}

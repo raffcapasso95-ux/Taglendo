@@ -18,7 +18,7 @@ async function Content() {
 
   return (
     <ListinoView
-      canEdit={role === "owner"}
+      canEdit={role === "owner" && !salon.suspended_at}
       ownerName={owner}
       services={(services.data ?? []).map((s) => ({ id: s.id, name: s.name, durationMin: s.duration_min, priceCents: s.price_cents }))}
     />

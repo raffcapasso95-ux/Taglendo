@@ -40,7 +40,7 @@ export async function loadClosures() {
     weeklyClosed: weeklyClosed.has(weekdayOf(h.date)),
   }));
   return {
-    canEdit: role === "owner",
+    canEdit: role === "owner" && !salon.suspended_at,
     today,
     year: Number(today.slice(0, 4)),
     ...splitClosures(rows, today),

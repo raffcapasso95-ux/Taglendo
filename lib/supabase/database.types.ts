@@ -49,6 +49,46 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"admin_audit": {
+                  Row: {
+                    "action": string,"admin_id": string | null,"created_at": string,"details": NonNullable<Json>,"id": string,"salon_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action": string,"admin_id"?: string | null,"created_at"?: string,"details"?: NonNullable<Json>,"id"?: string,"salon_id"?: string | null
+                  }
+                  Update: {
+                    "action"?: string,"admin_id"?: string | null,"created_at"?: string,"details"?: NonNullable<Json>,"id"?: string,"salon_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "admin_audit_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"admin_notes": {
+                  Row: {
+                    "author": string | null,"body": string,"created_at": string,"id": string,"salon_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author"?: string | null,"body": string,"created_at"?: string,"id"?: string,"salon_id": string
+                  }
+                  Update: {
+                    "author"?: string | null,"body"?: string,"created_at"?: string,"id"?: string,"salon_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "admin_notes_salon_id_fkey"
+      columns: ["salon_id"]
+isOneToOne: false
+      referencedRelation: "salons"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"appointments": {
                   Row: {
                     "cancelled_by": string | null,"client_id": string | null,"created_at": string,"ends_at": string,"id": string,"list_price_cents": number | null,"manage_token": string,"member_id": string,"price_cents": number,"price_note": string | null,"public_code": string,"reminder_sent_at": string | null,"salon_id": string,"service_id": string | null,"service_name": string,"source": Database["public"]['Enums']["appt_source_t"],"starts_at": string,"status": Database["public"]['Enums']["appt_status_t"]
@@ -323,6 +363,20 @@ isOneToOne: false
       referencedColumns: ["salon_id","weekday"]
     }
                   ]
+                },"platform_admins": {
+                  Row: {
+                    "created_at": string,"email": string,"user_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"email": string,"user_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"email"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"push_subscriptions": {
                   Row: {
                     "endpoint": string,"id": string,"keys": NonNullable<Json>,"member_id": string
@@ -365,14 +419,14 @@ isOneToOne: false
                   ]
                 },"salons": {
                   Row: {
-                    "access_note": string | null,"address": string | null,"area": string | null,"barbers_contacts": boolean,"barbers_edit": boolean,"barbers_see_all": boolean,"booking_online": boolean,"cancel_limit_min": number,"cancel_online": boolean,"city": string | null,"closed_holidays": (string)[],"cover_path": string | null,"created_at": string,"deleted_at": string | null,"description": string | null,"id": string,"instagram": string | null,"kids_until": number | null,"lat": number | null,"listed": boolean,"lng": number | null,"logo_path": string | null,"max_advance_days": number,"min_notice_min": number,"name": string,"onboarding_step": number,"patron_day": string | null,"patron_name": string | null,"payment_methods": (string)[],"phone": string | null,"plan": Database["public"]['Enums']["plan_t"],"products": string | null,"show_prices": boolean,"slot_step_min": number,"slug": string,"specialties": string | null,"step_free_access": boolean | null,"stripe_customer_id": string | null,"stripe_subscription_id": string | null,"sub_status": Database["public"]['Enums']["sub_status_t"],"timezone": string,"trial_ends_at": string,"vat_number": string | null
+                    "access_note": string | null,"address": string | null,"admin_hidden": boolean,"area": string | null,"barbers_contacts": boolean,"barbers_edit": boolean,"barbers_see_all": boolean,"booking_online": boolean,"cancel_limit_min": number,"cancel_online": boolean,"city": string | null,"closed_holidays": (string)[],"cover_path": string | null,"created_at": string,"deleted_at": string | null,"description": string | null,"id": string,"instagram": string | null,"kids_until": number | null,"lat": number | null,"listed": boolean,"lng": number | null,"logo_path": string | null,"max_advance_days": number,"min_notice_min": number,"name": string,"onboarding_step": number,"patron_day": string | null,"patron_name": string | null,"payment_methods": (string)[],"phone": string | null,"plan": Database["public"]['Enums']["plan_t"],"products": string | null,"show_prices": boolean,"slot_step_min": number,"slug": string,"specialties": string | null,"step_free_access": boolean | null,"stripe_customer_id": string | null,"stripe_subscription_id": string | null,"sub_status": Database["public"]['Enums']["sub_status_t"],"suspended_at": string | null,"suspended_reason": string | null,"timezone": string,"trial_ends_at": string,"vat_number": string | null
                   }
                   ComputedFields: never
                   Insert: {
-                    "access_note"?: string | null,"address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"city"?: string | null,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"kids_until"?: number | null,"lat"?: number | null,"listed"?: boolean,"lng"?: number | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name": string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"payment_methods"?: (string)[],"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"products"?: string | null,"show_prices"?: boolean,"slot_step_min"?: number,"slug": string,"specialties"?: string | null,"step_free_access"?: boolean | null,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
+                    "access_note"?: string | null,"address"?: string | null,"admin_hidden"?: boolean,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"city"?: string | null,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"kids_until"?: number | null,"lat"?: number | null,"listed"?: boolean,"lng"?: number | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name": string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"payment_methods"?: (string)[],"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"products"?: string | null,"show_prices"?: boolean,"slot_step_min"?: number,"slug": string,"specialties"?: string | null,"step_free_access"?: boolean | null,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"suspended_at"?: string | null,"suspended_reason"?: string | null,"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
                   }
                   Update: {
-                    "access_note"?: string | null,"address"?: string | null,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"city"?: string | null,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"kids_until"?: number | null,"lat"?: number | null,"listed"?: boolean,"lng"?: number | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name"?: string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"payment_methods"?: (string)[],"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"products"?: string | null,"show_prices"?: boolean,"slot_step_min"?: number,"slug"?: string,"specialties"?: string | null,"step_free_access"?: boolean | null,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
+                    "access_note"?: string | null,"address"?: string | null,"admin_hidden"?: boolean,"area"?: string | null,"barbers_contacts"?: boolean,"barbers_edit"?: boolean,"barbers_see_all"?: boolean,"booking_online"?: boolean,"cancel_limit_min"?: number,"cancel_online"?: boolean,"city"?: string | null,"closed_holidays"?: (string)[],"cover_path"?: string | null,"created_at"?: string,"deleted_at"?: string | null,"description"?: string | null,"id"?: string,"instagram"?: string | null,"kids_until"?: number | null,"lat"?: number | null,"listed"?: boolean,"lng"?: number | null,"logo_path"?: string | null,"max_advance_days"?: number,"min_notice_min"?: number,"name"?: string,"onboarding_step"?: number,"patron_day"?: string | null,"patron_name"?: string | null,"payment_methods"?: (string)[],"phone"?: string | null,"plan"?: Database["public"]['Enums']["plan_t"],"products"?: string | null,"show_prices"?: boolean,"slot_step_min"?: number,"slug"?: string,"specialties"?: string | null,"step_free_access"?: boolean | null,"stripe_customer_id"?: string | null,"stripe_subscription_id"?: string | null,"sub_status"?: Database["public"]['Enums']["sub_status_t"],"suspended_at"?: string | null,"suspended_reason"?: string | null,"timezone"?: string,"trial_ends_at"?: string,"vat_number"?: string | null
                   }
                   Relationships: [
                     
@@ -457,7 +511,28 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "booking_by_token":
+            "admin_add_note":
+{ Args: { "p_body": string,"p_id": string }; Returns: undefined
+                           },
+"admin_extend_trial":
+{ Args: { "p_days": number,"p_id": string,"p_reason"?: string }; Returns: string
+                           },
+"admin_overview":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"admin_salon":
+{ Args: { "p_id": string }; Returns: Json
+                           },
+"admin_salons":
+{ Args: { "p_dir"?: string,"p_limit"?: number,"p_offset"?: number,"p_q"?: string,"p_sort"?: string,"p_status"?: string }; Returns: Json
+                           },
+"admin_set_hidden":
+{ Args: { "p_hidden": boolean,"p_id": string,"p_reason"?: string }; Returns: undefined
+                           },
+"admin_set_suspended":
+{ Args: { "p_id": string,"p_reason"?: string,"p_suspended": boolean }; Returns: undefined
+                           },
+"booking_by_token":
 { Args: { "p_token": string }; Returns: Json
                            },
 "cancel_booking_by_token":
@@ -493,6 +568,9 @@ isOneToOne: false
 { Args: { "p_days": number,"p_duration"?: number,"p_exclude"?: string,"p_from": string,"p_member": string,"p_public"?: boolean,"p_salon": string,"p_service": string,"p_step"?: number }; Returns: {
               "ends_at": string,"member_id": string,"starts_at": string
             }[]
+                           },
+"is_platform_admin":
+{ Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "mark_activity_seen":
 { Args: { "p_salon": string }; Returns: undefined
