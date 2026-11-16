@@ -1,5 +1,6 @@
 "use client";
 
+import { adminCopy } from "@/lib/copy/admin";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -79,6 +80,8 @@ type Props = {
   isOwner: boolean;
   /** NUOVO: notifiche non lette (campanella). */
   unread: number;
+  /** Salone sospeso: si vedono gli appuntamenti, il resto è bloccato. */
+  suspended?: boolean;
   children: ReactNode;
 };
 
@@ -92,7 +95,7 @@ const firstName = (name: string) => name.split(" ")[0] ?? name;
  */
 const bellLabel = (n: number) => (n === 0 ? "Notifiche" : n === 1 ? "Notifiche, 1 nuova" : `Notifiche, ${n} nuove`);
 
-export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwner, unread: unreadFromServer, children }: Props) {
+export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwner, unread: unreadFromServer, suspended = false, children }: Props) {
   const pathname = usePathname();
   const unread = useUnread(unreadFromServer, pathname);
   const search = useSearchParams();
@@ -234,6 +237,12 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
 
       <div className={styles.content}>
         <OfflineSync />
+        {suspended ? (
+          <div className={styles.suspended} role="status">
+            <strong>{adminCopy.suspended.title}</strong>
+            <span>{adminCopy.suspended.text}</span>
+          </div>
+        ) : null}
         {children}
       </div>
       <SessionGuard />

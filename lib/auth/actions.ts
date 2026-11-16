@@ -130,7 +130,9 @@ export async function signIn(_prev: AuthState, data: FormData): Promise<AuthStat
     if (error.code === "invalid_credentials") return { field: "password", error: errors.credentials };
     return { error: errorFor(error) };
   }
-  redirect(next);
+  // chi gestisce Taglendo va al gestionale, non all'agenda di un salone che non ha
+  const { data: isAdmin } = await supabase.rpc("is_platform_admin");
+  redirect(isAdmin === true && next === "/agenda" ? "/admin" : next);
 }
 
 /** A4: manda il link per scegliere una nuova password. Risponde sempre "inviata". */
@@ -160,7 +162,8 @@ export async function setNewPassword(_prev: AuthState, data: FormData): Promise<
     if (error.code === "same_password") return { field: "password", error: errors.generic };
     return { error: errors.linkExpired };
   }
-  redirect("/agenda");
+  const { data: isAdmin } = await supabase.rpc("is_platform_admin");
+  redirect(isAdmin === true ? "/admin" : "/agenda");
 }
 
 /** Apple e Google: i pulsanti compaiono solo se il provider è acceso (variabili d'ambiente). */

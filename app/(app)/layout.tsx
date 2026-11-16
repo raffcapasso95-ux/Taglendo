@@ -21,6 +21,7 @@ async function Guard({ children }: { children: ReactNode }) {
       userInitials={initials(name)}
       isOwner={role === "owner"}
       unread={unread}
+      suspended={Boolean(salon.suspended_at)}
     >
       {children}
     </AppShell>

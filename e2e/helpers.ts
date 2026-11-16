@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 /** Variabili di .env.local (le stesse dell'app). */
-function env(name: string): string {
+export function env(name: string): string {
   if (process.env[name]) return process.env[name]!;
   const file = readFileSync(resolve(process.cwd(), ".env.local"), "utf8");
   const line = file.split("\n").find((l) => l.startsWith(`${name}=`));

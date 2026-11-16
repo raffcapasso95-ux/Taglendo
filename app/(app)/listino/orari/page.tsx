@@ -21,7 +21,7 @@ async function Content() {
 
   return (
     <OrariView
-      canEdit={role === "owner"}
+      canEdit={role === "owner" && !salon.suspended_at}
       ownerName={people.find((m) => m.role === "owner")?.name ?? ""}
       week={week}
       todayWeekday={weekdayOf(romeDate(new Date()))}

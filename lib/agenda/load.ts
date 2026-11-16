@@ -93,7 +93,7 @@ export async function loadAgenda(params: { date?: string | null; op?: string | n
 
   const isOwner = membership.role === "owner";
   const canSeeAll = isOwner || (flags.data?.barbers_see_all ?? true);
-  const canEdit = isOwner || (flags.data?.barbers_edit ?? true);
+  const canEdit = !membership.salon.suspended_at && (isOwner || (flags.data?.barbers_edit ?? true));
 
   const allOps: Operator[] = members;
   // Senza "vedere l'agenda di tutti" il barbiere vede solo la propria colonna (lo impone anche il database).
