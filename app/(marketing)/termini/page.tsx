@@ -24,7 +24,7 @@ export default function Page() {
           body: live ? (
             <List
               items={[
-                "Prova gratuita di 15 giorni con tutte le funzioni, senza carta.",
+                "Prova gratuita di 30 giorni dalla registrazione, con tutte le funzioni e senza carta. A prova finita l’agenda resta consultabile ma non si possono aggiungere appuntamenti, e la pagina online non è più visibile.",
                 "Piano Solo: 1 poltrona, 9,90 € al mese + IVA. Piano Salone: fino a 3 poltrone, 19,90 € al mese + IVA.",
                 "Nessuna commissione sulle prenotazioni.",
               ]}
@@ -32,7 +32,7 @@ export default function Page() {
           ) : (
             <>
               <P>Durante la beta Taglendo è gratuito, con tutte le funzioni e senza carta di credito. Sulle prenotazioni non ci sono commissioni.</P>
-              <P>Quando partiranno gli abbonamenti ti avvisiamo con largo anticipo e hai 15 giorni di prova con tutte le funzioni prima di scegliere se continuare.</P>
+              <P>Ogni salone ha 30 giorni di prova dalla registrazione, con tutte le funzioni. A prova finita l’agenda resta consultabile ma non si possono aggiungere appuntamenti e la pagina online non è più visibile: per il rinnovo scrivici a {company.email}.</P>
             </>
           ),
         },

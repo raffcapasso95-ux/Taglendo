@@ -1,3 +1,4 @@
+import { salonLock } from "@/lib/billing";
 import type { Metadata } from "next";
 import { CardsSkeleton } from "@/components/states/Skeletons";
 import { Suspense } from "react";
@@ -21,7 +22,7 @@ async function Content() {
 
   return (
     <OrariView
-      canEdit={role === "owner" && !salon.suspended_at}
+      canEdit={role === "owner" && !salonLock(salon)}
       ownerName={people.find((m) => m.role === "owner")?.name ?? ""}
       week={week}
       todayWeekday={weekdayOf(romeDate(new Date()))}

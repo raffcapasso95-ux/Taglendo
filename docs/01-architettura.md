@@ -6,7 +6,7 @@
 | Framework | Next.js (App Router) + TypeScript | Un solo progetto per sito, gestionale e pagine dei saloni |
 | Database, accesso | Supabase | PostgreSQL, Auth (email + password, Apple, Google), RLS, Storage per le foto, Edge Functions, `pg_cron` |
 | Hosting | Vercel | Anteprima per ogni branch, produzione su `main` |
-| Pagamenti | Stripe Billing | Prova di 15 giorni, piani Solo e Salone, Customer Portal per carta e fatture, webhook |
+| Pagamenti | Stripe Billing | Prova di 30 giorni, piani Solo e Salone, Customer Portal per carta e fatture, webhook |
 | Fattura elettronica | Provider SDI con API | Si emette sul webhook `invoice.paid` |
 | Email | Resend + React Email | Mittente “Barberia X” su dominio Taglendo. SPF/DKIM/DMARC configurati |
 | Push | Web Push (VAPID) | Avvisi al barbiere (C11, D5) |

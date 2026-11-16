@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { Done } from "@/components/onboarding/Done";
 import { requireSalon } from "@/lib/auth/session";
-import { billingEnabled } from "@/lib/billing";
 import { formatDayMonth } from "@/lib/dates/format";
 import { env } from "@/lib/supabase/env";
 
@@ -19,7 +18,7 @@ async function Content() {
       salonName={salon.name}
       url={url}
       display={url.replace(/^https?:\/\//, "")}
-      trialEnds={billingEnabled() ? formatDayMonth(new Date(salon.trial_ends_at)) : undefined}
+      trialEnds={formatDayMonth(new Date(salon.trial_ends_at))}
     />
   );
 }

@@ -1,3 +1,4 @@
+import { salonLock } from "@/lib/billing";
 import "server-only";
 import { requireSalon } from "@/lib/auth/session";
 import { dayRange, romeDate } from "@/lib/dates/rome";
@@ -8,8 +9,8 @@ import { signedPhotoUrls } from "./photoUrls";
 
 async function permissions(role: "owner" | "barber", salonId: string) {
   const supabase = await createClient();
-  const { data } = await supabase.from("salons").select("barbers_edit, barbers_contacts, suspended_at").eq("id", salonId).single();
-  const open = !data?.suspended_at; // sospeso: si guarda e basta
+  const { data } = await supabase.from("salons").select("barbers_edit, barbers_contacts, suspended_at, sub_status, trial_ends_at").eq("id", salonId).single();
+  const open = !data || !salonLock(data); // sospeso o prova finita: si guarda e basta
   if (role === "owner") return { canEdit: open, canSeeContacts: true };
   return { canEdit: open && (data?.barbers_edit ?? false), canSeeContacts: data?.barbers_contacts ?? false };
 }

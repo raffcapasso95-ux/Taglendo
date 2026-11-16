@@ -49,14 +49,15 @@ Il cliente non crea nessun account e nessuna password.
   - “solo i miei appuntamenti” per il titolare.
 
 ## Piani e prova
-- **Beta gratuita:** finché `BILLING_ENABLED` è spento, ogni salone ha l'accesso completo e nessuna scadenza; le regole qui sotto valgono dal lancio dei pagamenti (vedi `docs/05-fasi-e-prompt.md`).
-- **Prova:** 15 giorni dalla registrazione, con tutte le funzioni e senza carta.
+- **Prova:** 30 giorni dalla registrazione, con tutte le funzioni e senza carta. Esiste e scade anche con i pagamenti spenti (`BILLING_ENABLED` riguarda solo le schermate dell'abbonamento).
+- **Avviso:** da 7 giorni prima della scadenza, dentro il gestionale compare un avviso («La tua prova scade tra N giorni») con l'invito a scrivere a `aiuto@taglendo.it` per il rinnovo.
+- **Prova terminata:** il salone è bloccato (come un salone sospeso da Taglendo). Il titolare e i barbieri entrano nel gestionale e vedono gli appuntamenti già fissati, ma non possono aggiungere né cambiare altro; la pagina online non è più visibile, non si prenota online e il salone esce dalla ricerca. Il blocco lo impone il database (`private.salon_lock`). Taglendo può riaprire tutto prolungando la prova dal gestionale (/admin).
 - **Piani:**
   - Solo: 9,90 € al mese + IVA, 1 poltrona;
   - Salone: 19,90 € al mese + IVA, fino a 3 poltrone.
 - **IVA:** 22%, mostrata prima della conferma (B2).
 - **Aggiunta della seconda poltrona con il piano Solo:** compare la proposta di passare a Salone (B7), con calcolo proporzionale.
-- **Fine della prova senza piano:** schermata B3. Il gestionale resta in sola lettura con l'esportazione dei dati, e la pagina passa a solo telefono.
+- **Fine della prova senza piano:** vedi «Prova terminata» sopra (schermata B3 e l'esportazione dei dati arrivano con i pagamenti).
 - **Pagamento non riuscito:** avviso B4 e 7 giorni per aggiornare la carta. Poi le prenotazioni online si sospendono.
 - **Disdetta (B6):** il piano resta attivo fino alla fine del periodo pagato. Dopo, i dati restano consultabili ed esportabili per 12 mesi.
 

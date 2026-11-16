@@ -1,3 +1,4 @@
+import { salonLock } from "@/lib/billing";
 import "server-only";
 import { requireSalon } from "@/lib/auth/session";
 import { romeDate, weekdayOf } from "@/lib/dates/rome";
@@ -40,7 +41,7 @@ export async function loadClosures() {
     weeklyClosed: weeklyClosed.has(weekdayOf(h.date)),
   }));
   return {
-    canEdit: role === "owner" && !salon.suspended_at,
+    canEdit: role === "owner" && !salonLock(salon),
     today,
     year: Number(today.slice(0, 4)),
     ...splitClosures(rows, today),

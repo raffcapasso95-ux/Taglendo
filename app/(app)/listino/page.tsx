@@ -1,3 +1,4 @@
+import { salonLock } from "@/lib/billing";
 import type { Metadata } from "next";
 import { CardsSkeleton } from "@/components/states/Skeletons";
 import { Suspense } from "react";
@@ -18,7 +19,7 @@ async function Content() {
 
   return (
     <ListinoView
-      canEdit={role === "owner" && !salon.suspended_at}
+      canEdit={role === "owner" && !salonLock(salon)}
       ownerName={owner}
       services={(services.data ?? []).map((s) => ({ id: s.id, name: s.name, durationMin: s.duration_min, priceCents: s.price_cents }))}
     />

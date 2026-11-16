@@ -66,7 +66,7 @@ export const landCopy = {
     eyebrow: "Prezzi",
     title: "Gratis durante la beta.",
     leadOne: "Provi Taglendo senza pagare e senza carta di credito, con tutte le funzioni. Sulle prenotazioni non ci sono mai commissioni.",
-    leadTwo: "Quando partiranno gli abbonamenti ti avvisiamo con largo anticipo, e avrai 15 giorni di prova con tutte le funzioni prima di decidere.",
+    leadTwo: "Hai 30 giorni di prova dalla registrazione, con tutte le funzioni. A prova finita puoi solo consultare l’agenda e la tua pagina non è più visibile: per continuare ti basta scriverci.",
     leadThree: "Nessun impegno: i dati dei tuoi clienti restano tuoi e li puoi esportare quando vuoi.",
     cta: "Prova gratis",
     board: "Listino Taglendo",
