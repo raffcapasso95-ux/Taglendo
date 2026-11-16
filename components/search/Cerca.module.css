@@ -494,6 +494,12 @@
 
 /* su computer la pagina scorre per intero e la mappa resta ferma sotto la testata, a tutta altezza (come i siti di prenotazione più usati) */
 @media (min-width: 961px) {
+  /* la scheda del salone scelto sta in alto sulla mappa, sempre in vista anche prima di scorrere */
+  .sel {
+    bottom: auto;
+    top: 72px;
+  }
+
   .mapPane {
     position: sticky;
     top: calc(var(--site-top) + var(--space-3));
@@ -1008,6 +1014,7 @@
   color: var(--text-inverse);
   font: inherit;
   font-weight: 600;
+  white-space: nowrap;
   box-shadow: var(--shadow-toast);
   cursor: pointer;
   animation: rise 300ms var(--ease-out) both;
@@ -1045,12 +1052,11 @@
   position: absolute;
   z-index: 500;
   left: var(--space-6);
-  right: var(--space-6);
+  width: min(360px, calc(100% - 2 * var(--space-6)));
   bottom: var(--space-6);
   display: flex;
-  gap: var(--space-4);
-  align-items: flex-start;
-  padding: 14px;
+  flex-direction: column;
+  overflow: hidden;
   border-radius: var(--space-5);
   background: var(--surface);
   box-shadow: var(--shadow-map-card);
@@ -1066,16 +1072,15 @@
 
 .selPhoto {
   position: relative;
-  width: 96px;
-  height: 96px;
+  width: 100%;
+  height: 132px;
   flex-shrink: 0;
-  border-radius: 14px;
   background: var(--brand-plum);
   color: var(--text-inverse);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
+  font-size: 40px;
   font-weight: 700;
   overflow: hidden;
 }
@@ -1092,6 +1097,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: var(--space-3) var(--space-4) var(--space-4);
 }
 
 .selName {
@@ -1108,9 +1114,11 @@
 }
 
 .selX {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
   width: var(--tap-min);
   height: var(--tap-min);
-  margin: -6px -6px 0 0;
   border: 0;
   border-radius: 50%;
   background: transparent;
@@ -1297,12 +1305,12 @@
   .sel {
     left: var(--space-3);
     right: var(--space-3);
-    bottom: 84px;
+    width: auto;
+    bottom: var(--space-4);
   }
 
   .selPhoto {
-    width: 64px;
-    height: 64px;
+    height: 120px;
   }
 
   .floatSwitch {
@@ -1402,12 +1410,13 @@
 
 /* ── Dal confronto con altri siti di prenotazione ──────────────────────── */
 
-/* il giorno si cambia da qui, senza riaprire la ricerca: una riga che scorre di lato */
+/* il giorno si cambia da qui, senza riaprire la ricerca: linguette con la sottolineatura sul giorno scelto, una riga che scorre di lato */
 .days {
   display: flex;
-  gap: var(--space-2);
-  margin-top: var(--space-3);
-  padding: 2px;
+  gap: var(--space-1);
+  margin: var(--space-3) calc(-1 * var(--space-2)) 0;
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -1416,9 +1425,25 @@
   display: none;
 }
 
-.days .chip {
+.dayTab {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
   text-decoration: none;
+  white-space: nowrap;
+  margin-bottom: -1px;
+}
+
+.dayTabOn {
+  border-bottom-color: var(--brand-plum);
+  color: var(--text-primary);
+  font-weight: 700;
 }
 
 /* ricerca ridotta a una riga sul telefono */
@@ -1503,4 +1528,83 @@
   margin-left: auto;
   font: inherit;
   cursor: pointer;
+}
+
+/* Telefono, vista mappa: la mappa occupa tutto lo schermo e la ricerca diventa una barra che galleggia, con il ritorno all'elenco */
+.mapBar {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .page:has(.layout[data-view="map"]) .band {
+    display: none;
+  }
+
+  .layout[data-view="map"] {
+    padding-top: calc(var(--site-top) + env(safe-area-inset-top, 0px));
+  }
+
+  .mapBar {
+    position: absolute;
+    z-index: 600;
+    top: var(--space-3);
+    left: var(--space-3);
+    right: var(--space-3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-1) var(--space-1) var(--space-4);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    box-shadow: var(--shadow-map-card);
+  }
+
+  /* il pulsante «Cerca in questa zona» e l'avviso stanno sotto la barra, non sotto di essa */
+  .zoneBtn,
+  .toast {
+    top: calc(var(--space-3) + var(--tap-min) + var(--space-3));
+  }
+
+  .mapBarText {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .mapBarText span + span::before {
+    content: "·";
+    margin: 0 var(--space-2);
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .mapBarBtn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--tap-min);
+    padding: 0 var(--space-4);
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--action-primary);
+    color: var(--text-inverse);
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  /* con meno cose sopra, il titolo è più piccolo e il percorso (Home › Barbieri) lascia il posto allo schermo */
+  .crumb {
+    display: none;
+  }
+
+  .title {
+    margin-top: 0;
+    font-size: 26px;
+  }
 }
