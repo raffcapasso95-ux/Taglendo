@@ -10,7 +10,7 @@ import { adminCopy } from "@/lib/copy/admin";
 const copy = adminCopy.overview;
 const nf = new Intl.NumberFormat("it-IT");
 const TONE = { ok: styles.bOk, warn: styles.bWarn, bad: styles.bBad, plain: "" } as const;
-const base: Filters = { q: "", stato: "all", sort: "created", dir: "desc", page: 1 };
+const base: Filters = { view: "tabella", q: "", stato: "all", sort: "created", dir: "desc", page: 1 };
 
 /** L'andamento in una riga: una linea sottile con i valori del periodo. */
 function Spark({ values }: { values: number[] }) {

@@ -32,6 +32,18 @@ const ITEMS = [
       </svg>
     ),
   },
+  {
+    href: "/admin/utenze",
+    label: adminCopy.nav.users,
+    exact: false,
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" {...ICON}>
+        <circle cx="9" cy="8" r="3.3" />
+        <path d="M2.8 20c.4-3.5 3-5.6 6.2-5.6s5.8 2.1 6.2 5.6" />
+        <path d="M16 4.9a3.3 3.3 0 0 1 0 6.2M18.2 14.8c1.8.7 3 2.4 3.2 5.2" />
+      </svg>
+    ),
+  },
 ] as const;
 
 /** Le due voci del gestionale; la pagina in cui si è è segnata. */

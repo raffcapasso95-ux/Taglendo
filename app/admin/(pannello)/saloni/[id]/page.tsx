@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { SalonActionBar } from "@/components/admin/SalonActionBar";
 import { SalonActions } from "@/components/admin/SalonActions";
 import { agoLabel, clock, dateLabel, dateTimeLabel, money, stateBadge } from "@/components/admin/format";
 import styles from "@/components/admin/Admin.module.css";
@@ -45,6 +46,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
           {s.admin_hidden ? <span className={styles.badge}>{adminCopy.badges.hidden}</span> : null}
         </span>
       </div>
+      <SalonActionBar id={s.id} name={s.name} hidden={s.admin_hidden} suspended={Boolean(s.suspended_at)} />
       {s.suspended_at ? null : (
         <p>
           <Link href={`/${s.slug}`} className={styles.rowLink} target="_blank" rel="noopener">
@@ -135,7 +137,7 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
         </div>
 
         <div className={styles.stack}>
-          <SalonActions id={s.id} hidden={s.admin_hidden} suspended={Boolean(s.suspended_at)} />
+          <SalonActions id={s.id} />
 
           <section className={styles.panel} aria-labelledby="h-numeri">
             <h2 id="h-numeri">{d.sections.numbers}</h2>

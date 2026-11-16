@@ -12,7 +12,7 @@ const fail = (error: string): AdminResult => ({ ok: false, error });
 
 /** Il messaggio giusto per l'errore del database (le funzioni lo scrivono già in italiano). */
 function explain(error: { code?: string; message?: string }): string {
-  if (error.code === "22023" || error.code === "P0002") return error.message ?? adminCopy.errors.generic;
+  if (error.code === "22023" || error.code === "P0002" || error.code === "23505") return error.message ?? adminCopy.errors.generic;
   if (error.code === "42501") return adminCopy.errors.notAllowed;
   return adminCopy.errors.generic;
 }
@@ -46,6 +46,35 @@ export async function extendTrial(id: string, days: number, reason: string): Pro
 export async function addNote(id: string, body: string): Promise<AdminResult> {
   if (!body.trim() || body.length > 1000) return fail(adminCopy.errors.note);
   return run(id, (s) => s.rpc("admin_add_note", { p_id: id, p_body: body }), adminCopy.done.note);
+}
+
+async function runUser(call: (rpc: Awaited<ReturnType<typeof createClient>>) => PromiseLike<{ error: { code?: string; message?: string } | null }>, done: string): Promise<AdminResult> {
+  await requireAdmin();
+  const supabase = await createClient();
+  const { error } = await call(supabase);
+  if (error) return fail(explain(error));
+  revalidatePath("/admin/utenze");
+  revalidatePath("/admin");
+  return { ok: true, message: done };
+}
+
+const isId = (v: string) => /^[0-9a-f-]{36}$/i.test(v);
+
+export async function setUserBlocked(user: string, blocked: boolean, reason: string): Promise<AdminResult> {
+  if (!isId(user)) return fail(adminCopy.errors.generic);
+  if (blocked && !reason.trim()) return fail(adminCopy.errors.blockReasonNeeded);
+  return runUser((s) => s.rpc("admin_set_user_blocked", { p_user: user, p_blocked: blocked, p_reason: reason.slice(0, 300) }), blocked ? adminCopy.done.blocked : adminCopy.done.unblocked);
+}
+
+export async function addAdmin(email: string): Promise<AdminResult> {
+  const e = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return fail(adminCopy.errors.email);
+  return runUser((s) => s.rpc("admin_add_admin", { p_email: e }), adminCopy.done.adminAdded);
+}
+
+export async function removeAdmin(user: string): Promise<AdminResult> {
+  if (!isId(user)) return fail(adminCopy.errors.generic);
+  return runUser((s) => s.rpc("admin_remove_admin", { p_user: user }), adminCopy.done.adminRemoved);
 }
 
 /** Accesso all'area: email e password; chi non è un amministratore non entra e non lo sa. */

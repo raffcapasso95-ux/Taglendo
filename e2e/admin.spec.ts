@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { adminInsert, adminSelect, env, PASSWORD, uniqueEmail } from "./helpers";
+import { adminInsert, adminSelect, env, PASSWORD, signIn, uniqueEmail } from "./helpers";
 import { freshOwner } from "./agenda-helpers";
 
 /** Crea l'utente del gestionale e lo mette fra gli amministratori (come farà il creatore). */
@@ -77,8 +77,8 @@ test.describe("Gestionale Taglendo", () => {
     await expect(page.getByText("Contattato per l'avvio")).toBeVisible();
 
     // sospensione in due passi, con il motivo
-    await page.getByLabel("Motivo (lo vedi solo tu)").fill("Pagamento non arrivato");
     await page.getByRole("button", { name: "Sospendi il salone" }).click();
+    await page.getByRole("textbox", { name: "Motivo (lo vedi solo tu)" }).fill("Pagamento non arrivato");
     await page.getByRole("button", { name: "Conferma" }).click();
     await expect(page.getByText("Salone sospeso.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Riattiva il salone" })).toBeVisible();
@@ -115,6 +115,90 @@ test.describe("Gestionale Taglendo", () => {
     await expect(page.getByRole("button", { name: "Mostra nella ricerca" })).toBeVisible();
     await ownerPage.goto(`/${row!.slug}`);
     await expect(ownerPage.getByRole("heading", { name: salon, level: 1 })).toBeVisible();
+    await ownerPage.close();
+  });
+
+  test("azioni veloci dal menu della riga e elenco delle utenze", async ({ page, browser }) => {
+    const salon = `Barberia Rapida ${Date.now() % 100000}`;
+    const ownerPage = await (await browser.newContext()).newPage();
+    const owner = await freshOwner(ownerPage, salon);
+    await adminIn(page, await createAdmin());
+
+    await page.goto(`/admin/saloni?q=${encodeURIComponent(salon)}`);
+    const row = page.getByRole("row", { name: new RegExp(salon) });
+    await row.getByRole("button", { name: `Azioni per ${salon}` }).click();
+    await page.getByRole("menuitem", { name: "Nascondi dalla ricerca" }).click();
+    await expect(page.getByText("Salone nascosto dalla ricerca.")).toBeVisible();
+    await expect(row.getByText("Nascosto dalla ricerca")).toBeVisible();
+
+    await row.getByRole("button", { name: `Azioni per ${salon}` }).click();
+    await page.getByRole("menuitem", { name: "Prolunga la prova di 7 giorni" }).click();
+    await expect(page.getByText("Prova prolungata di 7 giorni.")).toBeVisible();
+
+    await row.getByRole("button", { name: `Azioni per ${salon}` }).click();
+    await page.getByRole("menuitem", { name: "Sospendi…" }).click();
+    await page.getByRole("textbox", { name: "Motivo (lo vedi solo tu)" }).fill("Prova");
+    await page.getByRole("button", { name: "Conferma" }).click();
+    await expect(page.getByText("Salone sospeso.")).toBeVisible();
+    await expect(row.getByText("Sospeso", { exact: true })).toBeVisible();
+
+    // utenze: si trova il titolare, con il suo salone
+    await page.goto(`/admin/utenze?q=${encodeURIComponent(owner)}`);
+    await expect(page.getByRole("heading", { name: "Utenze" })).toBeVisible();
+    const u = page.getByRole("row", { name: new RegExp(salon) });
+    await expect(u.getByText("Titolare")).toBeVisible();
+    await expect(u.getByText(owner, { exact: true })).toBeVisible();
+    await page.getByRole("link", { name: "Barbieri", exact: true }).click();
+    await expect(page).toHaveURL(/stato=barber/);
+    await ownerPage.close();
+  });
+
+  test("utenze: amministratori del pannello, blocco dell'accesso, vista a schede", async ({ page, browser }) => {
+    const salon = `Barberia Utenze ${Date.now() % 100000}`;
+    const ownerCtx = await browser.newContext();
+    const ownerPage = await ownerCtx.newPage();
+    const owner = await freshOwner(ownerPage, salon);
+    const admin = await createAdmin();
+    await adminIn(page, admin);
+
+    // chi entra nel pannello compare tra le utenze
+    await page.goto("/admin/utenze?stato=admin");
+    await expect(page.getByRole("row", { name: new RegExp(admin) })).toBeVisible();
+
+    // si aggiunge un account che esiste, non uno che non esiste
+    await page.getByRole("button", { name: "Aggiungi amministratore" }).click();
+    await page.getByLabel("Email dell'account").fill("nessuno@example.com");
+    await page.getByRole("button", { name: "Aggiungi", exact: true }).click();
+    await expect(page.getByText("Nessun account con questa email")).toBeVisible();
+    await page.getByRole("button", { name: "Aggiungi amministratore" }).click();
+    await page.getByLabel("Email dell'account").fill(owner);
+    await page.getByRole("button", { name: "Aggiungi", exact: true }).click();
+    await expect(page.getByText("Amministratore aggiunto.")).toBeVisible();
+    const ownerRow = page.getByRole("row", { name: new RegExp(owner) });
+    await expect(ownerRow.getByText("Amministratore", { exact: true })).toBeVisible();
+
+    // si toglie di nuovo
+    await ownerRow.getByRole("button", { name: /^Azioni per/ }).click();
+    await page.getByRole("menuitem", { name: "Togli dagli amministratori" }).click();
+    await page.getByRole("button", { name: "Conferma" }).click();
+    await expect(page.getByText("Amministratore rimosso.")).toBeVisible();
+
+    // vista a schede
+    await page.goto(`/admin/utenze?q=${encodeURIComponent(owner)}`);
+    await page.getByRole("link", { name: "Schede" }).click();
+    await expect(page).toHaveURL(/vista=schede/);
+    await expect(page.getByRole("article").filter({ hasText: owner })).toBeVisible();
+
+    // blocco dell'accesso: il titolare non entra più
+    await page.getByRole("article").filter({ hasText: owner }).getByRole("button", { name: /^Azioni per/ }).click();
+    await page.getByRole("menuitem", { name: "Blocca l'accesso…" }).click();
+    await page.getByRole("textbox", { name: "Motivo (lo vedi solo tu)" }).fill("Prova");
+    await page.getByRole("button", { name: "Conferma" }).click();
+    await expect(page.getByText("Accesso bloccato.")).toBeVisible();
+    await ownerCtx.clearCookies();
+    await signIn(ownerPage, owner, PASSWORD, { expectError: true });
+    await expect(ownerPage).toHaveURL(/\/accedi/);
+    await expect(ownerPage.getByRole("button", { name: "Accedi", exact: true })).toBeVisible();
     await ownerPage.close();
   });
 });

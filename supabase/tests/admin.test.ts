@@ -187,3 +187,64 @@ describe("gestionale di Taglendo: azioni", () => {
     });
   });
 });
+
+describe("gestionale di Taglendo: utenze", () => {
+  it("solo l'amministratore vede l'elenco; ricerca e filtri; nessun dato dei clienti", async () => {
+    await inTx(async (tx) => {
+      const s = await setup(tx);
+      await tx.asAdmin();
+      await tx.q(`update members set invite_email = 'invitato@example.com' where id = $1`, [s.memberIds[1]]);
+      await tx.q(`update auth.users set email_confirmed_at = now() where id = $1`, [s.userId]);
+      await tx.as(s.userId);
+      expect(await tx.error(`select admin_users()`)).toBe("42501");
+      await tx.as(ADMIN);
+      const list = async (status: string, q: string | null = null) =>
+        (await tx.q<{ j: { total: number; rows: Array<{ name: string; email: string; state: string; role: string; salon_name: string }> } }>(`select admin_users($1, $2) as j`, [q, status]))[0]!.j;
+      const all = await list("all", "prova");
+      expect(all.rows.map((r) => r.name).sort()).toEqual(["Barbiere 1", "Barbiere 2"]);
+      expect(all.rows.find((r) => r.name === "Barbiere 1")).toMatchObject({ email: "prova@example.com", role: "owner", state: "active", salon_name: "Salone di prova" });
+      expect((await list("invited", "prova")).rows.map((r) => r.email)).toEqual(["invitato@example.com"]);
+      expect((await list("owner", "prova")).rows).toHaveLength(1);
+      expect(JSON.stringify(all)).not.toContain("Mario Segretissimo");
+      expect(JSON.stringify(all)).not.toContain("+39 333");
+    });
+  });
+});
+
+describe("gestionale di Taglendo: utenze con accesso al pannello", () => {
+  it("gli amministratori compaiono nell'elenco; si aggiungono, si tolgono, si blocca un'utenza", async () => {
+    await inTx(async (tx) => {
+      const s = await setup(tx);
+      await tx.as(ADMIN);
+      const list = async (status: string) =>
+        (await tx.q<{ j: { rows: Array<{ email: string; state: string; is_admin: boolean; salon_name: string | null }> } }>(`select admin_users(null, $1, 'name', 'asc', 100) as j`, [status]))[0]!.j.rows;
+      // l'amministratore senza salone sta nell'elenco
+      expect((await list("admin")).map((r) => r.email)).toEqual(["creatore@example.com"]);
+      expect((await list("admin"))[0]!.salon_name).toBeNull();
+
+      // aggiungere un account esistente; uno inesistente no
+      expect(await tx.error(`select admin_add_admin('nessuno@example.com')`)).toBe("P0002");
+      await tx.q(`select admin_add_admin('Prova@Example.com')`);
+      expect((await list("admin")).map((r) => r.email).sort()).toEqual(["creatore@example.com", "prova@example.com"]);
+      expect(await tx.error(`select admin_add_admin('prova@example.com')`)).toBe("23505");
+      // non si toglie se stessi; si toglie un altro
+      expect(await tx.error(`select admin_remove_admin($1)`, [ADMIN])).toBe("22023");
+      await tx.q(`select admin_remove_admin($1)`, [s.userId]);
+      expect((await list("admin")).map((r) => r.email)).toEqual(["creatore@example.com"]);
+
+      // blocco: serve il motivo; chiude le sessioni; gli amministratori non si bloccano
+      expect(await tx.error(`select admin_set_user_blocked($1, true, '')`, [s.userId])).toBe("22023");
+      expect(await tx.error(`select admin_set_user_blocked($1, true, 'x')`, [ADMIN])).toBe("22023");
+      await tx.q(`select admin_set_user_blocked($1, true, 'Abuso')`, [s.userId]);
+      expect((await list("blocked")).map((r) => r.email)).toEqual(["prova@example.com"]);
+      await tx.q(`select admin_set_user_blocked($1, false)`, [s.userId]);
+      expect(await list("blocked")).toHaveLength(0);
+
+      // un titolare non può usare nessuna di queste funzioni
+      await tx.as(s.userId);
+      expect(await tx.error(`select admin_add_admin('prova@example.com')`)).toBe("42501");
+      expect(await tx.error(`select admin_set_user_blocked($1, true, 'x')`, [ADMIN])).toBe("42501");
+      expect(await tx.error(`select admin_remove_admin($1)`, [ADMIN])).toBe("42501");
+    });
+  });
+});

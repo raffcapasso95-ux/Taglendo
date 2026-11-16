@@ -2,19 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { addNote, extendTrial, setHidden, setSuspended, type AdminResult } from "@/lib/admin/actions";
+import { addNote, extendTrial, type AdminResult } from "@/lib/admin/actions";
 import { adminCopy } from "@/lib/copy/admin";
+import { Icon } from "./Icons";
 import styles from "./Admin.module.css";
 
 const copy = adminCopy.actions;
 
 /** Le azioni sul salone: ognuna dice com'è andata e aggiorna la scheda. */
-export function SalonActions({ id, hidden, suspended }: { id: string; hidden: boolean; suspended: boolean }) {
+export function SalonActions({ id }: { id: string }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [result, setResult] = useState<AdminResult | null>(null);
-  const [reason, setReason] = useState("");
-  const [confirm, setConfirm] = useState(false);
   const [days, setDays] = useState("15");
   const [note, setNote] = useState("");
 
@@ -30,67 +29,12 @@ export function SalonActions({ id, hidden, suspended }: { id: string; hidden: bo
 
   return (
     <div className={styles.panel}>
-      <h2>{adminCopy.detail.sections.actions}</h2>
+      <h2>{copy.trial} · {adminCopy.detail.sections.notes}</h2>
       {result ? (
         <p className={`${styles.status} ${result.ok ? "" : styles.statusErr}`} role={result.ok ? "status" : "alert"}>
           {result.ok ? result.message : result.error}
         </p>
       ) : null}
-
-      <div className={styles.actionGroup}>
-        <h3>{copy.visibility}</h3>
-        <p className={`${styles.hint} ${styles.muted}`}>{copy.hideHint}</p>
-        <div className={styles.rowBtns}>
-          <button type="button" className={`${styles.btn} ${styles.btnLine}`} disabled={pending} onClick={() => run(() => setHidden(id, !hidden, ""))}>
-            {hidden ? copy.show : copy.hide}
-          </button>
-        </div>
-      </div>
-
-      <div className={styles.actionGroup}>
-        <h3>{copy.suspension}</h3>
-        <p className={`${styles.hint} ${styles.muted}`}>{copy.suspendHint}</p>
-        {suspended ? (
-          <div className={styles.rowBtns}>
-            <button type="button" className={styles.btn} disabled={pending} onClick={() => run(() => setSuspended(id, false, ""))}>
-              {copy.reactivate}
-            </button>
-          </div>
-        ) : (
-          <>
-            <div className={styles.field}>
-              <label htmlFor="sosp-motivo">{copy.reasonLabel}</label>
-              <textarea id="sosp-motivo" className={styles.textarea} value={reason} maxLength={300} onChange={(e) => setReason(e.target.value)} />
-            </div>
-            {confirm ? (
-              <div className={styles.rowBtns}>
-                <button
-                  type="button"
-                  className={`${styles.btn} ${styles.btnDanger}`}
-                  disabled={pending}
-                  onClick={() =>
-                    run(() => setSuspended(id, true, reason), () => {
-                      setConfirm(false);
-                      setReason("");
-                    })
-                  }
-                >
-                  {copy.confirm}
-                </button>
-                <button type="button" className={`${styles.btn} ${styles.btnLine}`} onClick={() => setConfirm(false)}>
-                  {copy.cancel}
-                </button>
-              </div>
-            ) : (
-              <div className={styles.rowBtns}>
-                <button type="button" className={`${styles.btn} ${styles.btnLine}`} disabled={pending || !reason.trim()} onClick={() => setConfirm(true)}>
-                  {copy.suspend}
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
 
       <div className={styles.actionGroup}>
         <h3>{copy.trial}</h3>
@@ -106,6 +50,7 @@ export function SalonActions({ id, hidden, suspended }: { id: string; hidden: bo
         </div>
         <div className={styles.rowBtns}>
           <button type="button" className={`${styles.btn} ${styles.btnLine}`} disabled={pending} onClick={() => run(() => extendTrial(id, Number(days), ""))}>
+            <Icon name="clock" />
             {copy.extend}
           </button>
         </div>
@@ -119,6 +64,7 @@ export function SalonActions({ id, hidden, suspended }: { id: string; hidden: bo
         </div>
         <div className={styles.rowBtns}>
           <button type="button" className={`${styles.btn} ${styles.btnLine}`} disabled={pending || !note.trim()} onClick={() => run(() => addNote(id, note), () => setNote(""))}>
+            <Icon name="note" />
             {copy.addNote}
           </button>
         </div>
