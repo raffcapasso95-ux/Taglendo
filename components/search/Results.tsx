@@ -285,8 +285,7 @@ export function Results({
   const goPage = (n: number) => {
     setPage(n);
     // si riparte dall'inizio dell'elenco
-    document.querySelector("[data-list-col]")?.scrollTo({ top: 0, behavior: "smooth" });
-    if (window.innerWidth <= 960) window.scrollTo({ top: 0, behavior: "smooth" });
+    document.querySelector("[data-list-col]")?.scrollIntoView({ block: "start", behavior: "smooth" });
   };
   const changeMode = (m: "list" | "grid") => {
     // la salone in vista resta più o meno al suo posto: si torna alla pagina che lo contiene

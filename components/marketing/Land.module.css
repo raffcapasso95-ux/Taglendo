@@ -2085,3 +2085,9 @@
     display: none;
   }
 }
+
+/* pagine a tutta larghezza (la ricerca): la testata segue i bordi, non la colonna del sito */
+.header[data-wide="true"] .headerRow {
+  max-width: none;
+  padding: 0 var(--space-6);
+}

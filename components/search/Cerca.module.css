@@ -26,14 +26,13 @@
 .band {
   position: relative;
   z-index: 3;
-  padding: calc(var(--site-top) + env(safe-area-inset-top, 0px) + var(--space-5)) var(--site-gutter) var(--space-4);
+  padding: calc(var(--site-top) + env(safe-area-inset-top, 0px) + var(--space-5)) var(--space-6) var(--space-4);
   background: var(--surface-muted);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .bandIn {
-  max-width: calc(var(--site-wrap) - 2 * var(--site-gutter));
-  margin: 0 auto;
+  width: 100%;
 }
 
 .titleBlock {
@@ -295,16 +294,15 @@
 
 .layout {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   align-items: start;
   width: 100%;
-  max-width: var(--site-wrap);
-  margin: 0 auto;
 }
 
 .listCol {
   min-width: 0;
-  padding: var(--space-5) var(--space-6) var(--space-12) var(--site-gutter);
+  scroll-margin-top: var(--site-top);
+  padding: var(--space-5) var(--space-6) var(--space-12);
 }
 
 .summaryRow {
@@ -462,7 +460,7 @@
 .mapPane {
   position: relative;
   min-height: 480px;
-  margin: var(--space-5) var(--site-gutter) var(--space-5) 0;
+  margin: var(--space-3) var(--space-6) var(--space-3) 0;
   background: var(--map-bg);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-panel);
@@ -479,13 +477,9 @@
     display: none;
   }
 
-  .layout[data-mode="grid"] .listCol {
-    padding-right: var(--site-gutter);
-  }
-
   .layout[data-mode="grid"] .list {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: var(--space-4);
   }
 
@@ -498,29 +492,14 @@
   }
 }
 
-/* su computer la pagina è alta quanto lo schermo: la fascia in alto, poi l'elenco che scorre e la mappa ferma */
+/* su computer la pagina scorre per intero e la mappa resta ferma sotto la testata, a tutta altezza (come i siti di prenotazione più usati) */
 @media (min-width: 961px) {
-  .pageFixed {
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  .pageFixed .layout {
-    flex: 1;
+  .mapPane {
+    position: sticky;
+    top: calc(var(--site-top) + var(--space-3));
+    height: calc(100dvh - var(--site-top) - var(--space-6));
     min-height: 0;
-    align-items: stretch;
-    grid-template-rows: minmax(0, 1fr);
-  }
-
-  .pageFixed .listCol {
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-
-  .pageFixed .mapPane {
-    min-height: 0;
+    align-self: start;
   }
 }
 
