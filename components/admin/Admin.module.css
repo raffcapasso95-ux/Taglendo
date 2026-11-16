@@ -983,3 +983,374 @@ a.card:hover {
     display: none;
   }
 }
+
+/* ——— menu «⋯» delle righe, finestra di conferma, avvisi ——— */
+.menuBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  border: 1px solid transparent;
+  border-radius: var(--radius-input);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.menuBtn:hover,
+.menuBtn[aria-expanded="true"] {
+  background: var(--brand-peach);
+}
+
+.menuBtn:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+.menu {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  min-width: 250px;
+  max-height: calc(100dvh - 2 * var(--space-2));
+  overflow-y: auto;
+  padding: var(--space-2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-toast);
+}
+
+.menu a,
+.menu button {
+  display: flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-input);
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.menu a:hover,
+.menu button:hover,
+.menu a:focus-visible,
+.menu button:focus-visible {
+  background: var(--brand-peach);
+}
+
+.menu hr {
+  width: 100%;
+  margin: var(--space-1) 0;
+  border: 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.menu .menuDanger {
+  color: var(--status-error);
+}
+
+.dialog {
+  width: min(440px, calc(100vw - 2 * var(--space-4)));
+  padding: var(--space-6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.dialog::backdrop {
+  background: var(--backdrop-sheet);
+}
+
+.dialog h2 {
+  margin: 0 0 var(--space-2);
+  font-size: 18px;
+}
+
+.dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.toast {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  left: var(--space-4);
+  z-index: 70;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-toast);
+}
+
+.toastErr {
+  background: var(--status-error);
+}
+
+/* filtri a pastiglie */
+.chips {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 0 var(--space-1);
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.chip[aria-current="true"] {
+  border-color: var(--brand-plum);
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+}
+
+.chipN {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.actionsCell {
+  width: var(--tap-min);
+  text-align: right;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 899px) {
+  .table td.actionsCell {
+    justify-content: flex-end;
+    width: 100%;
+    padding-top: 0;
+  }
+
+  .table td.actionsCell::before {
+    content: none;
+  }
+}
+
+/* ——— rifiniture ——— */
+.actionGroup .field,
+.dialog .field {
+  flex: none;
+}
+
+.titleRow {
+  justify-content: flex-start;
+  gap: var(--space-4);
+}
+
+.main {
+  gap: var(--space-6);
+}
+
+.table .sub {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table td[data-label="Arrivato"],
+.table td[data-label="Registrata"],
+.table td[data-label="Ultimo accesso"],
+.table td[data-label="Ultimo appuntamento"] {
+  white-space: nowrap;
+}
+
+.table td[data-label="Salone"] {
+  min-width: 200px;
+}
+
+@media (max-width: 899px) {
+  .table .sub {
+    max-width: 60vw;
+  }
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table .sub {
+  max-width: 210px;
+}
+
+@media (min-width: 900px) and (max-width: 1499px) {
+  .hideMid {
+    display: none;
+  }
+}
+
+.table .subWrap {
+  max-width: none;
+  white-space: normal;
+}
+
+.showMid {
+  display: none;
+}
+
+@media (min-width: 900px) and (max-width: 1499px) {
+  .table .showMid {
+    display: block;
+  }
+}
+
+.menu a svg,
+.menu button svg {
+  flex: none;
+  margin-right: var(--space-3);
+  color: var(--text-secondary);
+}
+
+.menu .menuDanger svg {
+  color: inherit;
+}
+
+.btn svg {
+  flex: none;
+  margin-right: var(--space-2);
+}
+
+/* vista tabella / schede */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.toggle {
+  display: inline-flex;
+  padding: var(--space-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.toggle a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.toggle a[aria-current="true"] {
+  background: var(--brand-plum);
+  color: var(--text-inverse);
+}
+
+.gridCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+  padding: var(--space-5);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.sCardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.sCardHead strong {
+  font-size: 16px;
+}
+
+.sCardFacts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.sCardFacts dt {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.sCardFacts dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.titleActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.headRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.btnWarn {
+  border-color: var(--status-error);
+  color: var(--status-error);
+}

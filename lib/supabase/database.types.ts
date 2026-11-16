@@ -511,7 +511,10 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "admin_add_note":
+            "admin_add_admin":
+{ Args: { "p_email": string }; Returns: undefined
+                           },
+"admin_add_note":
 { Args: { "p_body": string,"p_id": string }; Returns: undefined
                            },
 "admin_extend_trial":
@@ -519,6 +522,9 @@ isOneToOne: false
                            },
 "admin_overview":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"admin_remove_admin":
+{ Args: { "p_user": string }; Returns: undefined
                            },
 "admin_salon":
 { Args: { "p_id": string }; Returns: Json
@@ -531,6 +537,12 @@ isOneToOne: false
                            },
 "admin_set_suspended":
 { Args: { "p_id": string,"p_reason"?: string,"p_suspended": boolean }; Returns: undefined
+                           },
+"admin_set_user_blocked":
+{ Args: { "p_blocked": boolean,"p_reason"?: string,"p_user": string }; Returns: undefined
+                           },
+"admin_users":
+{ Args: { "p_dir"?: string,"p_limit"?: number,"p_offset"?: number,"p_q"?: string,"p_sort"?: string,"p_status"?: string }; Returns: Json
                            },
 "booking_by_token":
 { Args: { "p_token": string }; Returns: Json
