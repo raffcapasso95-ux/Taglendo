@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition, type ReactNode } from "react";
@@ -62,8 +63,7 @@ function Pager({ page, total, onPage }: { page: number; total: number; onPage: (
 function Photo({ salon }: { salon: SalonView }) {
   if (salon.coverUrl) {
     // la foto arriva dall'archivio del salone, come nella sua pagina: un'immagine semplice, caricata quando serve
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={salon.coverUrl} alt="" loading="lazy" decoding="async" />;
+    return <Image src={salon.coverUrl} alt="" fill sizes="(max-width: 960px) 96px, 112px" />;
   }
   return (
     <span className={styles.noPhoto} aria-hidden="true">
@@ -157,8 +157,7 @@ function MapCard({ salon: s, onClose }: { salon: SalonView; onClose: () => void 
     <div className={styles.sel} role="group" aria-label={s.name}>
       <Link href={href} className={styles.selPhoto} tabIndex={-1} aria-hidden="true">
         {s.coverUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={s.coverUrl} alt="" />
+          <Image src={s.coverUrl} alt="" fill sizes="96px" />
         ) : (
           Array.from(s.name)[0]
         )}

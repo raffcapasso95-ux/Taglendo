@@ -934,7 +934,7 @@
 }
 
 @media (max-width: 479px) {
-  .login {
+  .page .login {
     display: none;
   }
 }
@@ -1662,7 +1662,7 @@
 }
 
 .page .fLink {
-  min-height: 36px;
+  min-height: var(--tap-min);
 }
 
 .fText {
@@ -1919,4 +1919,21 @@
 
 .header[data-tone="light"] .logoTag {
   color: var(--text-secondary);
+}
+
+/* Testata dei saloni: ritorno al sito per i clienti. Sul telefono resta la sola lente, sopra i 720 px anche il testo */
+.page .clientLink {
+  gap: var(--space-2);
+  min-width: var(--tap-min);
+  justify-content: center;
+}
+
+.clientText {
+  display: none;
+}
+
+@media (min-width: 720px) {
+  .clientText {
+    display: inline;
+  }
 }

@@ -68,8 +68,7 @@ async function Recent() {
               <Link href={`/${s.slug}`} className={styles.salon}>
                 <span className={styles.salonPhoto}>
                   {s.coverUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={s.coverUrl} alt="" loading="lazy" decoding="async" />
+                    <Image src={s.coverUrl} alt="" fill sizes="(min-width: 961px) 25vw, 70vw" />
                   ) : (
                     <span className={styles.salonNoPhoto} aria-hidden="true">
                       {s.logoUrl ? (

@@ -1,6 +1,6 @@
 /** Testi della home dei saloni e della pagina Funzioni (ridisegno di novembre 2026, design/ridisegno-sito-2026-11). */
 export const saloniCopy = {
-  nav: { how: "Come funziona", page: "La tua pagina", features: "Funzioni", cost: "Quanto costa", faq: "Domande", signIn: "Accedi", try: "Prova gratis" },
+  nav: { how: "Come funziona", page: "La tua pagina", features: "Funzioni", cost: "Quanto costa", faq: "Domande", signIn: "Accedi", try: "Prova gratis", client: "Cerchi un barbiere?", clientAria: "Cerchi un barbiere? Vai al sito per i clienti" },
   hero: {
     kicker: "Per barbieri, da 1 a 3 poltrone",
     title: "La tua agenda online,",
