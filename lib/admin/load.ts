@@ -86,7 +86,7 @@ export type SalonDetail = {
 export type UserRow = {
   row_id: string;
   name: string;
-  role: "owner" | "barber" | "admin";
+  role: "owner" | "barber";
   active: boolean;
   user_id: string | null;
   email: string | null;
@@ -102,8 +102,19 @@ export type UserRow = {
   state: "active" | "invited" | "inactive" | "unconfirmed" | "blocked";
 };
 
+export type AdminRow = {
+  user_id: string;
+  email: string;
+  name: string | null;
+  added_at: string;
+  last_sign_in_at: string | null;
+  created_at: string | null;
+  blocked: boolean;
+  self: boolean;
+};
+
 export const PAGE_SIZE = 25;
-export const USER_FILTERS = ["all", "admin", "owner", "barber", "active", "invited", "inactive", "unconfirmed", "blocked"] as const;
+export const USER_FILTERS = ["all", "owner", "barber", "active", "invited", "inactive", "unconfirmed", "blocked"] as const;
 export const USER_SORTS = ["access", "name", "salon", "created"] as const;
 export type UserFilters = { view: View; q: string; stato: (typeof USER_FILTERS)[number]; sort: (typeof USER_SORTS)[number]; dir: "asc" | "desc"; page: number };
 export const STATES = ["all", "trialing", "active", "expired", "suspended", "incomplete", "hidden", "blocked"] as const;
@@ -138,14 +149,14 @@ export function parseFilters(p: { vista?: Raw; q?: Raw; stato?: Raw; ordina?: Ra
   const stato = STATES.find((s) => s === one(p.stato)) ?? "all";
   const sort = SORTS.find((s) => s === one(p.ordina)) ?? "created";
   const page = Math.max(1, Math.min(1000, Number.parseInt(one(p.pagina), 10) || 1));
-  return { view: one(p.vista) === "schede" ? "schede" : "tabella", q: one(p.q).trim().slice(0, 80), stato, sort, dir: one(p.dir) === "asc" ? "asc" : "desc", page };
+  return { view: one(p.vista) === "tabella" ? "tabella" : "schede", q: one(p.q).trim().slice(0, 80), stato, sort, dir: one(p.dir) === "asc" ? "asc" : "desc", page };
 }
 
 /** L'indirizzo dell'elenco con i filtri (per ordinare, filtrare e cambiare pagina). */
 export function listHref(f: Filters, change: Partial<Filters> = {}): string {
   const g = { ...f, ...change };
   const q = new URLSearchParams();
-  if (g.view === "schede") q.set("vista", "schede");
+  if (g.view === "tabella") q.set("vista", "tabella");
   if (g.q) q.set("q", g.q);
   if (g.stato !== "all") q.set("stato", g.stato);
   if (g.sort !== "created") q.set("ordina", g.sort);
@@ -165,13 +176,13 @@ export function parseUserFilters(p: { vista?: Raw; q?: Raw; stato?: Raw; ordina?
   const stato = USER_FILTERS.find((s) => s === one(p.stato)) ?? "all";
   const sort = USER_SORTS.find((s) => s === one(p.ordina)) ?? "access";
   const page = Math.max(1, Math.min(1000, Number.parseInt(one(p.pagina), 10) || 1));
-  return { view: one(p.vista) === "schede" ? "schede" : "tabella", q: one(p.q).trim().slice(0, 80), stato, sort, dir: one(p.dir) === "asc" ? "asc" : "desc", page };
+  return { view: one(p.vista) === "tabella" ? "tabella" : "schede", q: one(p.q).trim().slice(0, 80), stato, sort, dir: one(p.dir) === "asc" ? "asc" : "desc", page };
 }
 
 export function userHref(f: UserFilters, change: Partial<UserFilters> = {}): string {
   const g = { ...f, ...change };
   const q = new URLSearchParams();
-  if (g.view === "schede") q.set("vista", "schede");
+  if (g.view === "tabella") q.set("vista", "tabella");
   if (g.q) q.set("q", g.q);
   if (g.stato !== "all") q.set("stato", g.stato);
   if (g.sort !== "access") q.set("ordina", g.sort);
@@ -179,4 +190,10 @@ export function userHref(f: UserFilters, change: Partial<UserFilters> = {}): str
   if (g.page > 1) q.set("pagina", String(g.page));
   const s = q.toString();
   return `/admin/utenze${s ? `?${s}` : ""}`;
+}
+
+export async function loadAdmins(): Promise<AdminRow[] | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("admin_admins");
+  return error ? null : (data as unknown as AdminRow[]);
 }

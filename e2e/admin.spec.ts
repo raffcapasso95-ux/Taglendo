@@ -69,6 +69,8 @@ test.describe("Gestionale Taglendo", () => {
     await page.getByRole("link", { name: salon }).click();
     await expect(page.getByRole("heading", { name: salon, level: 1 })).toBeVisible();
     await expect(page.getByText("I dati dei clienti del salone non si vedono da qui")).toBeVisible();
+    // i giorni di prova che restano si leggono subito
+    await expect(page.getByRole("img", { name: /giorni rimasti/ }).first()).toBeVisible();
 
     // nota
     await page.getByLabel("Nuova nota").fill("Contattato per l'avvio");
@@ -124,7 +126,7 @@ test.describe("Gestionale Taglendo", () => {
     const owner = await freshOwner(ownerPage, salon);
     await adminIn(page, await createAdmin());
 
-    await page.goto(`/admin/saloni?q=${encodeURIComponent(salon)}`);
+    await page.goto(`/admin/saloni?vista=tabella&q=${encodeURIComponent(salon)}`);
     const row = page.getByRole("row", { name: new RegExp(salon) });
     await row.getByRole("button", { name: `Azioni per ${salon}` }).click();
     await page.getByRole("menuitem", { name: "Nascondi dalla ricerca" }).click();
@@ -140,16 +142,17 @@ test.describe("Gestionale Taglendo", () => {
     await page.getByRole("textbox", { name: "Motivo (lo vedi solo tu)" }).fill("Prova");
     await page.getByRole("button", { name: "Conferma" }).click();
     await expect(page.getByText("Salone sospeso.")).toBeVisible();
-    await expect(row.getByText("Sospeso", { exact: true })).toBeVisible();
+    await expect(row.getByText("Sospeso", { exact: true }).first()).toBeVisible();
 
     // utenze: si trova il titolare, con il suo salone
-    await page.goto(`/admin/utenze?q=${encodeURIComponent(owner)}`);
+    await page.goto(`/admin/utenze?vista=tabella&q=${encodeURIComponent(owner)}`);
     await expect(page.getByRole("heading", { name: "Utenze" })).toBeVisible();
     const u = page.getByRole("row", { name: new RegExp(salon) });
     await expect(u.getByText("Titolare")).toBeVisible();
     await expect(u.getByText(owner, { exact: true })).toBeVisible();
     await page.getByRole("link", { name: "Barbieri", exact: true }).click();
     await expect(page).toHaveURL(/stato=barber/);
+    await expect(page.getByRole("link", { name: "Tabella" })).toHaveAttribute("aria-current", "true");
     await ownerPage.close();
   });
 
@@ -161,9 +164,10 @@ test.describe("Gestionale Taglendo", () => {
     const admin = await createAdmin();
     await adminIn(page, admin);
 
-    // chi entra nel pannello compare tra le utenze
-    await page.goto("/admin/utenze?stato=admin");
-    await expect(page.getByRole("row", { name: new RegExp(admin) })).toBeVisible();
+    // gli amministratori hanno la loro pagina, separata dalle utenze dei saloni
+    await page.goto("/admin/amministratori");
+    await expect(page.getByRole("heading", { name: "Amministratori", level: 1 })).toBeVisible();
+    await expect(page.getByRole("article").filter({ hasText: admin })).toContainText("Tu");
 
     // si aggiunge un account che esiste, non uno che non esiste
     await page.getByRole("button", { name: "Aggiungi amministratore" }).click();
@@ -174,20 +178,26 @@ test.describe("Gestionale Taglendo", () => {
     await page.getByLabel("Email dell'account").fill(owner);
     await page.getByRole("button", { name: "Aggiungi", exact: true }).click();
     await expect(page.getByText("Amministratore aggiunto.")).toBeVisible();
-    const ownerRow = page.getByRole("row", { name: new RegExp(owner) });
-    await expect(ownerRow.getByText("Amministratore", { exact: true })).toBeVisible();
+    const card = page.getByRole("article").filter({ hasText: owner });
+    await expect(card).toBeVisible();
+
+    // nelle utenze dei saloni lo stesso account è segnato come anche amministratore
+    await page.goto(`/admin/utenze?q=${encodeURIComponent(owner)}`);
+    await expect(page.getByRole("article").filter({ hasText: owner })).toContainText("Anche amministratore");
 
     // si toglie di nuovo
-    await ownerRow.getByRole("button", { name: /^Azioni per/ }).click();
-    await page.getByRole("menuitem", { name: "Togli dagli amministratori" }).click();
+    await page.goto("/admin/amministratori");
+    await page.getByRole("article").filter({ hasText: owner }).getByRole("button", { name: "Togli dagli amministratori" }).click();
     await page.getByRole("button", { name: "Conferma" }).click();
     await expect(page.getByText("Amministratore rimosso.")).toBeVisible();
+    await expect(page.getByRole("article").filter({ hasText: owner })).toHaveCount(0);
 
-    // vista a schede
+    // utenze: schede di default, tabella a richiesta
     await page.goto(`/admin/utenze?q=${encodeURIComponent(owner)}`);
-    await page.getByRole("link", { name: "Schede" }).click();
-    await expect(page).toHaveURL(/vista=schede/);
     await expect(page.getByRole("article").filter({ hasText: owner })).toBeVisible();
+    await page.getByRole("link", { name: "Tabella" }).click();
+    await expect(page).toHaveURL(/vista=tabella/);
+    await page.getByRole("link", { name: "Schede" }).click();
 
     // blocco dell'accesso: il titolare non entra più
     await page.getByRole("article").filter({ hasText: owner }).getByRole("button", { name: /^Azioni per/ }).click();

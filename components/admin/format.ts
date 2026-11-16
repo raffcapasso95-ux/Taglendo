@@ -37,3 +37,6 @@ export function stateBadge(row: Pick<SalonRow, "state" | "trial_ends_at">, now =
       return { text: adminCopy.badges.expired, tone: "warn" };
   }
 }
+
+/** Giorni che mancano a una data (arrotondati per eccesso; negativi se è passata). */
+export const daysLeft = (iso: string, now = Date.now()) => Math.ceil((new Date(iso).getTime() - now) / 86400000);

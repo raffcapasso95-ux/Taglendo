@@ -1354,3 +1354,320 @@ a.card:hover {
   border-color: var(--status-error);
   color: var(--status-error);
 }
+
+/* ——— ridisegno: avatar, prova, schede, scheda del salone ——— */
+.nameCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.nameText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.badge svg {
+  margin-right: var(--space-1);
+  vertical-align: -2px;
+}
+
+.meter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 140px;
+}
+
+.meterTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.meterLabel {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.meterValue {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.meterBar {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--brand-apricot);
+  transition: width 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.meterSoon .meterFill {
+  background: var(--status-warning);
+}
+
+.meterSoon .meterValue {
+  color: var(--status-warning);
+}
+
+.meterOk .meterValue {
+  color: var(--status-success);
+}
+
+.meterBad .meterValue {
+  color: var(--status-error);
+}
+
+.meterMuted .meterValue {
+  color: var(--text-secondary);
+}
+
+.meterHint {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.meterLg {
+  gap: var(--space-3);
+  min-width: 240px;
+}
+
+.meterBig {
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.meterLg .meterValue {
+  font-size: 16px;
+}
+
+.meterCell {
+  min-width: 170px;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  padding: var(--space-3) 0 0;
+  border-top: 1px solid var(--border-subtle);
+  list-style: none;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.stats li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.stats svg {
+  margin-right: var(--space-1);
+}
+
+.stats strong {
+  color: var(--text-primary);
+}
+
+.owner {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-size: 14px;
+}
+
+.sortBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sortPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sortPill:hover {
+  background: var(--brand-peach);
+}
+
+.sortPill[aria-current="true"] {
+  background: var(--brand-peach);
+}
+
+/* niente transform: romperebbe la posizione del menu «⋯» (position: fixed) dentro la scheda */
+.sCard {
+  transition: border-color 200ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.sCard:hover {
+  border-color: var(--brand-apricot);
+  box-shadow: var(--shadow-toast);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sCard,
+  .meterFill {
+    transition: none;
+  }
+
+}
+
+/* la scheda del salone: fascia prugna con i dati principali */
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-6);
+  border-radius: var(--radius-card);
+  background: var(--plum-glow), var(--brand-plum);
+  color: var(--text-inverse);
+}
+
+.heroMain {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.heroText h1 {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.heroSub {
+  margin: 0;
+  color: var(--on-plum-soft);
+}
+
+.hero .badge {
+  background: var(--on-plum-line);
+  color: var(--text-inverse);
+}
+
+.heroLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  color: var(--brand-peach);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.heroLink:hover {
+  text-decoration: underline;
+}
+
+.heroMeter {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--on-plum-hover);
+  border: 1px solid var(--on-plum-line);
+}
+
+.hero .meterLabel,
+.hero .meterHint {
+  color: var(--on-plum-soft);
+}
+
+.hero .meterValue {
+  color: var(--text-inverse);
+}
+
+.hero .meterBar {
+  background: var(--on-plum-line);
+}
+
+.hero .meterSoon .meterFill {
+  background: var(--brand-peach);
+}
+
+.hero .meterSoon .meterValue,
+.hero .meterOk .meterValue,
+.hero .meterBad .meterValue,
+.hero .meterMuted .meterValue {
+  color: var(--text-inverse);
+}
+
+@media (max-width: 599px) {
+  .hero {
+    padding: var(--space-4);
+  }
+
+  .heroMain {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .heroText h1 {
+    font-size: 26px;
+  }
+
+  .heroMeter {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1023px) {
+  .nav {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .navLink {
+    flex: none;
+  }
+}
+
+@media (max-width: 599px) {
+  .titleActions .btn {
+    flex: 1 1 100%;
+  }
+}

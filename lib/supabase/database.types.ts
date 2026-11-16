@@ -517,6 +517,9 @@ isOneToOne: false
 "admin_add_note":
 { Args: { "p_body": string,"p_id": string }; Returns: undefined
                            },
+"admin_admins":
+{ Args: Record<PropertyKey, never>; Returns: Json
+                           },
 "admin_extend_trial":
 { Args: { "p_days": number,"p_id": string,"p_reason"?: string }; Returns: string
                            },

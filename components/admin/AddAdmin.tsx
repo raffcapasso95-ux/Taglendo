@@ -8,7 +8,7 @@ import { ActionDialog } from "./ActionDialog";
 import { Icon } from "./Icons";
 import styles from "./Admin.module.css";
 
-const copy = adminCopy.users;
+const copy = adminCopy.admins;
 
 /** «Aggiungi amministratore»: dà l'accesso al gestionale a un account che esiste già. */
 export function AddAdmin() {
@@ -27,14 +27,14 @@ export function AddAdmin() {
     <>
       <button type="button" className={styles.btn} disabled={pending} onClick={() => setOpen(true)}>
         <Icon name="shield" />
-        {copy.addAdmin}
+        {copy.add}
       </button>
       <ActionDialog
         open={open}
         title={copy.addTitle}
         text={copy.addText}
         field={{ label: copy.addLabel, type: "email" }}
-        confirm={copy.add}
+        confirm={copy.confirmAdd}
         onClose={() => setOpen(false)}
         onConfirm={(email) => {
           setOpen(false);

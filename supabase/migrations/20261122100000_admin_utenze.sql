@@ -1,4 +1,4 @@
--- Taglendo · gestionale: elenco delle utenze (titolari e barbieri dei saloni). Solo lettura, solo amministratori.
+-- Taglendo · gestionale: utenze (titolari e barbieri dei saloni) e amministratori (chi gestisce Taglendo) sono due cose diverse.
 -- Dei clienti finali non c'è niente qui: sono persone dei saloni, non utenze.
 create function public.admin_users(p_q text default null, p_status text default 'all', p_sort text default 'access', p_dir text default 'desc', p_limit int default 25, p_offset int default 0)
 returns jsonb
@@ -14,7 +14,7 @@ begin
   perform private.require_admin();
   return (
     with staff as (
-      -- titolari e barbieri: una riga per ogni posto in un salone
+      -- una riga per ogni posto in un salone
       select m.id as row_id, m.user_id, m.name, m.role::text as role, m.active,
              coalesce(u.email, m.invite_email) as email,
              s.id as salon_id, s.name as salon_name, s.slug as salon_slug, s.suspended_at,
@@ -23,15 +23,6 @@ begin
       from public.members m
       join public.salons s on s.id = m.salon_id and s.deleted_at is null
       left join auth.users u on u.id = m.user_id
-      union all
-      -- chi entra nel gestionale ma non ha un posto in un salone
-      select a.user_id, a.user_id, split_part(a.email, '@', 1), 'admin', true,
-             a.email, null::uuid, null::text, null::text, null::timestamptz,
-             u.last_sign_in_at, u.created_at, u.banned_until is not null and u.banned_until > now(),
-             u.email_confirmed_at is not null
-      from public.platform_admins a
-      join auth.users u on u.id = a.user_id
-      where not exists (select 1 from public.members m where m.user_id = a.user_id)
     ),
     base as (
       select st.*,
@@ -50,7 +41,6 @@ begin
              or b.name ilike '%' || v_q || '%' or coalesce(b.email, '') ilike '%' || v_q || '%' or coalesce(b.salon_name, '') ilike '%' || v_q || '%')
         and (coalesce(p_status, 'all') = 'all'
              or (p_status in ('owner', 'barber') and b.role = p_status)
-             or (p_status = 'admin' and b.is_admin)
              or b.state = p_status)
     )
     select jsonb_build_object(
@@ -72,6 +62,26 @@ begin
         ) r), '[]'::jsonb)
     )
   );
+end
+$$;
+
+-- Gli amministratori: chi può entrare nel gestionale di Taglendo.
+create function public.admin_admins()
+returns jsonb
+language plpgsql stable security definer set search_path = ''
+as $$
+begin
+  perform private.require_admin();
+  return coalesce((
+    select jsonb_agg(to_jsonb(r) order by r.added_at)
+    from (
+      select a.user_id, a.email, a.created_at as added_at, u.last_sign_in_at, u.created_at,
+             (u.banned_until is not null and u.banned_until > now()) as blocked,
+             a.user_id = (select auth.uid()) as self,
+             (select m.name from public.members m where m.user_id = a.user_id order by m.role limit 1) as name
+      from public.platform_admins a
+      join auth.users u on u.id = a.user_id
+    ) r), '[]'::jsonb);
 end
 $$;
 
@@ -141,7 +151,7 @@ $$;
 do $$
 declare f text;
 begin
-  foreach f in array array['public.admin_users(text, text, text, text, int, int)', 'public.admin_set_user_blocked(uuid, boolean, text)', 'public.admin_add_admin(text)', 'public.admin_remove_admin(uuid)'] loop
+  foreach f in array array['public.admin_users(text, text, text, text, int, int)', 'public.admin_admins()', 'public.admin_set_user_blocked(uuid, boolean, text)', 'public.admin_add_admin(text)', 'public.admin_remove_admin(uuid)'] loop
     execute format('revoke all on function %s from public, anon', f);
     execute format('grant execute on function %s to authenticated', f);
   end loop;

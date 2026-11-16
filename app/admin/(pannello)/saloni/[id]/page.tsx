@@ -2,11 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { Icon } from "@/components/admin/Icons";
+import { TrialMeter } from "@/components/admin/TrialMeter";
+import { Avatar } from "@/components/ui/Avatar";
 import { SalonActionBar } from "@/components/admin/SalonActionBar";
 import { SalonActions } from "@/components/admin/SalonActions";
 import { agoLabel, clock, dateLabel, dateTimeLabel, money, stateBadge } from "@/components/admin/format";
 import styles from "@/components/admin/Admin.module.css";
-import { loadSalon, type SalonDetail } from "@/lib/admin/load";
+import { loadSalon, type SalonDetail, type SalonState } from "@/lib/admin/load";
 import { adminCopy } from "@/lib/copy/admin";
 
 const d = adminCopy.detail;
@@ -22,8 +25,8 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 }
 
 function stateOf(s: SalonDetail["salon"]) {
-  const state = s.suspended_at ? "suspended" : s.onboarding_step < 5 ? "incomplete" : s.sub_status === "active" ? "active" : new Date(s.trial_ends_at).getTime() > Date.now() ? "trialing" : "expired";
-  return stateBadge({ state, trial_ends_at: s.trial_ends_at });
+  const state: SalonState = s.suspended_at ? "suspended" : s.onboarding_step < 5 ? "incomplete" : s.sub_status === "active" ? "active" : new Date(s.trial_ends_at).getTime() > Date.now() ? "trialing" : "expired";
+  return { state, badge: stateBadge({ state, trial_ends_at: s.trial_ends_at }) };
 }
 
 async function Content({ params }: { params: Promise<{ id: string }> }) {
@@ -32,28 +35,47 @@ async function Content({ params }: { params: Promise<{ id: string }> }) {
   const data = await loadSalon(id);
   if (!data) notFound();
   const { salon: s, members, services, hours, counts, notes, audit } = data;
-  const badge = stateOf(s);
+  const { state, badge } = stateOf(s);
   const n = d.numbers;
   return (
     <>
       <Link href="/admin/saloni" className={styles.back}>
         ← {d.back}
       </Link>
-      <div className={styles.titleRow}>
-        <h1>{s.name}</h1>
-        <span className={styles.badges}>
-          <span className={`${styles.badge} ${TONE[badge.tone]}`}>{badge.text}</span>
-          {s.admin_hidden ? <span className={styles.badge}>{adminCopy.badges.hidden}</span> : null}
-        </span>
-      </div>
+      <section className={styles.hero} aria-labelledby="salone-t">
+        <div className={styles.heroMain}>
+          <Avatar name={s.name} size="lg" color={0} />
+          <div className={styles.heroText}>
+            <h1 id="salone-t">{s.name}</h1>
+            <p className={styles.heroSub}>{[s.address, s.city].filter(Boolean).join(" · ") || s.slug}</p>
+            <span className={styles.badges}>
+              <span className={`${styles.badge} ${TONE[badge.tone]}`}>{badge.text}</span>
+              {s.admin_hidden ? (
+                <span className={styles.badge}>
+                  <Icon name="eyeOff" size={13} />
+                  {adminCopy.badges.hidden}
+                </span>
+              ) : null}
+            </span>
+            {s.suspended_at ? null : (
+              <Link href={`/${s.slug}`} className={styles.heroLink} target="_blank" rel="noopener">
+                <Icon name="external" size={16} />
+                {d.publicPage}
+              </Link>
+            )}
+          </div>
+        </div>
+        <div className={styles.heroMeter}>
+          <TrialMeter state={state} trialEndsAt={s.trial_ends_at} createdAt={s.created_at} size="lg" />
+        </div>
+      </section>
       <SalonActionBar id={s.id} name={s.name} hidden={s.admin_hidden} suspended={Boolean(s.suspended_at)} />
-      {s.suspended_at ? null : (
-        <p>
-          <Link href={`/${s.slug}`} className={styles.rowLink} target="_blank" rel="noopener">
-            {d.publicPage}
-          </Link>
-        </p>
-      )}
+      <ul className={styles.kpis}>
+        <li><div className={styles.kpi}><span className={styles.label}>{adminCopy.hero.appointments}</span><span className={`${styles.kpiBig} ${styles.num}`}>{counts.appointments}</span><span className={styles.hint}>{n.last30}: {counts.last30}</span></div></li>
+        <li><div className={styles.kpi}><span className={styles.label}>{adminCopy.hero.upcoming}</span><span className={`${styles.kpiBig} ${styles.num}`}>{counts.upcoming}</span><span className={styles.hint}>{d.lastActivity}: {agoLabel(data.last_activity)}</span></div></li>
+        <li><div className={styles.kpi}><span className={styles.label}>{adminCopy.hero.barbers}</span><span className={`${styles.kpiBig} ${styles.num}`}>{members.filter((m) => m.active).length}</span><span className={styles.hint}>{members.filter((m) => !m.accepted).length ? d.member.invited : d.member.accepted}</span></div></li>
+        <li><div className={styles.kpi}><span className={styles.label}>{adminCopy.hero.services}</span><span className={`${styles.kpiBig} ${styles.num}`}>{services.filter((v) => v.active).length}</span><span className={styles.hint}>{n.clients}: {counts.clients}</span></div></li>
+      </ul>
 
       <div className={styles.cols}>
         <div className={styles.stack}>
