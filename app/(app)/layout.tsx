@@ -3,6 +3,8 @@ import { CardsSkeleton } from "@/components/states/Skeletons";
 import { AppShell } from "@/components/app/AppShell";
 import { unreadActivity } from "@/lib/activity/load";
 import { requireSalon } from "@/lib/auth/session";
+import { salonLock, trialWarning } from "@/lib/billing";
+import { formatDayMonth } from "@/lib/dates/format";
 import { initials } from "@/lib/rules/agenda";
 import { env } from "@/lib/supabase/env";
 
@@ -13,6 +15,9 @@ import { env } from "@/lib/supabase/env";
 async function Guard({ children }: { children: ReactNode }) {
   const { name, salon, role } = await requireSalon();
   const unread = await unreadActivity();
+  const lock = salonLock(salon);
+  const warning = trialWarning(salon);
+  const notice = lock ? ({ kind: lock } as const) : warning !== null ? ({ kind: "trial_ending", days: warning, endsOn: formatDayMonth(new Date(salon.trial_ends_at)) } as const) : null;
   return (
     <AppShell
       salonName={salon.name}
@@ -21,7 +26,7 @@ async function Guard({ children }: { children: ReactNode }) {
       userInitials={initials(name)}
       isOwner={role === "owner"}
       unread={unread}
-      suspended={Boolean(salon.suspended_at)}
+      notice={notice}
     >
       {children}
     </AppShell>

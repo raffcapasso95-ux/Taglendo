@@ -1,12 +1,16 @@
 /**
- * Pagamenti e accesso.
+ * Prova e accesso.
  *
- * Nella beta gratuita i pagamenti sono spenti (`BILLING_ENABLED` non è "true"):
- * ogni salone ha l'accesso completo, senza scadenza. Quando si accendono, valgono
- * le regole di docs/04-regole.md (prova di 15 giorni, piani Solo e Salone).
- * Quando succede, ai saloni della beta si dà una nuova prova di 15 giorni
- * (vedi docs/05-fasi-e-prompt.md, "Rilascio gratuito").
+ * La prova dura 30 giorni dalla registrazione. A prova finita (e senza abbonamento attivo) il salone è «bloccato»:
+ * si vedono gli appuntamenti già fissati, ma non si può aggiungere o cambiare altro, la pagina pubblica non è più visibile
+ * e non si prenota online. Lo stesso vale per un salone sospeso da Taglendo. Il blocco lo impone il database
+ * (`private.salon_lock`); qui c'è la stessa regola per decidere cosa mostrare.
+ * Vale anche con i pagamenti spenti: la prova esiste e scade. `billingEnabled` riguarda solo le schermate dell'abbonamento.
  */
+
+export const TRIAL_DAYS = 30;
+/** Da quanti giorni prima della scadenza si mostra l'avviso. */
+export const TRIAL_WARNING_DAYS = 7;
 
 export function billingEnabled(): boolean {
   return process.env.BILLING_ENABLED === "true";
@@ -15,27 +19,28 @@ export function billingEnabled(): boolean {
 export type AccessInput = {
   sub_status: "trialing" | "active" | "past_due" | "canceled" | "expired";
   trial_ends_at: string;
+  suspended_at?: string | null;
 };
 
-/**
- * Il salone può usare tutte le funzioni (prenotazioni online comprese)?
- * Con i pagamenti spenti sì, sempre. `enabled` e `now` servono solo ai test.
- */
-export function hasActiveAccess(
-  salon: AccessInput,
-  enabled: boolean = billingEnabled(),
-  now: number = Date.now(),
-): boolean {
-  if (!enabled) return true;
-  switch (salon.sub_status) {
-    case "active":
-      return true;
-    case "trialing":
-      return new Date(salon.trial_ends_at).getTime() > now;
-    case "past_due":
-      // I 7 giorni di tolleranza per il pagamento non riuscito arrivano con la Fase 6.
-      return true;
-    default:
-      return false;
-  }
+export type SalonLock = "suspended" | "trial_ended" | null;
+
+/** Perché il salone è bloccato, o null se è aperto. `now` serve solo ai test. */
+export function salonLock(salon: AccessInput, now: number = Date.now()): SalonLock {
+  if (salon.suspended_at) return "suspended";
+  if (salon.sub_status === "active" || salon.sub_status === "past_due") return null;
+  if (salon.sub_status === "trialing" && new Date(salon.trial_ends_at).getTime() > now) return null;
+  return "trial_ended";
+}
+
+/** Il salone può usare tutte le funzioni (prenotazioni online comprese)? */
+export function hasActiveAccess(salon: AccessInput, now: number = Date.now()): boolean {
+  return salonLock(salon, now) === null;
+}
+
+/** La prova è in corso e finisce entro `TRIAL_WARNING_DAYS` giorni (di calendario, ora di Roma)? Torna i giorni che mancano (0 = oggi). */
+export function trialWarning(salon: AccessInput, now: number = Date.now()): number | null {
+  if (salon.sub_status !== "trialing" || salonLock(salon, now) !== null) return null;
+  const day = (t: number) => new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Rome" }).format(new Date(t));
+  const days = Math.round((Date.parse(`${day(new Date(salon.trial_ends_at).getTime())}T12:00:00Z`) - Date.parse(`${day(now)}T12:00:00Z`)) / 86400000);
+  return days <= TRIAL_WARNING_DAYS ? Math.max(0, days) : null;
 }

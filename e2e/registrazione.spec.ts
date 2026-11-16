@@ -29,9 +29,9 @@ test.describe("Registrazione e primo avvio", () => {
     await expect(page).toHaveURL(/\/primo-avvio\/1$/);
 
     await completeOnboarding(page, "Barberia Prova");
-    await expect(page.getByText("Beta gratuita: non ti chiediamo nessun pagamento.")).toBeVisible();
+    await expect(page.getByText(/Prova gratuita attiva fino al/)).toBeVisible();
 
-    // nel database: salone in prova di 15 giorni, titolare e orari predefiniti
+    // nel database: salone in prova di 30 giorni, titolare e orari predefiniti
     const [salon] = await adminSelect<{ id: string; name: string; slug: string; onboarding_step: number; plan: string; trial_days: number }>(
       "salons",
       `select=id,name,slug,onboarding_step,plan&name=eq.Barberia%20Prova&order=created_at.desc&limit=1`,

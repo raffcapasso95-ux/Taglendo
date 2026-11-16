@@ -148,8 +148,10 @@
   text-decoration: none;
 }
 
-a.card:hover {
-  border-color: var(--brand-plum);
+@media (hover: hover) {
+  a.card:hover {
+    border-color: var(--brand-plum);
+  }
 }
 
 .num {
@@ -362,8 +364,10 @@ a.card:hover {
   text-decoration: none;
 }
 
-.rowLink:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .rowLink:hover {
+    text-decoration: underline;
+  }
 }
 
 .sub {
@@ -829,8 +833,10 @@ a.card:hover {
   text-decoration: none;
 }
 
-.mixList a:hover .mixName {
-  text-decoration: underline;
+@media (hover: hover) {
+  .mixList a:hover .mixName {
+    text-decoration: underline;
+  }
 }
 
 .swatch {
@@ -866,8 +872,10 @@ a.card:hover {
   text-decoration: none;
 }
 
-.feed a:hover strong {
-  text-decoration: underline;
+@media (hover: hover) {
+  .feed a:hover strong {
+    text-decoration: underline;
+  }
 }
 
 .feedText {
@@ -998,9 +1006,14 @@ a.card:hover {
   cursor: pointer;
 }
 
-.menuBtn:hover,
 .menuBtn[aria-expanded="true"] {
   background: var(--brand-peach);
+}
+
+@media (hover: hover) {
+  .menuBtn:hover {
+    background: var(--brand-peach);
+  }
 }
 
 .menuBtn:disabled {
@@ -1039,11 +1052,16 @@ a.card:hover {
   cursor: pointer;
 }
 
-.menu a:hover,
-.menu button:hover,
 .menu a:focus-visible,
 .menu button:focus-visible {
   background: var(--brand-peach);
+}
+
+@media (hover: hover) {
+  .menu a:hover,
+  .menu button:hover {
+    background: var(--brand-peach);
+  }
 }
 
 .menu hr {
@@ -1513,8 +1531,10 @@ a.card:hover {
   text-decoration: none;
 }
 
-.sortPill:hover {
-  background: var(--brand-peach);
+@media (hover: hover) {
+  .sortPill:hover {
+    background: var(--brand-peach);
+  }
 }
 
 .sortPill[aria-current="true"] {
@@ -1526,9 +1546,11 @@ a.card:hover {
   transition: border-color 200ms cubic-bezier(0.23, 1, 0.32, 1), box-shadow 200ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.sCard:hover {
-  border-color: var(--brand-apricot);
-  box-shadow: var(--shadow-toast);
+@media (hover: hover) {
+  .sCard:hover {
+    border-color: var(--brand-apricot);
+    box-shadow: var(--shadow-toast);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1595,8 +1617,10 @@ a.card:hover {
   text-decoration: none;
 }
 
-.heroLink:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .heroLink:hover {
+    text-decoration: underline;
+  }
 }
 
 .heroMeter {

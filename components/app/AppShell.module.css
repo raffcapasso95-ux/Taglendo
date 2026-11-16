@@ -506,3 +506,21 @@
   color: var(--status-error);
   font-size: 14px;
 }
+
+.noticeSoon {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-3) var(--space-4) 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-input);
+  background: var(--brand-peach);
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.noticeSoon a,
+.suspended a {
+  color: inherit;
+  font-weight: 600;
+}

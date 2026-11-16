@@ -564,6 +564,8 @@
 }
 
 .pgPin {
+  --y: 0;
+
   position: absolute;
   z-index: 2;
   top: var(--y);

@@ -15,7 +15,7 @@ async function createUser(tx: Tx, id: string, confirmed = true, name: string | n
 }
 
 describe("register_salon", () => {
-  it("crea salone in prova (+15 giorni), titolare, orari e preferenze", async () => {
+  it("crea salone in prova (+30 giorni), titolare, orari e preferenze", async () => {
     await inTx(async (tx) => {
       await createUser(tx, NEW_USER);
       await tx.as(NEW_USER);
@@ -33,7 +33,7 @@ describe("register_salon", () => {
         sub_status: "trialing",
         onboarding_step: 1,
         phone: null,
-        trial_days: "15",
+        trial_days: "30",
       });
       expect(String(salon!.slug)).toMatch(/^salone-[0-9a-f]{8}$/);
 
