@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { cx } from "@/components/ui/cx";
 import { SALONI, SALONI_END_ID, type NavItem } from "./navItems";
 import styles from "./Land.module.css";
@@ -43,18 +43,10 @@ const Arrow = () => (
   </svg>
 );
 
-/**
- * Le voci del menu, per la barra (computer) e per l'elenco del telefono.
- * Le sezioni della home sono link a `#id` (si scorre, e la voce della sezione in vista si sottolinea);
- * l'altra pagina ha una freccia, e quando ci si è dentro è la voce corrente.
- */
-export function NavLinks({ items, current, layout, onNavigate }: { items: NavItem[]; current?: "funzioni"; layout: "bar" | "list"; onNavigate?: () => void }) {
-  const pathname = usePathname();
-  const onHome = pathname === SALONI;
-  const active = useActiveSection(
-    items.flatMap((i) => (i.id ? [i.id] : [])),
-    onHome,
-  );
+type ViewProps = { items: NavItem[]; current?: "funzioni"; layout: "bar" | "list"; onNavigate?: () => void; onHome: boolean; active: string | null };
+
+/** Le voci, senza sapere dove ci si trova: è anche quello che si vede mentre la pagina si prepara. */
+export function NavLinksView({ items, current, layout, onNavigate, onHome, active }: ViewProps) {
   return (
     <>
       {items.map((item) => {
@@ -75,5 +67,29 @@ export function NavLinks({ items, current, layout, onNavigate }: { items: NavIte
         );
       })}
     </>
+  );
+}
+
+function Located(props: Omit<ViewProps, "onHome" | "active">) {
+  const pathname = usePathname();
+  const onHome = pathname === SALONI;
+  const active = useActiveSection(
+    props.items.flatMap((i) => (i.id ? [i.id] : [])),
+    onHome,
+  );
+  return <NavLinksView {...props} onHome={onHome} active={active} />;
+}
+
+/**
+ * Le voci del menu, per la barra (computer) e per l'elenco del telefono.
+ * Le sezioni della home sono link a `#id` (si scorre, e la voce della sezione in vista si sottolinea);
+ * l'altra pagina ha una freccia, e quando ci si è dentro è la voce corrente.
+ * Il percorso della pagina si legge solo nel browser: nella preparazione della pagina (e nella build) valgono le voci senza evidenziazione.
+ */
+export function NavLinks(props: Omit<ViewProps, "onHome" | "active">) {
+  return (
+    <Suspense fallback={<NavLinksView {...props} onHome={false} active={null} />}>
+      <Located {...props} />
+    </Suspense>
   );
 }
