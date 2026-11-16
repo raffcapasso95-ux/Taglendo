@@ -1748,3 +1748,16 @@
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+
+/* In Funzioni: per tornare alla home dei saloni senza passare dal menu */
+.crumbBack {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--tap-min);
+  margin-bottom: var(--space-2);
+  color: var(--text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}

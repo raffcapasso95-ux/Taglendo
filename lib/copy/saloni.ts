@@ -1,6 +1,7 @@
 /** Testi della home dei saloni e della pagina Funzioni (ridisegno di novembre 2026, design/ridisegno-sito-2026-11). */
 export const saloniCopy = {
   nav: { how: "Come funziona", page: "La tua pagina", features: "Funzioni", cost: "Quanto costa", faq: "Domande", signIn: "Accedi", try: "Prova gratis", client: "Cerchi un barbiere?", clientAria: "Cerchi un barbiere? Vai al sito per i clienti", switchLabel: "Per chi è Taglendo", forSalons: "Saloni", forClients: "Clienti" },
+  menu: { title: "Menu", open: "Apri il menu", close: "Chiudi il menu", clients: "Cerchi un barbiere?", services: "Cosa cerchi" },
   hero: {
     kicker: "Per barbieri, da 1 a 3 poltrone",
     title: "La tua agenda online,",
@@ -99,6 +100,7 @@ export const saloniCopy = {
   bar: { main: "Gratis durante la beta", sub: "Senza carta di credito", cta: "Prova gratis" },
   /** Pagina Funzioni (design/ridisegno-sito-2026-11/prototipi/Funzioni.dc.html). Le voci corrispondono a funzioni del gestionale. */
   functions: {
+    back: "Taglendo per i saloni",
     kicker: "Funzioni",
     title: "Tutto quello che c’è dentro Taglendo.",
     lead: "Niente moduli da comprare a parte: durante la beta è tutto incluso, per ogni barbiere del salone.",

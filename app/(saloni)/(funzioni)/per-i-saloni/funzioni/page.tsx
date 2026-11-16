@@ -66,6 +66,12 @@ export default function Page() {
       <section className={styles.fhero} aria-labelledby="funzioni-t">
         <div className={cx(styles.wrap, styles.fheroGrid)}>
           <div className={styles.fheroText}>
+            <Link href="/per-i-saloni" className={styles.crumbBack}>
+              <Icon size={16}>
+                <path d="m15 6-6 6 6 6" />
+              </Icon>
+              {copy.back}
+            </Link>
             <p className={styles.label}>{copy.kicker}</p>
             <h1 className={styles.fh1} id="funzioni-t">
               {copy.title}

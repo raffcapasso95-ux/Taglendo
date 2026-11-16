@@ -90,14 +90,57 @@ test.describe("Sito commerciale", () => {
     await expect(page.getByRole("contentinfo").getByRole("link", { name: "Tutte le funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
   });
 
-  test("la testata dei saloni ha poche voci e un link a «Cerchi un barbiere?» verso la home dei clienti", async ({ page, isMobile }) => {
+  test("menu dei saloni (computer): le sezioni scorrono e si evidenziano, «Funzioni» è l'altra pagina e lo dice con la freccia", async ({ page, isMobile }) => {
+    test.skip(isMobile, "la barra delle voci c'è da computer; sul telefono c'è il menu a tendina");
     await page.goto("/per-i-saloni");
-    const header = page.getByRole("banner");
-    const toClients = header.getByRole("link", { name: /Cerchi un barbiere/ });
-    await expect(toClients).toHaveAttribute("href", "/");
-    if (!isMobile) await expect(header.getByRole("navigation").getByRole("link")).toHaveCount(3);
-    await toClients.click();
-    await expect(page).toHaveURL(/\/$/);
+    const bar = page.getByRole("banner").getByRole("navigation", { name: "Sezioni" });
+    await expect(bar.getByRole("link")).toHaveCount(4);
+    await expect(bar.getByRole("link", { name: "Funzioni" })).toHaveAttribute("href", "/per-i-saloni/funzioni");
+    // nella home le sezioni sono link nella pagina
+    await expect(bar.getByRole("link", { name: "Quanto costa" })).toHaveAttribute("href", "#costo");
+    await bar.getByRole("link", { name: "Quanto costa" }).click();
+    await expect(bar.getByRole("link", { name: "Quanto costa" })).toHaveAttribute("aria-current", "location");
+    await expect(page.locator("#costo")).toBeInViewport();
+    await expect(bar.getByRole("link", { name: "Come funziona" })).not.toHaveAttribute("aria-current", /./);
+    // da lì a un'altra pagina e ritorno: in Funzioni «Funzioni» è la voce corrente e le sezioni riportano alla home
+    await bar.getByRole("link", { name: "Funzioni" }).click();
+    await expect(page).toHaveURL(/\/per-i-saloni\/funzioni$/);
+    const bar2 = page.getByRole("banner").getByRole("navigation", { name: "Sezioni" });
+    await expect(bar2.getByRole("link", { name: "Funzioni" })).toHaveAttribute("aria-current", "page");
+    await expect(bar2.getByRole("link", { name: "Quanto costa" })).toHaveAttribute("href", "/per-i-saloni#costo");
+    await page.getByRole("link", { name: "Taglendo per i saloni" }).first().click();
+    await expect(page).toHaveURL(/\/per-i-saloni$/);
+    // il passaggio ai clienti, da computer, sta nella testata
+    await expect(page.getByRole("banner").getByRole("link", { name: "Cerchi un barbiere?" })).toHaveAttribute("href", "/");
+  });
+
+  test("menu a tendina (telefono e tablet): stesse voci, si apre, si chiude con Esc e toccando una voce", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "il menu a tendina c'è sotto i 1024 px");
+    for (const [path, items, cta] of [
+      ["/per-i-saloni", ["Come funziona", "Quanto costa", "Domande", "Funzioni"], "Prova gratis"],
+      ["/", ["Taglio", "Barba", "Sfumatura", "Rasatura", "Bambini"], "Hai un salone?"],
+    ] as const) {
+      await page.goto(path);
+      const open = page.getByRole("button", { name: "Apri il menu" });
+      await expect(open).toHaveAttribute("aria-expanded", "false");
+      await open.click();
+      const menu = page.getByRole("dialog", { name: "Menu" });
+      await expect(menu).toBeVisible();
+      for (const label of items) await expect(menu.getByRole("link", { name: label, exact: true })).toBeVisible();
+      await expect(menu.getByRole("link", { name: cta })).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(menu).toBeHidden();
+      await expect(page.getByRole("button", { name: "Apri il menu" })).toBeFocused();
+    }
+    // toccare una sezione chiude il menu e porta lì
+    await page.goto("/per-i-saloni");
+    await page.getByRole("button", { name: "Apri il menu" }).click();
+    await page.getByRole("dialog", { name: "Menu" }).getByRole("link", { name: "Quanto costa" }).click();
+    await expect(page.getByRole("dialog", { name: "Menu" })).toBeHidden();
+    await expect(page.locator("#costo")).toBeInViewport();
+    // e «Cerchi un barbiere?» è nel menu
+    await page.getByRole("button", { name: "Apri il menu" }).click();
+    await expect(page.getByRole("dialog", { name: "Menu" }).getByRole("link", { name: "Cerchi un barbiere?" })).toHaveAttribute("href", "/");
   });
 
   test("Funzioni: la pagina nuova, con le email vere, i permessi e cosa Taglendo non fa", async ({ page, isMobile }) => {

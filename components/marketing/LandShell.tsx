@@ -2,8 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { LandEffects } from "@/components/marketing/LandEffects";
+import { MobileMenu } from "@/components/marketing/MobileMenu";
+import { NavLinks } from "@/components/marketing/NavLinks";
+import { CLIENTI_NAV, SALONI_NAV } from "@/components/marketing/navItems";
 import { CookieConsent } from "@/components/salon/CookieConsent";
-import { AccountMenu } from "@/components/marketing/AccountMenu";
+import { AccountMenu, type AccountInfo } from "@/components/marketing/AccountMenu";
 import { getAccount } from "@/components/marketing/AuthLinks";
 import { saloniCopy } from "@/lib/copy/saloni";
 import { searchCopy } from "@/lib/copy/search";
@@ -26,7 +29,7 @@ async function AuthActions({ audience }: { audience: Audience }) {
 function GuestActions({ audience }: { audience: Audience }) {
   if (audience === "clienti") {
     return (
-      <Link className={`${styles.btn} ${styles.btnSmall}`} href={SALONI}>
+      <Link className={`${styles.btn} ${styles.btnSmall} ${styles.hideNarrow}`} href={SALONI}>
         {site.forSalons}
       </Link>
     );
@@ -43,6 +46,48 @@ function GuestActions({ audience }: { audience: Audience }) {
   );
 }
 
+/** In fondo al menu del telefono: per chi è dentro «Apri l'agenda»; per gli ospiti i pulsanti dell'audience. */
+function MenuActions({ audience, account }: { audience: Audience; account: AccountInfo | null }) {
+  if (account) {
+    return (
+      <>
+        {audience === "saloni" ? (
+          <Link className={styles.menuSub} href="/">
+            {nav.client}
+          </Link>
+        ) : null}
+        <Link className={`${styles.btn} ${styles.menuCta}`} href="/agenda">
+          {marketingCopy.account.heroCta}
+        </Link>
+      </>
+    );
+  }
+  if (audience === "clienti") {
+    return (
+      <Link className={`${styles.btn} ${styles.menuCta}`} href={SALONI}>
+        {site.forSalons}
+      </Link>
+    );
+  }
+  return (
+    <>
+      <Link className={styles.menuSub} href="/">
+        {nav.client}
+      </Link>
+      <Link className={styles.menuSub} href="/accedi">
+        {nav.signIn}
+      </Link>
+      <Link className={`${styles.btn} ${styles.menuCta}`} href="/registrati">
+        {nav.try}
+      </Link>
+    </>
+  );
+}
+
+async function MenuFoot({ audience }: { audience: Audience }) {
+  return <MenuActions audience={audience} account={await getAccount()} />;
+}
+
 export type Audience = "clienti" | "saloni";
 const SALONI = "/per-i-saloni";
 
@@ -55,6 +100,7 @@ const SALONI = "/per-i-saloni";
  */
 export function LandShell({ audience, solid = false, overlay = false, light = false, current, children }: { audience: Audience; solid?: boolean; overlay?: boolean; light?: boolean; current?: "funzioni"; children: React.ReactNode }) {
   const f = searchCopy.footer;
+  const items = audience === "clienti" ? CLIENTI_NAV : SALONI_NAV;
   return (
     <div className={styles.page} data-land="">
       <LandEffects />
@@ -81,41 +127,26 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
           </Link>
 
           <nav className={styles.nav} aria-label={audience === "clienti" ? site.servicesLabel : "Sezioni"}>
-            {audience === "clienti" ? (
-              <>
-                {site.services.map((v) => (
-                  <Link key={v.name} href={`/cerca?servizio=${encodeURIComponent(v.query)}`} className={styles.navLink}>
-                    {v.name}
-                  </Link>
-                ))}
-              </>
-            ) : (
-              <>
-                <Link href={`${SALONI}#come`} className={styles.navLink}>
-                  {nav.how}
-                </Link>
-                <Link href={`${SALONI}/funzioni`} className={styles.navLink} aria-current={current === "funzioni" ? "page" : undefined}>
-                  {nav.features}
-                </Link>
-                <Link href={`${SALONI}#costo`} className={styles.navLink}>
-                  {nav.cost}
-                </Link>
-              </>
-            )}
+            <NavLinks items={items} current={current} layout="bar" />
           </nav>
           <div className={styles.headerActions}>
             {audience === "saloni" ? (
-              <Link href="/" className={`${styles.navLink} ${styles.clientLink}`} aria-label={nav.clientAria}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <Link href="/" className={`${styles.navLink} ${styles.clientLink}`}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <circle cx="11" cy="11" r="6.5" />
                   <path d="m16 16 4.5 4.5" />
                 </svg>
-                <span className={styles.clientText}>{nav.client}</span>
+                {nav.client}
               </Link>
             ) : null}
             <Suspense fallback={<GuestActions audience={audience} />}>
               <AuthActions audience={audience} />
             </Suspense>
+            <MobileMenu items={items} current={current}>
+              <Suspense fallback={<MenuActions audience={audience} account={null} />}>
+                <MenuFoot audience={audience} />
+              </Suspense>
+            </MobileMenu>
           </div>
         </div>
       </header>
