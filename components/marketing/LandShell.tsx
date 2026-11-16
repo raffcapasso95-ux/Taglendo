@@ -98,7 +98,7 @@ const SALONI = "/per-i-saloni";
  * `light` (saloni): testata chiara e piena, per le pagine senza apertura su foto (Funzioni). `current`: la voce della pagina in cui si è.
  * `overlay` (clienti): la testata è trasparente sulla foto dell'apertura e diventa chiara appena si scorre.
  */
-export function LandShell({ audience, solid = false, overlay = false, light = false, current, children }: { audience: Audience; solid?: boolean; overlay?: boolean; light?: boolean; current?: "funzioni"; children: React.ReactNode }) {
+export function LandShell({ audience, solid = false, overlay = false, light = false, wide = false, current, children }: { audience: Audience; solid?: boolean; overlay?: boolean; light?: boolean; wide?: boolean; current?: "funzioni"; children: React.ReactNode }) {
   const f = searchCopy.footer;
   const items = audience === "clienti" ? CLIENTI_NAV : SALONI_NAV;
   return (
@@ -109,6 +109,7 @@ export function LandShell({ audience, solid = false, overlay = false, light = fa
         className={styles.header}
         data-land-header=""
         data-audience={audience}
+        data-wide={wide ? "true" : undefined}
         data-tone={audience === "clienti" ? (overlay ? "auto" : "light") : light ? "light" : undefined}
         data-solid={solid || light || (audience === "clienti" && !overlay) ? "true" : undefined}
         data-scrolled={solid || light || (audience === "clienti" && !overlay) ? "true" : undefined}

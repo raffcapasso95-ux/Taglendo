@@ -105,7 +105,7 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
   const others = cities.filter((c) => c.city !== place);
 
   return (
-    <div className={cx(styles.page, count > 0 && styles.pageFixed)}>
+    <div className={styles.page}>
       <RememberSearch />
       {ok && ok.hits.length > 0 ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: structuredData(ok.hits, place) }} /> : null}
       <section className={styles.band} aria-label={copy.results.searchLabel}>
