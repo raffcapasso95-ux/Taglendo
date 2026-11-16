@@ -1921,20 +1921,161 @@
   color: var(--text-secondary);
 }
 
-/* Testata dei saloni: il link verso i clienti è una voce come le altre; sul telefono resta la sola lente */
+/* ── Menu: barra (computer), elenco a tendina (telefono e tablet) ─────────────────────────── */
+
+/* il link verso i clienti: voce di testo da computer; sotto i 1024 px sta nel menu */
 .page .clientLink {
+  display: none;
   gap: var(--space-2);
-  min-width: var(--tap-min);
-  justify-content: center;
+  align-items: center;
 }
 
-.clientText {
+@media (min-width: 1024px) {
+  .page .clientLink {
+    display: flex;
+  }
+}
+
+/* la voce che porta a un'altra pagina ha una freccia */
+.page .navPage {
+  gap: 6px;
+}
+
+.page .navLink[aria-current="location"] {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+/* si scorre dolcemente fra le sezioni, salvo a chi ha chiesto meno movimento */
+@media (prefers-reduced-motion: no-preference) {
+  :root:has([data-land]) {
+    scroll-behavior: smooth;
+  }
+}
+
+.menuWrap {
+  display: flex;
+}
+
+@media (min-width: 1024px) {
+  .menuWrap {
+    display: none;
+  }
+}
+
+.menuBtn {
+  width: var(--tap-min);
+  height: var(--tap-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.menuBtn[aria-expanded="true"] {
+  background: var(--surface-muted);
+}
+
+/* il foglio si apre sotto la testata (che con il foglio aperto è piena) */
+.menuPanel {
+  position: absolute;
+  z-index: 2;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: calc(100dvh - 68px - env(safe-area-inset-top, 0px));
+  overflow-y: auto;
+  padding: var(--space-2) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom, 0px));
+  background: var(--canvas);
+  color: var(--text-primary);
+  border-top: 1px solid var(--grid-line);
+  box-shadow: var(--shadow-popover);
+  animation: menu-in var(--duration-normal) var(--ease-out) both;
+}
+
+.menuPanel[hidden] {
   display: none;
 }
 
-@media (min-width: 720px) {
-  .clientText {
-    display: inline;
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.menuScrim {
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 100dvh;
+  border: 0;
+  background: var(--backdrop-sheet);
+  cursor: default;
+}
+
+.menuList {
+  display: flex;
+  flex-direction: column;
+}
+
+.page .menuLink {
+  min-height: 56px;
+  padding: 0 var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--grid-line);
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.page .menuLink[aria-current] {
+  color: var(--brand-plum);
+  background: var(--surface-muted);
+  border-radius: var(--radius-input);
+}
+
+.menuFoot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.page .menuSub {
+  min-height: var(--tap-min);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-2);
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.page .menuCta {
+  width: 100%;
+  margin-top: var(--space-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menuPanel {
+    animation: none;
+  }
+}
+
+/* «Hai un salone?» nella testata dei clienti: sotto i 400 px sta solo nel menu */
+@media (max-width: 399px) {
+  .hideNarrow {
+    display: none;
   }
 }
 
