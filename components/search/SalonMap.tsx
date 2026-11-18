@@ -9,6 +9,8 @@ import styles from "./Cerca.module.css";
 
 const copy = searchCopy.map;
 
+export type Anchor = { x: number; top: number; bottom: number };
+
 type Props = {
   salons: SalonView[];
   center: { lat: number; lng: number };
@@ -21,6 +23,8 @@ type Props = {
   selected: string | null;
   onHover: (slug: string | null) => void;
   onSelect: (slug: string | null) => void;
+  /** Dove sta sulla mappa l'etichetta del salone scelto (per agganciarle la scheda su computer); null se non c'è. */
+  onAnchor: (anchor: Anchor | null) => void;
   /** «Cerca in questa zona»: il centro della mappa dove l'ha lasciata chi guarda. */
   onSearchZone: (center: { lat: number; lng: number }) => void;
   searchingZone: boolean;
@@ -50,15 +54,18 @@ const Icon = ({ d }: { d: string }) => (
  * La mappa dei risultati (Leaflet + OpenStreetMap, colori attenuati): un'etichetta per salone con il primo orario libero,
  * controlli + / − / «torna alla mia posizione», legenda, e «Cerca in questa zona» dopo aver spostato la mappa.
  */
-export function SalonMap({ salons, center, radiusKm, near, hovered, selected, onHover, onSelect, onSearchZone, searchingZone, toast }: Props) {
+export function SalonMap({ salons, center, radiusKm, near, hovered, selected, onHover, onSelect, onAnchor, onSearchZone, searchingZone, toast }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const home = useRef<() => void>(() => {});
   const markers = useRef(new Map<string, { marker: L.Marker; salon: SalonView }>());
-  const handlers = useRef({ onHover, onSelect });
+  const handlers = useRef({ onHover, onSelect, onAnchor });
+  const selectedRef = useRef(selected);
+  const report = useRef<() => void>(() => {});
   // i gestori dei segnaposto leggono sempre le funzioni più recenti
   useEffect(() => {
-    handlers.current = { onHover, onSelect };
+    handlers.current = { onHover, onSelect, onAnchor };
+    selectedRef.current = selected;
   });
   const [moved, setMoved] = useState(false);
 
@@ -108,10 +115,26 @@ export function SalonMap({ salons, center, radiusKm, near, hovered, selected, on
     };
     map.on("dragend", user);
     map.on("zoomend", user);
+    // la scheda del salone scelto segue la sua etichetta mentre la mappa si sposta o cambia scala
+    let raf = 0;
+    report.current = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const slug = selectedRef.current;
+        const pin = slug ? store.get(slug)?.marker.getElement() : null;
+        if (!pin) return handlers.current.onAnchor(null);
+        const p = (pin.firstElementChild ?? pin).getBoundingClientRect(); // l'icona ha misura zero: conta la pastiglia al suo interno
+        const b = el.getBoundingClientRect();
+        handlers.current.onAnchor({ x: p.left + p.width / 2 - b.left, top: p.top - b.top, bottom: p.bottom - b.top });
+      });
+    };
+    map.on("move zoom zoomend resize", report.current);
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => {
+      cancelAnimationFrame(raf);
+      report.current = () => {};
       ro.disconnect();
       store.clear();
       mapRef.current = null;
@@ -133,7 +156,13 @@ export function SalonMap({ salons, center, radiusKm, near, hovered, selected, on
   useEffect(() => {
     const m = selected ? markers.current.get(selected) : null;
     const map = mapRef.current;
-    if (m && map && !map.getBounds().pad(-0.15).contains(m.marker.getLatLng())) map.panTo(m.marker.getLatLng(), { animate: true });
+    if (m && map) {
+      // su computer la scheda si apre sopra l'etichetta: la mappa la porta in vista con il posto per la scheda
+      if (window.innerWidth > 960) map.panInside(m.marker.getLatLng(), { paddingTopLeft: [180, 340], paddingBottomRight: [180, 70], animate: true });
+      else if (!map.getBounds().pad(-0.15).contains(m.marker.getLatLng())) map.panTo(m.marker.getLatLng(), { animate: true });
+    }
+    if (!selected) handlers.current.onAnchor(null);
+    else report.current();
   }, [selected]);
 
   const zoom = (by: number) => mapRef.current?.setZoom(mapRef.current.getZoom() + by);

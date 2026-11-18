@@ -1623,3 +1623,58 @@
     font-size: 32px;
   }
 }
+
+/* su computer la scheda del salone scelto è agganciata alla sua etichetta sulla mappa, come nei siti di prenotazione più usati */
+@keyframes sel-pop {
+  from {
+    opacity: 0;
+    margin-top: 8px;
+  }
+}
+
+@media (min-width: 961px) {
+  .sel[data-anchored] {
+    --cl: clamp(calc(160px + var(--space-3)), var(--ax), calc(100% - 160px - var(--space-3)));
+
+    left: var(--cl);
+    top: calc(var(--ay) - 14px);
+    bottom: auto;
+    width: 320px;
+    overflow: visible;
+    transform: translate(-50%, -100%);
+    animation: sel-pop 180ms var(--ease-out) both;
+  }
+
+  .sel[data-anchored][data-below] {
+    top: calc(var(--ab) + 14px);
+    transform: translate(-50%, 0);
+  }
+
+  /* la coda punta all'etichetta, anche quando la scheda è spostata per non uscire dalla mappa */
+  .sel[data-anchored]::after {
+    content: "";
+    position: absolute;
+    left: clamp(28px, calc(160px + var(--ax) - var(--cl)), calc(100% - 28px));
+    bottom: -8px;
+    width: 16px;
+    height: 16px;
+    background: var(--surface);
+    transform: translateX(-50%) rotate(45deg);
+  }
+
+  .sel[data-anchored][data-below]::after {
+    bottom: auto;
+    top: -8px;
+    background: var(--brand-plum);
+  }
+
+  .sel[data-anchored] .selPhoto {
+    border-radius: var(--space-5) var(--space-5) 0 0;
+  }
+}
+
+@media (min-width: 961px) and (prefers-reduced-motion: reduce) {
+  .sel[data-anchored] {
+    animation: none;
+  }
+}
