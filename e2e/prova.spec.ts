@@ -34,6 +34,22 @@ test.describe("La prova: 30 giorni, avviso a 7 giorni, poi sola lettura", () => 
     await expect(page.getByRole("status").filter({ hasText: /La tua prova scade (domani|oggi)/ })).toBeVisible();
   });
 
+  test("agenda su computer con l'avviso in cima: la pagina non scorre (solo la griglia), niente doppio scorrimento", async ({ page, isMobile }) => {
+    test.skip(isMobile, "su telefono la pagina scorre per intero");
+    const salon = `Barberia Scroll ${Date.now() % 100000}`;
+    await freshOwner(page, salon);
+    await page.setViewportSize({ width: 1600, height: 900 });
+    for (const [days, avviso] of [[-1, "Prova terminata"], [5, "La tua prova scade"]] as const) {
+      await setTrial(salon, inDays(days));
+      await page.goto("/agenda");
+      await expect(page.getByRole("status").filter({ hasText: avviso })).toBeVisible();
+      // (l'altezza dell'avviso si misura appena la pagina è pronta)
+      await expect
+        .poll(() => page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight), { message: `pagina più alta dello schermo con l'avviso «${avviso}»` })
+        .toBeLessThanOrEqual(1);
+    }
+  });
+
   test("a prova finita: si vedono gli appuntamenti, non si aggiunge niente, la pagina online non c'è più", async ({ page, browser }) => {
     const salon = `Barberia Scaduta ${Date.now() % 100000}`;
     await freshOwner(page, salon);
