@@ -1608,3 +1608,18 @@
     font-size: 26px;
   }
 }
+
+/* su computer la scheda del salone scelto è alta quanto il suo contenuto, in alto sulla mappa (sta dopo la regola di base, che altrimenti la tira fino in fondo) */
+@media (min-width: 961px) {
+  .sel {
+    top: var(--space-4);
+    bottom: auto;
+    width: min(320px, calc(100% - 2 * var(--space-4)));
+    left: var(--space-4);
+  }
+
+  .selPhoto {
+    height: 96px;
+    font-size: 32px;
+  }
+}

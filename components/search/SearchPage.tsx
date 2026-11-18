@@ -101,7 +101,7 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
   const filtered = Boolean(filters.service || filters.date);
   const tags = activeTags(filters);
   const count = ok?.hits.length ?? 0;
-  const searchBox = <SearchBox initial={ok && !ok.near ? place : typed} service={filters.service ?? ""} date={filters.date} services={services} compact submitLabel={copy.results.update} />;
+  const searchBox = <SearchBox initial={ok?.near ? (place ? `${copy.results.nearYou} · ${place}` : copy.results.nearYou) : ok ? place : typed} near={ok?.near ? { lat: ok.center.lat, lng: ok.center.lng } : undefined} service={filters.service ?? ""} date={filters.date} services={services} compact submitLabel={copy.results.update} />;
   const others = cities.filter((c) => c.city !== place);
   // il riepilogo dice solo ciò che è stato scelto («Barba · Bologna · Domani»); senza scelte, il luogo
   const where = ok?.anywhere ? copy.results.anyWhere : ok?.near ? copy.results.nearYou : place || copy.results.anyWhere;

@@ -94,6 +94,7 @@ export function SearchBox({
   compact = false,
   submitLabel,
   labels,
+  near,
 }: {
   initial?: string;
   service?: string;
@@ -105,6 +106,8 @@ export function SearchBox({
   submitLabel?: string;
   /** Le tre etichette dei campi (in apertura sono domande: «Cosa ti serve?», «Dove?», «Quando?»). */
   labels?: { service: string; where: string; when: string; placeholder?: string };
+  /** Si sta cercando «Vicino a me»: il campo Dove lo dice (`initial`) e, se non lo si tocca, Aggiorna cerca ancora lì. */
+  near?: { lat: number; lng: number };
 }) {
   const router = useRouter();
   const id = useId();
@@ -121,6 +124,8 @@ export function SearchBox({
   const [geo, setGeo] = useState<"idle" | "busy" | "denied">("idle");
   const [missing, setMissing] = useState(false);
   const typed = useRef(false);
+  // «Vicino a te» nel campo Dove: finché non si scrive altro, vale la posizione e non il testo
+  const [nearKept, setNearKept] = useState(Boolean(near));
   const today = useToday();
 
   // i suggerimenti delle città seguono ciò che si scrive
@@ -202,6 +207,7 @@ export function SearchBox({
     if (!o) return;
     if (o.kind === "near") return nearMe();
     typed.current = false;
+    setNearKept(false);
     setPlace(o.city.name);
     setMissing(false);
     go({ dove: o.city.name });
@@ -217,6 +223,7 @@ export function SearchBox({
         onKeyDown={(e) => e.key === "Escape" && setPanel(null)}
         onSubmit={(e) => {
           e.preventDefault();
+          if (near && nearKept) return go({ lat: near.lat, lng: near.lng });
           let where = place.trim();
           // «bolo» + Cerca: si prende la prima città suggerita, se quella scritta non è già una città
           const first = places[0];
@@ -357,6 +364,7 @@ export function SearchBox({
             }}
             onChange={(e) => {
               typed.current = true;
+              setNearKept(false);
               setPlace(e.target.value);
               setMissing(false);
               setPanel("place");
