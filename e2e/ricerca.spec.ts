@@ -259,8 +259,9 @@ test.describe("Ricerca dei saloni", () => {
       await expect(page.getByRole("button", { name: "Mappa", exact: true })).toHaveCount(0);
     }
     await expect(map).toBeVisible();
-    // un segnaposto per ogni salone dell'elenco
-    await expect(page.locator(".leaflet-marker-icon")).toHaveCount(salons);
+    // un segnaposto per ogni salone dell'elenco (più quello del luogo cercato)
+    await expect(page.locator('.leaflet-marker-icon:not([title="Il luogo cercato"])')).toHaveCount(salons);
+    await expect(page.locator('.leaflet-marker-icon[title="Il luogo cercato"]')).toHaveCount(1);
   });
 
   test("il titolare si toglie dalla ricerca e ci torna", async ({ page }) => {
