@@ -895,10 +895,11 @@
 }
 
 .me {
+  display: block; /* è dentro un'icona di misura zero: senza, larghezza e altezza non contano e il punto non si vede */
   position: relative;
-  width: 18px;
-  height: 18px;
-  margin: -9px 0 0 -9px;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
   border-radius: 50%;
   background: var(--brand-apricot);
   border: 3px solid var(--surface);
@@ -912,6 +913,28 @@
   border-radius: 50%;
   background: var(--brand-apricot);
   animation: pulse 2s var(--ease-out) infinite;
+}
+
+/* il luogo cercato (città o indirizzo): un segnaposto a goccia, con la punta sul punto */
+.placePin {
+  display: block;
+  position: relative;
+  width: 26px;
+  height: 26px;
+  margin: -31px 0 0 -13px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: var(--brand-plum);
+  border: 3px solid var(--surface);
+  box-shadow: var(--shadow-ctl);
+}
+
+.placePin::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--brand-apricot);
 }
 
 @keyframes pulse {
@@ -1049,6 +1072,11 @@
 }
 
 .sel {
+  /* dove sta l'etichetta del salone scelto sulla mappa (le imposta la scheda; su computer la aggancia) */
+  --ax: 0px;
+  --ay: 0px;
+  --ab: 0px;
+
   position: absolute;
   z-index: 500;
   left: var(--space-6);

@@ -82,6 +82,8 @@ export function SalonMap({ salons, center, radiusKm, near, hovered, selected, on
     }).addTo(map);
     if (radiusKm > 0) L.circle([center.lat, center.lng], { radius: radiusKm * 1000, interactive: false, className: styles.zone }).addTo(map);
     if (near) L.marker([center.lat, center.lng], { icon: L.divIcon({ className: "", html: `<span class="${styles.me}"></span>`, iconSize: [0, 0] }), interactive: false, keyboard: false, title: copy.here }).addTo(map);
+    // il luogo cercato (città o indirizzo): un segnaposto a goccia sul punto
+    else if (radiusKm > 0) L.marker([center.lat, center.lng], { icon: L.divIcon({ className: "", html: `<span class="${styles.placePin}"></span>`, iconSize: [0, 0] }), interactive: false, keyboard: false, title: copy.searched, zIndexOffset: -500 }).addTo(map);
     const store = markers.current;
     for (const s of salons) {
       const marker = L.marker([s.lat, s.lng], { icon: pill(s, ""), title: copy.pinAria(s.name, s.pin?.text ?? null), alt: s.name, keyboard: true, riseOnHover: true }).addTo(map);
