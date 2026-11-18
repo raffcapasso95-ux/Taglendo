@@ -200,6 +200,19 @@ test.describe("Ricerca dei saloni", () => {
     await expect(page).toHaveURL(/\/cerca\?lat=44\.49\d*&lng=11\.34\d*/);
     await expect(page.getByRole("heading", { level: 1, name: "Barbieri vicino a te · Bologna" })).toBeVisible();
     await expect(page.locator('[data-salon="barberia-saragozza"]')).toBeVisible();
+    // il campo Dove lo dice, e «Aggiorna» cerca ancora vicino a te (senza cambiare luogo)
+    // sul telefono i campi stanno dietro la riga di riepilogo («Modifica»)
+    const edit = page.getByRole("button", { name: /Modifica$/ });
+    if (await edit.isVisible()) await edit.click();
+    const dove = page.getByRole("combobox", { name: "Dove" });
+    await expect(dove).toHaveValue(/^Vicino a te/);
+    await dove.press("Enter");
+    await expect(page).toHaveURL(/\/cerca\?.*lat=44\.49\d*&lng=11\.34\d*/);
+    // se si scrive un'altra città, vale quella
+    await dove.fill("Torino");
+    await dove.press("Enter");
+    await expect(page).toHaveURL(/dove=Torino/);
+    await expect(page).not.toHaveURL(/lat=/);
     await ctx.close();
   });
 
@@ -344,6 +357,11 @@ test.describe("Barbieri vicino a te: filtri, ordine, mappa (ridisegno del sito)"
     const card = page.getByRole("group", { name: "Barberia Saragozza" });
     await expect(card).toBeVisible();
     await expect(card.getByRole("link", { name: "Vedi la pagina" })).toHaveAttribute("href", "/barberia-saragozza");
+    // su computer la scheda è alta quanto il suo contenuto, non fino in fondo alla mappa
+    if (!isMobile) {
+      const box = (await card.boundingBox())!;
+      expect(box.height).toBeLessThan(330);
+    }
     await card.getByRole("button", { name: "Chiudi la scheda" }).click();
     await expect(card).toBeHidden();
     // controlli

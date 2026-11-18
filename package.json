@@ -23,7 +23,7 @@
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "leaflet": "^1.9.4",
-    "next": "16.4.4",
+    "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "web-push": "^3.6.7"
@@ -38,7 +38,7 @@
     "@types/react-dom": "^19",
     "@types/web-push": "^3.6.4",
     "eslint": "^9",
-    "eslint-config-next": "16.4.4",
+    "eslint-config-next": "16.4.6",
     "lighthouse": "^13.6.0",
     "pg": "^8.23.1",
     "stylelint": "^17.16.0",
