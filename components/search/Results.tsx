@@ -13,6 +13,7 @@ import styles from "./Cerca.module.css";
 
 const copy = searchCopy;
 // la mappa si carica solo nel browser (Leaflet usa `window`)
+import type { Anchor } from "./SalonMap";
 const SalonMap = dynamic(() => import("./SalonMap").then((m) => m.SalonMap), { ssr: false, loading: () => <div className={styles.mapLoading} aria-hidden="true" /> });
 
 const Svg = ({ size = 16, d }: { size?: number; d: string }) => (
@@ -158,10 +159,12 @@ function SalonCard({ salon: s, active, onActive, onMap }: { salon: SalonView; ac
 }
 
 /** La scheda che si apre in basso sulla mappa quando si sceglie un salone. */
-function MapCard({ salon: s, onClose }: { salon: SalonView; onClose: () => void }) {
+function MapCard({ salon: s, anchor, onClose }: { salon: SalonView; anchor: Anchor | null; onClose: () => void }) {
   const href = `/${s.slug}`;
+  // su computer la scheda sta agganciata all'etichetta (sopra; sotto se in alto non c'è posto)
+  const style = anchor ? ({ "--ax": `${anchor.x}px`, "--ay": `${anchor.top}px`, "--ab": `${anchor.bottom}px` } as React.CSSProperties) : undefined;
   return (
-    <div className={styles.sel} role="group" aria-label={s.name}>
+    <div className={styles.sel} role="group" aria-label={s.name} data-anchored={anchor ? "true" : undefined} data-below={anchor && anchor.top < 350 ? "true" : undefined} style={style}>
       <Link href={href} className={styles.selPhoto} tabIndex={-1} aria-hidden="true">
         {s.coverUrl ? (
           <Image src={s.coverUrl} alt="" fill sizes="(max-width: 960px) 100vw, 360px" />
@@ -237,6 +240,7 @@ export function Results({
   const [page, setPage] = useState(1);
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [anchor, setAnchor] = useState<Anchor | null>(null);
   const [zone, setZone] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [seen, setSeen] = useState(salons);
@@ -346,11 +350,12 @@ export function Results({
           selected={selected}
           onHover={setHovered}
           onSelect={pick}
+          onAnchor={setAnchor}
           onSearchZone={searchZone}
           searchingZone={zone}
           toast={toast}
         />
-        {chosen ? <MapCard salon={chosen} onClose={() => setSelected(null)} /> : null}
+        {chosen ? <MapCard salon={chosen} anchor={anchor} onClose={() => setSelected(null)} /> : null}
       </div>
       {/* sul telefono: passa da elenco a mappa, sempre a portata di pollice */}
       {view === "list" ? (

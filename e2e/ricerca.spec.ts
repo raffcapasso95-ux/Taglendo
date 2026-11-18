@@ -361,6 +361,14 @@ test.describe("Barbieri vicino a te: filtri, ordine, mappa (ridisegno del sito)"
     if (!isMobile) {
       const box = (await card.boundingBox())!;
       expect(box.height).toBeLessThan(330);
+      // e sta agganciata all'etichetta sulla mappa: sopra di lei e centrata (o appena spostata per restare dentro la mappa)
+      await page.waitForTimeout(500); // finita la mappa che si sposta
+      const pinBox = (await pin.boundingBox())!;
+      const cardBox = (await card.boundingBox())!;
+      expect(Math.abs(cardBox.x + cardBox.width / 2 - (pinBox.x + pinBox.width / 2))).toBeLessThan(cardBox.width / 2 - 20);
+      const above = cardBox.y + cardBox.height <= pinBox.y + 2;
+      const below = cardBox.y >= pinBox.y + pinBox.height - 2;
+      expect(above || below).toBe(true);
     }
     await card.getByRole("button", { name: "Chiudi la scheda" }).click();
     await expect(card).toBeHidden();
