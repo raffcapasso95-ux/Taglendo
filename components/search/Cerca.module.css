@@ -1072,6 +1072,11 @@
 }
 
 .sel {
+  /* dove sta l'etichetta del salone scelto sulla mappa (le imposta la scheda; su computer la aggancia) */
+  --ax: 0px;
+  --ay: 0px;
+  --ab: 0px;
+
   position: absolute;
   z-index: 500;
   left: var(--space-6);
