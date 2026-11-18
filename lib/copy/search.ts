@@ -191,6 +191,7 @@ export const searchCopy = {
     zoomOut: "Riduci la mappa",
     locate: "Torna alla mia posizione",
     here: "Tu sei qui",
+    searched: "Il luogo cercato",
     zone: "Cerca in questa zona",
     zoneBusy: "Cerco in questa zona…",
     zoneDone: (n: number) => (n === 1 ? "1 barberia in questa zona" : `${n} barberie in questa zona`),

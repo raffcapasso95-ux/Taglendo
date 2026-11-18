@@ -200,6 +200,15 @@ test.describe("Ricerca dei saloni", () => {
     await expect(page).toHaveURL(/\/cerca\?lat=44\.49\d*&lng=11\.34\d*/);
     await expect(page.getByRole("heading", { level: 1, name: "Barbieri vicino a te · Bologna" })).toBeVisible();
     await expect(page.locator('[data-salon="barberia-saragozza"]')).toBeVisible();
+    // sulla mappa il punto «Tu sei qui» si vede (ha una misura vera)
+    const me = page.locator('[title="Tu sei qui"] > span');
+    await expect(me).toBeAttached();
+    const showMap = page.getByRole("button", { name: "Mappa", exact: true });
+    if (await showMap.isVisible()) await showMap.click(); // sul telefono la mappa sta dietro il pulsante «Mappa»
+    const meBox = (await me.boundingBox())!;
+    expect(meBox.width).toBeGreaterThan(10);
+    expect(meBox.height).toBeGreaterThan(10);
+    if (await showMap.isHidden()) await page.getByRole("button", { name: /Elenco$/ }).click(); // di nuovo l'elenco, dove sta il campo Dove
     // il campo Dove lo dice, e «Aggiorna» cerca ancora vicino a te (senza cambiare luogo)
     // sul telefono i campi stanno dietro la riga di riepilogo («Modifica»)
     const edit = page.getByRole("button", { name: /Modifica$/ });
@@ -345,6 +354,17 @@ test.describe("Barbieri vicino a te: filtri, ordine, mappa (ridisegno del sito)"
     await expect(page).toHaveURL(/ordina=primo/);
     await page.reload();
     await expect(page.getByLabel("Ordina")).toHaveValue("first");
+  });
+
+  test("mappa: il luogo cercato ha un segnaposto visibile", async ({ page }) => {
+    await page.goto("/cerca?dove=Bologna");
+    const place = page.locator('[title="Il luogo cercato"] > span');
+    await expect(place).toBeAttached();
+    const showMap = page.getByRole("button", { name: "Mappa", exact: true });
+    if (await showMap.isVisible()) await showMap.click(); // sul telefono la mappa sta dietro il pulsante «Mappa»
+    const box = (await place.boundingBox())!;
+    expect(box.width).toBeGreaterThan(15);
+    expect(box.height).toBeGreaterThan(15);
   });
 
   test("mappa: etichetta con il primo orario, scheda in basso, «Cerca in questa zona» dopo aver spostato la mappa", async ({ page, isMobile }) => {
