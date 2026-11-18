@@ -105,6 +105,24 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
   const [openAt, setOpenAt] = useState<string | null>(null);
   const menuOpen = openAt === pathname;
   const timer = useRef<number | undefined>(undefined);
+  const noticeRef = useRef<HTMLDivElement>(null);
+  // l'agenda su computer sta in una pagina alta quanto lo schermo: toglie lo spazio dell'avviso, così non compare un secondo scorrimento
+  useEffect(() => {
+    const el = noticeRef.current;
+    const root = document.documentElement;
+    if (!el) {
+      root.style.removeProperty("--notice-h");
+      return;
+    }
+    const set = () => root.style.setProperty("--notice-h", `${el.offsetHeight}px`);
+    set();
+    const ro = new ResizeObserver(set);
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty("--notice-h");
+    };
+  }, [notice]);
   const menuRef = useRef<HTMLDivElement>(null);
   const openerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -238,24 +256,28 @@ export function AppShell({ salonName, bookingUrl, userName, userInitials, isOwne
 
       <div className={styles.content}>
         <OfflineSync />
-        {notice?.kind === "suspended" ? (
-          <div className={styles.suspended} role="status">
-            <strong>{adminCopy.suspended.title}</strong>
-            <span>{adminCopy.suspended.text}</span>
-          </div>
-        ) : notice?.kind === "trial_ended" ? (
-          <div className={styles.suspended} role="status">
-            <strong>{provaCopy.ended.title}</strong>
-            <span>
-              {provaCopy.ended.text} <a href={`mailto:${provaCopy.email}`}>{provaCopy.email}</a>
-            </span>
-          </div>
-        ) : notice?.kind === "trial_ending" ? (
-          <div className={styles.noticeSoon} role="status">
-            <strong>{provaCopy.ending.title(notice.days)}</strong>
-            <span>
-              {provaCopy.ending.text(notice.endsOn)} <a href={`mailto:${provaCopy.email}`}>{provaCopy.email}</a>
-            </span>
+        {notice ? (
+          <div ref={noticeRef} className={styles.noticeWrap}>
+          {notice?.kind === "suspended" ? (
+            <div className={styles.suspended} role="status">
+              <strong>{adminCopy.suspended.title}</strong>
+              <span>{adminCopy.suspended.text}</span>
+            </div>
+          ) : notice?.kind === "trial_ended" ? (
+            <div className={styles.suspended} role="status">
+              <strong>{provaCopy.ended.title}</strong>
+              <span>
+                {provaCopy.ended.text} <a href={`mailto:${provaCopy.email}`}>{provaCopy.email}</a>
+              </span>
+            </div>
+          ) : notice?.kind === "trial_ending" ? (
+            <div className={styles.noticeSoon} role="status">
+              <strong>{provaCopy.ending.title(notice.days)}</strong>
+              <span>
+                {provaCopy.ending.text(notice.endsOn)} <a href={`mailto:${provaCopy.email}`}>{provaCopy.email}</a>
+              </span>
+            </div>
+          ) : null}
           </div>
         ) : null}
         {children}

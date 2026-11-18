@@ -301,11 +301,15 @@
 }
 
 @media (min-width: 1024px) {
+  .page {
+    min-height: calc(100dvh - var(--notice-h, 0px));
+  }
+
   .main {
     /* testata più bassa: lo spazio serve alla griglia, per vedere la giornata senza scorrere */
     gap: var(--space-3);
     padding: var(--space-5) var(--space-8) var(--space-4) var(--space-8);
-    height: 100dvh;
+    height: calc(100dvh - var(--notice-h, 0px)); /* meno l'avviso in cima, se c'è */
   }
 
   .header {
@@ -383,7 +387,7 @@
     gap: var(--space-4);
     width: var(--side-panel-width);
     flex: none;
-    height: 100dvh;
+    height: calc(100dvh - var(--notice-h, 0px));
     overflow-y: auto;
     padding: var(--space-6) var(--space-4);
     border-left: 1px solid var(--border-subtle);

@@ -507,6 +507,10 @@
   font-size: 14px;
 }
 
+.noticeWrap {
+  display: flow-root; /* comprende i margini degli avvisi, per misurarne l'altezza intera */
+}
+
 .noticeSoon {
   display: flex;
   flex-direction: column;
