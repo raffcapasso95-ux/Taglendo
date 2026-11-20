@@ -191,6 +191,15 @@ test.describe("Ricerca dei saloni", () => {
     expect(style.top).toBeGreaterThanOrEqual(68); // sotto la testata fissa
   });
 
+  test("scheda del salone: «3 barbieri» è accanto allo stato, non un'etichetta sulla foto", async ({ page }) => {
+    await page.goto("/cerca?dove=Bologna");
+    const card = page.locator('[data-salon="barberia-saragozza"]');
+    await expect(card.getByText("3 barbieri")).toBeVisible();
+    // sta nella riga dello stato (aperto/chiuso), non sulla foto
+    await expect(card.locator("p", { hasText: "3 barbieri" })).toContainText(/Aperto|Chiuso/);
+    await expect(card.locator('[aria-hidden="true"]').filter({ hasText: "barbieri" })).toHaveCount(0);
+  });
+
   test("niente elenco di città in arrivo, niente «Vicino a me» tra le città, niente «altre città» nei risultati, niente messaggi WhatsApp pronti", async ({ page }) => {
     await page.goto("/");
     await expect(page.locator("#citta")).toBeAttached();

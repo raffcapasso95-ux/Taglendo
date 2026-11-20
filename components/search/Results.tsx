@@ -97,7 +97,7 @@ function SalonCard({ salon: s, active, onActive, onMap }: { salon: SalonView; ac
     <article className={cx(styles.card, active && styles.cardOn)} data-salon={s.slug} onMouseEnter={() => onActive(s.slug)} onMouseLeave={() => onActive(null)} aria-labelledby={`sal-${s.slug}`}>
       <span className={styles.photo} aria-hidden="true">
         <Photo salon={s} />
-        {s.isNew ? <span className={styles.badge}>{copy.card.newBadge}</span> : s.barbers >= 2 ? <span className={styles.badge}>{copy.card.barbers(s.barbers)}</span> : null}
+        {s.isNew ? <span className={styles.badge}>{copy.card.newBadge}</span> : null}
       </span>
       <div className={styles.body}>
         <div className={styles.head}>
@@ -110,6 +110,15 @@ function SalonCard({ salon: s, active, onActive, onMap }: { salon: SalonView; ac
         </div>
         <p className={styles.status}>
           <Status s={s} />
+          {s.barbers >= 2 ? (
+            <>
+              <span className={styles.statusSep} aria-hidden="true">
+                {" "}
+                ·{" "}
+              </span>
+              <span className={styles.chairs}>{copy.card.barbers(s.barbers)}</span>
+            </>
+          ) : null}
         </p>
         {s.services.length > 0 ? (
           <ul className={styles.services} aria-label={copy.card.services}>

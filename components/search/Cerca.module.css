@@ -636,6 +636,11 @@
   color: var(--text-secondary);
 }
 
+/* quanti barbieri: testo discreto accanto allo stato, non un'etichetta sulla foto */
+.chairs {
+  white-space: nowrap;
+}
+
 .state {
   display: inline-flex;
   align-items: center;
