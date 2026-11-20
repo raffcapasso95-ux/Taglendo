@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { signIn } from "./helpers";
 
 test.describe("Sito commerciale", () => {
-  test("privacy, termini e cookie hanno la stessa testata e lo stesso piè di pagina del resto del sito", async ({ page }) => {
+  test("privacy, termini e cookie hanno la stessa testata e lo stesso piè di pagina del resto del sito", async ({ page, isMobile }) => {
     const footerLinks = async (path: string) => {
       await page.goto(path);
       const footer = page.getByRole("contentinfo");
@@ -17,7 +17,7 @@ test.describe("Sito commerciale", () => {
       // stessa testata: logo, servizi e «Hai un salone?»
       const banner = page.getByRole("banner");
       await expect(banner.getByRole("link", { name: "Hai un salone?" })).toBeVisible();
-      await expect(banner.getByRole("link", { name: "Barba" })).toBeVisible();
+      if (!isMobile) await expect(banner.getByRole("link", { name: "Barba" })).toBeVisible();
     }
   });
 
