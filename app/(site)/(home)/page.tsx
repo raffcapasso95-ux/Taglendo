@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
-import { NearMeButton } from "@/components/search/NearMeButton";
 import { SearchBox } from "@/components/search/SearchBox";
 import { cx } from "@/components/ui/cx";
 import styles from "@/components/search/Home.module.css";
@@ -22,8 +21,6 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: searchCopy.meta.homeTitle, description: searchCopy.meta.homeDescription, images: ["/og.png"] },
 };
 
-/** Le città più grandi: sempre in elenco («Presto anche a»), anche prima che ci siano saloni. */
-const BIG_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze", "Bari", "Catania", "Venezia", "Verona", "Padova", "Salerno"] as const;
 /** I riquadri delle città, nell'ordine dei colori del design. */
 const CITY_TONES = ["Plum", "Peach", "White", "Cream"] as const;
 
@@ -109,12 +106,10 @@ async function HeroSearch() {
 
 const cityNote = (c: CityStat) => (c.freeToday > 0 ? copy.cityToday(c.freeToday) : c.freeTomorrow > 0 ? copy.cityTomorrow : null);
 
-/** Le città con barberie (quattro riquadri) e, sotto, quelle dove Taglendo arriva presto. */
+/** Le città con barberie (quattro riquadri). Niente elenco di città «in arrivo»: chi cerca un barbiere vede solo dove ce ne sono. */
 async function Cities() {
   const stats = await cityStats(12);
   const shown = stats.slice(0, 4);
-  const have = new Set(stats.map((c) => c.city.toLowerCase()));
-  const soon = BIG_CITIES.filter((c) => !have.has(c.toLowerCase()));
   return (
     <>
       {shown.length > 0 ? (
@@ -141,20 +136,10 @@ async function Cities() {
         </ul>
       ) : null}
       <div className={styles.soonHead}>
-        <p className={styles.soonLabel}>{copy.soon}</p>
         <Link href="/per-i-saloni" className={styles.soonLink}>
           {copy.missing}
         </Link>
       </div>
-      <ul className={styles.soon}>
-        {soon.map((city) => (
-          <li key={city}>
-            <Link href={`/barbieri/${citySlug(city)}`} className={styles.soonCity} aria-label={copy.cityLink(city)}>
-              {city}
-            </Link>
-          </li>
-        ))}
-      </ul>
     </>
   );
 }
@@ -263,7 +248,6 @@ export default function Page() {
               </h2>
               <p className={styles.sub}>{copy.citiesLead}</p>
             </div>
-            <NearMeButton className={styles.nearMe} />
           </div>
           <Suspense fallback={null}>
             <Cities />
