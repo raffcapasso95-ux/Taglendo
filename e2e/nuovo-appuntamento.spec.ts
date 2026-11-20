@@ -79,7 +79,8 @@ test.describe("Nuovo appuntamento", () => {
     await expect(d.getByRole("button", { name: "Apri il calendario" })).toHaveAttribute("aria-expanded", "true");
     await expect(d.getByRole("button", { name: /domenica .*, chiuso/i }).first()).toBeDisabled();
     await d.getByRole("button", { name: "Mese successivo" }).click();
-    await d.getByRole("button", { name: /^Mercoledì \d+ .* 20\d\d$/ }).first().click();
+    // l'ultimo mercoledì del mese dopo è sempre fuori dalla striscia dei giorni, qualunque sia la data di oggi
+    await d.getByRole("button", { name: /^Mercoledì \d+ .* 20\d\d$/ }).last().click();
     // scelto il giorno tornano gli orari, e il pulsante del calendario resta acceso con la data
     await expect(d.getByRole("group", { name: "Mattina" })).toBeVisible();
     await expect(d.getByRole("button", { name: "Apri il calendario" })).toContainText(/\d+ [a-z]{3}/);
