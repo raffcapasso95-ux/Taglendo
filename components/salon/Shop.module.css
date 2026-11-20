@@ -1593,6 +1593,7 @@
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--space-4); /* senza, il primo giorno si aggancia al bordo della scheda e perde il margine */
   scrollbar-width: none;
   overscroll-behavior-x: contain;
 }

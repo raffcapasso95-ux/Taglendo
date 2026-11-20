@@ -23,7 +23,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: baseline; /* titolo e link sulla stessa riga di testo (il link ha un'area di tocco alta 44 px) */
   gap: var(--space-4);
   margin-bottom: 28px;
 }

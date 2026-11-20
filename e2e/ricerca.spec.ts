@@ -205,6 +205,27 @@ test.describe("Ricerca dei saloni", () => {
     await expect(page.getByText("Messaggi WhatsApp pronti")).toHaveCount(0);
   });
 
+  test("home: «Cosa ti facciamo oggi?» e «Tutti i servizi» stanno sulla stessa riga di testo", async ({ page }) => {
+    await page.goto("/");
+    const title = page.getByRole("heading", { name: "Cosa ti facciamo oggi?" });
+    const link = page.getByRole("link", { name: "Tutti i servizi" });
+    await title.scrollIntoViewIfNeeded();
+    const bottoms = await page.evaluate(() => {
+      const textBottom = (el: Element) => {
+        const r = document.createRange();
+        r.selectNodeContents(el);
+        return r.getBoundingClientRect().bottom;
+      };
+      const h = [...document.querySelectorAll("h2")].find((e) => e.textContent?.includes("Cosa ti facciamo oggi"))!;
+      const a = [...document.querySelectorAll("a")].find((e) => e.textContent?.trim() === "Tutti i servizi")!;
+      return [textBottom(h), textBottom(a)];
+    });
+    await expect(title).toBeVisible();
+    await expect(link).toBeVisible();
+    // il testo del link non sta più in alto del titolo: stesso piano, con la differenza dei corpi (il titolo è più grande)
+    expect(Math.abs(bottoms[0]! - bottoms[1]!)).toBeLessThan(10);
+  });
+
   test("«Vicino a me» usa la posizione del telefono", async ({ browser }) => {
     const ctx = await browser.newContext({ geolocation: { latitude: 44.4949, longitude: 11.3426 }, permissions: ["geolocation"] });
     const page = await ctx.newPage();
