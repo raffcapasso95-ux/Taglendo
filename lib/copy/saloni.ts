@@ -126,7 +126,6 @@ export const saloniCopy = {
           { b: "Appuntamenti a mano", n: "per chi chiama o passa in negozio" },
           { b: "“In negozio ora”", n: "per chi entra senza prenotare" },
           { b: "Sposta un appuntamento", n: "il cliente riceve un’email" },
-          { b: "Messaggi WhatsApp pronti", n: "li invii tu, con un tocco" },
         ],
       },
       pagina: {
@@ -204,7 +203,7 @@ export const saloniCopy = {
       lead: "Meglio dirlo subito. Sono scelte, non dimenticanze.",
       items: [
         { b: "Pagamenti online", t: "Il cliente paga in salone, come ha sempre fatto. Niente carte da salvare, niente commissioni." },
-        { b: "SMS", t: "I promemoria partono via email. Su WhatsApp il messaggio è già pronto: lo mandi tu con un tocco." },
+        { b: "SMS", t: "I promemoria partono via email." },
         { b: "Un’app da scaricare", t: "Si usa dal browser, sul telefono e sul computer. Se vuoi, la aggiungi alla schermata Home." },
         { b: "Catene e grandi saloni", t: "È pensato per barberie da una a tre poltrone. Per questo resta semplice." },
       ],

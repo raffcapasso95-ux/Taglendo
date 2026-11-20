@@ -18,7 +18,7 @@ export const landCopy = {
   },
   tape: {
     label: "Cosa c’è dentro",
-    items: ["Agenda per poltrona", "Link di prenotazione", "Conferma via email", "Rubrica clienti", "Messaggi WhatsApp pronti", "Telefono e computer", "Zero commissioni"],
+    items: ["Agenda per poltrona", "Link di prenotazione", "Conferma via email", "Rubrica clienti", "Telefono e computer", "Zero commissioni"],
   },
   how: {
     eyebrow: "Come funziona",
@@ -75,7 +75,6 @@ export const landCopy = {
       { n: "Pagina del salone", s: "online o solo al telefono", p: "inclusa" },
       { n: "Conferma via email", s: "il cliente conferma con un codice", p: "inclusa" },
       { n: "Rubrica clienti", s: "storico visite e note sul taglio", p: "inclusa" },
-      { n: "Messaggi WhatsApp pronti", s: "li controlli e li invii tu", p: "inclusi" },
       { n: "Telefono e computer", s: "la stessa agenda, sempre aggiornata", p: "inclusi" },
       { n: "Commissioni sulle prenotazioni", s: "", p: "0 €" },
       { n: "Carta di credito", s: "", p: "non serve" },

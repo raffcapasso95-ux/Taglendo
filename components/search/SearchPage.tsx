@@ -102,7 +102,6 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
   const tags = activeTags(filters);
   const count = ok?.hits.length ?? 0;
   const searchBox = <SearchBox initial={ok?.near ? (place ? `${copy.results.nearYou} · ${place}` : copy.results.nearYou) : ok ? place : typed} near={ok?.near ? { lat: ok.center.lat, lng: ok.center.lng } : undefined} service={filters.service ?? ""} date={filters.date} services={services} compact submitLabel={copy.results.update} />;
-  const others = cities.filter((c) => c.city !== place);
   // il riepilogo dice solo ciò che è stato scelto («Barba · Bologna · Domani»); senza scelte, il luogo
   const where = ok?.anywhere ? copy.results.anyWhere : ok?.near ? copy.results.nearYou : place || copy.results.anyWhere;
   const summaryParts = [filters.service, where, filters.date ? dayPhrase(filters.date, today) : null].filter((p): p is string => Boolean(p));
@@ -169,16 +168,6 @@ export function SearchPage({ result, cities, services, typed, filters }: { resul
           near={ok.near}
           filters={filters}
           mapBar={summaryParts}
-          footer={
-            others.length > 0 ? (
-              <section aria-labelledby="altre-citta" className={styles.otherCities}>
-                <h2 id="altre-citta" className={styles.otherTitle}>
-                  {copy.results.otherCities}
-                </h2>
-                <CityLinks cities={others} />
-              </section>
-            ) : null
-          }
           summary={
             <>
               <p className={styles.summaryText}>

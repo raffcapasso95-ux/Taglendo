@@ -37,8 +37,8 @@ test.describe("Ricerca dei saloni", () => {
     // le città con saloni in fondo alla home
     await page.goto("/");
     await expect(page.getByRole("link", { name: /^Bologna\s*\d+ barberi[ae]/ })).toHaveAttribute("href", "/barbieri/bologna");
-    // le grandi città ci sono sempre, anche senza saloni
-    await expect(page.getByRole("link", { name: "Barbieri a Roma" })).toHaveAttribute("href", "/barbieri/roma");
+    // le città senza saloni non compaiono (niente elenco «presto anche a»)
+    await expect(page.getByRole("link", { name: "Barbieri a Roma" })).toHaveCount(0);
     // i saloni arrivati da poco, con la foto
     await expect(page.getByRole("heading", { name: "Appena arrivate su Taglendo" })).toBeVisible();
     await expect(page.getByRole("link", { name: /Barberia Saragozza/ }).first()).toHaveAttribute("href", "/barberia-saragozza");
@@ -189,6 +189,41 @@ test.describe("Ricerca dei saloni", () => {
     const style = await pane.evaluate((el) => ({ position: getComputedStyle(el).position, top: parseFloat(getComputedStyle(el).top) }));
     expect(style.position).toBe("sticky");
     expect(style.top).toBeGreaterThanOrEqual(68); // sotto la testata fissa
+  });
+
+  test("niente elenco di città in arrivo, niente «Vicino a me» tra le città, niente «altre città» nei risultati, niente messaggi WhatsApp pronti", async ({ page }) => {
+    await page.goto("/");
+    await expect(page.locator("#citta")).toBeAttached();
+    await expect(page.getByText("Presto anche a")).toHaveCount(0);
+    await expect(page.locator("#citta").getByRole("button", { name: /Vicino a me/ })).toHaveCount(0);
+    await page.goto("/cerca?dove=Bologna");
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByText("Barbieri in altre città")).toHaveCount(0);
+    await page.goto("/per-i-saloni/funzioni");
+    await expect(page.getByText("Messaggi WhatsApp pronti")).toHaveCount(0);
+    await page.goto("/per-i-saloni");
+    await expect(page.getByText("Messaggi WhatsApp pronti")).toHaveCount(0);
+  });
+
+  test("home: «Cosa ti facciamo oggi?» e «Tutti i servizi» stanno sulla stessa riga di testo", async ({ page }) => {
+    await page.goto("/");
+    const title = page.getByRole("heading", { name: "Cosa ti facciamo oggi?" });
+    const link = page.getByRole("link", { name: "Tutti i servizi" });
+    await title.scrollIntoViewIfNeeded();
+    const bottoms = await page.evaluate(() => {
+      const textBottom = (el: Element) => {
+        const r = document.createRange();
+        r.selectNodeContents(el);
+        return r.getBoundingClientRect().bottom;
+      };
+      const h = [...document.querySelectorAll("h2")].find((e) => e.textContent?.includes("Cosa ti facciamo oggi"))!;
+      const a = [...document.querySelectorAll("a")].find((e) => e.textContent?.trim() === "Tutti i servizi")!;
+      return [textBottom(h), textBottom(a)];
+    });
+    await expect(title).toBeVisible();
+    await expect(link).toBeVisible();
+    // il testo del link non sta più in alto del titolo: stesso piano, con la differenza dei corpi (il titolo è più grande)
+    expect(Math.abs(bottoms[0]! - bottoms[1]!)).toBeLessThan(10);
   });
 
   test("«Vicino a me» usa la posizione del telefono", async ({ browser }) => {

@@ -98,6 +98,24 @@ test.describe("Accessibilità: finestre, tastiera, movimento", () => {
 });
 
 test.describe("Accessibilità: percorsi nuovi del ridisegno", () => {
+  test("prenotazione sul telefono: la striscia dei giorni ha il margine ai lati (il primo giorno non tocca il bordo della scheda)", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "la striscia a scorrimento è solo sul telefono");
+    await page.goto("/barberia-saragozza");
+    const banner = page.getByRole("dialog", { name: "Cookie" });
+    await banner.waitFor({ timeout: 5000 }).catch(() => {});
+    if (await banner.isVisible()) await banner.getByRole("button", { name: "Rifiuta" }).click();
+    const card = page.locator("#prenota-card");
+    await card.getByRole("button", { name: /^Barba/ }).click();
+    await card.getByRole("button", { name: /^Chi è libero prima/ }).click();
+    await expect(card.getByRole("button", { name: /Prima disponibilità/ })).toBeVisible();
+    await page.waitForTimeout(800); // l'aggancio della striscia si assesta
+    const title = (await card.getByRole("heading", { name: "Quando vieni?" }).boundingBox())!;
+    const first = (await card.getByRole("group", { name: "Giorno" }).getByRole("button").first().boundingBox())!;
+    const box = (await card.boundingBox())!;
+    expect(first.x, "il primo giorno è allineato al testo, non al bordo della scheda").toBeGreaterThanOrEqual(title.x - 2);
+    expect(first.x - box.x, "margine fra bordo della scheda e primo giorno").toBeGreaterThanOrEqual(10);
+  });
+
   test("axe sui passi della prenotazione pubblica", async ({ page }) => {
     await page.goto("/barberia-saragozza");
     const banner = page.getByRole("dialog", { name: "Cookie" });
