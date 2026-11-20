@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
-import { company } from "@/lib/site";
+import { company, isPlaceholder } from "@/lib/site";
 import styles from "./Marketing.module.css";
+
+/** Un dato dell'azienda: se è ancora un segnaposto si vede evidenziato. */
+export function Field({ value }: { value: string }) {
+  return isPlaceholder(value) ? <mark className={styles.placeholder}>{value}</mark> : <>{value}</>;
+}
 
 type LegalSection = { id: string; title: string; body: ReactNode };
 

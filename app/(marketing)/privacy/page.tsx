@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Field } from "@/components/marketing/SiteFooter";
-import { LegalPage, List, P } from "@/components/marketing/LegalPage";
+import { Field, LegalPage, List, P } from "@/components/marketing/LegalPage";
 import { company } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Informativa privacy · Taglendo", description: "Quali dati trattiamo, perché, per quanto tempo e come esercitare i tuoi diritti.", alternates: { canonical: "/privacy" } };

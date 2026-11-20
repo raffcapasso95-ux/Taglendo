@@ -2,6 +2,25 @@ import { expect, test } from "@playwright/test";
 import { signIn } from "./helpers";
 
 test.describe("Sito commerciale", () => {
+  test("privacy, termini e cookie hanno la stessa testata e lo stesso piè di pagina del resto del sito", async ({ page }) => {
+    const footerLinks = async (path: string) => {
+      await page.goto(path);
+      const footer = page.getByRole("contentinfo");
+      await expect(footer).toBeVisible();
+      return footer.getByRole("link").allInnerTexts();
+    };
+    const home = await footerLinks("/");
+    expect(home).toContain("Cerca un barbiere");
+    for (const path of ["/privacy", "/termini", "/cookie"]) {
+      expect(await footerLinks(path), `piè di pagina di ${path}`).toEqual(home);
+      await expect(page.getByRole("button", { name: "Preferenze cookie" })).toBeVisible();
+      // stessa testata: logo, servizi e «Hai un salone?»
+      const banner = page.getByRole("banner");
+      await expect(banner.getByRole("link", { name: "Hai un salone?" })).toBeVisible();
+      await expect(banner.getByRole("link", { name: "Barba" })).toBeVisible();
+    }
+  });
+
   test("la pagina iniziale mostra il prodotto e porta a registrazione e accesso", async ({ page, isMobile }) => {
     await page.goto("/per-i-saloni");
     await expect(page).toHaveTitle(/Taglendo — Prenotazioni online e agenda per barbieri/);

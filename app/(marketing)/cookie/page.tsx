@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Field } from "@/components/marketing/SiteFooter";
-import { LegalPage, P } from "@/components/marketing/LegalPage";
+import { Field, LegalPage, P } from "@/components/marketing/LegalPage";
 import styles from "@/components/marketing/Marketing.module.css";
 
 export const metadata: Metadata = { title: "Cookie · Taglendo", description: "Quali cookie usiamo e come cambiare scelta.", alternates: { canonical: "/cookie" } };

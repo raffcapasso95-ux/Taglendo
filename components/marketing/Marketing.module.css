@@ -611,7 +611,9 @@
   gap: 40px 64px;
   max-width: var(--site-max);
   margin: 0 auto;
-  padding: clamp(32px, 5vw, 64px) 20px clamp(64px, 8vw, 112px);
+
+  /* la testata del sito è fissa: il testo parte sotto di lei */
+  padding: calc(var(--site-top) + clamp(32px, 5vw, 64px)) 20px clamp(64px, 8vw, 112px);
 }
 
 .toc {

@@ -1,20 +1,14 @@
-import { Suspense } from "react";
-import { AuthLinks, GuestLinks } from "@/components/marketing/AuthLinks";
-import { SiteFooter } from "@/components/marketing/SiteFooter";
-import { SiteHeader } from "@/components/marketing/SiteHeader";
-import styles from "@/components/marketing/Marketing.module.css";
+import type { Viewport } from "next";
+import { LandShell } from "@/components/marketing/LandShell";
 
-/** Cornice delle pagine del sito: barra in alto, contenuto, piè di pagina con i link legali e le preferenze cookie. */
+/** La barra del browser ha lo stesso prugna della testata. */
+export const viewport: Viewport = { themeColor: "#3E2532", viewportFit: "cover" };
+
+/** Le pagine legali (privacy, termini, cookie): stessa testata e stesso piè di pagina del resto del sito. */
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className={styles.page}>
-      <SiteHeader>
-        <Suspense fallback={<GuestLinks />}>
-          <AuthLinks />
-        </Suspense>
-      </SiteHeader>
-      <main>{children}</main>
-      <SiteFooter />
-    </div>
+    <LandShell audience="clienti" solid>
+      {children}
+    </LandShell>
   );
 }
